@@ -60,6 +60,8 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 
 Стилизация: Tailwind CSS v4 + цвета из Material Design 3 (Material You Tokens).
 
+Компоненты: shadcn (на основе radix UI), копированные в кастомный UI, со стилизацией из токенов.
+
 Иконки: `lucide-react` (использование `@mui/icons-material` запрещено).
 
 ### Ключевые токены цвета (Material Design 3 Seed: `#0B6E4F`):
