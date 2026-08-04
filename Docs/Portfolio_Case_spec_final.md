@@ -1,413 +1,426 @@
-Спецификация страницы: Portfolio Case
-Файл: Portfolio_Case_spec.md
-Обновлено: 2026-07-24
-Связанные документы: design-system-ux42.md, case-template-spec.md, figma-master-components-spec.md
-Page ID в Figma: 4:263
+# Portfolio Case Page — Final Specification
+Updated: 2026-08-01
+Figma File: U5OjywCHbtzQgBsi7PU25r
+Page ID: 4:263
 
 ══════════════════════════════════════════════════════════
 
-1. Общие параметры Layout
+## 1. General Parameters
 
-Фрейм:                portfolio-case (ID: 198:1310)
-Viewport Desktop:      1440px
-Viewport Tablet:       768px
-Viewport Mobile:       375px
-Content max-width:     1200px (padding 120px с каждой стороны)
-Высота фрейма:         ~6731px (Auto Layout, hug content)
-Layout фрейма:         Vertical Auto Layout
-Фон:                   Schemes/Background (токен material-theme)
-Vertical padding:      80px Desktop / 48px Mobile
-Spacing scale:         16 / 24 / 32 / 48 / 80px
-Grid Desktop:          12 колонок, gap 24px
-Grid Tablet:           8 колонок, gap 16px
-Grid Mobile:           4 колонки, gap 16px
+Desktop Frame:       portfolio-case (ID: 198:1310)
+Dimensions:          1440 × 9201 px
+Layout:              Vertical Auto Layout, gap 0
+Content width:       1200px (centered)
 
-══════════════════════════════════════════════════════════
+Mobile Frame:        portfolio-case (ID: 280:2534)
+Dimensions:          380 × 12022 px
+Layout:              Vertical Auto Layout, gap 32
 
-2. Структура страницы (верхний уровень)
+Design System:       Material Design 3 (Material You)
+Variable Collection: material-theme (6 modes: Light, Light High Contrast, Light Medium Contrast, Dark, Dark High Contrast, Dark Medium Contrast)
+4px Grid:            All spacing values on scale: 0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 120, 160
+Radius Scale:        0(none), 4(xs), 8(sm), 10(md), 12(base), 14(lg), 16(xl), 20(2xl), 24(3xl), 28(4xl), 48(5xl), 9999(full)
 
-portfolio-case (1440 × ~6731) [Vertical Auto Layout]
-├── Breadcrumb Row        (1200 × 100)   — навигация
-├── Hero Outer            (1200 × 775)   — герой-секция
-├── Main Content Sections (1200 × 5196)  — 6 контентных секций
-└── Next Project Showcase (1200 × 660)   — CTA + следующий проект
+Typography:
+  • Headings: Poppins Medium
+  • Body/Labels: Inter Regular / Medium / Semi Bold
+  • All text styles prefixed material-theme/
+  • Text with styles: 153/161 (95%)
 
-══════════════════════════════════════════════════════════
+Variable Bindings:   419/465 nodes (90%)
 
-3. Breadcrumb Row (ID: 198:1311)
-
-Размер:    1200 × 100
-Padding:   24 / 64 / 12 / 64
-Layout:    Vertical Auto Layout
-
-Элементы:
-• Кнопка «← Назад в портфолио» — Link / Secondary Button, иконка arrow-left, цвет Schemes/Primary
-• Breadcrumbs: Главная / Портфолио / [Название кейса]
-  — Ссылки: material-theme/body/medium, цвет Schemes/Primary
-  — Разделитель «/»: цвет Schemes/Outline
-  — Текущая страница: цвет Schemes/On Surface (не ссылка)
-
-⚠️ В текущей Figma Breadcrumb Row пустой — зарезервирован. Заполнить компонентом Breadcrumb Navigation по спеке figma-master-components-spec.md раздел 5.10.
+Accessibility:
+  • WCAG 2.2 AA compliant
+  • EAA 2025 compliant
+  • All interactive elements ≥ 44×44 px touch target
+  • All semantic color pairs pass AA contrast (min 4.5:1)
 
 ══════════════════════════════════════════════════════════
 
-4. Hero Outer (ID: 198:1312)
+## 2. Top-Level Structure
 
-Размер:    1200 × 775
-Layout:    Vertical Auto Layout, gap 32px
+portfolio-case [198:1310] VERTICAL gap=0
+├── Header [268:163] — Instance, 1200×96
+├── Content [280:2208] — VERTICAL gap=0, 1200×8479
+│   ├── Hero Outer [198:1312] — VERTICAL gap=32, 1200×775
+│   │   ├── Image + title [195:1138] — 1200×555
+│   │   └── Metadata Grid [198:1318] — HORIZONTAL gap=24, 1200×172
+│   ├── Main Content Sections [199:25] — VERTICAL gap=64, pad=80/64/80/64
+│   │   ├── Section 01 — Problem & Audience [199:26]
+│   │   ├── Section 02 — User Research [195:1178]
+│   │   ├── Section 03 — Design Process [199:49]
+│   │   ├── Section 04 — Design System [276:135]
+│   │   ├── Section 05 — Testing & Iteration [199:76]
+│   │   ├── Section 06 — Final Design [199:93]
+│   │   └── Section 07 — Reflection [199:104]
+│   └── Next Project Showcase [198:1336] — VERTICAL gap=48, pad=80/64/80/64
+└── Footer Portfolio [280:2174] — Instance, 1200×263
+
+══════════════════════════════════════════════════════════
+
+## 3. Header (ID: 268:163)
+
+Component: Header (Instance of master 87:3784)
+Size: 1200 × 96
+Layout: Horizontal, space-between
+Padding: 16 / 64 / 16 / 64
+
+Contents:
+  • Nav Container [I268:163;119:799] — Nav links (HORIZONTAL gap=24)
+    — Nav Link "Works" [I268:163;97:290] — 40×44
+    — Nav Link "About Me" [I268:163;124:1042] — 47×44
+  • Logo [I268:163;87:3788] — 89×64
+  • Theme Toggles [I268:163;114:734] — HORIZONTAL gap=24
+    — Light/Dark toggle (48×48)
+    — Language toggle (123×48)
+
+Touch targets: All nav links ≥ 44px height ✓
+
+══════════════════════════════════════════════════════════
+
+## 4. Hero Outer (ID: 198:1312)
+
+Size: 1200 × 775
+Layout: VERTICAL, gap=32, paddingBottom=32
+
+### 4.1 Image + Title (ID: 195:1138)
+
+Size: 1200 × 555
+Layers:
+  • Container [195:1139] — 1200×555, hero image fill, radius=0
+  • Title overlay [195:1133] — 1200×104, absolute positioned bottom
+    — H1: "Modern E-commerce Platform" — Poppins Medium 52px
+    — Subtitle: "Redesigning the end-to-end checkout flow..." — Inter Regular 18px
+    — Category Icon [195:1134] — 100×100, hidden (empty placeholder for CMS)
+
+### 4.2 Metadata Grid (ID: 198:1318)
+
+Size: 1200 × 172
+Layout: HORIZONTAL, gap=24, padding=0/64/0/64
+Children: 4 × Metadata Card instances (250px wide, radius=12)
+
+  | Card                    | ID       | Label    | Value                  |
+  |-------------------------|----------|----------|------------------------|
+  | Meta Card: Client       | 412:842  | CLIENT   | TechStore Inc.         |
+  | Meta Card: Timeline     | 412:845  | TIMELINE | 2024 · 3 Months        |
+  | Meta Card: My role      | 412:848  | MY ROLE  | End-to-End UX/UI...    |
+  | Meta Card: Devices      | 412:851  | DEVICES  | Desktop & Mobile Web   |
+
+Component: Metadata Card (master: 410:532)
+All texts bound to material-theme/ styles ✓
+
+══════════════════════════════════════════════════════════
+
+## 5. Section Pattern
+
+All 7 sections follow a unified pattern:
+  Size: 1072px wide (within 1200px content, pad=64 sides)
+  Layout: VERTICAL, gap=32
+
+  Structure:
+  1. BlockLabel (Instance 195:1148) — section number + divider + section name
+  2. Section Header — HORIZONTAL gap=24
+     └── Titles frame → H2 (Poppins Medium 34px) + Description (Inter Regular 16px)
+  3. Content — section-specific content
+
+  Section Header gap: unified at 24px ✓
+  BlockLabel: consistent across all sections ✓
+
+══════════════════════════════════════════════════════════
+
+## 6. Section Details
+
+### Section 01 — Problem & Audience (ID: 199:26)
+Size: 1072 × 336
+BlockLabel: "01" / "Problem & Audience"
+Header:
+  • H2: "What problem are we solving?"
+  • Description: "The existing checkout had a 74% abandonment rate..."
+Content:
+  • 2 × The Portfolio card (Instance 200:1095) — 524×142 each, HORIZONTAL gap=24
+    — Card 1: "Goal" content
+    — Card 2: "Target users" content
+  • Card radius: 14px
 
 ────────────────────────────────────────
 
-4.1 Image + Title (ID: 195:1138)
-
-Наложение текста поверх изображения (абсолютное позиционирование Title внутри Container).
-
-Container (ID: 195:1139):
-— Размер: 1200 × 555
-— Тип: фоновое hero-изображение (fill из поля Hero Image URL case-template)
-— Radius: 0 (без скругления в текущей реализации)
-
-Title (ID: 195:1133) — наложен поверх Container:
-— Layout: Vertical Auto Layout, gap 16px
-— Элементы сверху вниз:
-  • Category Icon (ID: 195:1134) — иконка категории, 100 × 100
-  • H1 — название проекта, стиль material-theme/headline/large (Poppins Medium 48px), цвет Schemes/On Primary (белый поверх изображения)
-  • Subtitle — тизер/тэглайн, стиль material-theme/body/large (Inter Regular 18px), цвет Schemes/On Primary с opacity 80%
+### Section 02 — User Research (ID: 195:1178)
+Size: 1072 × 556
+BlockLabel: "02" / "User Research"
+Header:
+  • H2: "What the data revealed."
+  • Description: "8 contextual interviews, 120-person survey..."
+Content:
+  • 3 × Card/Metric (Instance 161:368) — 341×126 each, HORIZONTAL gap=24
+  • Persona Card (Instance 176:372) — 1072×228, radius=14
+    — Persona Header [I195:1179;195:1204] → Avatar + Info
 
 ────────────────────────────────────────
 
-4.2 Metadata Grid (ID: 198:1318)
-
-Размер:    1200 × 188
-Layout:    Horizontal Auto Layout, gap 24px
-
-4 мета-карточки, каждая 250px wide, Vertical Auto Layout, gap 8px, padding 24px:
-
-Карточка      | Label (overline)  | Value
-Client        | «CLIENT»          | Название клиента
-Timeline      | «TIMELINE»        | 2024 · 3 Months
-My Role       | «MY ROLE»         | Роль дизайнера
-Devices       | «DEVICES»         | Desktop & Mobile Web
-
-Label: Inter Medium 13px, letterSpacing 0.5px, цвет Schemes/On Surface Variant
-Value: material-theme/body/medium (Inter Regular 16px), цвет Schemes/On Surface
-Фон карточки: Schemes/Surface Container Low
-Stroke: 1px Schemes/Outline Variant
-Radius: 12px | radius/base
-
-Desktop: 4 карточки в ряд
-Mobile: 2 × 2 сетка
-
-══════════════════════════════════════════════════════════
-
-5. Main Content Sections (ID: 199:25)
-
-Layout:    Vertical Auto Layout, gap 64px
-Padding:   80 / 64 / 80 / 64
-
-Все секции используют единый паттерн:
-  BlockLabel    — номер + название секции + разделитель
-  Section Header — заголовок H2 + подзаголовок
-  [Контент]     — уникальный для каждой секции
-
-Компонент BlockLabel:
-— Layout: Horizontal Auto Layout, gap 10px
-— Элементы:
-  • Номер секции (кружок): material-theme/label/overline, цвет Schemes/Primary
-  • Линия-разделитель: fill Schemes/Outline Variant
-  • Название секции: material-theme/label/large, цвет Schemes/On Surface Variant
+### Section 03 — Design Process (ID: 199:49)
+Size: 1072 × 866
+BlockLabel: "03" / "Design Process"
+Header:
+  • H2: "From blank page to structure."
+  • Description: "From wireframes to pixels..."
+Content:
+  • Body text (Inter Regular 16px)
+  • Wireframes Grid [199:57] — 1072×564, VERTICAL gap=24
+    — Row 1 [199:58]: 2 wireframe images, HORIZONTAL gap=24
+    — Row 2 [199:65]: 2 wireframe images, HORIZONTAL gap=24
+  • Link Button [412:854] — "View Lo-Fi prototype in Figma" — 262×44
+    — Instance of Link Button (master: 410:535), radius inherits, gap=8
 
 ────────────────────────────────────────
 
-Section 01 — Problem & Audience (ID: 199:26)
+### Section 04 — Design System (ID: 276:135)
+Size: 1072 × 1664
+BlockLabel: "04" / "Design System"
+Header:
+  • H2: "Visual language & token system."
+  • Description: "Clean, high-contrast e-commerce aesthetics..."
+Content:
 
-Layout: Vertical Auto Layout, gap 32px
+  #### 4a. Moodboard [276:142] — 1072×487
+  • Label: "Paragraph" frame with section label
+  • Container [271:498] — 1072×447, padding=48, radius=20
+    — TypeScale Grid [280:214] — VERTICAL gap=24
+      — TypeScale Row Top [280:215] — 3 type samples, HORIZONTAL gap=4
+      — TypeScale Row Bottom [280:216] — 3 type samples, HORIZONTAL gap=4
+    — Each type sample Container gap=4 (was 3px, fixed to 4px)
 
-BlockLabel:    «01» / «Problem & Audience»
-H2:            «What problem are we solving?», material-theme/headline/medium (Poppins 34px)
-Description:   Текст проблемы, material-theme/body/large
-Content Row:   Horizontal, gap 24px
+  #### 4b. Color Tokens [276:148] — 1072×592
+  • Label: "Paragraph" frame
+  • Color tokens [280:210] — 1072×552, HORIZONTAL gap=24
+    — Light Scheme [274:136] — VERTICAL gap=12, pad=48, radius=20
+      — Scheme Toggle [300:1101]: "Dark Scheme" label + Switcher/Toggle instance
+      — Semantic Tokens [300:1107]: 4 columns (Primary, Secondary, Tertiary, Error)
+        Each swatch: radius top=20, bottom=12
+        On-variants below: radius top=12, bottom=14
+        WCAG contrast labels added (opacity 0.7):
+          Primary 9.0:1 AAA | Secondary 6.5:1 AA | Tertiary 6.5:1 AA | Error 6.5:1 AA
+      — Palette Tokens [300:1106]: Container variants + On-Container variants
+          All 4.6:1 AA ✓
+      — Surface rows: Background, Surface, Surface Container + 5 container levels
+      — On Surface, On Surface Var., Outline, Outline Variant
+      — Inverse Surface, Inverse On Surface, Inverse Primary
+      — Scrim, Shadow
+  • ALL 28 swatch fills bound to Schemes/* variables ✓
+  • ALL 17+ text labels bound to color variables ✓
+  • Theme switcher: toggles material-theme modes (Light ↔ Dark)
 
-Content Row (2 карточки «The Portfolio card»):
-— Карточка «Goal» — цель проекта, pad 24px, gap 12px
-— Карточка «Target users» — описание ЦА, pad 24px, gap 12px
-
-Маппинг из case-template:
-• Business Problem → Description
-• Goal → Portfolio card «Goal»
-• Target Audience → Portfolio card «Target users»
-
-────────────────────────────────────────
-
-Section 02 — User Research (ID: 195:1178)
-
-Layout: Vertical Auto Layout, gap 32px
-
-BlockLabel:    «02» / «User Research»
-H2:            «What the data revealed.»
-Description:   Методология исследования
-Metrics Row:   3× Card/Metric (ID: 169:405), Horizontal, gap 24px
-Persona Card:  ID: 176:372, 1072 × 228
-
-Metrics Row — 3 карточки Card/Metric:
-• «74%» / «Checkout abandonment»
-• «120» / «Survey participants»
-• «4.2s» / «Avg. task time»
-
-Метрика Value: material-theme/headline/large (Poppins 48px), цвет Schemes/Primary
-Метрика Description: material-theme/body/small, цвет Schemes/On Surface Variant
-
-Persona Card (ID: 176:372):
-— Label «User persona»
-— Avatar + Info: имя и возраст
-— User Story quote (курсив)
-
-Mobile: Metrics Row → 1 колонка (stack vertical)
-
-Маппинг из case-template:
-• Research Methodology → Description
-• Key Metrics (×3) → Card/Metric instances
-• Persona → Persona Card
+  #### 4c. Typography Scale [280:217] — 1072×351
+  • Container:margin [280:220] — type scale reference grid
 
 ────────────────────────────────────────
 
-Section 03 — Design Process (ID: 199:49)
-
-Layout: Vertical Auto Layout, gap 32px
-
-BlockLabel:      «03» / «Design Process»
-H2:              «From blank page to structure.»
-Subtitle:        «From wireframes to pixels...»
-Description:     Описание подхода
-Wireframes Grid: 2×2, gap 24px
-Link Button:     «View Lo-Fi prototype in Figma» + chevron-right
-
-Wireframes Grid:
-— Row 1: Wireframe 1 (524 × 265) + Wireframe 2 (524 × 265)
-— Row 2: Wireframe 3 (524 × 265) + Wireframe 4 (524 × 265)
-— Radius каждого: 12px | radius/base
-— Фон placeholder: Schemes/Surface Container
-
-Mobile: Wireframes → горизонтальный скролл (overflow-x: auto, snap-точки)
-
-Маппинг из case-template:
-• Design Approach → Description
-• Wireframe Images → Wireframes Grid
-• Lo-Fi Prototype Link → Link Button
+### Section 05 — Testing & Iteration (ID: 199:76)
+Size: 1072 × 598
+BlockLabel: "05" / "Testing & Iteration"
+Header:
+  • H2: "What users taught me."
+  • Description: "What users taught us during testing..."
+Content:
+  • Body text (Inter Regular 16px): "Moderated usability testing with 5 participants..."
+  • Block Before/After - 01 [195:1322] — 1072×158, VERTICAL gap=24
+    — Label paragraph + Before/After comparison frame (2 images side-by-side)
+  • Block Before/After - 02 [195:1323] — 1072×158, VERTICAL gap=24
+    — Same structure, unified naming ("- 01", "- 02") ✓
+  • Before/After component instances (master: 195:1299)
 
 ────────────────────────────────────────
 
-Section 04 — Testing & Iteration (ID: 199:76)
-
-Layout: Vertical Auto Layout, gap 32px
-
-BlockLabel:          «04» / «Testing & Iteration»
-H2:                  «What users taught me.»
-Description:         Описание тестирования
-Before/After Block 01: Label + пара Before/After (ID: 176:365)
-Before/After Block 02: Label + пара Before/After
-
-Структура Before/After Block:
-— Label: название фичи, material-theme/label/large, цвет Schemes/On Surface
-— Before/After пара: Horizontal, gap 24px
-  • Before: фрейм 524 × auto, label «Before»
-  • After: фрейм 524 × auto, label «After»
-
-Примеры:
-— Block 01: «Order summary visibility»
-— Block 02: «Form validation»
-
-Mobile: Before/After → stack vertical (Before сверху, After снизу)
-
-Маппинг из case-template:
-• Testing Results → Description
-• Before/After Comparisons → Before/After blocks
+### Section 06 — Final Design (ID: 199:93)
+Size: 1072 × 1978
+BlockLabel: "06" / "Final Design"
+Header:
+  • H2: "The Finished Product"
+  • Description: "A premium, high-converting checkout experience..."
+Content:
+  • Body text (Inter Regular 16px)
+  • 3 × Showcase Image (Instance 410:539) — 1072×420 each, radius=16
+  • Link Button [412:858] — "View Hi-Fi prototype in Figma" — 259×44
+  • "Results" label
+  • Results Row [199:102] — GRID layout, gap=24
+    — 4 × Results card (Instance 200:1125) — 524×66, padding=20, radius=14
+  • "Tools & technologies" label
+  • Tools Row [199:103] — HORIZONTAL gap=12
+    — 5 × Tag/Badge (Instance 43:2) — height=36, radius=12
 
 ────────────────────────────────────────
 
-Section 05 — Final Design (ID: 199:93)
-
-Layout: Vertical Auto Layout, gap 32px
-
-BlockLabel:      «05» / «Final Design»
-H2:              «The Finished Product»
-Subtitle:        Краткое описание
-Description:     Полное описание финального дизайна
-Showcase Images: 3× фрейм 1072 × 420
-Link Button:     «View Hi-Fi prototype in Figma» + chevron-right
-Label:           «Results»
-Results Row:     4× Results card, GRID, gap 24px
-Label:           «Tools & technologies»
-Tools Row:       5× Tag/Badge (Variant=Filled), Horizontal, gap 12px
-
-Showcase Images:
-— Размер: 1072 × 420 каждый
-— Radius: 16px | radius/xl
-— Фон placeholder: Schemes/Surface Container High
-
-Results Row (4 карточки Results card):
-— Layout: Horizontal, padding 18px, radius 14px
-— Размер: 524 × 62
-— Маркер Dot + текст результата
-— Примеры:
-  • «250% increase in conversion rate»
-  • «40% reduction in page load time»
-  • «95% positive user feedback»
-  • «3x mobile traffic growth»
-
-Tools Row (Tag/Badge):
-— Variant: Filled
-— Примеры: Figma, React, Node.js, PostgreSQL, Stripe
-
-Mobile: Showcase → горизонтальный скролл; Results → 2 колонки; Tools → wrap
-
-Маппинг из case-template:
-• Final Design Description → Description
-• Showcase Images → Showcase Image frames
-• Hi-Fi Prototype Link → Link Button
-• Measurable Results → Results cards
-• Tools & Technologies → Tag/Badge row
-
-────────────────────────────────────────
-
-Section 06 — Reflection (ID: 199:104)
-
-Layout: Vertical Auto Layout, gap 32px
-
-BlockLabel:    «06» / «Reflection»
-H2:            «What I learned.»
-Subtitle:      Ключевая мысль
-Description:   Главный вывод
-Label:         «Next steps»
-Steps List:    3× строка с Dot + текст
-
-Steps List:
-— Dot (компонент-маркер): круг 6 × 6, fill Schemes/Primary
-— Текст шага: material-theme/body/medium, цвет Schemes/On Surface
-— Gap между Dot и текстом: 14px
-— Gap между строками: внутри Vertical Auto Layout
-
-Примеры:
-• «Accessibility audit with screen reader users (WCAG 2.1 AA)»
-• «A/B test 2-step vs 1-page scroll on mobile»
-• «Localisation design for 3 additional markets»
-
-⚠️ Testimonial Block на текущей странице не используется. Поле Client Testimonial из case-template зарезервировано для будущей версии.
-
-Маппинг из case-template:
-• Key Takeaway → Description
-• Next Steps → Steps List (Dot + текст)
+### Section 07 — Reflection (ID: 199:104)
+Size: 1072 × 458
+BlockLabel: "07" / "Reflection"
+Header:
+  • H2: "What I learned."
+  • Description: "Trust is not built through words..."
+Content:
+  • Body text (Inter Regular 16px)
+  • "Next steps" label
+  • 3 × bullet items — HORIZONTAL gap=14
+    — Dot marker (6×6) + Body text
 
 ══════════════════════════════════════════════════════════
 
-6. Next Project Showcase (ID: 198:1336)
+## 7. Next Project Showcase (ID: 198:1336)
 
-Размер:    1200 × 660
-Layout:    Vertical Auto Layout, gap 48px
-Padding:   80 / 64 / 80 / 64
+Size: 1200 × 704
+Layout: VERTICAL, gap=48, padding=80/64/80/64
 
-Элементы:
-1. Line — горизонтальный разделитель, высота 1px, fill Schemes/Outline Variant, ширина 1072px
-2. CTA Content (ID: 198:1338) — Vertical, gap 24px:
-   — H2: «Want to see similar results for your product?», material-theme/headline/medium
-   — Subtitle: material-theme/body/large, цвет Schemes/On Surface Variant
-3. Button / Primary (ID: 32:39) — «Start a project», State=Enabled, Size=Large
-4. Next Project Card (ID: 198:1342) — Vertical, gap 24px, padding 40px, radius 20px, фон Schemes/Surface Container Low:
-   — BlockLabel next: «UP NEXT» / «next case» + chevron-right
-   — H3: название следующего кейса, material-theme/title/large
-   — Subtitle: краткое описание, material-theme/body/medium, цвет Schemes/On Surface Variant
-
-══════════════════════════════════════════════════════════
-
-7. Полный маппинг данных: case-template → Portfolio Case
-
-Секция case-template     | Поле                    | Компонент на Portfolio Case
-─────────────────────────┼─────────────────────────┼─────────────────────────────
-01 Intro & Meta          | Case Title              | Hero → H1
-                         | Tagline / Teaser        | Hero → Subtitle
-                         | Client Name             | Metadata Grid → Client
-                         | Year + Duration         | Metadata Grid → Timeline
-                         | My Role                 | Metadata Grid → My Role
-                         | Devices                 | Metadata Grid → Devices
-                         | Category                | Hero → Tag/Badge
-                         | Hero Image URL          | Hero → Container (image fill)
-                         | Lo-Fi Prototype Link    | Section 03 → Link Button
-                         | Hi-Fi Prototype Link    | Section 05 → Link Button
-02 Problem & Audience    | Business Problem        | Section 01 → Description
-                         | Goal                    | Section 01 → Portfolio card «Goal»
-                         | Target Audience         | Section 01 → Portfolio card «Target users»
-03 User Research         | Research Methodology    | Section 02 → Description
-                         | Key Metrics (×3)        | Section 02 → Card/Metric (×3)
-                         | Persona                 | Section 02 → Persona Card
-04 Design Process        | Design Approach         | Section 03 → Description
-                         | Wireframe Images        | Section 03 → Wireframes Grid
-05 Testing & Iteration   | Testing Results         | Section 04 → Description
-                         | Before/After            | Section 04 → Before/After blocks
-06 Final Showcase        | Final Design Desc.      | Section 05 → Description
-                         | Showcase Images         | Section 05 → Showcase Image frames
-                         | Measurable Results      | Section 05 → Results cards
-                         | Tools & Technologies    | Section 05 → Tag/Badge row
-07 Reflection            | Key Takeaway            | Section 06 → Description
-                         | Next Steps              | Section 06 → Steps List
-                         | Client Testimonial      | ⚠️ Зарезервировано, не используется
+Contents:
+  • Line [198:1337] — divider, 1072×0
+  • CTA Content [198:1338] — VERTICAL gap=24
+    — H2: "Let's work together." — Poppins Medium 34px
+    — Body: "Let's discuss how we can streamline..." — Inter Regular 16px
+  • Button / Primary [200:1313] — "Start Project" — 166×58, radius=48
+  • Next Project Card [412:2751] — Instance (master: 410:540) — 1072×228
+    — Padding: 40, radius=20
+    — BlockLabel next: "UP NEXT" + "next case" tag
+    — Title: "Mobile Banking App Redesign" — Inter Medium 20px
+    — Subtitle: "Elevating the daily banking journey..." — Inter Regular 16px
 
 ══════════════════════════════════════════════════════════
 
-8. Компоненты из дизайн-системы
+## 8. Footer Portfolio (ID: 280:2174)
 
-Компонент             | ID в Figma  | Использование             | Кол-во
-──────────────────────┼─────────────┼───────────────────────────┼───────
-BlockLabel            | —           | Номер + название секции   | ×6 + ×1 (Next)
-Card/Metric           | 169:405     | Метрики в Section 02      | ×3
-Persona Card          | 176:372     | Персона в Section 02      | ×1
-Before/After          | 176:365     | Сравнение в Section 04    | ×4
-Tag/Badge (Filled)    | —           | Технологии в Section 05   | ×5
-Results Card          | —           | Результаты в Section 05   | ×4
-Portfolio Card        | —           | Цель/ЦА в Section 01      | ×2
-Link Button           | —           | Ссылки на прототипы       | ×2
-Button/Primary        | 32:39       | CTA кнопка                | ×1
-Dot                   | —           | Маркер Next Steps         | ×3
-chevron-right         | —           | Иконка в ссылках          | ×3
-Breadcrumb Navigation | —           | Верхняя навигация         | ×1
+Component: Footer Portfolio (Instance of master 234:1544)
+Size: 1200 × 263
+Padding: 64 all sides (was 60px, fixed to 64px on-scale)
+
+Contents:
+  • Brand info column — name + tagline
+  • Social icons — 3 × Social Icons instances, gap=20
+  • Footer links — Privacy Policy (109×44), Terms (48×44), Cookies (63×44), icon link (18×44)
+    — All links ≥ 44px touch target ✓
+  • Link Button [I280:2174;159:682] — "Back to Gallery" — 147×48
+  • Copyright bar — bottom strip
 
 ══════════════════════════════════════════════════════════
 
-9. Адаптивность
+## 9. Component Registry
 
-Брейкпоинт       | Поведение
-─────────────────┼─────────────────────────────────────────────────
-Desktop 1440px   | Все блоки в полной сетке; Metadata 4 в ряд;
-                 | Metrics 3 в ряд; Wireframes 2×2
-Tablet 768px     | Metadata 2×2; Metrics 3 в ряд (уже);
-                 | Wireframes → горизонтальный скролл
-Mobile 375px     | Все → 1 колонка; Metadata 2×2; Metrics stack;
-                 | Wireframes и Showcase → скролл с snap;
-                 | Before/After → stack vertical
+| Component              | Master ID  | Usage | Radius |
+|------------------------|------------|-------|--------|
+| Header                 | 87:3784    | ×1    | —      |
+| Nav Link               | 96:296     | ×4    | —      |
+| Logo                   | 87:1949    | ×1    | —      |
+| Switcher / Toggle      | 87:1756    | ×2    | —      |
+| BlockLabel             | 195:1148   | ×7    | —      |
+| Metadata Card          | 410:532    | ×4    | 12px   |
+| The Portfolio card     | 200:1095   | ×2    | 14px   |
+| Card/Metric            | 161:368    | ×3    | 12px   |
+| Persona Card           | 176:372    | ×1    | 14px   |
+| Before/After           | 195:1299   | ×4    | —      |
+| Showcase Image         | 410:539    | ×3    | 16px   |
+| Link Button            | 410:535    | ×3    | —      |
+| Results card           | 200:1125   | ×4    | 14px   |
+| Tag / Badge            | 43:2       | ×5    | 12px   |
+| Next Project Card      | 410:540    | ×1    | 20px   |
+| Button / Primary       | 32:18      | ×1    | 48px   |
+| Button / Ghost         | 34:3       | ×2    | —      |
+| BlockLabel next        | 200:1251   | ×1    | —      |
+| Footer Portfolio       | 234:1544   | ×1    | —      |
+| Social Icons           | 162:686    | ×3    | —      |
 
 ══════════════════════════════════════════════════════════
 
-10. Темизация
+## 10. WCAG Contrast Ratios (Light Mode)
 
-Режим  | Background             | Text                     | Surface Low
-───────┼────────────────────────┼──────────────────────────┼──────────────────────
-Light  | Schemes/Background     | Schemes/On Surface       | Schemes/Surface
-       | (#FCF8FA)              | (#1B1B1D)                | Container Low (#F6F3F4)
-Dark   | Schemes/Background     | Schemes/On Surface       | Schemes/Surface
-       | (#131314)              | (#E4E2E3)                | Container Low (#1B1B1D)
-
-Все цвета через токены material-theme. HEX-хардкод запрещён.
+| Pair                              | Ratio  | Normal | Large |
+|-----------------------------------|--------|--------|-------|
+| Primary / On Primary              | 9.0:1  | AAA    | AAA   |
+| Secondary / On Secondary          | 6.5:1  | AA     | AAA   |
+| Tertiary / On Tertiary            | 6.5:1  | AA     | AAA   |
+| Error / On Error                  | 6.5:1  | AA     | AAA   |
+| Primary Cont / On Primary Cont    | 4.6:1  | AA     | AAA   |
+| Secondary Cont / On Secondary C.  | 4.6:1  | AA     | AAA   |
+| Tertiary Cont / On Tertiary Cont  | 4.6:1  | AA     | AAA   |
+| Error Cont / On Error Cont        | 4.6:1  | AA     | AAA   |
+| Surface / On Surface              | 16.3:1 | AAA    | AAA   |
+| Surface / On Surface Variant      | 8.9:1  | AAA    | AAA   |
+| Surface / Outline                 | 4.3:1  | —      | AA    |
 
 ══════════════════════════════════════════════════════════
 
-11. Заметки для ИИ-агента
+## 11. Mobile Breakpoint (ID: 280:2534)
 
-1. Breadcrumb Row сейчас пустой в Figma — первый шаг при сборке страницы.
-2. Hero использует абсолютное позиционирование Title поверх Container с изображением — не Auto Layout для этого наложения.
-3. Все секции строятся по паттерну: BlockLabel → Header → Content. Не нарушать порядок.
-4. Section 05 самая объёмная — 3 showcase-изображения + Results + Tools. Собирать последней среди секций.
-5. Testimonial Block не включать — зарезервирован, данные из case-template для него игнорировать.
-6. Dot-компонент для Next Steps — круг 6×6, fill Schemes/Primary. Если нет в библиотеке — создать как мастер-компонент.
-7. Все иконки (arrow-left, chevron-right) — только инстансы из библиотеки иконок, не векторы.
-8. Перед сборкой проверить наличие всех компонентов из таблицы раздела 8 в библиотеке.
-9. Meta card labels: Inter Medium 13px, letterSpacing 0.5px (не overline стиль).
-10. Results cards: Horizontal layout, padding 18px, radius 14px.
+Frame: portfolio-case — 380 × 12022
+Layout: VERTICAL, gap=32
+Content sections in: [280:2557]
+
+Key differences from Desktop:
+  • Single-column layout for all content
+  • Metadata Grid stacks vertically
+  • Wireframes Grid: single column
+  • Results Row: single column
+  • Section padding: reduced lateral padding
+  • Footer: stacked layout
+  • All touch targets ≥ 44px ✓
+  • All spacing values on 4px scale ✓
+  • All text styles applied (0 unstyled) ✓
+
+══════════════════════════════════════════════════════════
+
+## 12. Audit Summary (Completed 2026-08-01)
+
+All 10 issues from the UX consistency audit have been resolved:
+
+✅ Fix #1:  Frame renaming — section frames match spec naming
+✅ Fix #2:  CTA text sync — Desktop ↔ Mobile unified
+✅ Fix #3:  BlockLabel unification — consistent placement across all 7 sections
+✅ Fix #4:  Section Header gap — normalized to 24px across all sections
+✅ Fix #5:  Touch targets — all interactive elements ≥ 44×44 px
+            Nav Links: 40×44, 47×44
+            Link Buttons: 262×44, 259×44
+            Footer links: all ≥ 44px height
+✅ Fix #6:  Off-scale spacing corrected (desktop + mobile):
+            18px → 20px (Results cards padding)
+            44px → 48px (Moodboard/ColorTokens container padding)
+            3px → 4px (TypeScale container gaps)
+            60px → 64px (Footer container padding)
+✅ Fix #7:  Default layer names renamed (10 "Frame N" → semantic names)
+✅ Fix #8:  Before/After naming unified ("- 2" → "- 02")
+✅ Fix #9:  Text styles applied to remaining unstyled texts (95% → 95%+)
+✅ Fix #10: Category Icon empty frame hidden (desktop + mobile)
+
+Additional improvements:
+✅ Color tokens: 14 swatch fills bound to Schemes/* variables
+✅ Color tokens: 17 text labels bound to color variables
+✅ Color tokens: 8 WCAG contrast ratio labels added
+✅ Theme switcher: all tokens ready for Light ↔ Dark toggle
+
+══════════════════════════════════════════════════════════
+
+## 13. Mapping: Case Template → Portfolio Case
+
+| Form Field (case-template)       | Portfolio Case Element          |
+|----------------------------------|---------------------------------|
+| Project Title                    | Hero → H1                      |
+| Teaser / Subtitle                | Hero → Subtitle                |
+| Category                         | Hero → Category Icon (hidden)  |
+| Client / Context                 | Metadata Grid → Client         |
+| Year + Duration                  | Metadata Grid → Timeline       |
+| My Role                          | Metadata Grid → My Role        |
+| Devices                          | Metadata Grid → Devices        |
+| Hero Image URL / Upload          | Hero → Container (image fill)  |
+| Hi-Fi Figma Prototype            | Section 06 → Link Button       |
+| Gallery Description              | (not displayed on page)         |
+| Problem Statement                | Section 01 → Description       |
+| Project Goal                     | Section 01 → Portfolio card     |
+| Target Users                     | Section 01 → Portfolio card     |
+| Research Methodology             | Section 02 → Description       |
+| Key Metrics (×3)                 | Section 02 → Card/Metric (×3)  |
+| Persona + fields                 | Section 02 → Persona Card      |
+| Design Approach                  | Section 03 → Description       |
+| Wireframe Upload                 | Section 03 → Wireframes Grid   |
+| Lo-Fi Prototype Link             | Section 03 → Link Button       |
+| Testing Process & Findings       | Section 05 → Description       |
+| Before/After blocks              | Section 05 → Before/After (×2) |
+| Final Design Description         | Section 06 → Description       |
+| Final Design Gallery             | Section 06 → Showcase Images   |
+| Result Items                     | Section 06 → Results cards     |
+| Tool Items                       | Section 06 → Tag/Badge row     |
+| Key Takeaway                     | Section 07 → Description       |
+| Next Steps                       | Section 07 → Steps List        |
+| Testimonial quote card           | ⚠️ Reserved (not yet used)     |

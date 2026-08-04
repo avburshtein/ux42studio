@@ -467,3 +467,72 @@ body {
   background-color: var(--md-sys-color-background);
   min-height: 100dvh;
 }
+
+/* --- Typography utilities (M3 / UX42) — @utility for responsive variants --- */
+@utility text-display-sm {
+  font: var(--text-display-sm);
+  letter-spacing: var(--text-display-sm-tracking);
+}
+@utility text-headline-md {
+  font: var(--text-headline-md);
+  letter-spacing: var(--text-headline-md-tracking);
+}
+@utility text-headline-sm {
+  font: var(--text-headline-sm);
+  letter-spacing: var(--text-headline-sm-tracking);
+}
+@utility text-title-lg {
+  font: var(--text-title-lg);
+  letter-spacing: var(--text-title-lg-tracking);
+}
+@utility text-title-md {
+  font: var(--text-title-md);
+  letter-spacing: var(--text-title-md-tracking);
+}
+@utility text-title-sm {
+  font: var(--text-title-sm);
+  letter-spacing: var(--text-title-sm-tracking);
+}
+@utility text-body-lg {
+  font: var(--text-body-lg);
+  letter-spacing: var(--text-body-lg-tracking);
+}
+@utility text-body-md {
+  font: var(--text-body-md);
+  letter-spacing: var(--text-body-md-tracking);
+}
+@utility text-body-sm {
+  font: var(--text-body-sm);
+  letter-spacing: var(--text-body-sm-tracking);
+}
+@utility text-label-lg {
+  font: var(--text-label-lg);
+  letter-spacing: var(--text-label-lg-tracking);
+}
+@utility text-label-md {
+  font: var(--text-label-md);
+  letter-spacing: var(--text-label-md-tracking);
+}
+@utility text-label-sm {
+  font: var(--text-label-sm);
+  letter-spacing: var(--text-label-sm-tracking);
+}
+@utility text-label-overline {
+  font: var(--text-label-overline);
+  letter-spacing: var(--text-label-overline-tracking);
+  text-transform: uppercase;
+}
+@utility text-button {
+  font: var(--text-button);
+  letter-spacing: var(--text-button-tracking);
+}
+
+/* Hero title overlay scrim */
+.hero-title-scrim {
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--md-sys-color-scrim) 72%, transparent),
+    color-mix(in srgb, var(--md-sys-color-scrim) 24%, transparent),
+    transparent
+  );
+}
