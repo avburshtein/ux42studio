@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
-		"dev:cf": "opennextjs-cloudflare build && wrangler pages dev .open-next/assets --service env.WORKER_SELF_REFERENCE=.open-next/worker.js --compatibility-flag nodejs_compat",
+		"dev:cf": "opennextjs-cloudflare watch",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
@@ -13,8 +13,10 @@
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
 		"db:generate": "drizzle-kit generate --config=drizzle.config.ts",
-		"db:migrate:local": "wrangler d1 migrations apply YOUR_DB_NAME --local",
-		"db:studio": "drizzle-kit studio --config=drizzle.config.ts"
+		"db:migrate:local": "wrangler d1 migrations apply ux42-portfolio-db --local",
+		"db:migrate:remote": "wrangler d1 migrations apply ux42-portfolio-db --remote",
+		"db:studio": "drizzle-kit studio --config=drizzle.config.ts",
+		"db:push": "dotenv -e .env.local -- drizzle-kit push --config=drizzle.config.ts"
 	},
 	"dependencies": {
 		"@opennextjs/cloudflare": "^1.17.1",
