@@ -1,13 +1,14 @@
-import type { Config } from 'drizzle-kit';
+import 'dotenv/config'; // Подгружает переменные из .env / .env.local
+import { defineConfig } from 'drizzle-kit';
 
-export default {
-  schema: './db/schema/index.ts',
-  out: './drizzle',
-  dialect: 'sqlite',
-  driver: 'd1-http',
-  dbCredentials: {
-    // Для локальной генерации/миграций через wrangler D1
-    wranglerConfigPath: 'wrangler.toml',
-    dbName: 'YOUR_DB_NAME', // Укажите имя вашей D1 базы из wrangler.toml
-  },
-} satisfies Config;
+export default defineConfig({
+    out: './drizzle',
+    schema: './db/schema/index.ts',
+    dialect: 'sqlite',
+    driver: 'd1-http',
+    dbCredentials: {
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
+        databaseId: '67d7cb5f-5397-48b6-ae54-f7ac877e251e',
+        token: process.env.CLOUDFLARE_D1_TOKEN!,
+    },
+});

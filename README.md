@@ -1,48 +1,47 @@
-# ux42 portfolio ✦
+# OpenNext Starter
 
-Минималистичный и молниеносный сервис портфолио для дизайнеров. Построен на современном Edge-стеке с фокусом на продуктивность, приватность и нулевую стоимость инфраструктуры.
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
----
+## Getting Started
 
-### ✨ Особенности
+Read the documentation at https://opennext.js.org/cloudflare.
 
-- **Публичный каталог:** Лаконичные страницы профилей (`/u/designer`) и проектов с мгновенным откликом на Edge.
-- **Закрытый доступ:** Регистрация строго по инвайтам для сохранения качества комьюнити.
-- **Zero Egress Fee:** Все медиафайлы и галереи хранятся в R2 с неограниченным бесплатным исходящим трафиком.
+## Develop
 
----
-
-### 🛠 Технологический стек
-
-- **Фреймворк:** Next.js (App Router, Server Actions) + OpenNext
-- **База данных:** Cloudflare D1 (Serverless SQLite)
-- **ORM:** Drizzle ORM
-- **Хранилище медиа:** Cloudflare R2
-- **Деплой:** Cloudflare Pages / Workers
-
----
-
-### 🚀 Быстрый старт
-
-**Настройка окружения**
-Создайте файл `.env.local` и укажите переменные:
-
-```env
-SUPER_ADMIN_EMAILS=admin@example.com
-
-```
-
-**Локальный запуск с эмуляцией D1 и R2**
+Run the Next.js development server:
 
 ```bash
 npm run dev
-
+# or similar package manager command
 ```
 
-**Миграции базы данных**
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+## Preview
+
+Preview the application locally on the Cloudflare runtime:
 
 ```bash
-npx drizzle-kit generate
-npx wrangler d1 migrations apply <YOUR_DB_NAME> --local
-
+npm run preview
+# or similar package manager command
 ```
+
+## Deploy
+
+Deploy the application to Cloudflare:
+
+```bash
+npm run deploy
+# or similar package manager command
+```
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
