@@ -1,12 +1,25 @@
-export default function ProjectPage({
-  params,
-}: {
-  params: { 'user-slug': string; 'project-slug': string };
-}) {
+interface PageProps {
+  params: Promise<{
+    'user-slug': string;
+    'project-slug': string;
+  }>;
+}
+
+export default async function ProjectPage({ params }: PageProps) {
+  const { 'user-slug': userSlug, 'project-slug': projectSlug } = await params;
+
   return (
-    <main className="p-8">
-      <h1 className="text-3xl font-bold">Проект: {params['project-slug']}</h1>
-      <p className="mt-2 text-gray-600">Автор: {params['user-slug']}</p>
+    <main className="max-w-4xl mx-auto p-8 font-sans">
+      <h1 className="text-2xl font-bold">Профиль: {userSlug}</h1>
+      <p className="text-gray-600 mt-2">Проект: {projectSlug}</p>
     </main>
   );
+}
+
+// Если в файле объявлен generateMetadata, обновите и его сигнатуру:
+export async function generateMetadata({ params }: PageProps) {
+  const { 'project-slug': projectSlug } = await params;
+  return {
+    title: `Проект ${projectSlug}`,
+  };
 }

@@ -7,7 +7,7 @@ export default async function HomePage() {
   const { env } = await getCloudflareContext();
   const db = getDb(env.DB);
 
-  // Выборка с объектами where / orderBy в стиле v2
+  // Чистый синтаксис Drizzle RQB v2
   const profile = await db.query.profiles.findFirst({
     where: {
       slug: 'denis-zakharchenko',
