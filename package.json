@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev",
-		"dev:cf": "opennextjs-cloudflare watch",
+		"dev:cf": "opennextjs-cloudflare build && wrangler dev --port 8787",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint",
@@ -16,7 +16,9 @@
 		"db:migrate:local": "wrangler d1 migrations apply ux42-portfolio-db --local",
 		"db:migrate:remote": "wrangler d1 migrations apply ux42-portfolio-db --remote",
 		"db:studio": "drizzle-kit studio --config=drizzle.config.ts",
-		"db:push": "dotenv -e .env.local -- drizzle-kit push --config=drizzle.config.ts"
+		"db:push": "drizzle-kit push --config=drizzle.config.ts",
+		"db:seed:local": "wrangler d1 execute ux42-portfolio-db --local --file=./drizzle/seed.sql",
+		"db:seed:remote": "wrangler d1 execute ux42-portfolio-db --remote --file=./drizzle/seed.sql"
 	},
 	"dependencies": {
 		"@opennextjs/cloudflare": "^1.17.1",
