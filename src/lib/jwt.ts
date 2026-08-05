@@ -18,11 +18,11 @@ export async function signJwt(payload: Record<string, any>, secret: string) {
         false,
         ['sign'],
     );
-        const TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
-        const now = Math.floor(Date.now() / 1000);
-        const body = { ...payload, iat: now, exp: now + TTL_SECONDS };
-        const sig = await crypto.subtle.sign('HMAC', key, enc.encode(toSign));
-        return `${toSign}.${base64UrlEncode(new Uint8Array(sig))}`;
+    const TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
+    const now = Math.floor(Date.now() / 1000);
+    const body = { ...payload, iat: now, exp: now + TTL_SECONDS };
+    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(toSign));
+    return `${toSign}.${base64UrlEncode(new Uint8Array(sig))}`;
 }
 
 export async function verifyJwt(token: string, secret: string) {
@@ -53,9 +53,13 @@ export async function verifyJwt(token: string, secret: string) {
             payloadB64.replace(/-/g, '+').replace(/_/g, '/'),
             'base64',
         ).toString('utf8');
-            const payload = JSON.parse(payloadStr);
-            if (typeof payload.exp === 'number' && Math.floor(Date.now() / 1000) > payload.exp) return null;
-            return payload;
+        const payload = JSON.parse(payloadStr);
+        if (
+            typeof payload.exp === 'number' &&
+            Math.floor(Date.now() / 1000) > payload.exp
+        )
+            return null;
+        return payload;
     } catch (err) {
         return null;
     }

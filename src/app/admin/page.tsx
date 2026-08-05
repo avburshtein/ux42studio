@@ -15,7 +15,9 @@ export default async function AdminDashboardPage() {
     if (!payload?.userId) redirect('/login');
 
     const db = getDb(env.DB);
-    const user = await db.query.users.findFirst({ where: (u, { eq }) => eq(u.id, payload.userId) });
+    const user = await db.query.users.findFirst({
+        where: (u, { eq }) => eq(u.id, payload.userId),
+    });
     if (!user || user.role !== 'admin') redirect('/login');
 
     return (
