@@ -5,7 +5,9 @@ import { getDb } from '@/db';
 import { verifyJwt } from '@/lib/jwt';
 
 export default async function AdminDashboardPage() {
-    const token = cookies().get('auth-token');
+    const cookiesList = await cookies();
+
+    const token = cookiesList.get('auth-token');
     if (!token?.value) redirect('/login');
 
     const { env } = await getCloudflareContext();
@@ -16,7 +18,9 @@ export default async function AdminDashboardPage() {
 
     const db = getDb(env.DB);
     const user = await db.query.users.findFirst({
-        where: (u, { eq }) => eq(u.id, payload.userId),
+        where: {
+            id: payload.userId as string,
+        },
     });
     if (!user || user.role !== 'admin') redirect('/login');
 

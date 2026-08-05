@@ -28,7 +28,7 @@ export default function LoginForm() {
                 return;
             }
 
-            const data = await res.json().catch(() => ({}));
+            const data = (await res.json().catch(() => ({}))) as { message?: string };
             setError(data?.message || 'Ошибка входа');
         } catch (err) {
             setError('Сетевая ошибка');
