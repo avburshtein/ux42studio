@@ -1,0 +1,66 @@
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Input } from '../ui/Input';
+import { Label } from '../ui/Label';
+import { Button } from '../ui/Button';
+
+export default function RegisterForm() {
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [invite, setInvite] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+
+    async function onSubmit(e: React.FormEvent) {
+        e.preventDefault();
+        setError(null);
+        setLoading(true);
+        try {
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, invite }),
+            });
+
+            if (res.ok) {
+                router.push('/admin');
+                return;
+            }
+
+            const data = await res.json().catch(() => ({}));
+            setError(data?.message || 'Ошибка регистрации');
+        } catch (err) {
+            setError('Сетевая ошибка');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    return (
+        <form onSubmit={onSubmit} className='space-y-4'>
+            <div>
+                <Label htmlFor='email'>Email</Label>
+                <Input
+                    id='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+            </div>
+            <div>
+                <Label htmlFor='invite'>Код инвайта</Label>
+                <Input
+                    id='invite'
+                    value={invite}
+                    onChange={(e) => setInvite(e.target.value)}
+                />
+            </div>
+            {error && <p className='text-sm text-red-600'>{error}</p>}
+            <div className='flex justify-end'>
+                <Button type='submit' disabled={loading}>
+                    {loading ? 'Загрузка...' : 'Зарегистрироваться'}
+                </Button>
+            </div>
+        </form>
+    );
+}
