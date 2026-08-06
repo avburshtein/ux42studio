@@ -1,0 +1,328 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm, useFieldArray } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import { Card } from '@/components/ui/Card';
+import { updateProjectShowcase } from '@/lib/actions/projects';
+
+const assetSchema = z.object({
+    id: z.string().optional(),
+    fileId: z.string().min(1, 'File ID is required'),
+    assetType: z.enum(['moodboard', 'wireframe', 'final_gallery']),
+    caption: z.string().optional().or(z.literal('')),
+    order: z.number().int(),
+});
+
+const comparisonSchema = z.object({
+    id: z.string().optional(),
+    featureName: z.string().min(1, 'Feature name is required'),
+    beforeFileId: z.string().optional().or(z.literal('')),
+    afterFileId: z.string().optional().or(z.literal('')),
+    beforeText: z.string().optional().or(z.literal('')),
+    afterText: z.string().optional().or(z.literal('')),
+    order: z.number().int(),
+});
+
+const formSchema = z.object({
+    finalDescription: z.string().optional().or(z.literal('')),
+    assets: z.array(assetSchema),
+    comparisons: z.array(comparisonSchema),
+});
+
+type FormData = z.infer<typeof formSchema>;
+
+export default function ShowcasePage({
+    params,
+}: {
+    params: Promise<{ id: string }>;
+}) {
+    const router = useRouter();
+    const [projectId, setProjectId] = useState<string>('');
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        params.then((p) => setProjectId(p.id));
+    }, [params]);
+
+    const {
+        register,
+        handleSubmit,
+        control,
+        formState: { errors },
+    } = useForm<FormData>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            finalDescription: '',
+            assets: [],
+            comparisons: [],
+        },
+    });
+
+    const {
+        fields: assetFields,
+        append: appendAsset,
+        remove: removeAsset,
+    } = useFieldArray({ control, name: 'assets' });
+
+    const {
+        fields: comparisonFields,
+        append: appendComparison,
+        remove: removeComparison,
+    } = useFieldArray({ control, name: 'comparisons' });
+
+    const onSubmit = async (data: FormData) => {
+        if (!projectId) return;
+        setSaving(true);
+        setError(null);
+        try {
+            await updateProjectShowcase(projectId, {
+                finalDescription: data.finalDescription || null,
+                assets: data.assets.map((a) => ({
+                    ...a,
+                    caption: a.caption || null,
+                })),
+                comparisons: data.comparisons.map((c) => ({
+                    ...c,
+                    beforeFileId: c.beforeFileId || null,
+                    afterFileId: c.afterFileId || null,
+                    beforeText: c.beforeText || null,
+                    afterText: c.afterText || null,
+                })),
+            });
+            router.push(`/admin/projects/${projectId}/edit/review`);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Save failed');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    return (
+        <Card>
+            <h2 className='mb-6 text-title-lg text-on-background'>Showcase</h2>
+            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+                <div>
+                    <Label htmlFor='finalDescription'>Final Description</Label>
+                    <textarea
+                        id='finalDescription'
+                        {...register('finalDescription')}
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        rows={4}
+                    />
+                </div>
+
+                {/* Gallery Assets */}
+                <div>
+                    <div className='mb-3 flex items-center justify-between'>
+                        <Label>Gallery Assets</Label>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() =>
+                                appendAsset({
+                                    fileId: '',
+                                    assetType: 'final_gallery',
+                                    caption: '',
+                                    order: assetFields.length,
+                                })
+                            }
+                        >
+                            + Add Asset
+                        </Button>
+                    </div>
+                    {assetFields.map((field, index) => (
+                        <div
+                            key={field.id}
+                            className='mb-4 rounded-md border border-outline-variant p-4'
+                        >
+                            <div className='mb-3 flex items-center justify-between'>
+                                <span className='text-title-sm text-on-surface'>
+                                    Asset {index + 1}
+                                </span>
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    onClick={() => removeAsset(index)}
+                                >
+                                    Remove
+                                </Button>
+                            </div>
+                            <div className='space-y-3'>
+                                <div>
+                                    <Label>File ID *</Label>
+                                    <Input
+                                        {...register(`assets.${index}.fileId`)}
+                                    />
+                                    {errors.assets?.[index]?.fileId && (
+                                        <p className='mt-1 text-body-sm text-error'>
+                                            Required
+                                        </p>
+                                    )}
+                                </div>
+                                <div>
+                                    <Label>Asset Type</Label>
+                                    <select
+                                        {...register(
+                                            `assets.${index}.assetType`,
+                                        )}
+                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                                    >
+                                        <option value='moodboard'>
+                                            Moodboard
+                                        </option>
+                                        <option value='wireframe'>
+                                            Wireframe
+                                        </option>
+                                        <option value='final_gallery'>
+                                            Final Gallery
+                                        </option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <Label>Caption</Label>
+                                    <Input
+                                        {...register(`assets.${index}.caption`)}
+                                    />
+                                </div>
+                                <input
+                                    type='hidden'
+                                    {...register(`assets.${index}.order`)}
+                                    value={index}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Before/After Comparisons */}
+                <div>
+                    <div className='mb-3 flex items-center justify-between'>
+                        <Label>Before/After Comparisons</Label>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() =>
+                                appendComparison({
+                                    featureName: '',
+                                    beforeFileId: '',
+                                    afterFileId: '',
+                                    beforeText: '',
+                                    afterText: '',
+                                    order: comparisonFields.length,
+                                })
+                            }
+                        >
+                            + Add Comparison
+                        </Button>
+                    </div>
+                    {comparisonFields.map((field, index) => (
+                        <div
+                            key={field.id}
+                            className='mb-4 rounded-md border border-outline-variant p-4'
+                        >
+                            <div className='mb-3 flex items-center justify-between'>
+                                <span className='text-title-sm text-on-surface'>
+                                    Comparison {index + 1}
+                                </span>
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    onClick={() => removeComparison(index)}
+                                >
+                                    Remove
+                                </Button>
+                            </div>
+                            <div className='space-y-3'>
+                                <div>
+                                    <Label>Feature Name *</Label>
+                                    <Input
+                                        {...register(
+                                            `comparisons.${index}.featureName`,
+                                        )}
+                                    />
+                                    {errors.comparisons?.[index]
+                                        ?.featureName && (
+                                        <p className='mt-1 text-body-sm text-error'>
+                                            Required
+                                        </p>
+                                    )}
+                                </div>
+                                <div className='grid grid-cols-2 gap-3'>
+                                    <div>
+                                        <Label>Before File ID</Label>
+                                        <Input
+                                            {...register(
+                                                `comparisons.${index}.beforeFileId`,
+                                            )}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label>After File ID</Label>
+                                        <Input
+                                            {...register(
+                                                `comparisons.${index}.afterFileId`,
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='grid grid-cols-2 gap-3'>
+                                    <div>
+                                        <Label>Before Text</Label>
+                                        <textarea
+                                            {...register(
+                                                `comparisons.${index}.beforeText`,
+                                            )}
+                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                                            rows={2}
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label>After Text</Label>
+                                        <textarea
+                                            {...register(
+                                                `comparisons.${index}.afterText`,
+                                            )}
+                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                                            rows={2}
+                                        />
+                                    </div>
+                                </div>
+                                <input
+                                    type='hidden'
+                                    {...register(`comparisons.${index}.order`)}
+                                    value={index}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+
+                {error && <p className='text-body-sm text-error'>{error}</p>}
+
+                <div className='flex justify-between gap-3 pt-4'>
+                    <Button
+                        type='button'
+                        variant='ghost'
+                        onClick={() =>
+                            router.push(
+                                `/admin/projects/${projectId}/edit/design`,
+                            )
+                        }
+                    >
+                        ← Back
+                    </Button>
+                    <Button type='submit' disabled={saving}>
+                        {saving ? 'Saving...' : 'Save & Next →'}
+                    </Button>
+                </div>
+            </form>
+        </Card>
+    );
+}
