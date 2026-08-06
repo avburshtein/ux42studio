@@ -1,58 +1,68 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
+import ProjectCard from '@/components/ProjectCard';
 
-export const revalidate = 0;
+export const revalidate = 300;
 
 export default async function HomePage() {
-  const { env } = await getCloudflareContext();
-  const db = getDb(env.DB);
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
 
-  // Чистый синтаксис Drizzle RQB v2
-  const profile = await db.query.profiles.findFirst({
-    where: {
-      slug: 'denis-zakharchenko',
-    },
-    with: {
-      user: true,
-      socialLinks: {
-        orderBy: { order: 'asc' },
-      },
-      projects: {
-        with: {
-          projectCategories: {
-            with: {
-              category: true,
+    const [publishedProjects, allCategories] = await Promise.all([
+        db.query.projects.findMany({
+            where: {
+                status: 'published',
+                showOnHomepage: 1,
             },
-          },
-          keyMetrics: true,
-        },
-      },
-    },
-  });
+            with: {
+                profile: {
+                    columns: { slug: true, fullName: true, avatarFileId: true },
+                },
+                projectCategories: {
+                    with: { category: true },
+                },
+                coverFile: true,
+            },
+            orderBy: { publishedAt: 'desc' },
+            limit: 20,
+        }),
+        db.query.categories.findMany({
+            orderBy: { order: 'asc' },
+        }),
+    ]);
 
-  if (!profile) {
-    return <main className="p-8 font-sans text-red-500">Профиль не найден</main>;
-  }
+    return (
+        <main className='max-w-page mx-auto px-4 py-8 sm:px-6 lg:px-8'>
+            <header className='mb-8'>
+                <h1 className='text-headline-md text-on-background mb-2'>
+                    Каталог дизайнеров
+                </h1>
+                {allCategories.length > 0 && (
+                    <div className='flex flex-wrap gap-2 mt-4'>
+                        {allCategories.map((cat) => (
+                            <button
+                                key={cat.id}
+                                type='button'
+                                className='px-4 py-1.5 rounded-full border border-outline text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                            >
+                                {cat.name}
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </header>
 
-  return (
-    <main className="max-w-4xl mx-auto p-8 font-sans">
-      <header className="border-b pb-6 mb-8">
-        <h1 className="text-3xl font-bold">{profile.fullName}</h1>
-        <p className="text-lg text-gray-600">{profile.headline}</p>
-        <p className="text-sm text-gray-500 mt-1">{profile.location} • {profile.website}</p>
-      </header>
-
-      <section>
-        <h2 className="text-2xl font-bold mb-4">Проекты</h2>
-        <div className="grid gap-6">
-          {profile.projects.map((project) => (
-            <article key={project.id} className="p-6 border rounded-xl bg-card shadow-sm">
-              <h3 className="text-xl font-semibold">{project.title}</h3>
-              <p className="text-gray-700 mt-2">{project.teaser}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-    </main>
-  );
+            {publishedProjects.length === 0 ? (
+                <p className='text-body-lg text-on-surface-variant text-center py-16'>
+                    Пока нет опубликованных проектов
+                </p>
+            ) : (
+                <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+                    {publishedProjects.map((project) => (
+                        <ProjectCard key={project.id} project={project} />
+                    ))}
+                </div>
+            )}
+        </main>
+    );
 }
