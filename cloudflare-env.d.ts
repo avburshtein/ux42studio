@@ -9,6 +9,8 @@ declare namespace Cloudflare {
         NEXTJS_ENV: string;
         WORKER_SELF_REFERENCE: Fetcher /* ux42next */;
         JWT_SECRET: string;
+        ADMIN_EMAIL: string;
+        ADMIN_PASSWORD: string;
     }
 }
 interface CloudflareEnv extends Cloudflare.Env {}
