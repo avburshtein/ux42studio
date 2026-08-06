@@ -1,47 +1,65 @@
-# OpenNext Starter
+# UX42 Studio & Portfolio Platform
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Мультиарендная платформа портфолио для дизайнеров на Next.js + Cloudflare (D1, R2, Workers).
 
-## Getting Started
+## Стек
 
-Read the documentation at https://opennext.js.org/cloudflare.
+- **Фронтенд:** Next.js (App Router, Server Actions)
+- **БД:** Cloudflare D1 + Drizzle ORM
+- **Хранилище:** Cloudflare R2
+- **Стили:** Tailwind CSS v4 + Material Design 3 (seed: `#0B6E4F`)
+- **Деплой:** Cloudflare Pages / Workers via `@opennextjs/cloudflare`
 
-## Develop
-
-Run the Next.js development server:
-
-```bash
-npm run dev
-# or similar package manager command
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-## Preview
-
-Preview the application locally on the Cloudflare runtime:
+## Разработка
 
 ```bash
-npm run preview
-# or similar package manager command
+npm run dev        # Next.js dev server
+npm run preview    # Локальный Cloudflare runtime
+npm run deploy     # Деплой в Cloudflare
 ```
 
-## Deploy
+## Создание первого суперадмина
 
-Deploy the application to Cloudflare:
+### Локально
 
-```bash
-npm run deploy
-# or similar package manager command
-```
+1. Создай `.dev.vars` с переменными:
 
-## Learn More
+    ```
+    ADMIN_EMAIL=admin@ux42.studio
+    ADMIN_PASSWORD=your-secure-password
+    JWT_SECRET=your-secret-key
+    ```
 
-To learn more about Next.js, take a look at the following resources:
+2. Запусти `npm run dev` и вызови:
+    ```bash
+    curl -X POST http://localhost:3000/api/auth/init
+    ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Продакшен
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Установи секреты в Cloudflare:
+
+    ```bash
+    npx wrangler secret put ADMIN_EMAIL
+    npx wrangler secret put ADMIN_PASSWORD
+    npx wrangler secret put JWT_SECRET
+    ```
+
+2. Задеплой и вызови **один раз**:
+
+    ```bash
+    curl -X POST https://ux42.studio/api/auth/init
+    ```
+
+3. **Сразу после успешного ответа** удали секреты:
+
+    ```bash
+    npx wrangler secret delete ADMIN_EMAIL
+    npx wrangler secret delete ADMIN_PASSWORD
+    ```
+
+    `JWT_SECRET` не удаляй — он нужен для работы middleware.
+
+4. Войди под созданным админом в `/super-admin`. Чтобы назначить других админов: `/super-admin/users` → «Set Admin».
+
+> **Важно:** эндпоинт `/api/auth/init` срабатывает только один раз. Повторный вызов вернёт `403 Forbidden`.
