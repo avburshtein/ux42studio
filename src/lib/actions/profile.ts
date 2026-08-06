@@ -5,6 +5,23 @@ import { getDb } from '@/db';
 import { profiles, socialLinks } from '@/db/schema/profiles';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
+
+export async function getMyProfileId(): Promise<string | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { userId },
+        columns: { id: true },
+    });
+
+    return profile?.id ?? null;
+}
 
 export async function updateProfile(
     profileId: string,

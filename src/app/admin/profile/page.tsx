@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
-import { updateProfile } from '@/lib/actions/profile';
+import { updateProfile, getMyProfileId } from '@/lib/actions/profile';
 
 const socialLinkSchema = z.object({
     id: z.string().optional(),
@@ -33,11 +33,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function ProfilePage({
-    profileId = '',
-}: {
-    profileId?: string;
-}) {
+export default function ProfilePage() {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -74,6 +70,11 @@ export default function ProfilePage({
         setError(null);
         setSuccess(false);
         try {
+            const profileId = await getMyProfileId();
+            if (!profileId) {
+                setError('Profile not found');
+                return;
+            }
             await updateProfile(profileId, {
                 ...data,
                 headline: data.headline || undefined,

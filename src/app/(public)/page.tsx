@@ -5,7 +5,7 @@ import ProjectCard from '@/components/ProjectCard';
 export const revalidate = 300;
 
 export default async function HomePage() {
-    const { env } = await getCloudflareContext();
+    const { env } = await getCloudflareContext({ async: true });
     const db = getDb(env.DB);
 
     const [publishedProjects, allCategories] = await Promise.all([
