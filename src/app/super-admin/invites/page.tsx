@@ -53,6 +53,7 @@ export default async function SuperAdminInvitesPage() {
                         ) as string;
                         await createInvite({
                             email: email || undefined,
+                            createdByUserId: userId,
                             expiresAt: expiresAtStr
                                 ? Math.floor(
                                       new Date(expiresAtStr).getTime() / 1000,

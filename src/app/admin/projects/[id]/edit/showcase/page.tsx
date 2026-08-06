@@ -83,17 +83,17 @@ export default function ShowcasePage({
         setError(null);
         try {
             await updateProjectShowcase(projectId, {
-                finalDescription: data.finalDescription || null,
+                finalDescription: data.finalDescription || undefined,
                 assets: data.assets.map((a) => ({
                     ...a,
-                    caption: a.caption || null,
+                    caption: a.caption || undefined,
                 })),
                 comparisons: data.comparisons.map((c) => ({
                     ...c,
-                    beforeFileId: c.beforeFileId || null,
-                    afterFileId: c.afterFileId || null,
-                    beforeText: c.beforeText || null,
-                    afterText: c.afterText || null,
+                    beforeFileId: c.beforeFileId || undefined,
+                    afterFileId: c.afterFileId || undefined,
+                    beforeText: c.beforeText || undefined,
+                    afterText: c.afterText || undefined,
                 })),
             });
             router.push(`/admin/projects/${projectId}/edit/review`);

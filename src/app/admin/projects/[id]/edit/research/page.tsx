@@ -81,13 +81,16 @@ export default function ResearchPage({
         setError(null);
         try {
             await updateProjectResearch(projectId, {
-                researchMethodology: data.researchMethodology || null,
-                userStory: data.userStory || null,
+                researchMethodology: data.researchMethodology || undefined,
+                userStory: data.userStory || undefined,
                 personas: data.personas.map((p) => ({
                     ...p,
-                    avatarFileId: p.avatarFileId || null,
+                    avatarFileId: p.avatarFileId || undefined,
                 })),
-                keyMetrics: data.keyMetrics,
+                keyMetrics: data.keyMetrics.map((m, i) => ({
+                    ...m,
+                    order: i,
+                })),
             });
             router.push(`/admin/projects/${projectId}/edit/design`);
         } catch (e) {

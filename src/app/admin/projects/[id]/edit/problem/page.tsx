@@ -47,9 +47,9 @@ export default function ProblemPage({
         setError(null);
         try {
             await updateProjectProblem(projectId, {
-                problemStatement: data.problemStatement || null,
-                projectGoal: data.projectGoal || null,
-                targetUsers: data.targetUsers || null,
+                problemStatement: data.problemStatement || undefined,
+                projectGoal: data.projectGoal || undefined,
+                targetUsers: data.targetUsers || undefined,
             });
             router.push(`/admin/projects/${projectId}/edit/research`);
         } catch (e) {

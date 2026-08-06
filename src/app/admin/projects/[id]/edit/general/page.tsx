@@ -74,17 +74,17 @@ export default function GeneralPage({
         try {
             await updateProjectMeta(projectId, {
                 ...data,
-                teaser: data.teaser || null,
-                client: data.client || null,
-                year: data.year ? parseInt(data.year, 10) : null,
-                duration: data.duration || null,
-                myRole: data.myRole || null,
-                constraints: data.constraints || null,
-                devices: data.devices || null,
-                tags: data.tags || null,
-                coverFileId: data.coverFileId || null,
-                figmaPrototypeUrl: data.figmaPrototypeUrl || null,
-                webPrototypeUrl: data.webPrototypeUrl || null,
+                teaser: data.teaser || undefined,
+                client: data.client || undefined,
+                year: data.year ? parseInt(data.year, 10) : undefined,
+                duration: data.duration || undefined,
+                myRole: data.myRole || undefined,
+                constraints: data.constraints || undefined,
+                devices: data.devices || undefined,
+                tags: data.tags || undefined,
+                coverFileId: data.coverFileId || undefined,
+                figmaPrototypeUrl: data.figmaPrototypeUrl || undefined,
+                webPrototypeUrl: data.webPrototypeUrl || undefined,
             });
             router.push(`/admin/projects/${projectId}/edit/problem`);
         } catch (e) {

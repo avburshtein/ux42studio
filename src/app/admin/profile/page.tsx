@@ -33,7 +33,11 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function ProfilePage() {
+export default function ProfilePage({
+    profileId = '',
+}: {
+    profileId?: string;
+}) {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -70,14 +74,14 @@ export default function ProfilePage() {
         setError(null);
         setSuccess(false);
         try {
-            await updateProfile({
+            await updateProfile(profileId, {
                 ...data,
-                headline: data.headline || null,
-                bio: data.bio || null,
-                location: data.location || null,
-                website: data.website || null,
-                avatarFileId: data.avatarFileId || null,
-                coverFileId: data.coverFileId || null,
+                headline: data.headline || undefined,
+                bio: data.bio || undefined,
+                location: data.location || undefined,
+                website: data.website || undefined,
+                avatarFileId: data.avatarFileId || undefined,
+                coverFileId: data.coverFileId || undefined,
             });
             setSuccess(true);
             router.refresh();

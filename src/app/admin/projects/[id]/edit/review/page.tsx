@@ -98,16 +98,16 @@ export default function ReviewPage({
         setError(null);
         try {
             await updateProjectReview(projectId, {
-                keyTakeaway: data.keyTakeaway || null,
+                keyTakeaway: data.keyTakeaway || undefined,
                 reviews: data.reviews.map((r) => ({
                     ...r,
-                    authorRole: r.authorRole || null,
-                    avatarFileId: r.avatarFileId || null,
+                    authorRole: r.authorRole || undefined,
+                    avatarFileId: r.avatarFileId || undefined,
                 })),
-                results: data.results,
-                tools: data.tools,
-                nextSteps: data.nextSteps,
-                publish: data.publish,
+                nextSteps: data.nextSteps.map((n, i) => ({
+                    ...n,
+                    order: i,
+                })),
             });
             router.push('/admin');
         } catch (e) {

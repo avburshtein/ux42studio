@@ -58,11 +58,9 @@ export default function DesignPage({
         setError(null);
         try {
             await updateProjectDesign(projectId, {
-                visualDirection: data.visualDirection || null,
-                displayFont: data.displayFont || null,
-                bodyFont: data.bodyFont || null,
-                designApproach: data.designApproach || null,
-                colorRoleIds: data.colorRoleIds,
+                visualDirection: data.visualDirection || undefined,
+                displayFont: data.displayFont || undefined,
+                bodyFont: data.bodyFont || undefined,
             });
             router.push(`/admin/projects/${projectId}/edit/showcase`);
         } catch (e) {
