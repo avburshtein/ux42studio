@@ -1,14 +1,20 @@
 import React from 'react';
+import { cn } from '@/lib/utils';
 
-interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
+const Label = React.forwardRef<
+    HTMLLabelElement,
+    React.LabelHTMLAttributes<HTMLLabelElement>
+>(({ className, ...props }, ref) => (
+    <label
+        ref={ref}
+        className={cn(
+            'text-label-md text-[var(--md-sys-color-on-surface)] peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+            className,
+        )}
+        {...props}
+    />
+));
+Label.displayName = 'Label';
 
-export function Label({ className = '', ...props }: LabelProps) {
-    return (
-        <label
-            className={`block text-sm font-medium text-slate-700 ${className}`}
-            {...props}
-        />
-    );
-}
-
+export { Label };
 export default Label;
