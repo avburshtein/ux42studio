@@ -64,6 +64,31 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 
 Иконки: `lucide-react` (использование `@mui/icons-material` запрещено).
 
+### 🔐 Особенности авторизации и запуска в Cloudflare
+
+**JWT-авторизация через библиотеку `jose`:**
+
+- Для `signJwt` и `verifyJwt` используется библиотека **`jose@^6`** (`SignJWT`, `jwtVerify`) — стандартное, проверенное решение вместо самописной криптографии на `crypto.subtle`.
+- Токен подписывается алгоритмом **HS256**, срок жизни — **7 дней** (`setExpirationTime('7d')`).
+- Секретный ключ берётся из `process.env.JWT_SECRET`. Если переменная не задана, middleware логирует ошибку `❌ [Middleware]: JWT_SECRET не найден в process.env. Проверьте .env.local` и возвращает 500.
+- Middleware (`src/middleware.ts`) проверяет наличие куки `auth-token` на всех защищённых маршрутах; при отсутствии — редирект на `/login`.
+
+**Запуск Next.js в окружении Cloudflare (next dev):**
+
+- В `next.config.ts` вызывается `initOpenNextCloudflareForDev()` с явным путём к `wrangler.toml`:
+    ```ts
+    initOpenNextCloudflareForDev({
+        configPath: path.resolve(process.cwd(), 'wrangler.toml'),
+    });
+    ```
+- Это подключает эмуляцию D1 и переменных из `.dev.vars` для локальной разработки.
+- Блок `images` (кастомный лоадер для R2) временно закомментирован.
+
+**Тёмная тема (Dark Theme):**
+
+- Селекторы тёмной темы в `globals.css` обёрнуты в `:where(html[data-theme="dark"])` и `:where(html:not([data-theme="light"]))` с вложенным `@media (prefers-color-scheme: dark)`.
+- Это гарантирует корректную работу `data-theme` атрибутов и системных предпочтений без конфликтов специфичности.
+
 ### Ключевые токены цвета (Material Design 3 Seed: `#0B6E4F`):
 
 - **Primary:** Forest Green (`#0B6E4F` / CSS var: `--md-sys-color-primary`) — Личность бренда, действия.
