@@ -23,6 +23,44 @@ export async function getMyProfileId(): Promise<string | null> {
     return profile?.id ?? null;
 }
 
+export async function getOrCreateProfileId(): Promise<string | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const existing = await db.query.profiles.findFirst({
+        where: { userId },
+        columns: { id: true },
+    });
+
+    if (existing) return existing.id;
+
+    const id = crypto.randomUUID();
+    const user = await db.query.users.findFirst({
+        where: { id: userId },
+        columns: { email: true },
+    });
+
+    const slug = user?.email
+        ? user.email
+              .split('@')[0]
+              .toLowerCase()
+              .replace(/[^a-z0-9]/g, '-')
+        : `user-${id.slice(0, 8)}`;
+
+    await db.insert(profiles).values({
+        id,
+        userId,
+        slug,
+        fullName: user?.email?.split('@')[0] ?? 'User',
+    });
+
+    return id;
+}
+
 export async function updateProfile(
     profileId: string,
     data: {

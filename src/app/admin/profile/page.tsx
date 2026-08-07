@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +9,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
-import { updateProfile, getMyProfileId } from '@/lib/actions/profile';
+import { updateProfile, getOrCreateProfileId } from '@/lib/actions/profile';
+import Link from 'next/link';
 
 const socialLinkSchema = z.object({
     id: z.string().optional(),
@@ -38,6 +39,15 @@ export default function ProfilePage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [profileId, setProfileId] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchProfileId = async () => {
+            const id = await getOrCreateProfileId();
+            setProfileId(id);
+        };
+        fetchProfileId();
+    }, []);
 
     const {
         register,
@@ -70,7 +80,7 @@ export default function ProfilePage() {
         setError(null);
         setSuccess(false);
         try {
-            const profileId = await getMyProfileId();
+            const profileId = await getOrCreateProfileId();
             if (!profileId) {
                 setError('Profile not found');
                 return;
@@ -93,12 +103,28 @@ export default function ProfilePage() {
         }
     };
 
+    const showMenu = async () => {
+        if (profileId) {
+            setError('Profile not found');
+            return (
+                <div className=''>
+                    <Link href='/admin'>Дашборд</Link>
+                </div>
+            );
+        }
+        return null;
+    };
+
     return (
         <main className='mx-auto max-w-container-form px-4 py-8'>
-            <h1 className='mb-8 text-headline-sm text-on-background'>
-                Настройки профиля
-            </h1>
-            <Card>
+            <div className='flex items-center justify-between gap-4'>
+                <h1 className='mb-8 text-headline-sm text-on-background'>
+                    Настройки профиля
+                </h1>
+                {showMenu()}
+            </div>
+
+            <div className=''>
                 <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                     <div>
                         <Label htmlFor='fullName'>Full Name *</Label>
@@ -285,7 +311,7 @@ export default function ProfilePage() {
                         </Button>
                     </div>
                 </form>
-            </Card>
+            </div>
         </main>
     );
 }

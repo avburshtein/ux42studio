@@ -34,7 +34,7 @@ export default async function AdminDashboardPage() {
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
             <div className='mb-8 flex items-center justify-between'>
-                <div>
+                <div className=''>
                     <h1 className='text-headline-sm text-on-background'>
                         Мои проекты
                     </h1>
@@ -42,9 +42,17 @@ export default async function AdminDashboardPage() {
                         Управляйте своими кейсами
                     </p>
                 </div>
-                <Link href='/admin/projects/new'>
-                    <Button>Создать проект</Button>
-                </Link>
+
+                <div className='flex items-center gap-8'>
+                    <div className=''>
+                        <Link href='/admin/profile'>Профиль</Link>
+                    </div>
+                    <div>
+                        <Link href='/admin/projects/new'>
+                            <Button>Создать проект</Button>
+                        </Link>
+                    </div>
+                </div>
             </div>
 
             {projectList.length === 0 ? (
