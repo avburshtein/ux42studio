@@ -19,10 +19,11 @@
   --radius-5xl: 48px;
 
   /* Размеры контейнеров (max-w-*) */
-  --container-content: 1200px;
-  --container-form: 850px;
-  --container-narrow: 768px;
-  --container-page: 1440px;
+  --max-width-container-content: 1200px;
+  --max-width-container-form: 850px;
+  --max-width-container-narrow: 768px;
+  --max-width-container-page: 1440px;
+  --max-width-page: 1440px;
 
   /* Семантические цвета (bg-*, text-*, border-*) */
   --color-primary: var(--md-sys-color-primary);
@@ -58,6 +59,22 @@
   --color-lavender-light: var(--md-ext-lavender-light);
   --color-lavender-purple: var(--md-ext-lavender-purple);
   --color-green-accent: var(--md-ext-green-accent);
+
+  /* Типографика (text-*) */
+  --text-display-sm: 500 52px/60px var(--font-display);
+  --text-headline-md: 500 34px/42px var(--font-display);
+  --text-headline-sm: 500 26px/34px var(--font-display);
+  --text-title-lg: 500 20px/28px var(--font-display);
+  --text-title-md: 500 16px/24px var(--font-body);
+  --text-title-sm: 500 14px/20px var(--font-body);
+  --text-body-lg: 400 18px/28px var(--font-body);
+  --text-body-md: 400 16px/24px var(--font-body);
+  --text-body-sm: 400 14px/22px var(--font-body);
+  --text-label-lg: 600 16px/24px var(--font-body);
+  --text-label-md: 500 13px/20px var(--font-body);
+  --text-label-sm: 600 11px/16px var(--font-body);
+  --text-label-overline: 600 10px/16px var(--font-body);
+  --text-button: 500 16px/24px var(--font-body);
 }
 
 /* 2. СЕМАНТИЧЕСКИЕ ЦВЕТОВЫЕ ТОКЕНЫ (LIGHT THEME BY DEFAULT) */
@@ -101,21 +118,6 @@
   --md-ext-lavender-purple: #6e528a;
   --md-ext-green-accent: #336210;
 
-  /* Typography Spec Vars */
-  --text-display-sm: 500 52px/60px var(--font-display);
-  --text-headline-md: 500 34px/42px var(--font-display);
-  --text-headline-sm: 500 26px/34px var(--font-display);
-  --text-title-lg: 500 20px/28px var(--font-display);
-  --text-title-md: 500 16px/24px var(--font-body);
-  --text-title-sm: 500 14px/20px var(--font-body);
-  --text-body-lg: 400 18px/28px var(--font-body);
-  --text-body-md: 400 16px/24px var(--font-body);
-  --text-body-sm: 400 14px/22px var(--font-body);
-  --text-label-lg: 600 16px/24px var(--font-body);
-  --text-label-md: 500 13px/20px var(--font-body);
-  --text-label-sm: 600 11px/16px var(--font-body);
-  --text-label-overline: 600 10px/16px var(--font-body);
-  --text-button: 500 16px/24px var(--font-body);
 }
 
 /* 3. DARK THEME OVERRIDES */
@@ -166,63 +168,6 @@ body {
   color: var(--md-sys-color-on-background);
   background-color: var(--md-sys-color-background);
   min-height: 100dvh;
-}
-
-@utility text-display-sm {
-  font: var(--text-display-sm);
-}
-
-@utility text-headline-md {
-  font: var(--text-headline-md);
-}
-
-@utility text-headline-sm {
-  font: var(--text-headline-sm);
-}
-
-@utility text-title-lg {
-  font: var(--text-title-lg);
-}
-
-@utility text-title-md {
-  font: var(--text-title-md);
-}
-
-@utility text-title-sm {
-  font: var(--text-title-sm);
-}
-
-@utility text-body-lg {
-  font: var(--text-body-lg);
-}
-
-@utility text-body-md {
-  font: var(--text-body-md);
-}
-
-@utility text-body-sm {
-  font: var(--text-body-sm);
-}
-
-@utility text-label-lg {
-  font: var(--text-label-lg);
-}
-
-@utility text-label-md {
-  font: var(--text-label-md);
-}
-
-@utility text-label-sm {
-  font: var(--text-label-sm);
-}
-
-@utility text-label-overline {
-  font: var(--text-label-overline);
-  text-transform: uppercase;
-}
-
-@utility text-button {
-  font: var(--text-button);
 }
 
 .hero-title-scrim {

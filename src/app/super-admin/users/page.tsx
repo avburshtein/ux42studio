@@ -4,6 +4,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { users } from '@/db/schema';
 import { Button } from '@/components/ui/Button';
+import PageTitle from '@/components/ui/PageTitle';
 import { toggleUserActive, setUserRole } from '@/lib/actions/admin';
 
 export default async function SuperAdminUsersPage() {
@@ -20,9 +21,7 @@ export default async function SuperAdminUsersPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <h1 className='text-headline-sm text-on-background mb-6'>
-                Управление пользователями
-            </h1>
+            <PageTitle className='mb-6'>Управление пользователями</PageTitle>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

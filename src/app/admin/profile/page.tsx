@@ -9,8 +9,14 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
-import { updateProfile, getOrCreateProfileId } from '@/lib/actions/profile';
+import PageTitle from '@/components/ui/PageTitle';
+import {
+    updateProfile,
+    getOrCreateProfileId,
+    getMyProfile,
+} from '@/lib/actions/profile';
 import Link from 'next/link';
+import FormBox from '@/components/ui/FormBox';
 
 const socialLinkSchema = z.object({
     id: z.string().optional(),
@@ -41,18 +47,11 @@ export default function ProfilePage() {
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const fetchProfileId = async () => {
-            const id = await getOrCreateProfileId();
-            setProfileId(id);
-        };
-        fetchProfileId();
-    }, []);
-
     const {
         register,
         handleSubmit,
         control,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -75,17 +74,48 @@ export default function ProfilePage() {
         remove: removeLink,
     } = useFieldArray({ control, name: 'socialLinks' });
 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const id = await getOrCreateProfileId();
+            setProfileId(id);
+            if (!id) return;
+
+            const profile = await getMyProfile();
+            if (profile) {
+                reset({
+                    fullName: profile.fullName,
+                    headline: profile.headline ?? '',
+                    bio: profile.bio ?? '',
+                    location: profile.location ?? '',
+                    website: profile.website ?? '',
+                    slug: profile.slug,
+                    avatarFileId: profile.avatarFileId ?? '',
+                    coverFileId: profile.coverFileId ?? '',
+                    socialLinks: profile.socialLinks.map((link) => ({
+                        id: link.id,
+                        platform:
+                            link.platform as FormData['socialLinks'][number]['platform'],
+                        title: link.title,
+                        url: link.url,
+                        order: link.order,
+                    })),
+                });
+            }
+        };
+        fetchProfile();
+    }, [reset]);
+
     const onSubmit = async (data: FormData) => {
         setSaving(true);
         setError(null);
         setSuccess(false);
         try {
-            const profileId = await getOrCreateProfileId();
-            if (!profileId) {
+            const id = profileId ?? (await getOrCreateProfileId());
+            if (!id) {
                 setError('Profile not found');
                 return;
             }
-            await updateProfile(profileId, {
+            await updateProfile(id, {
                 ...data,
                 headline: data.headline || undefined,
                 bio: data.bio || undefined,
@@ -103,28 +133,21 @@ export default function ProfilePage() {
         }
     };
 
-    const showMenu = async () => {
-        if (profileId) {
-            setError('Profile not found');
-            return (
-                <div className=''>
-                    <Link href='/admin'>Дашборд</Link>
-                </div>
-            );
-        }
-        return null;
-    };
-
     return (
-        <main className='mx-auto max-w-container-form px-4 py-8'>
+        <main className=''>
             <div className='flex items-center justify-between gap-4'>
-                <h1 className='mb-8 text-headline-sm text-on-background'>
-                    Настройки профиля
-                </h1>
-                {showMenu()}
+                <PageTitle className='mb-8'>Настройки профиля</PageTitle>
+                {profileId && (
+                    <Link
+                        href='/admin'
+                        className='text-body-sm text-primary hover:underline'
+                    >
+                        Дашборд
+                    </Link>
+                )}
             </div>
 
-            <div className=''>
+            <FormBox className=''>
                 <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                     <div>
                         <Label htmlFor='fullName'>Full Name *</Label>
@@ -311,7 +334,7 @@ export default function ProfilePage() {
                         </Button>
                     </div>
                 </form>
-            </div>
+            </FormBox>
         </main>
     );
 }

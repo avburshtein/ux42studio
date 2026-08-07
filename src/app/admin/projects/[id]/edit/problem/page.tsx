@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectProblem } from '@/lib/actions/projects';
 
 const formSchema = z.object({
@@ -61,9 +62,7 @@ export default function ProblemPage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>
-                Problem & Audience
-            </h2>
+            <Title className='mb-6'>Problem & Audience</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='problemStatement'>Problem Statement</Label>

@@ -1,6 +1,7 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import ProjectCard from '@/components/ProjectCard';
+import PageTitle from '@/components/ui/PageTitle';
 
 export const revalidate = 300;
 
@@ -34,9 +35,7 @@ export default async function HomePage() {
     return (
         <main className='max-w-page mx-auto px-4 py-8 sm:px-6 lg:px-8'>
             <header className='mb-8'>
-                <h1 className='text-headline-md text-on-background mb-2'>
-                    Каталог дизайнеров
-                </h1>
+                <PageTitle className='mb-2'>Каталог дизайнеров</PageTitle>
                 {allCategories.length > 0 && (
                     <div className='flex flex-wrap gap-2 mt-4'>
                         {allCategories.map((cat) => (

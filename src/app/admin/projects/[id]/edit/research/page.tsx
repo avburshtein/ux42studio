@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectResearch } from '@/lib/actions/projects';
 
 const personaSchema = z.object({
@@ -102,7 +103,7 @@ export default function ResearchPage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>Research</h2>
+            <Title className='mb-6'>Research</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
                     <Label htmlFor='researchMethodology'>

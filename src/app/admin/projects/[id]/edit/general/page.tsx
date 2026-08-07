@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectMeta } from '@/lib/actions/projects';
 
 const formSchema = z.object({
@@ -96,9 +97,7 @@ export default function GeneralPage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>
-                General (Meta)
-            </h2>
+            <Title className='mb-6'>General (Meta)</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='title'>Title *</Label>

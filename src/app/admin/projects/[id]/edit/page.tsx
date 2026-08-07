@@ -1,3 +1,5 @@
+import PageTitle from '@/components/ui/PageTitle';
+
 interface PageProps {
     params: Promise<{
         id: string;
@@ -9,9 +11,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
     return (
         <main className='p-8'>
-            <h1 className='text-2xl font-bold'>
-                Редактирование проекта #{projectId}
-            </h1>
+            <PageTitle>Редактирование проекта #{projectId}</PageTitle>
         </main>
     );
 }

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectShowcase } from '@/lib/actions/projects';
 
 const assetSchema = z.object({
@@ -106,7 +107,7 @@ export default function ShowcasePage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>Showcase</h2>
+            <Title className='mb-6'>Showcase</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
                     <Label htmlFor='finalDescription'>Final Description</Label>

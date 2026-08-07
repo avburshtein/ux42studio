@@ -7,6 +7,7 @@ import { desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import PageTitle from '@/components/ui/PageTitle';
 import { deleteProject } from '@/lib/actions/projects';
 
 export default async function AdminDashboardPage() {
@@ -35,9 +36,7 @@ export default async function AdminDashboardPage() {
         <main className='mx-auto max-w-container-content px-4 py-8'>
             <div className='mb-8 flex items-center justify-between'>
                 <div className=''>
-                    <h1 className='text-headline-sm text-on-background'>
-                        Мои проекты
-                    </h1>
+                    <PageTitle>Мои проекты</PageTitle>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
                         Управляйте своими кейсами
                     </p>

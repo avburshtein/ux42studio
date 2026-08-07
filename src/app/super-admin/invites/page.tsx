@@ -7,6 +7,8 @@ import { desc, eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
+import PageTitle from '@/components/ui/PageTitle';
+import Title from '@/components/ui/Title';
 import { createInvite, revokeInvite } from '@/lib/actions/admin';
 
 export default async function SuperAdminInvitesPage() {
@@ -36,14 +38,12 @@ export default async function SuperAdminInvitesPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <h1 className='text-headline-sm text-on-background mb-6'>
+            <PageTitle className='mb-6'>
                 Генерация и менеджмент инвайтов
-            </h1>
+            </PageTitle>
 
             <Card className='mb-8'>
-                <h2 className='text-title-sm text-on-surface mb-4'>
-                    Создать инвайт
-                </h2>
+                <Title className='mb-4'>Создать инвайт</Title>
                 <form
                     action={async (formData: FormData) => {
                         'use server';

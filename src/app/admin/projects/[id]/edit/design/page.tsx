@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectDesign } from '@/lib/actions/projects';
 
 const formSchema = z.object({
@@ -72,7 +73,7 @@ export default function DesignPage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>Design</h2>
+            <Title className='mb-6'>Design</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='visualDirection'>Visual Direction</Label>

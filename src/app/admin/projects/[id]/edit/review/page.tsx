@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
+import Title from '@/components/ui/Title';
 import { updateProjectReview } from '@/lib/actions/projects';
 
 const reviewItemSchema = z.object({
@@ -119,9 +120,7 @@ export default function ReviewPage({
 
     return (
         <Card>
-            <h2 className='mb-6 text-title-lg text-on-background'>
-                Review & Publish
-            </h2>
+            <Title className='mb-6'>Review & Publish</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
                     <Label htmlFor='keyTakeaway'>Key Takeaway</Label>

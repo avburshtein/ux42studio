@@ -6,6 +6,7 @@ import { projects, profiles } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
+import PageTitle from '@/components/ui/PageTitle';
 import { toggleHomepage } from '@/lib/actions/admin';
 
 export default async function SuperAdminProjectsPage() {
@@ -34,9 +35,7 @@ export default async function SuperAdminProjectsPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <h1 className='text-headline-sm text-on-background mb-6'>
-                Модерация всех проектов
-            </h1>
+            <PageTitle className='mb-6'>Модерация всех проектов</PageTitle>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

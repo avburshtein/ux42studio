@@ -23,6 +23,60 @@ export async function getMyProfileId(): Promise<string | null> {
     return profile?.id ?? null;
 }
 
+export type ProfileData = {
+    id: string;
+    fullName: string;
+    headline: string | null;
+    bio: string | null;
+    location: string | null;
+    website: string | null;
+    slug: string;
+    avatarFileId: string | null;
+    coverFileId: string | null;
+    socialLinks: Array<{
+        id: string;
+        platform: string;
+        title: string;
+        url: string;
+        order: number;
+    }>;
+};
+
+export async function getMyProfile(): Promise<ProfileData | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { userId },
+        with: { socialLinks: true },
+    });
+
+    if (!profile) return null;
+
+    return {
+        id: profile.id,
+        fullName: profile.fullName,
+        headline: profile.headline,
+        bio: profile.bio,
+        location: profile.location,
+        website: profile.website,
+        slug: profile.slug,
+        avatarFileId: profile.avatarFileId,
+        coverFileId: profile.coverFileId,
+        socialLinks: profile.socialLinks.map((link) => ({
+            id: link.id,
+            platform: link.platform,
+            title: link.title,
+            url: link.url,
+            order: link.order,
+        })),
+    };
+}
+
 export async function getOrCreateProfileId(): Promise<string | null> {
     const headersList = await headers();
     const userId = headersList.get('x-user-id');

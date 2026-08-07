@@ -5,6 +5,8 @@ import { getDb } from '@/db';
 import { users, projects, invites, profiles } from '@/db/schema';
 import { desc, sql, eq } from 'drizzle-orm';
 import { Card } from '@/components/ui/Card';
+import PageTitle from '@/components/ui/PageTitle';
+import Title from '@/components/ui/Title';
 
 export default async function SuperAdminOverviewPage() {
     const headersList = await headers();
@@ -50,9 +52,7 @@ export default async function SuperAdminOverviewPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <h1 className='text-headline-sm text-on-background mb-6'>
-                Обзорная статистика
-            </h1>
+            <PageTitle className='mb-6'>Обзорная статистика</PageTitle>
 
             <div className='mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3'>
                 {metrics.map((m) => (
@@ -68,9 +68,7 @@ export default async function SuperAdminOverviewPage() {
             </div>
 
             <div className='mb-10'>
-                <h2 className='text-title-md text-on-background mb-4'>
-                    Последние пользователи
-                </h2>
+                <Title className='mb-4'>Последние пользователи</Title>
                 <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                     <table className='w-full'>
                         <thead>
@@ -129,9 +127,7 @@ export default async function SuperAdminOverviewPage() {
             </div>
 
             <div>
-                <h2 className='text-title-md text-on-background mb-4'>
-                    Последние проекты
-                </h2>
+                <Title className='mb-4'>Последние проекты</Title>
                 <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                     <table className='w-full'>
                         <thead>
