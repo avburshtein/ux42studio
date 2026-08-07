@@ -6,7 +6,6 @@ export async function middleware(request: NextRequest) {
     const token = request.cookies.get('auth-token')?.value;
     const { pathname } = request.nextUrl;
 
-    // Нет куки → редирект на /login
     if (!token) {
         const loginUrl = new URL('/login', request.url);
         return NextResponse.redirect(loginUrl);
@@ -14,6 +13,9 @@ export async function middleware(request: NextRequest) {
 
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
+        console.error(
+            '❌ [Middleware]: JWT_SECRET не найден в process.env. Проверьте .env.local',
+        );
         return NextResponse.json(
             { error: 'JWT_SECRET is not configured' },
             { status: 500 },

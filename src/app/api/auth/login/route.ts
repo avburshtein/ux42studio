@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { users } from '@/db/schema/users';
 import { signJwt } from '@/lib/jwt';
 import { verifyPassword } from '@/lib/crypto';
 

@@ -17,6 +17,7 @@ export default async function SuperAdminLayout({
         { href: '/super-admin/users', label: 'Users' },
         { href: '/super-admin/invites', label: 'Invites' },
         { href: '/super-admin/projects', label: 'Projects' },
+        { href: '/admin', label: 'Admin' },
     ];
 
     return (
