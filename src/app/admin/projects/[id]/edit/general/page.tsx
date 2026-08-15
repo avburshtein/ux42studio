@@ -12,10 +12,11 @@ import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import { updateProjectMeta, getCategories } from '@/lib/actions/projects';
+import { slugify } from '@/lib/utils/slug';
 
 const formSchema = z.object({
     title: z.string().min(1, 'Title is required'),
-    slug: z.string().min(1, 'Slug is required'),
+    slug: z.string().optional().or(z.literal('')),
     teaser: z.string().max(200).optional().or(z.literal('')),
     client: z.string().optional().or(z.literal('')),
     year: z.any().optional(),
@@ -87,6 +88,15 @@ export default function GeneralPage({
     });
 
     const selectedCategoryIds = watch('categoryIds') ?? [];
+    const titleValue = watch('title');
+    const slugValue = watch('slug');
+
+    // Auto-fill slug from title when slug is empty
+    useEffect(() => {
+        if (!slugValue && titleValue) {
+            setValue('slug', slugify(titleValue));
+        }
+    }, [titleValue, slugValue, setValue]);
 
     const toggleCategory = (categoryId: string) => {
         const current = selectedCategoryIds;
@@ -139,7 +149,7 @@ export default function GeneralPage({
                 </div>
 
                 <div>
-                    <Label htmlFor='slug'>Slug *</Label>
+                    <Label htmlFor='slug'>Slug</Label>
                     <Input id='slug' {...register('slug')} />
                     {errors.slug && (
                         <p className='mt-1 text-body-sm text-error'>

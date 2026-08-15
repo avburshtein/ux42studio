@@ -18,6 +18,7 @@ import {
 } from '@/db/schema/project-details';
 import { eq, and, inArray, asc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { slugify } from '@/lib/utils/slug';
 
 // ---- Section 00: Meta ----
 
@@ -44,6 +45,11 @@ export async function updateProjectMeta(
     const db = getDb(env.DB);
 
     const { categoryIds, ...projectFields } = data;
+
+    // Auto-generate slug from title when slug is empty
+    if (!projectFields.slug?.trim() && projectFields.title?.trim()) {
+        projectFields.slug = slugify(projectFields.title);
+    }
 
     await db.batch([
         db
