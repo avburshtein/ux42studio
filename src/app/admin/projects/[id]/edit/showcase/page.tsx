@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import { updateProjectShowcase } from '@/lib/actions/projects';
 
 const assetSchema = z.object({
@@ -30,10 +31,18 @@ const comparisonSchema = z.object({
     order: z.number().int(),
 });
 
+const projectItemSchema = z.object({
+    id: z.string().optional(),
+    content: z.string().min(1, 'Content is required'),
+    order: z.number().int(),
+});
+
 const formSchema = z.object({
     finalDescription: z.string().optional().or(z.literal('')),
     assets: z.array(assetSchema),
     comparisons: z.array(comparisonSchema),
+    results: z.array(projectItemSchema),
+    tools: z.array(projectItemSchema),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -56,6 +65,7 @@ export default function ShowcasePage({
         register,
         handleSubmit,
         control,
+        setValue,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -63,6 +73,8 @@ export default function ShowcasePage({
             finalDescription: '',
             assets: [],
             comparisons: [],
+            results: [],
+            tools: [],
         },
     });
 
@@ -77,6 +89,18 @@ export default function ShowcasePage({
         append: appendComparison,
         remove: removeComparison,
     } = useFieldArray({ control, name: 'comparisons' });
+
+    const {
+        fields: resultFields,
+        append: appendResult,
+        remove: removeResult,
+    } = useFieldArray({ control, name: 'results' });
+
+    const {
+        fields: toolFields,
+        append: appendTool,
+        remove: removeTool,
+    } = useFieldArray({ control, name: 'tools' });
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;
@@ -95,6 +119,14 @@ export default function ShowcasePage({
                     afterFileId: c.afterFileId || undefined,
                     beforeText: c.beforeText || undefined,
                     afterText: c.afterText || undefined,
+                })),
+                results: data.results.map((r, i) => ({
+                    ...r,
+                    order: i,
+                })),
+                tools: data.tools.map((t, i) => ({
+                    ...t,
+                    order: i,
                 })),
             });
             router.push(`/admin/projects/${projectId}/edit/review`);
@@ -157,9 +189,19 @@ export default function ShowcasePage({
                             </div>
                             <div className='space-y-3'>
                                 <div>
-                                    <Label>File ID *</Label>
-                                    <Input
-                                        {...register(`assets.${index}.fileId`)}
+                                    <Label>Image *</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            (field as { fileId?: string })
+                                                .fileId || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                `assets.${index}.fileId`,
+                                                fileId ?? '',
+                                            )
+                                        }
+                                        aspectRatio={4 / 3}
                                     />
                                     {errors.assets?.[index]?.fileId && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -257,19 +299,41 @@ export default function ShowcasePage({
                                 </div>
                                 <div className='grid grid-cols-2 gap-3'>
                                     <div>
-                                        <Label>Before File ID</Label>
-                                        <Input
-                                            {...register(
-                                                `comparisons.${index}.beforeFileId`,
-                                            )}
+                                        <Label>Before Image</Label>
+                                        <ImageUploaderField
+                                            value={
+                                                (
+                                                    field as {
+                                                        beforeFileId?: string;
+                                                    }
+                                                ).beforeFileId || null
+                                            }
+                                            onChange={(fileId) =>
+                                                setValue(
+                                                    `comparisons.${index}.beforeFileId`,
+                                                    fileId ?? '',
+                                                )
+                                            }
+                                            aspectRatio={16 / 10}
                                         />
                                     </div>
                                     <div>
-                                        <Label>After File ID</Label>
-                                        <Input
-                                            {...register(
-                                                `comparisons.${index}.afterFileId`,
-                                            )}
+                                        <Label>After Image</Label>
+                                        <ImageUploaderField
+                                            value={
+                                                (
+                                                    field as {
+                                                        afterFileId?: string;
+                                                    }
+                                                ).afterFileId || null
+                                            }
+                                            onChange={(fileId) =>
+                                                setValue(
+                                                    `comparisons.${index}.afterFileId`,
+                                                    fileId ?? '',
+                                                )
+                                            }
+                                            aspectRatio={16 / 10}
                                         />
                                     </div>
                                 </div>
@@ -301,6 +365,104 @@ export default function ShowcasePage({
                                     value={index}
                                 />
                             </div>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Results */}
+                <div>
+                    <div className='mb-3 flex items-center justify-between'>
+                        <Label>Results</Label>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() =>
+                                appendResult({
+                                    content: '',
+                                    order: resultFields.length,
+                                })
+                            }
+                        >
+                            + Add Result
+                        </Button>
+                    </div>
+                    {resultFields.map((field, index) => (
+                        <div
+                            key={field.id}
+                            className='mb-3 flex items-start gap-3'
+                        >
+                            <div className='flex-1'>
+                                <Input
+                                    {...register(`results.${index}.content`)}
+                                    placeholder='Result description'
+                                />
+                                {errors.results?.[index]?.content && (
+                                    <p className='mt-1 text-body-sm text-error'>
+                                        Required
+                                    </p>
+                                )}
+                            </div>
+                            <Button
+                                type='button'
+                                variant='ghost'
+                                onClick={() => removeResult(index)}
+                            >
+                                Remove
+                            </Button>
+                            <input
+                                type='hidden'
+                                {...register(`results.${index}.order`)}
+                                value={index}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Tools */}
+                <div>
+                    <div className='mb-3 flex items-center justify-between'>
+                        <Label>Tools</Label>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() =>
+                                appendTool({
+                                    content: '',
+                                    order: toolFields.length,
+                                })
+                            }
+                        >
+                            + Add Tool
+                        </Button>
+                    </div>
+                    {toolFields.map((field, index) => (
+                        <div
+                            key={field.id}
+                            className='mb-3 flex items-start gap-3'
+                        >
+                            <div className='flex-1'>
+                                <Input
+                                    {...register(`tools.${index}.content`)}
+                                    placeholder='Tool name'
+                                />
+                                {errors.tools?.[index]?.content && (
+                                    <p className='mt-1 text-body-sm text-error'>
+                                        Required
+                                    </p>
+                                )}
+                            </div>
+                            <Button
+                                type='button'
+                                variant='ghost'
+                                onClick={() => removeTool(index)}
+                            >
+                                Remove
+                            </Button>
+                            <input
+                                type='hidden'
+                                {...register(`tools.${index}.order`)}
+                                value={index}
+                            />
                         </div>
                     ))}
                 </div>

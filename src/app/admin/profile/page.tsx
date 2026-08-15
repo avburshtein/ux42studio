@@ -17,6 +17,7 @@ import {
 } from '@/lib/actions/profile';
 import Link from 'next/link';
 import FormBox from '@/components/ui/FormBox';
+import ImageUploaderField from '@/components/ImageUploaderField';
 
 const socialLinkSchema = z.object({
     id: z.string().optional(),
@@ -52,6 +53,8 @@ export default function ProfilePage() {
         handleSubmit,
         control,
         reset,
+        setValue,
+        watch,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -199,16 +202,25 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                        <Label htmlFor='avatarFileId'>Avatar File ID</Label>
-                        <Input
-                            id='avatarFileId'
-                            {...register('avatarFileId')}
+                        <Label>Avatar</Label>
+                        <ImageUploaderField
+                            value={watch('avatarFileId') || null}
+                            onChange={(fileId) =>
+                                setValue('avatarFileId', fileId ?? '')
+                            }
+                            aspectRatio={1}
                         />
                     </div>
 
                     <div>
-                        <Label htmlFor='coverFileId'>Cover File ID</Label>
-                        <Input id='coverFileId' {...register('coverFileId')} />
+                        <Label>Cover</Label>
+                        <ImageUploaderField
+                            value={watch('coverFileId') || null}
+                            onChange={(fileId) =>
+                                setValue('coverFileId', fileId ?? '')
+                            }
+                            aspectRatio={16 / 5}
+                        />
                     </div>
 
                     {/* Social Links */}

@@ -10,7 +10,11 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
-import { updateProjectReview } from '@/lib/actions/projects';
+import {
+    updateProjectReview,
+    getProjectPreviewInfo,
+} from '@/lib/actions/projects';
+import Link from 'next/link';
 
 const reviewItemSchema = z.object({
     id: z.string().optional(),
@@ -30,8 +34,6 @@ const projectItemSchema = z.object({
 const formSchema = z.object({
     keyTakeaway: z.string().optional().or(z.literal('')),
     reviews: z.array(reviewItemSchema),
-    results: z.array(projectItemSchema),
-    tools: z.array(projectItemSchema),
     nextSteps: z.array(projectItemSchema),
     publish: z.boolean().optional(),
 });
@@ -47,6 +49,7 @@ export default function ReviewPage({
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
@@ -62,8 +65,6 @@ export default function ReviewPage({
         defaultValues: {
             keyTakeaway: '',
             reviews: [],
-            results: [],
-            tools: [],
             nextSteps: [],
             publish: false,
         },
@@ -76,18 +77,6 @@ export default function ReviewPage({
     } = useFieldArray({ control, name: 'reviews' });
 
     const {
-        fields: resultFields,
-        append: appendResult,
-        remove: removeResult,
-    } = useFieldArray({ control, name: 'results' });
-
-    const {
-        fields: toolFields,
-        append: appendTool,
-        remove: removeTool,
-    } = useFieldArray({ control, name: 'tools' });
-
-    const {
         fields: nextStepFields,
         append: appendNextStep,
         remove: removeNextStep,
@@ -97,8 +86,9 @@ export default function ReviewPage({
         if (!projectId) return;
         setSaving(true);
         setError(null);
+        setPreviewUrl(null);
         try {
-            await updateProjectReview(projectId, {
+            const result = await updateProjectReview(projectId, {
                 keyTakeaway: data.keyTakeaway || undefined,
                 reviews: data.reviews.map((r) => ({
                     ...r,
@@ -109,8 +99,22 @@ export default function ReviewPage({
                     ...n,
                     order: i,
                 })),
+                publish: data.publish,
             });
-            router.push('/admin');
+
+            if (result && 'error' in result && result.error) {
+                setError(result.error);
+                return;
+            }
+
+            if (data.publish) {
+                const info = await getProjectPreviewInfo(projectId);
+                if (info) {
+                    setPreviewUrl(`/u/${info.authorSlug}/${info.projectSlug}`);
+                }
+            } else {
+                router.push('/admin');
+            }
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
         } finally {
@@ -222,104 +226,6 @@ export default function ReviewPage({
                     ))}
                 </div>
 
-                {/* Results */}
-                <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Results</Label>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() =>
-                                appendResult({
-                                    content: '',
-                                    order: resultFields.length,
-                                })
-                            }
-                        >
-                            + Add Result
-                        </Button>
-                    </div>
-                    {resultFields.map((field, index) => (
-                        <div
-                            key={field.id}
-                            className='mb-3 flex items-start gap-3'
-                        >
-                            <div className='flex-1'>
-                                <Input
-                                    {...register(`results.${index}.content`)}
-                                    placeholder='Result description'
-                                />
-                                {errors.results?.[index]?.content && (
-                                    <p className='mt-1 text-body-sm text-error'>
-                                        Required
-                                    </p>
-                                )}
-                            </div>
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                onClick={() => removeResult(index)}
-                            >
-                                Remove
-                            </Button>
-                            <input
-                                type='hidden'
-                                {...register(`results.${index}.order`)}
-                                value={index}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Tools */}
-                <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Tools</Label>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() =>
-                                appendTool({
-                                    content: '',
-                                    order: toolFields.length,
-                                })
-                            }
-                        >
-                            + Add Tool
-                        </Button>
-                    </div>
-                    {toolFields.map((field, index) => (
-                        <div
-                            key={field.id}
-                            className='mb-3 flex items-start gap-3'
-                        >
-                            <div className='flex-1'>
-                                <Input
-                                    {...register(`tools.${index}.content`)}
-                                    placeholder='Tool name'
-                                />
-                                {errors.tools?.[index]?.content && (
-                                    <p className='mt-1 text-body-sm text-error'>
-                                        Required
-                                    </p>
-                                )}
-                            </div>
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                onClick={() => removeTool(index)}
-                            >
-                                Remove
-                            </Button>
-                            <input
-                                type='hidden'
-                                {...register(`tools.${index}.order`)}
-                                value={index}
-                            />
-                        </div>
-                    ))}
-                </div>
-
                 {/* Next Steps */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
@@ -380,7 +286,23 @@ export default function ReviewPage({
                     <Label htmlFor='publish'>Publish project</Label>
                 </div>
 
-                {error && <p className='text-body-sm text-error'>{error}</p>}
+                {/* Reserved helper text space (no layout shift) */}
+                <div className='min-h-[1.5rem]'>
+                    {error && (
+                        <p className='text-body-sm text-error'>{error}</p>
+                    )}
+                    {previewUrl && (
+                        <p className='text-body-sm text-primary'>
+                            Published!{' '}
+                            <Link
+                                href={previewUrl}
+                                className='underline hover:opacity-80'
+                            >
+                                View live preview
+                            </Link>
+                        </p>
+                    )}
+                </div>
 
                 <div className='flex justify-between gap-3 pt-4'>
                     <Button

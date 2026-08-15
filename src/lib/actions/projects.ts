@@ -7,6 +7,7 @@ import {
     projectCategories,
     projectAssets,
 } from '@/db/schema/projects';
+import { categories } from '@/db/schema/categories';
 import {
     projectPersonas,
     projectKeyMetrics,
@@ -14,7 +15,7 @@ import {
     projectReviews,
     projectItems,
 } from '@/db/schema/project-details';
-import { eq } from 'drizzle-orm';
+import { eq, and, inArray, asc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 
 // ---- Section 00: Meta ----
@@ -35,13 +36,46 @@ export async function updateProjectMeta(
         coverFileId?: string;
         figmaPrototypeUrl?: string;
         webPrototypeUrl?: string;
+        categoryIds?: string[];
     },
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    await db.update(projects).set(data).where(eq(projects.id, projectId));
+    const { categoryIds, ...projectFields } = data;
+
+    await db.batch([
+        db
+            .update(projects)
+            .set(projectFields)
+            .where(eq(projects.id, projectId)),
+        db
+            .delete(projectCategories)
+            .where(eq(projectCategories.projectId, projectId)),
+        ...(categoryIds || []).map((categoryId) =>
+            db.insert(projectCategories).values({ projectId, categoryId }),
+        ),
+    ]);
+
     revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Categories ----
+
+export async function getCategories() {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    return db
+        .select({
+            id: categories.id,
+            name: categories.name,
+            slug: categories.slug,
+            order: categories.order,
+        })
+        .from(categories)
+        .orderBy(asc(categories.order), asc(categories.name))
+        .all();
 }
 
 // ---- Section 02: Problem & Audience ----
@@ -227,11 +261,15 @@ export async function updateProjectShowcase(
             }),
         ),
 
-        // Replace result items
-        db.delete(projectItems).where(
-            eq(projectItems.projectId, projectId),
-            // Удаляем только results и tools, не next_steps
-        ),
+        // Replace result/tool items (keep next_step items intact)
+        db
+            .delete(projectItems)
+            .where(
+                and(
+                    eq(projectItems.projectId, projectId),
+                    inArray(projectItems.type, ['result', 'tool']),
+                ),
+            ),
         ...(data.results || []).map((r) =>
             db.insert(projectItems).values({
                 id: r.id || crypto.randomUUID(),
@@ -274,10 +312,24 @@ export async function updateProjectReview(
             content: string;
             order: number;
         }>;
+        publish?: boolean;
     },
-) {
+): Promise<{ error?: string } | void> {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
+
+    // Validate title before publishing
+    if (data.publish) {
+        const project = await db
+            .select({ title: projects.title })
+            .from(projects)
+            .where(eq(projects.id, projectId))
+            .get();
+
+        if (!project?.title?.trim()) {
+            return { error: 'Title is required before publishing' };
+        }
+    }
 
     await db.batch([
         // Update project-level fields
@@ -303,6 +355,14 @@ export async function updateProjectReview(
         ),
 
         // Replace next_step items
+        db
+            .delete(projectItems)
+            .where(
+                and(
+                    eq(projectItems.projectId, projectId),
+                    eq(projectItems.type, 'next_step'),
+                ),
+            ),
         ...(data.nextSteps || []).map((n) =>
             db.insert(projectItems).values({
                 id: n.id || crypto.randomUUID(),
@@ -314,7 +374,44 @@ export async function updateProjectReview(
         ),
     ]);
 
+    // Publish
+    if (data.publish) {
+        await db
+            .update(projects)
+            .set({
+                status: 'published',
+                publishedAt: Math.floor(Date.now() / 1000),
+            })
+            .where(eq(projects.id, projectId));
+    }
+
     revalidatePath(`/admin/projects/${projectId}`);
+    revalidatePath('/');
+}
+
+// ---- Preview ----
+
+export async function getProjectPreviewInfo(projectId: string): Promise<{
+    authorSlug: string;
+    projectSlug: string;
+} | null> {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db.query.projects.findFirst({
+        where: { id: projectId },
+        with: {
+            profile: { columns: { slug: true } },
+        },
+        columns: { slug: true },
+    });
+
+    if (!project || !project.profile) return null;
+
+    return {
+        authorSlug: project.profile.slug,
+        projectSlug: project.slug,
+    };
 }
 
 // ---- Delete ----

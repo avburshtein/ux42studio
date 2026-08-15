@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
-import { updateProjectMeta } from '@/lib/actions/projects';
+import ImageUploaderField from '@/components/ImageUploaderField';
+import { updateProjectMeta, getCategories } from '@/lib/actions/projects';
 
 const formSchema = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -31,6 +32,13 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
+type Category = {
+    id: string;
+    name: string;
+    slug: string;
+    order: number;
+};
+
 export default function GeneralPage({
     params,
 }: {
@@ -40,14 +48,23 @@ export default function GeneralPage({
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
+    useEffect(() => {
+        getCategories()
+            .then(setCategories)
+            .catch(() => setCategories([]));
+    }, []);
+
     const {
         register,
         handleSubmit,
+        setValue,
+        watch,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -65,8 +82,19 @@ export default function GeneralPage({
             coverFileId: '',
             figmaPrototypeUrl: '',
             webPrototypeUrl: '',
+            categoryIds: [],
         },
     });
+
+    const selectedCategoryIds = watch('categoryIds') ?? [];
+
+    const toggleCategory = (categoryId: string) => {
+        const current = selectedCategoryIds;
+        const next = current.includes(categoryId)
+            ? current.filter((id) => id !== categoryId)
+            : [...current, categoryId];
+        setValue('categoryIds', next);
+    };
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;
@@ -86,6 +114,7 @@ export default function GeneralPage({
                 coverFileId: data.coverFileId || undefined,
                 figmaPrototypeUrl: data.figmaPrototypeUrl || undefined,
                 webPrototypeUrl: data.webPrototypeUrl || undefined,
+                categoryIds: data.categoryIds ?? [],
             });
             router.push(`/admin/projects/${projectId}/edit/problem`);
         } catch (e) {
@@ -166,8 +195,45 @@ export default function GeneralPage({
                 </div>
 
                 <div>
-                    <Label htmlFor='coverFileId'>Cover Image ID</Label>
-                    <Input id='coverFileId' {...register('coverFileId')} />
+                    <Label>Cover Image</Label>
+                    <ImageUploaderField
+                        value={watch('coverFileId') || null}
+                        onChange={(fileId) =>
+                            setValue('coverFileId', fileId ?? '')
+                        }
+                        aspectRatio={16 / 9}
+                    />
+                </div>
+
+                <div>
+                    <Label>Categories</Label>
+                    {categories.length === 0 ? (
+                        <p className='text-body-sm text-on-surface-variant'>
+                            No categories available
+                        </p>
+                    ) : (
+                        <div className='flex flex-wrap gap-2'>
+                            {categories.map((cat) => {
+                                const selected = selectedCategoryIds.includes(
+                                    cat.id,
+                                );
+                                return (
+                                    <button
+                                        key={cat.id}
+                                        type='button'
+                                        onClick={() => toggleCategory(cat.id)}
+                                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-label-md transition-colors ${
+                                            selected
+                                                ? 'border-primary bg-primary-container text-on-primary-container'
+                                                : 'border-outline-variant text-on-surface-variant hover:border-outline'
+                                        }`}
+                                    >
+                                        {cat.name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
                 </div>
 
                 <div>
