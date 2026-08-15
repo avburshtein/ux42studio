@@ -3,25 +3,51 @@ import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { users } from '@/db/schema';
+import { like, desc } from 'drizzle-orm';
 import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import PageTitle from '@/components/ui/PageTitle';
 import { toggleUserActive, setUserRole } from '@/lib/actions/admin';
 
-export default async function SuperAdminUsersPage() {
+export default async function SuperAdminUsersPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ q?: string }>;
+}) {
     const headersList = await headers();
     const userId = headersList.get('x-user-id');
     if (!userId) redirect('/login');
 
+    const { q } = await searchParams;
+
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    const allUsers = await db.query.users.findMany({
-        orderBy: (users, { desc }) => [desc(users.createdAt)],
-    });
+    const allUsers = await db
+        .select()
+        .from(users)
+        .where(q ? like(users.email, `%${q}%`) : undefined)
+        .orderBy(desc(users.createdAt));
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
             <PageTitle className='mb-6'>Управление пользователями</PageTitle>
+
+            <form
+                method='GET'
+                action='/super-admin/users'
+                className='mb-6 flex max-w-md gap-2'
+            >
+                <Input
+                    type='search'
+                    name='q'
+                    defaultValue={q ?? ''}
+                    placeholder='Поиск по email...'
+                />
+                <Button type='submit' variant='outline'>
+                    Найти
+                </Button>
+            </form>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

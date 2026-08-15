@@ -45,6 +45,14 @@ export async function POST(req: Request) {
             );
         }
 
+        // 2.1 Проверка блокировки пользователя
+        if (!user.isActive) {
+            return NextResponse.json(
+                { message: 'Account is blocked' },
+                { status: 403 },
+            );
+        }
+
         // 3. Генерация JWT
         const jwtSecret = env.JWT_SECRET || process.env.JWT_SECRET;
         if (!jwtSecret) throw new Error('JWT_SECRET is not configured');

@@ -1,5 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { getDb } from '@/db';
+import { users } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 import { verifyJwt } from '@/lib/jwt';
 
 export async function middleware(request: NextRequest) {
@@ -33,6 +37,25 @@ export async function middleware(request: NextRequest) {
         email: string;
         role: string;
     };
+
+    // Проверка блокировки пользователя
+    try {
+        const { env } = await getCloudflareContext();
+        const db = getDb(env.DB);
+        const user = await db
+            .select({ isActive: users.isActive })
+            .from(users)
+            .where(eq(users.id, userId))
+            .get();
+
+        if (!user || !user.isActive) {
+            const res = NextResponse.redirect(new URL('/login', request.url));
+            res.cookies.delete('auth-token');
+            return res;
+        }
+    } catch (err) {
+        console.error('❌ [Middleware]: Ошибка проверки isActive', err);
+    }
 
     // Проверка доступа к /super-admin/* — только admin
     if (pathname.startsWith('/super-admin') && role !== 'admin') {
