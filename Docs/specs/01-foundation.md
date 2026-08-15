@@ -86,14 +86,13 @@ export const config = {
 };
 ```
 
-**Важно:** middleware в Edge-рантайме. `verifyJwt` должен работать без Node.js-зависимостей (Web Crypto API). Проверить, что `@/lib/jwt` использует `crypto.subtle` из Web Crypto, а не `jsonwebtoken` из Node.
+**Важно:** middleware в Edge-рантайме. `verifyJwt` должен работать без Node.js-зависимостей. Проверить, что `@/lib/jwt` использует библиотеку `jose@^6`, а не `jsonwebtoken` из Node.
 
 ### Файл: `src/lib/jwt.ts` (проверить/дописать)
 
 Убедиться, что:
 
-- `signJwt` использует `crypto.subtle.importKey` + `crypto.subtle.sign` (HMAC-SHA256)
-- `verifyJwt` использует `crypto.subtle.verify`
+- `signJwt` и `verifyJwt` используют библиотеку `jose@^6` (`SignJWT`, `jwtVerify`), алгоритм HS256
 - Нет импортов из `jsonwebtoken` или других Node.js-библиотек
 
 ---

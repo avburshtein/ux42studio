@@ -13,7 +13,7 @@
 
 Регистрация по приглашениям: Закрытый доступ на основе инвайт-кодов для контроля качества платформы на этапе MVP.
 
-Изолированная суперадминка: Полная защита интерфейса управления платформой на сетевом уровне с помощью Cloudflare Zero Trust без написания собственной сложной логики авторизации для админа.
+Изолированная суперадминка: Доступ к `/super-admin/*` ограничен ролью `admin` через JWT-авторизацию в middleware (роль выдаётся при инициализации и делегируется через `/super-admin/users`).
 
 Адаптация под Free Tier: Оптимизация архитектуры под бесплатные лимиты Cloudflare (D1 + R2), гарантирующая нулевую стоимость хостинга и отсутствие платы за исходящий трафик (no egress fees).
 
@@ -54,7 +54,7 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 
 Хранилище медиа: Cloudflare R2 — объектное хранилище для аватаров, обложек и галерей проектов.
 
-Безопасность суперадминки: Cloudflare Zero Trust (Access) — периметральная авторизация для маршрутов /super-admin/\*.
+Безопасность суперадминки: JWT-авторизация с ролью `admin` для маршрутов `/super-admin/*` (проверка в middleware).
 
 Деплой и Сборка: Cloudflare Pages / Workers via @opennextjs/cloudflare.
 
@@ -125,7 +125,7 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 - `GET /admin/projects/[id]/edit` — Редактирование проекта и загрузка галереи
 - `GET /admin/profile` — Настройки профиля (аватар, bio, соцсети)
 
-**Суперадминка (Cloudflare Zero Trust: `/super-admin/*`)**
+**Суперадминка (JWT, роль `admin`: `/super-admin/*`)**
 
 - `GET /super-admin` — Обзорная статистика платформы
 - `GET /super-admin/users` — Список всех пользователей (блокировка, поиск)
@@ -134,7 +134,7 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 
 **Внутренние API-эндпоинты / Server Actions (API)**
 
-- `POST /api/upload` — Direct upload в Cloudflare R2 (получение presigned URL или прямой прокси)
+- `POST /api/upload` — прямой server-side upload в Cloudflare R2 (multipart → `MY_BUCKET.put`)
 - `GET /api/health` — Проверка статуса сервиса / D1 / R2
 
 ### Поток создания кейса (`Case Template Engine`), основные секции:

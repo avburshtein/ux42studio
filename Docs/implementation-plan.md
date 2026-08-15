@@ -91,7 +91,7 @@
 
 - Запрос `profiles` → `projects` текущего пользователя
 - Таблица: title, status, viewsCount, дата создания
-- Кнопки: «Создать», «Редактировать», «Удалить» (soft)
+- Кнопки: «Создать», «Редактировать», «Удалить» (hard-delete)
 
 ### 3.2 Создание проекта `GET /admin/projects/new`
 
@@ -173,7 +173,7 @@
 
 ### 5.1 Upload в R2 `POST /api/upload`
 
-- Генерация presigned URL через нативный Web Crypto API (без `@aws-sdk/client-s3`)
+- Прямой server-side upload: multipart → `env.MY_BUCKET.put` (без presigned URL)
 - Запись метаданных в таблицу `files`
 - Валидация MIME-типов и размера
 
@@ -188,7 +188,7 @@
 - `auth.ts` — login, register, logout
 - `projects.ts` — createProject, updateProjectMeta, updateProjectProblem, updateProjectResearch, updateProjectDesign, updateProjectShowcase, updateProjectReview, deleteProject, publishProject
 - `profile.ts` — updateProfile, addSocialLink, removeSocialLink
-- `upload.ts` — getPresignedUrl, confirmUpload
+- `upload.ts` — uploadFile (прямой server-side PUT в R2)
 - `admin.ts` — createInvite, revokeInvite, toggleUserActive
 
 ---
@@ -254,9 +254,9 @@
 - Использование `db.batch()` Drizzle для мутаций, затрагивающих несколько таблиц
 - Проверка совместимости `@opennextjs/cloudflare` → D1 batch на старте Этапа 3
 
-### R2 Presigned URL
+### R2 Upload
 
-- Нативный Web Crypto API для подписи (без `@aws-sdk/client-s3`)
+- Прямой server-side PUT в R2 (`env.MY_BUCKET.put`) через multipart
 - Совместимость с Edge-рантаймом Cloudflare Workers
 
 ### Стилизация

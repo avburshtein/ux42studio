@@ -41,7 +41,7 @@
     - MIME-тип: только изображения (`image/png`, `image/jpeg`, `image/webp`, `image/svg+xml`)
     - Размер: макс 10 MB
 4. Сгенерировать `r2Key`: `uploads/{userId}/{crypto.randomUUID()}-{fileName}`
-5. Загрузить в R2: `env.R2.put(r2Key, file.stream(), { httpMetadata: { contentType } })`
+5. Загрузить в R2: `env.MY_BUCKET.put(r2Key, file.stream(), { httpMetadata: { contentType } })`
 6. Записать метаданные в `files`:
     ```ts
     await db.insert(files).values({
@@ -57,17 +57,7 @@
     ```
 7. Вернуть `{ fileId, r2Key, url: `/r2/${r2Key}` }`
 
-**Важно:** R2 в Cloudflare Workers доступен через `env.R2` (бакет должен быть настроен в `wrangler.toml`). Проверить, что бакет называется, например, `UX42_MEDIA` и доступен через `env.UX42_MEDIA`.
-
-### Альтернатива: Presigned URL (если прямая загрузка не работает)
-
-Если `env.R2.put()` недоступен в рантайме Next.js на Cloudflare, использовать presigned URL:
-
-1. `POST /api/upload` → генерирует presigned URL через Web Crypto API
-2. Клиент загружает файл напрямую в R2 по presigned URL
-3. `POST /api/upload/confirm` → клиент подтверждает загрузку, сервер записывает метаданные в `files`
-
-**Выбор подхода:** начать с прямого `env.R2.put()`. Если не работает — переключиться на presigned URL.
+**Важно:** R2 в Cloudflare Workers доступен через `env.MY_BUCKET` (бакет должен быть настроен в `wrangler.toml`). Реализован прямой server-side PUT (`env.MY_BUCKET.put`), presigned URL не используется.
 
 ---
 
@@ -160,8 +150,7 @@ export async function logout() {
 
 ```ts
 'use server';
-// getPresignedUrl — если выбран подход с presigned URL
-// confirmUpload — подтверждение загрузки, запись в files
+// uploadFile — прямой server-side PUT в R2 (multipart → env.MY_BUCKET.put)
 ```
 
 ---
