@@ -466,6 +466,53 @@ export async function getProjectPreviewInfo(projectId: string): Promise<{
     };
 }
 
+// ---- Archive / Restore ----
+
+export async function archiveProject(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(projects)
+        .set({
+            status: 'archived',
+            showOnHomepage: 0,
+        })
+        .where(eq(projects.id, projectId));
+
+    revalidatePath('/admin');
+    revalidatePath('/');
+}
+
+export async function unarchiveProject(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(projects)
+        .set({
+            status: 'published',
+            publishedAt: Math.floor(Date.now() / 1000),
+        })
+        .where(eq(projects.id, projectId));
+
+    revalidatePath('/admin');
+    revalidatePath('/');
+}
+
+export async function getProjectStatus(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ status: projects.status })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    return project?.status ?? null;
+}
+
 // ---- Delete ----
 
 export async function deleteProject(projectId: string) {

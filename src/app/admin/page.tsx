@@ -3,14 +3,31 @@ import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { projects, profiles } from '@/db/schema';
-import { desc } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import PageTitle from '@/components/ui/PageTitle';
-import { deleteProject } from '@/lib/actions/projects';
+import {
+    deleteProject,
+    archiveProject,
+    unarchiveProject,
+} from '@/lib/actions/projects';
 
-export default async function AdminDashboardPage() {
+const STATUS_TABS = [
+    { value: 'all', label: 'Все' },
+    { value: 'draft', label: 'Черновики' },
+    { value: 'published', label: 'Опубликованные' },
+    { value: 'archived', label: 'Архив' },
+] as const;
+
+type StatusFilter = (typeof STATUS_TABS)[number]['value'];
+
+export default async function AdminDashboardPage({
+    searchParams,
+}: {
+    searchParams: Promise<{ status?: string }>;
+}) {
     const headersList = await headers();
     const userId = headersList.get('x-user-id');
     if (!userId) redirect('/login');
@@ -27,8 +44,18 @@ export default async function AdminDashboardPage() {
         redirect('/admin/profile');
     }
 
+    const params = await searchParams;
+    const statusFilter: StatusFilter = STATUS_TABS.some(
+        (t) => t.value === params.status,
+    )
+        ? (params.status as StatusFilter)
+        : 'all';
+
     const projectList = await db.query.projects.findMany({
-        where: { profileId: profile.id },
+        where:
+            statusFilter === 'all'
+                ? { profileId: profile.id }
+                : { profileId: profile.id, status: statusFilter },
         orderBy: (projects, { desc }) => [desc(projects.updatedAt)],
     });
 
@@ -54,13 +81,33 @@ export default async function AdminDashboardPage() {
                 </div>
             </div>
 
+            <div className='mb-6 flex gap-2 border-b border-outline-variant pb-0'>
+                {STATUS_TABS.map((tab) => (
+                    <Link
+                        key={tab.value}
+                        href={
+                            tab.value === 'all'
+                                ? '/admin'
+                                : `/admin?status=${tab.value}`
+                        }
+                        className={`px-4 py-2 text-label-md -mb-px border-b-2 ${
+                            statusFilter === tab.value
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-on-surface-variant hover:text-on-surface'
+                        }`}
+                    >
+                        {tab.label}
+                    </Link>
+                ))}
+            </div>
+
             {projectList.length === 0 ? (
                 <Card className='flex flex-col items-center gap-4 py-16 text-center'>
                     <p className='text-body-lg text-on-surface-variant'>
-                        У вас пока нет проектов
+                        Проектов в этой категории нет
                     </p>
                     <Link href='/admin/projects/new'>
-                        <Button>Создать первый проект</Button>
+                        <Button>Создать проект</Button>
                     </Link>
                 </Card>
             ) : (
@@ -99,12 +146,17 @@ export default async function AdminDashboardPage() {
                                             className={`inline-block rounded-full px-2 py-0.5 text-label-sm ${
                                                 project.status === 'published'
                                                     ? 'bg-primary-container text-on-primary-container'
-                                                    : 'bg-surface-variant text-on-surface-variant'
+                                                    : project.status ===
+                                                        'archived'
+                                                      ? 'bg-surface-variant text-on-surface-variant'
+                                                      : 'bg-surface-variant text-on-surface-variant'
                                             }`}
                                         >
                                             {project.status === 'published'
                                                 ? 'Опубликован'
-                                                : 'Черновик'}
+                                                : project.status === 'archived'
+                                                  ? 'Архив'
+                                                  : 'Черновик'}
                                         </span>
                                     </td>
                                     <td className='px-4 py-3 text-body-sm text-on-surface-variant'>
@@ -117,6 +169,41 @@ export default async function AdminDashboardPage() {
                                     </td>
                                     <td className='px-4 py-3 text-right'>
                                         <div className='flex items-center justify-end gap-2'>
+                                            {project.status === 'published' && (
+                                                <form
+                                                    action={async () => {
+                                                        'use server';
+                                                        await archiveProject(
+                                                            project.id,
+                                                        );
+                                                    }}
+                                                >
+                                                    <Button
+                                                        variant='ghost'
+                                                        type='submit'
+                                                    >
+                                                        В архив
+                                                    </Button>
+                                                </form>
+                                            )}
+                                            {project.status === 'archived' && (
+                                                <form
+                                                    action={async () => {
+                                                        'use server';
+                                                        await unarchiveProject(
+                                                            project.id,
+                                                        );
+                                                    }}
+                                                >
+                                                    <Button
+                                                        variant='ghost'
+                                                        type='submit'
+                                                        className='text-primary'
+                                                    >
+                                                        Восстановить
+                                                    </Button>
+                                                </form>
+                                            )}
                                             <Link
                                                 href={`/admin/projects/${project.id}/edit/general`}
                                             >

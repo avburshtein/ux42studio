@@ -13,6 +13,8 @@ import Title from '@/components/ui/Title';
 import {
     updateProjectReview,
     getProjectPreviewInfo,
+    archiveProject,
+    getProjectStatus,
 } from '@/lib/actions/projects';
 import Link from 'next/link';
 
@@ -50,10 +52,17 @@ export default function ReviewPage({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [projectStatus, setProjectStatus] = useState<string | null>(null);
+    const [archiving, setArchiving] = useState(false);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
     }, [params]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectStatus(projectId).then((status) => setProjectStatus(status));
+    }, [projectId]);
 
     const {
         register,
@@ -285,6 +294,29 @@ export default function ReviewPage({
                     />
                     <Label htmlFor='publish'>Publish project</Label>
                 </div>
+
+                {/* Archive */}
+                {projectStatus === 'published' && (
+                    <div className='flex items-center gap-2'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            disabled={archiving}
+                            onClick={async () => {
+                                if (!projectId) return;
+                                setArchiving(true);
+                                try {
+                                    await archiveProject(projectId);
+                                    setProjectStatus('archived');
+                                } finally {
+                                    setArchiving(false);
+                                }
+                            }}
+                        >
+                            {archiving ? 'Архивация...' : 'В архив'}
+                        </Button>
+                    </div>
+                )}
 
                 {/* Reserved helper text space (no layout shift) */}
                 <div className='min-h-[1.5rem]'>
