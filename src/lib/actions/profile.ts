@@ -173,3 +173,20 @@ export async function removeSocialLink(linkId: string) {
     await db.delete(socialLinks).where(eq(socialLinks.id, linkId));
     revalidatePath('/admin/profile');
 }
+
+export async function updateSocialLinkOrder(
+    profileId: string,
+    links: Array<{ id: string; order: number }>,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    for (const l of links) {
+        await db
+            .update(socialLinks)
+            .set({ order: l.order })
+            .where(eq(socialLinks.id, l.id));
+    }
+
+    revalidatePath('/admin/profile');
+}

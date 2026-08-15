@@ -12,6 +12,11 @@ import {
     SelectValue,
 } from '@/components/ui/Select';
 import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import {
+    addSocialLink,
+    removeSocialLink,
+    updateSocialLinkOrder,
+} from '@/lib/actions/profile';
 
 type SocialLink = {
     id?: string;
@@ -22,8 +27,8 @@ type SocialLink = {
 };
 
 type SocialLinksEditorProps = {
-    value: SocialLink[];
-    onChange: (links: SocialLink[]) => void;
+    profileId: string;
+    initialLinks: SocialLink[];
 };
 
 const PLATFORM_OPTIONS = [
@@ -40,28 +45,53 @@ const PLATFORM_OPTIONS = [
 ];
 
 export default function SocialLinksEditor({
-    value,
-    onChange,
+    profileId,
+    initialLinks,
 }: SocialLinksEditorProps) {
+    const [links, setLinks] = useState<SocialLink[]>(initialLinks);
     const [dragIndex, setDragIndex] = useState<number | null>(null);
+    const [busy, setBusy] = useState(false);
 
-    const addLink = () => {
-        onChange([
-            ...value,
-            {
+    const addLink = async () => {
+        setBusy(true);
+        try {
+            const id = await addSocialLink(profileId, {
                 platform: 'custom',
                 title: '',
                 url: '',
-                order: value.length,
-            },
-        ]);
+                order: links.length,
+            });
+            setLinks((prev) => [
+                ...prev,
+                {
+                    id,
+                    platform: 'custom',
+                    title: '',
+                    url: '',
+                    order: prev.length,
+                },
+            ]);
+        } finally {
+            setBusy(false);
+        }
     };
 
-    const removeLink = (index: number) => {
-        const updated = value
-            .filter((_, i) => i !== index)
-            .map((link, i) => ({ ...link, order: i }));
-        onChange(updated);
+    const removeLink = async (index: number) => {
+        const link = links[index];
+        if (!link) return;
+        setBusy(true);
+        try {
+            if (link.id) {
+                await removeSocialLink(link.id);
+            }
+            const updated = links
+                .filter((_, i) => i !== index)
+                .map((l, i) => ({ ...l, order: i }));
+            setLinks(updated);
+            await persistOrder(updated);
+        } finally {
+            setBusy(false);
+        }
     };
 
     const updateLink = (
@@ -69,10 +99,23 @@ export default function SocialLinksEditor({
         field: keyof SocialLink,
         fieldValue: string,
     ) => {
-        const updated = value.map((link, i) =>
-            i === index ? { ...link, [field]: fieldValue } : link,
+        setLinks((prev) =>
+            prev.map((link, i) =>
+                i === index ? { ...link, [field]: fieldValue } : link,
+            ),
         );
-        onChange(updated);
+    };
+
+    const persistOrder = async (ordered: SocialLink[]) => {
+        const withIds = ordered.filter((l): l is SocialLink & { id: string } =>
+            Boolean(l.id),
+        );
+        if (withIds.length > 0) {
+            await updateSocialLinkOrder(
+                profileId,
+                withIds.map((l) => ({ id: l.id, order: l.order })),
+            );
+        }
     };
 
     const handleDragStart = (index: number) => {
@@ -83,27 +126,28 @@ export default function SocialLinksEditor({
         e.preventDefault();
         if (dragIndex === null || dragIndex === index) return;
 
-        const newLinks = [...value];
+        const newLinks = [...links];
         const [dragged] = newLinks.splice(dragIndex, 1);
         newLinks.splice(index, 0, dragged);
         const reordered = newLinks.map((link, i) => ({ ...link, order: i }));
-        onChange(reordered);
+        setLinks(reordered);
         setDragIndex(index);
     };
 
     const handleDragEnd = () => {
         setDragIndex(null);
+        persistOrder(links);
     };
 
     return (
         <div className='space-y-3' role='list' aria-label='Social links'>
-            {value.length === 0 && (
+            {links.length === 0 && (
                 <p className='text-body-sm text-[var(--md-sys-color-on-surface-variant)] py-4 text-center'>
                     No social links added yet.
                 </p>
             )}
 
-            {value.map((link, index) => (
+            {links.map((link, index) => (
                 <div
                     key={link.id ?? `new-${index}`}
                     draggable
@@ -164,6 +208,7 @@ export default function SocialLinksEditor({
                     <button
                         type='button'
                         onClick={() => removeLink(index)}
+                        disabled={busy}
                         className='flex h-9 w-9 items-center justify-center rounded-md text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-variant)] hover:text-[var(--md-sys-color-error)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)] shrink-0 mt-1'
                         aria-label={`Remove link ${index + 1}`}
                     >
@@ -177,6 +222,7 @@ export default function SocialLinksEditor({
                 variant='outline'
                 size='sm'
                 onClick={addLink}
+                disabled={busy}
                 className='w-full'
             >
                 <Plus className='h-4 w-4 mr-1' />

@@ -10,14 +10,18 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
-import { updateProjectDesign } from '@/lib/actions/projects';
+import ColorRolePicker from '@/components/ColorRolePicker';
+import {
+    updateProjectDesign,
+    getProjectColorRoles,
+} from '@/lib/actions/projects';
 
 const formSchema = z.object({
     visualDirection: z.string().optional().or(z.literal('')),
     displayFont: z.string().optional().or(z.literal('')),
     bodyFont: z.string().optional().or(z.literal('')),
     designApproach: z.string().optional().or(z.literal('')),
-    colorRoleIds: z
+    colorRoles: z
         .array(
             z.object({
                 roleId: z.string(),
@@ -43,15 +47,25 @@ export default function DesignPage({
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    const { register, handleSubmit } = useForm<FormData>({
+    const { register, handleSubmit, setValue, watch } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             visualDirection: '',
             displayFont: '',
             bodyFont: '',
             designApproach: '',
+            colorRoles: [],
         },
     });
+
+    const colorRoles = watch('colorRoles') ?? [];
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectColorRoles(projectId)
+            .then((roles) => setValue('colorRoles', roles))
+            .catch(() => setValue('colorRoles', []));
+    }, [projectId, setValue]);
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;
@@ -62,6 +76,8 @@ export default function DesignPage({
                 visualDirection: data.visualDirection || undefined,
                 displayFont: data.displayFont || undefined,
                 bodyFont: data.bodyFont || undefined,
+                designApproach: data.designApproach || undefined,
+                colorRoles: data.colorRoles ?? [],
             });
             router.push(`/admin/projects/${projectId}/edit/showcase`);
         } catch (e) {
@@ -107,10 +123,10 @@ export default function DesignPage({
 
                 <div>
                     <Label>Color Roles</Label>
-                    <p className='text-body-sm text-on-surface-variant'>
-                        Color role selection will be available in a future
-                        update.
-                    </p>
+                    <ColorRolePicker
+                        value={colorRoles}
+                        onChange={(roles) => setValue('colorRoles', roles)}
+                    />
                 </div>
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}

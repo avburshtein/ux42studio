@@ -8,6 +8,7 @@ import {
     projectAssets,
 } from '@/db/schema/projects';
 import { categories } from '@/db/schema/categories';
+import { projectColorRoles, colorRoles } from '@/db/schema/color-roles';
 import {
     projectPersonas,
     projectKeyMetrics,
@@ -172,13 +173,64 @@ export async function updateProjectDesign(
         visualDirection?: string;
         displayFont?: string;
         bodyFont?: string;
+        designApproach?: string;
+        colorRoles?: Array<{ roleId: string; order: number }>;
     },
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    await db.update(projects).set(data).where(eq(projects.id, projectId));
+    const { colorRoles: roleSelections, ...projectFields } = data;
+
+    await db.batch([
+        db
+            .update(projects)
+            .set(projectFields)
+            .where(eq(projects.id, projectId)),
+        db
+            .delete(projectColorRoles)
+            .where(eq(projectColorRoles.projectId, projectId)),
+        ...(roleSelections || []).map((r) =>
+            db.insert(projectColorRoles).values({
+                projectId,
+                roleId: r.roleId,
+                order: r.order,
+            }),
+        ),
+    ]);
+
     revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function getColorRoles() {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    return db
+        .select({
+            id: colorRoles.id,
+            name: colorRoles.name,
+            slug: colorRoles.slug,
+            lightColor: colorRoles.lightColor1,
+            darkColor: colorRoles.darkColor1,
+        })
+        .from(colorRoles)
+        .all();
+}
+
+export async function getProjectColorRoles(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    return db
+        .select({
+            roleId: projectColorRoles.roleId,
+            order: projectColorRoles.order,
+        })
+        .from(projectColorRoles)
+        .where(eq(projectColorRoles.projectId, projectId))
+        .orderBy(asc(projectColorRoles.order))
+        .all();
 }
 
 // ---- Section 07: Showcase (db.batch) ----

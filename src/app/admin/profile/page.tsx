@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
@@ -18,14 +18,7 @@ import {
 import Link from 'next/link';
 import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
-
-const socialLinkSchema = z.object({
-    id: z.string().optional(),
-    platform: z.enum(['github', 'behance', 'dribbble', 'telegram', 'custom']),
-    title: z.string().min(1, 'Title is required'),
-    url: z.string().url('Must be a valid URL'),
-    order: z.number().int(),
-});
+import SocialLinksEditor from '@/components/SocialLinksEditor';
 
 const formSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -36,10 +29,17 @@ const formSchema = z.object({
     slug: z.string().min(1, 'Slug is required'),
     avatarFileId: z.string().optional().or(z.literal('')),
     coverFileId: z.string().optional().or(z.literal('')),
-    socialLinks: z.array(socialLinkSchema),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+type SocialLink = {
+    id: string;
+    platform: string;
+    title: string;
+    url: string;
+    order: number;
+};
 
 export default function ProfilePage() {
     const router = useRouter();
@@ -47,11 +47,11 @@ export default function ProfilePage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
+    const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
 
     const {
         register,
         handleSubmit,
-        control,
         reset,
         setValue,
         watch,
@@ -67,15 +67,8 @@ export default function ProfilePage() {
             slug: '',
             avatarFileId: '',
             coverFileId: '',
-            socialLinks: [],
         },
     });
-
-    const {
-        fields: linkFields,
-        append: appendLink,
-        remove: removeLink,
-    } = useFieldArray({ control, name: 'socialLinks' });
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -94,15 +87,16 @@ export default function ProfilePage() {
                     slug: profile.slug,
                     avatarFileId: profile.avatarFileId ?? '',
                     coverFileId: profile.coverFileId ?? '',
-                    socialLinks: profile.socialLinks.map((link) => ({
+                });
+                setSocialLinks(
+                    profile.socialLinks.map((link) => ({
                         id: link.id,
-                        platform:
-                            link.platform as FormData['socialLinks'][number]['platform'],
+                        platform: link.platform,
                         title: link.title,
                         url: link.url,
                         order: link.order,
                     })),
-                });
+                );
             }
         };
         fetchProfile();
@@ -225,103 +219,17 @@ export default function ProfilePage() {
 
                     {/* Social Links */}
                     <div>
-                        <div className='mb-3 flex items-center justify-between'>
-                            <Label>Social Links</Label>
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                onClick={() =>
-                                    appendLink({
-                                        platform: 'custom',
-                                        title: '',
-                                        url: '',
-                                        order: linkFields.length,
-                                    })
-                                }
-                            >
-                                + Add Link
-                            </Button>
-                        </div>
-                        {linkFields.map((field, index) => (
-                            <div
-                                key={field.id}
-                                className='mb-4 rounded-md border border-outline-variant p-4'
-                            >
-                                <div className='mb-3 flex items-center justify-between'>
-                                    <span className='text-title-sm text-on-surface'>
-                                        Link {index + 1}
-                                    </span>
-                                    <Button
-                                        type='button'
-                                        variant='ghost'
-                                        onClick={() => removeLink(index)}
-                                    >
-                                        Remove
-                                    </Button>
-                                </div>
-                                <div className='space-y-3'>
-                                    <div>
-                                        <Label>Platform</Label>
-                                        <select
-                                            {...register(
-                                                `socialLinks.${index}.platform`,
-                                            )}
-                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
-                                        >
-                                            <option value='github'>
-                                                GitHub
-                                            </option>
-                                            <option value='behance'>
-                                                Behance
-                                            </option>
-                                            <option value='dribbble'>
-                                                Dribbble
-                                            </option>
-                                            <option value='telegram'>
-                                                Telegram
-                                            </option>
-                                            <option value='custom'>
-                                                Custom
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <Label>Title *</Label>
-                                        <Input
-                                            {...register(
-                                                `socialLinks.${index}.title`,
-                                            )}
-                                        />
-                                        {errors.socialLinks?.[index]?.title && (
-                                            <p className='mt-1 text-body-sm text-error'>
-                                                Required
-                                            </p>
-                                        )}
-                                    </div>
-                                    <div>
-                                        <Label>URL *</Label>
-                                        <Input
-                                            type='url'
-                                            {...register(
-                                                `socialLinks.${index}.url`,
-                                            )}
-                                        />
-                                        {errors.socialLinks?.[index]?.url && (
-                                            <p className='mt-1 text-body-sm text-error'>
-                                                Must be a valid URL
-                                            </p>
-                                        )}
-                                    </div>
-                                    <input
-                                        type='hidden'
-                                        {...register(
-                                            `socialLinks.${index}.order`,
-                                        )}
-                                        value={index}
-                                    />
-                                </div>
-                            </div>
-                        ))}
+                        <Label>Social Links</Label>
+                        {profileId ? (
+                            <SocialLinksEditor
+                                profileId={profileId}
+                                initialLinks={socialLinks}
+                            />
+                        ) : (
+                            <p className='text-body-sm text-on-surface-variant'>
+                                Loading...
+                            </p>
+                        )}
                     </div>
 
                     {error && (
