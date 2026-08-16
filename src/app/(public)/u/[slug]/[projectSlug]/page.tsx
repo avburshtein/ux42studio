@@ -33,7 +33,7 @@ function Section({
 }) {
     return (
         <section className='max-w-content mx-auto px-4 sm:px-6 lg:px-8 py-10 border-b border-outline-variant last:border-b-0'>
-            <h2 className='text-headline-sm text-on-background mb-6'>
+            <h2 className='font-display text-headline-sm text-on-background mb-6'>
                 {title}
             </h2>
             {children}
@@ -198,7 +198,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     )}
 
                     <div className='max-w-content mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10 pb-10'>
-                        <h1 className='text-display-sm text-on-background mb-3'>
+                        <h1 className='font-display text-display-sm text-on-background mb-3'>
                             {project.title}
                         </h1>
                         {project.teaser && (
@@ -321,7 +321,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-6'>
                         {project.problemStatement && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Problem Statement
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -331,7 +331,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         )}
                         {project.projectGoal && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Project Goal
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -341,7 +341,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         )}
                         {project.targetUsers && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Target Users
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -359,7 +359,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-8'>
                         {project.researchMethodology && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Research Methodology
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -369,7 +369,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         )}
                         {project.userStory && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     User Story
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -381,7 +381,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Personas */}
                         {personas.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Personas
                                 </h3>
                                 <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -438,7 +438,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Key Metrics */}
                         {keyMetrics.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Key Metrics
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
@@ -447,7 +447,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                             key={metric.id}
                                             className='rounded-xl border border-outline-variant bg-surface p-4 text-center'
                                         >
-                                            <p className='text-headline-sm text-primary'>
+                                            <p className='font-display text-headline-sm text-primary'>
                                                 {metric.value}
                                             </p>
                                             <p className='text-body-sm text-on-surface-variant mt-1'>
@@ -468,7 +468,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-8'>
                         {project.visualDirection && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Visual Direction
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -500,7 +500,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         </div>
                         {project.designApproach && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Design Approach
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -512,7 +512,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Color Roles */}
                         {colorRolesData.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Color Roles
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -604,7 +604,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-8'>
                         {project.testingProcess && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Testing Process
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -696,7 +696,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-8'>
                         {project.finalDescription && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Final Description
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -708,7 +708,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Gallery: Moodboard */}
                         {moodboardAssets.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Moodboard
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -746,7 +746,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Gallery: Wireframes */}
                         {wireframeAssets.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Wireframes
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -784,7 +784,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Gallery: Final */}
                         {finalGalleryAssets.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Final Gallery
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -822,7 +822,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Results */}
                         {resultItems.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-3'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-3'>
                                     Results
                                 </h3>
                                 <ul className='space-y-2'>
@@ -844,7 +844,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Tools */}
                         {toolItems.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-3'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-3'>
                                     Tools
                                 </h3>
                                 <div className='flex flex-wrap gap-2'>
@@ -869,7 +869,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     <div className='space-y-8'>
                         {project.keyTakeaway && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-2'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-2'>
                                     Key Takeaway
                                 </h3>
                                 <p className='text-body-md text-on-surface-variant whitespace-pre-line'>
@@ -881,7 +881,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Reviews */}
                         {reviews.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-4'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
                                     Reviews
                                 </h3>
                                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
@@ -937,7 +937,7 @@ export default async function ProjectPage({ params }: PageProps) {
                         {/* Next Steps */}
                         {nextStepItems.length > 0 && (
                             <div>
-                                <h3 className='text-title-lg text-on-surface mb-3'>
+                                <h3 className='font-display text-title-lg text-on-surface mb-3'>
                                     Next Steps
                                 </h3>
                                 <ul className='space-y-2'>
