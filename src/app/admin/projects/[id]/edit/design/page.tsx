@@ -14,6 +14,7 @@ import ColorRolePicker from '@/components/ColorRolePicker';
 import {
     updateProjectDesign,
     getProjectColorRoles,
+    getProjectDesign,
 } from '@/lib/actions/projects';
 
 const formSchema = z.object({
@@ -65,6 +66,18 @@ export default function DesignPage({
         getProjectColorRoles(projectId)
             .then((roles) => setValue('colorRoles', roles))
             .catch(() => setValue('colorRoles', []));
+    }, [projectId, setValue]);
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectDesign(projectId)
+            .then((d) => {
+                setValue('visualDirection', d?.visualDirection ?? '');
+                setValue('displayFont', d?.displayFont ?? '');
+                setValue('bodyFont', d?.bodyFont ?? '');
+                setValue('designApproach', d?.designApproach ?? '');
+            })
+            .catch(() => {});
     }, [projectId, setValue]);
 
     const onSubmit = async (data: FormData) => {

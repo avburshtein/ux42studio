@@ -11,7 +11,11 @@ import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
-import { updateProjectMeta, getCategories } from '@/lib/actions/projects';
+import {
+    updateProjectMeta,
+    getCategories,
+    getProjectMeta,
+} from '@/lib/actions/projects';
 import { slugify } from '@/lib/utils/slug';
 
 const formSchema = z.object({
@@ -67,6 +71,7 @@ export default function GeneralPage({
         handleSubmit,
         setValue,
         watch,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -87,6 +92,31 @@ export default function GeneralPage({
             categoryIds: [],
         },
     });
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectMeta(projectId)
+            .then((meta) => {
+                if (meta.slug) setSlugTouched(true);
+                reset({
+                    title: meta.title ?? '',
+                    slug: meta.slug ?? '',
+                    teaser: meta.teaser ?? '',
+                    client: meta.client ?? '',
+                    year: meta.year ? String(meta.year) : '',
+                    duration: meta.duration ?? '',
+                    myRole: meta.myRole ?? '',
+                    constraints: meta.constraints ?? '',
+                    devices: meta.devices ?? '',
+                    tags: meta.tags ?? '',
+                    coverFileId: meta.coverFileId ?? '',
+                    figmaPrototypeUrl: meta.figmaPrototypeUrl ?? '',
+                    webPrototypeUrl: meta.webPrototypeUrl ?? '',
+                    categoryIds: meta.categoryIds ?? [],
+                });
+            })
+            .catch(() => {});
+    }, [projectId, reset]);
 
     const selectedCategoryIds = watch('categoryIds') ?? [];
     const titleValue = watch('title');

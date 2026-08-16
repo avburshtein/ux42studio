@@ -10,7 +10,10 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
-import { updateProjectResearch } from '@/lib/actions/projects';
+import {
+    updateProjectResearch,
+    getProjectResearch,
+} from '@/lib/actions/projects';
 
 const personaSchema = z.object({
     id: z.string().optional(),
@@ -53,6 +56,7 @@ export default function ResearchPage({
         register,
         handleSubmit,
         control,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -75,6 +79,23 @@ export default function ResearchPage({
         append: appendMetric,
         remove: removeMetric,
     } = useFieldArray({ control, name: 'keyMetrics' });
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectResearch(projectId)
+            .then((r) => {
+                reset({
+                    researchMethodology: r?.researchMethodology ?? '',
+                    userStory: r?.userStory ?? '',
+                    personas: (r?.personas ?? []).map((p) => ({
+                        ...p,
+                        avatarFileId: p.avatarFileId ?? undefined,
+                    })),
+                    keyMetrics: r?.keyMetrics ?? [],
+                });
+            })
+            .catch(() => {});
+    }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;

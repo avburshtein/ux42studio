@@ -11,7 +11,10 @@ import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
-import { updateProjectShowcase } from '@/lib/actions/projects';
+import {
+    updateProjectShowcase,
+    getProjectShowcase,
+} from '@/lib/actions/projects';
 
 const assetSchema = z.object({
     id: z.string().optional(),
@@ -66,6 +69,7 @@ export default function ShowcasePage({
         handleSubmit,
         control,
         setValue,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -101,6 +105,30 @@ export default function ShowcasePage({
         append: appendTool,
         remove: removeTool,
     } = useFieldArray({ control, name: 'tools' });
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectShowcase(projectId)
+            .then((s) => {
+                reset({
+                    finalDescription: s?.finalDescription ?? '',
+                    assets: (s?.assets ?? []).map((a) => ({
+                        ...a,
+                        caption: a.caption ?? '',
+                    })),
+                    comparisons: (s?.comparisons ?? []).map((c) => ({
+                        ...c,
+                        beforeFileId: c.beforeFileId ?? '',
+                        afterFileId: c.afterFileId ?? '',
+                        beforeText: c.beforeText ?? '',
+                        afterText: c.afterText ?? '',
+                    })),
+                    results: s?.results ?? [],
+                    tools: s?.tools ?? [],
+                });
+            })
+            .catch(() => {});
+    }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;

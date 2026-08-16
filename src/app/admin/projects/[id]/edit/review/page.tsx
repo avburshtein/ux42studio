@@ -15,6 +15,7 @@ import {
     getProjectPreviewInfo,
     archiveProject,
     getProjectStatus,
+    getProjectReview,
 } from '@/lib/actions/projects';
 import Link from 'next/link';
 
@@ -68,6 +69,7 @@ export default function ReviewPage({
         register,
         handleSubmit,
         control,
+        reset,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -90,6 +92,24 @@ export default function ReviewPage({
         append: appendNextStep,
         remove: removeNextStep,
     } = useFieldArray({ control, name: 'nextSteps' });
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectReview(projectId)
+            .then((r) => {
+                reset({
+                    keyTakeaway: r?.keyTakeaway ?? '',
+                    reviews: (r?.reviews ?? []).map((rev) => ({
+                        ...rev,
+                        authorRole: rev.authorRole ?? '',
+                        avatarFileId: rev.avatarFileId ?? '',
+                    })),
+                    nextSteps: r?.nextSteps ?? [],
+                    publish: false,
+                });
+            })
+            .catch(() => {});
+    }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;

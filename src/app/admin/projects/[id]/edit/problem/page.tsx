@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
-import { updateProjectProblem } from '@/lib/actions/projects';
+import {
+    updateProjectProblem,
+    getProjectProblem,
+} from '@/lib/actions/projects';
 
 const formSchema = z.object({
     problemStatement: z.string().optional().or(z.literal('')),
@@ -33,7 +36,7 @@ export default function ProblemPage({
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    const { register, handleSubmit } = useForm<FormData>({
+    const { register, handleSubmit, reset } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             problemStatement: '',
@@ -41,6 +44,19 @@ export default function ProblemPage({
             targetUsers: '',
         },
     });
+
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectProblem(projectId)
+            .then((p) => {
+                reset({
+                    problemStatement: p?.problemStatement ?? '',
+                    projectGoal: p?.projectGoal ?? '',
+                    targetUsers: p?.targetUsers ?? '',
+                });
+            })
+            .catch(() => {});
+    }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;

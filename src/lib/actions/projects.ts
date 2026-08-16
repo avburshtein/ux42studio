@@ -519,6 +519,253 @@ export async function getProjectStatus(projectId: string) {
     return project?.status ?? null;
 }
 
+// ---- Getters (load existing data into edit forms) ----
+
+export async function getProjectMeta(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({
+            title: projects.title,
+            slug: projects.slug,
+            teaser: projects.teaser,
+            client: projects.client,
+            year: projects.year,
+            duration: projects.duration,
+            myRole: projects.myRole,
+            constraints: projects.constraints,
+            devices: projects.devices,
+            tags: projects.tags,
+            coverFileId: projects.coverFileId,
+            figmaPrototypeUrl: projects.figmaPrototypeUrl,
+            webPrototypeUrl: projects.webPrototypeUrl,
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    const categoryRows = await db
+        .select({ categoryId: projectCategories.categoryId })
+        .from(projectCategories)
+        .where(eq(projectCategories.projectId, projectId))
+        .all();
+
+    return {
+        ...project,
+        categoryIds: categoryRows.map((r) => r.categoryId),
+    };
+}
+
+export async function getProjectProblem(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    return db
+        .select({
+            galleryDescription: projects.galleryDescription,
+            problemStatement: projects.problemStatement,
+            projectGoal: projects.projectGoal,
+            targetUsers: projects.targetUsers,
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+}
+
+export async function getProjectResearch(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({
+            researchMethodology: projects.researchMethodology,
+            userStory: projects.userStory,
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    const personas = await db
+        .select({
+            id: projectPersonas.id,
+            nameAndAge: projectPersonas.nameAndAge,
+            avatarFileId: projectPersonas.avatarFileId,
+            bio: projectPersonas.bio,
+            painPoints: projectPersonas.painPoints,
+        })
+        .from(projectPersonas)
+        .where(eq(projectPersonas.projectId, projectId))
+        .all();
+
+    const keyMetrics = await db
+        .select({
+            id: projectKeyMetrics.id,
+            value: projectKeyMetrics.value,
+            description: projectKeyMetrics.description,
+            order: projectKeyMetrics.order,
+        })
+        .from(projectKeyMetrics)
+        .where(eq(projectKeyMetrics.projectId, projectId))
+        .orderBy(asc(projectKeyMetrics.order))
+        .all();
+
+    return {
+        researchMethodology: project?.researchMethodology,
+        userStory: project?.userStory,
+        personas,
+        keyMetrics,
+    };
+}
+
+export async function getProjectDesign(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    return db
+        .select({
+            visualDirection: projects.visualDirection,
+            displayFont: projects.displayFont,
+            bodyFont: projects.bodyFont,
+            designApproach: projects.designApproach,
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+}
+
+export async function getProjectShowcase(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({
+            finalDescription: projects.finalDescription,
+            designApproach: projects.designApproach,
+            testingProcess: projects.testingProcess,
+        })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    const assets = await db
+        .select({
+            id: projectAssets.id,
+            fileId: projectAssets.fileId,
+            assetType: projectAssets.assetType,
+            caption: projectAssets.caption,
+            order: projectAssets.order,
+        })
+        .from(projectAssets)
+        .where(eq(projectAssets.projectId, projectId))
+        .orderBy(asc(projectAssets.order))
+        .all();
+
+    const comparisons = await db
+        .select({
+            id: projectComparisons.id,
+            featureName: projectComparisons.featureName,
+            beforeFileId: projectComparisons.beforeFileId,
+            afterFileId: projectComparisons.afterFileId,
+            beforeText: projectComparisons.beforeText,
+            afterText: projectComparisons.afterText,
+            order: projectComparisons.order,
+        })
+        .from(projectComparisons)
+        .where(eq(projectComparisons.projectId, projectId))
+        .orderBy(asc(projectComparisons.order))
+        .all();
+
+    const results = await db
+        .select({
+            id: projectItems.id,
+            content: projectItems.content,
+            order: projectItems.order,
+        })
+        .from(projectItems)
+        .where(
+            and(
+                eq(projectItems.projectId, projectId),
+                eq(projectItems.type, 'result'),
+            ),
+        )
+        .orderBy(asc(projectItems.order))
+        .all();
+
+    const tools = await db
+        .select({
+            id: projectItems.id,
+            content: projectItems.content,
+            order: projectItems.order,
+        })
+        .from(projectItems)
+        .where(
+            and(
+                eq(projectItems.projectId, projectId),
+                eq(projectItems.type, 'tool'),
+            ),
+        )
+        .orderBy(asc(projectItems.order))
+        .all();
+
+    return {
+        finalDescription: project?.finalDescription,
+        designApproach: project?.designApproach,
+        testingProcess: project?.testingProcess,
+        assets,
+        comparisons,
+        results,
+        tools,
+    };
+}
+
+export async function getProjectReview(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ keyTakeaway: projects.keyTakeaway })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    const reviews = await db
+        .select({
+            id: projectReviews.id,
+            text: projectReviews.text,
+            authorName: projectReviews.authorName,
+            authorRole: projectReviews.authorRole,
+            avatarFileId: projectReviews.avatarFileId,
+            order: projectReviews.order,
+        })
+        .from(projectReviews)
+        .where(eq(projectReviews.projectId, projectId))
+        .orderBy(asc(projectReviews.order))
+        .all();
+
+    const nextSteps = await db
+        .select({
+            id: projectItems.id,
+            content: projectItems.content,
+            order: projectItems.order,
+        })
+        .from(projectItems)
+        .where(
+            and(
+                eq(projectItems.projectId, projectId),
+                eq(projectItems.type, 'next_step'),
+            ),
+        )
+        .orderBy(asc(projectItems.order))
+        .all();
+
+    return {
+        keyTakeaway: project?.keyTakeaway,
+        reviews,
+        nextSteps,
+    };
+}
+
 // ---- Delete ----
 
 export async function deleteProject(projectId: string) {
