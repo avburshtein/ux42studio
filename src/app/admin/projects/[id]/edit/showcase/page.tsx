@@ -69,6 +69,7 @@ export default function ShowcasePage({
         handleSubmit,
         control,
         setValue,
+        watch,
         reset,
         formState: { errors },
     } = useForm<FormData>({
@@ -220,8 +221,8 @@ export default function ShowcasePage({
                                     <Label>Image *</Label>
                                     <ImageUploaderField
                                         value={
-                                            (field as { fileId?: string })
-                                                .fileId || null
+                                            watch(`assets.${index}.fileId`) ||
+                                            null
                                         }
                                         onChange={(fileId) =>
                                             setValue(
@@ -330,11 +331,9 @@ export default function ShowcasePage({
                                         <Label>Before Image</Label>
                                         <ImageUploaderField
                                             value={
-                                                (
-                                                    field as {
-                                                        beforeFileId?: string;
-                                                    }
-                                                ).beforeFileId || null
+                                                watch(
+                                                    `comparisons.${index}.beforeFileId`,
+                                                ) || null
                                             }
                                             onChange={(fileId) =>
                                                 setValue(
@@ -349,11 +348,9 @@ export default function ShowcasePage({
                                         <Label>After Image</Label>
                                         <ImageUploaderField
                                             value={
-                                                (
-                                                    field as {
-                                                        afterFileId?: string;
-                                                    }
-                                                ).afterFileId || null
+                                                watch(
+                                                    `comparisons.${index}.afterFileId`,
+                                                ) || null
                                             }
                                             onChange={(fileId) =>
                                                 setValue(
