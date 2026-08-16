@@ -2,13 +2,14 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import { GripVertical, Plus, Trash2, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import {
     getProjectColorRoles,
     createColorRole,
+    updateColorRole,
     deleteColorRole,
     reorderColorRoles,
 } from '@/lib/actions/projects';
@@ -54,6 +55,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     const [isLoading, setIsLoading] = useState(true);
     const [dragIndex, setDragIndex] = useState<number | null>(null);
     const [showForm, setShowForm] = useState(false);
+    const [editingId, setEditingId] = useState<string | null>(null);
     const [form, setForm] = useState<NewRoleForm>(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -73,7 +75,29 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
         loadRoles();
     }, [loadRoles]);
 
-    const handleCreate = async () => {
+    const openCreate = () => {
+        setEditingId(null);
+        setForm(EMPTY_FORM);
+        setError(null);
+        setShowForm(true);
+    };
+
+    const openEdit = (role: ColorRole) => {
+        setEditingId(role.id);
+        setForm({
+            name: role.name,
+            lightColor1: role.lightColor1,
+            lightColor2: role.lightColor2,
+            darkColor1: role.darkColor1,
+            darkColor2: role.darkColor2,
+            lightContrastRatio: role.lightContrastRatio?.toString() ?? '',
+            darkContrastRatio: role.darkContrastRatio?.toString() ?? '',
+        });
+        setError(null);
+        setShowForm(true);
+    };
+
+    const handleSubmit = async () => {
         if (!form.name.trim()) {
             setError('Введите название роли');
             return;
@@ -81,7 +105,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
         setSaving(true);
         setError(null);
         try {
-            await createColorRole(projectId, {
+            const payload = {
                 name: form.name.trim(),
                 lightColor1: form.lightColor1,
                 lightColor2: form.lightColor2,
@@ -93,8 +117,16 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                 darkContrastRatio: form.darkContrastRatio
                     ? Number(form.darkContrastRatio)
                     : null,
-            });
+            };
+
+            if (editingId) {
+                await updateColorRole(editingId, payload);
+            } else {
+                await createColorRole(projectId, payload);
+            }
+
             setForm(EMPTY_FORM);
+            setEditingId(null);
             setShowForm(false);
             await loadRoles();
         } catch (err) {
@@ -209,6 +241,14 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             <span className='ml-auto text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
                                 #{index + 1}
                             </span>
+                            <button
+                                type='button'
+                                onClick={() => openEdit(role)}
+                                className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
+                                aria-label={`Редактировать роль ${role.name}`}
+                            >
+                                <Pencil className='h-4 w-4' />
+                            </button>
                             <button
                                 type='button'
                                 onClick={() => handleDelete(role.id)}
@@ -390,15 +430,20 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         <Button
                             type='button'
                             disabled={saving}
-                            onClick={handleCreate}
+                            onClick={handleSubmit}
                         >
-                            {saving ? 'Сохранение...' : 'Добавить роль'}
+                            {saving
+                                ? 'Сохранение...'
+                                : editingId
+                                  ? 'Сохранить'
+                                  : 'Добавить роль'}
                         </Button>
                         <Button
                             type='button'
                             variant='ghost'
                             onClick={() => {
                                 setShowForm(false);
+                                setEditingId(null);
                                 setError(null);
                                 setForm(EMPTY_FORM);
                             }}
@@ -408,11 +453,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                     </div>
                 </div>
             ) : (
-                <Button
-                    type='button'
-                    variant='outline'
-                    onClick={() => setShowForm(true)}
-                >
+                <Button type='button' variant='outline' onClick={openCreate}>
                     <Plus className='h-4 w-4 mr-1' />
                     Добавить роль
                 </Button>

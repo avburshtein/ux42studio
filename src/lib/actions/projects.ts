@@ -18,7 +18,7 @@ import {
     projectReviews,
     projectItems,
 } from '@/db/schema/project-details';
-import { eq, and, inArray, asc, desc } from 'drizzle-orm';
+import { eq, and, inArray, asc, desc, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { slugify } from '@/lib/utils/slug';
 
@@ -364,6 +364,66 @@ export async function createColorRole(
     });
 
     revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function updateColorRole(
+    roleId: string,
+    data: {
+        name: string;
+        lightColor1: string;
+        lightColor2: string;
+        darkColor1: string;
+        darkColor2: string;
+        lightContrastRatio?: number | null;
+        darkContrastRatio?: number | null;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const existing = await db
+        .select({ projectId: colorRoles.projectId })
+        .from(colorRoles)
+        .where(eq(colorRoles.id, roleId))
+        .get();
+
+    if (!existing) return;
+
+    // Генерируем уникальный slug в рамках проекта
+    const baseSlug = slugify(data.name) || `role-${crypto.randomUUID()}`;
+    let slug = baseSlug;
+    let suffix = 1;
+    while (
+        await db
+            .select({ id: colorRoles.id })
+            .from(colorRoles)
+            .where(
+                and(
+                    eq(colorRoles.projectId, existing.projectId),
+                    eq(colorRoles.slug, slug),
+                    sql`${colorRoles.id} != ${roleId}`,
+                ),
+            )
+            .get()
+    ) {
+        slug = `${baseSlug}-${suffix++}`;
+    }
+
+    await db
+        .update(colorRoles)
+        .set({
+            name: data.name,
+            slug,
+            lightColor1: data.lightColor1,
+            lightColor2: data.lightColor2,
+            darkColor1: data.darkColor1,
+            darkColor2: data.darkColor2,
+            lightContrastRatio: data.lightContrastRatio ?? null,
+            darkContrastRatio: data.darkContrastRatio ?? null,
+        })
+        .where(eq(colorRoles.id, roleId));
+
+    revalidatePath(`/admin/projects/${existing.projectId}`);
 }
 
 export async function deleteColorRole(roleId: string) {
