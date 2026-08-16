@@ -79,7 +79,8 @@ export async function POST(req: Request) {
 
         // 4. Сгенерировать r2Key
         const fileName = file.name || 'unnamed';
-        const r2Key = `uploads/${userId}/${crypto.randomUUID()}-${fileName}`;
+        const safeName = sanitizeFileName(fileName);
+        const r2Key = `uploads/${userId}/${crypto.randomUUID()}-${safeName}`;
 
         // 5. Загрузить в R2
         const fileBuffer = await file.arrayBuffer();
@@ -127,12 +128,25 @@ export async function POST(req: Request) {
         return NextResponse.json({
             fileId,
             r2Key,
-            url: `/r2/${r2Key}`,
         });
     } catch (err) {
         console.error('Upload error:', err);
         return NextResponse.json({ message: 'Server error' }, { status: 500 });
     }
+}
+
+/**
+ * Очищает имя файла для безопасного использования в ключе R2 и URL.
+ * Оставляет только [a-zA-Z0-9._-], заменяет остальные символы (пробелы,
+ * кириллицу, спецсимволы) на "_", убирает ведущие точки и схлопывает
+ * повторяющиеся подчёркивания.
+ */
+function sanitizeFileName(name: string): string {
+    const cleaned = name
+        .replace(/[^a-zA-Z0-9._-]/g, '_')
+        .replace(/^\.+/, '')
+        .replace(/_+/g, '_');
+    return cleaned || 'unnamed';
 }
 
 /**

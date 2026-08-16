@@ -3,7 +3,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { profiles, socialLinks } from '@/db/schema/profiles';
-import { eq } from 'drizzle-orm';
+import { files } from '@/db/schema/files';
+import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 
@@ -131,6 +132,52 @@ export async function updateProfile(
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
+
+    // Удаляем старый аватар/обложку, если они были заменены или убраны
+    if (data.avatarFileId !== undefined || data.coverFileId !== undefined) {
+        const current = await db
+            .select({
+                avatarFileId: profiles.avatarFileId,
+                coverFileId: profiles.coverFileId,
+            })
+            .from(profiles)
+            .where(eq(profiles.id, profileId))
+            .get();
+
+        const staleIds: string[] = [];
+        if (
+            data.avatarFileId !== undefined &&
+            current?.avatarFileId &&
+            current.avatarFileId !== data.avatarFileId
+        ) {
+            staleIds.push(current.avatarFileId);
+        }
+        if (
+            data.coverFileId !== undefined &&
+            current?.coverFileId &&
+            current.coverFileId !== data.coverFileId
+        ) {
+            staleIds.push(current.coverFileId);
+        }
+
+        if (staleIds.length > 0) {
+            const fileRows = await db
+                .select({ id: files.id, r2Key: files.r2Key })
+                .from(files)
+                .where(inArray(files.id, staleIds))
+                .all();
+
+            await Promise.all(
+                fileRows.map((f) =>
+                    env.MY_BUCKET.delete(f.r2Key).catch(() => {
+                        /* ignore */
+                    }),
+                ),
+            );
+
+            await db.delete(files).where(inArray(files.id, staleIds));
+        }
+    }
 
     await db
         .update(profiles)

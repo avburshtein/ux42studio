@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ImageUploader from './ImageUploader';
+import { getFileR2Key } from '@/lib/actions/projects';
 
 type UploadedFile = { fileId: string; r2Key: string };
 
@@ -14,17 +15,41 @@ type ImageUploaderFieldProps = {
 };
 
 export default function ImageUploaderField({
+    value,
     onChange,
     accept,
     maxSize,
     aspectRatio,
 }: ImageUploaderFieldProps) {
     const [uploaded, setUploaded] = useState<UploadedFile | null>(null);
+    const [existingR2Key, setExistingR2Key] = useState<string | null>(null);
 
-    // Only show a preview when we have a real r2Key (from a fresh upload).
-    // A bare fileId (loaded from DB) has no r2Key, so we render the empty
-    // dropzone instead of a broken image.
-    const activeValue: UploadedFile | null = uploaded ?? null;
+    // Resolve the r2Key for an existing fileId so we can show a preview.
+    // A fresh upload already carries its r2Key, so we only need this for
+    // files loaded from the database (which store only the fileId).
+    useEffect(() => {
+        let cancelled = false;
+        if (value) {
+            getFileR2Key(value)
+                .then((r2Key) => {
+                    if (!cancelled) setExistingR2Key(r2Key);
+                })
+                .catch(() => {
+                    if (!cancelled) setExistingR2Key(null);
+                });
+        } else {
+            setExistingR2Key(null);
+        }
+        return () => {
+            cancelled = true;
+        };
+    }, [value]);
+
+    const activeValue: UploadedFile | null =
+        uploaded ??
+        (value && existingR2Key
+            ? { fileId: value, r2Key: existingR2Key }
+            : null);
 
     return (
         <ImageUploader

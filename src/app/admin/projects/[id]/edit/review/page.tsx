@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     updateProjectReview,
     getProjectPreviewInfo,
@@ -70,6 +71,7 @@ export default function ReviewPage({
         handleSubmit,
         control,
         reset,
+        setValue,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -238,11 +240,18 @@ export default function ReviewPage({
                                     />
                                 </div>
                                 <div>
-                                    <Label>Avatar File ID</Label>
-                                    <Input
-                                        {...register(
-                                            `reviews.${index}.avatarFileId`,
-                                        )}
+                                    <Label>Avatar</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            (field as { avatarFileId?: string })
+                                                .avatarFileId || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                `reviews.${index}.avatarFileId`,
+                                                fileId ?? '',
+                                            )
+                                        }
                                     />
                                 </div>
                                 <input

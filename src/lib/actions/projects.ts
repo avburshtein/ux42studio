@@ -8,6 +8,8 @@ import {
     projectAssets,
 } from '@/db/schema/projects';
 import { categories } from '@/db/schema/categories';
+import { files } from '@/db/schema/files';
+import { profiles } from '@/db/schema/profiles';
 import { projectColorRoles, colorRoles } from '@/db/schema/color-roles';
 import {
     projectPersonas,
@@ -51,6 +53,20 @@ export async function updateProjectMeta(
         projectFields.slug = slugify(projectFields.title);
     }
 
+    // Удаляем старую обложку, если она была заменена или убрана
+    if (data.coverFileId !== undefined) {
+        const current = await db
+            .select({ coverFileId: projects.coverFileId })
+            .from(projects)
+            .where(eq(projects.id, projectId))
+            .get();
+
+        const oldCoverId = current?.coverFileId ?? null;
+        if (oldCoverId && oldCoverId !== data.coverFileId) {
+            await deleteFilesByIds([oldCoverId]);
+        }
+    }
+
     await db.batch([
         db
             .update(projects)
@@ -65,6 +81,49 @@ export async function updateProjectMeta(
     ]);
 
     revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Files ----
+
+export async function getFileR2Key(fileId: string): Promise<string | null> {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const row = await db
+        .select({ r2Key: files.r2Key })
+        .from(files)
+        .where(eq(files.id, fileId))
+        .get();
+
+    return row?.r2Key ?? null;
+}
+
+/**
+ * Удаляет объекты из R2 и записи из таблицы files для заданных fileId.
+ * Используется, когда файл больше не ссылается ни на один проект (например,
+ * при замене обложки/аватара/ассета). Best-effort: ошибки R2 игнорируются.
+ */
+async function deleteFilesByIds(fileIds: string[]) {
+    if (fileIds.length === 0) return;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const fileRows = await db
+        .select({ id: files.id, r2Key: files.r2Key })
+        .from(files)
+        .where(inArray(files.id, fileIds))
+        .all();
+
+    await Promise.all(
+        fileRows.map((f) =>
+            env.MY_BUCKET.delete(f.r2Key).catch(() => {
+                /* ignore */
+            }),
+        ),
+    );
+
+    await db.delete(files).where(inArray(files.id, fileIds));
 }
 
 // ---- Categories ----
@@ -128,6 +187,18 @@ export async function updateProjectResearch(
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
+    // Собираем старые avatarFileId персон до перезаписи
+    const oldPersonas = await db
+        .select({ avatarFileId: projectPersonas.avatarFileId })
+        .from(projectPersonas)
+        .where(eq(projectPersonas.projectId, projectId))
+        .all();
+
+    const oldAvatarIds = new Set<string>();
+    for (const row of oldPersonas) {
+        if (row.avatarFileId) oldAvatarIds.add(row.avatarFileId);
+    }
+
     await db.batch([
         // Update project-level fields
         db
@@ -167,6 +238,19 @@ export async function updateProjectResearch(
             }),
         ),
     ]);
+
+    // Удаляем аватары персон, которые больше не используются
+    const newAvatarIds = new Set<string>();
+    for (const p of data.personas || []) {
+        if (p.avatarFileId) newAvatarIds.add(p.avatarFileId);
+    }
+
+    const staleAvatarIds = [...oldAvatarIds].filter(
+        (id) => !newAvatarIds.has(id),
+    );
+    if (staleAvatarIds.length > 0) {
+        await deleteFilesByIds(staleAvatarIds);
+    }
 
     revalidatePath(`/admin/projects/${projectId}`);
 }
@@ -278,6 +362,30 @@ export async function updateProjectShowcase(
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
+    // Собираем старые fileId ассетов и сравнений до перезаписи
+    const [oldAssets, oldComparisons] = await Promise.all([
+        db
+            .select({ fileId: projectAssets.fileId })
+            .from(projectAssets)
+            .where(eq(projectAssets.projectId, projectId))
+            .all(),
+        db
+            .select({
+                beforeFileId: projectComparisons.beforeFileId,
+                afterFileId: projectComparisons.afterFileId,
+            })
+            .from(projectComparisons)
+            .where(eq(projectComparisons.projectId, projectId))
+            .all(),
+    ]);
+
+    const oldFileIds = new Set<string>();
+    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
+    for (const row of oldComparisons) {
+        if (row.beforeFileId) oldFileIds.add(row.beforeFileId);
+        if (row.afterFileId) oldFileIds.add(row.afterFileId);
+    }
+
     await db.batch([
         // Update project-level fields
         db
@@ -348,6 +456,19 @@ export async function updateProjectShowcase(
         ),
     ]);
 
+    // Удаляем файлы, которые больше не используются в showcase
+    const newFileIds = new Set<string>();
+    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
+    for (const c of data.comparisons || []) {
+        if (c.beforeFileId) newFileIds.add(c.beforeFileId);
+        if (c.afterFileId) newFileIds.add(c.afterFileId);
+    }
+
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
     revalidatePath(`/admin/projects/${projectId}`);
 }
 
@@ -389,6 +510,33 @@ export async function updateProjectReview(
         }
     }
 
+    // Validate avatarFileId references to avoid FK constraint failures
+    const avatarFileIds = (data.reviews || [])
+        .map((r) => r.avatarFileId)
+        .filter((id): id is string => !!id);
+
+    let validFileIds = new Set<string>();
+    if (avatarFileIds.length > 0) {
+        const rows = await db
+            .select({ id: files.id })
+            .from(files)
+            .where(inArray(files.id, avatarFileIds))
+            .all();
+        validFileIds = new Set(rows.map((r) => r.id));
+    }
+
+    // Собираем старые avatarFileId отзывов до перезаписи
+    const oldReviews = await db
+        .select({ avatarFileId: projectReviews.avatarFileId })
+        .from(projectReviews)
+        .where(eq(projectReviews.projectId, projectId))
+        .all();
+
+    const oldReviewAvatarIds = new Set<string>();
+    for (const row of oldReviews) {
+        if (row.avatarFileId) oldReviewAvatarIds.add(row.avatarFileId);
+    }
+
     await db.batch([
         // Update project-level fields
         db
@@ -407,7 +555,10 @@ export async function updateProjectReview(
                 text: r.text,
                 authorName: r.authorName,
                 authorRole: r.authorRole,
-                avatarFileId: r.avatarFileId,
+                avatarFileId:
+                    r.avatarFileId && validFileIds.has(r.avatarFileId)
+                        ? r.avatarFileId
+                        : undefined,
                 order: r.order,
             }),
         ),
@@ -431,6 +582,19 @@ export async function updateProjectReview(
             }),
         ),
     ]);
+
+    // Удаляем аватары отзывов, которые больше не используются
+    const newReviewAvatarIds = new Set<string>();
+    for (const r of data.reviews || []) {
+        if (r.avatarFileId) newReviewAvatarIds.add(r.avatarFileId);
+    }
+
+    const staleReviewAvatarIds = [...oldReviewAvatarIds].filter(
+        (id) => !newReviewAvatarIds.has(id),
+    );
+    if (staleReviewAvatarIds.length > 0) {
+        await deleteFilesByIds(staleReviewAvatarIds);
+    }
 
     // Publish
     if (data.publish) {
@@ -768,10 +932,83 @@ export async function getProjectReview(projectId: string) {
 
 // ---- Delete ----
 
+/**
+ * Собирает все fileId, на которые ссылается проект, удаляет их объекты из R2
+ * и записи из таблицы files. Вызывается перед удалением проекта, чтобы не
+ * оставлять «осиротевшие» файлы в хранилище.
+ */
+async function deleteProjectFiles(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const [cover, assets, personas, comparisons, reviews] = await Promise.all([
+        db
+            .select({ fileId: projects.coverFileId })
+            .from(projects)
+            .where(eq(projects.id, projectId))
+            .all(),
+        db
+            .select({ fileId: projectAssets.fileId })
+            .from(projectAssets)
+            .where(eq(projectAssets.projectId, projectId))
+            .all(),
+        db
+            .select({ fileId: projectPersonas.avatarFileId })
+            .from(projectPersonas)
+            .where(eq(projectPersonas.projectId, projectId))
+            .all(),
+        db
+            .select({
+                beforeFileId: projectComparisons.beforeFileId,
+                afterFileId: projectComparisons.afterFileId,
+            })
+            .from(projectComparisons)
+            .where(eq(projectComparisons.projectId, projectId))
+            .all(),
+        db
+            .select({ fileId: projectReviews.avatarFileId })
+            .from(projectReviews)
+            .where(eq(projectReviews.projectId, projectId))
+            .all(),
+    ]);
+
+    const fileIds = new Set<string>();
+    for (const row of cover) if (row.fileId) fileIds.add(row.fileId);
+    for (const row of assets) if (row.fileId) fileIds.add(row.fileId);
+    for (const row of personas) if (row.fileId) fileIds.add(row.fileId);
+    for (const row of comparisons) {
+        if (row.beforeFileId) fileIds.add(row.beforeFileId);
+        if (row.afterFileId) fileIds.add(row.afterFileId);
+    }
+    for (const row of reviews) if (row.fileId) fileIds.add(row.fileId);
+
+    if (fileIds.size === 0) return;
+
+    const ids = [...fileIds];
+    const fileRows = await db
+        .select({ id: files.id, r2Key: files.r2Key })
+        .from(files)
+        .where(inArray(files.id, ids))
+        .all();
+
+    // Удаляем объекты из R2 (best-effort, не блокируем удаление проекта)
+    await Promise.all(
+        fileRows.map((f) =>
+            env.MY_BUCKET.delete(f.r2Key).catch(() => {
+                /* ignore */
+            }),
+        ),
+    );
+
+    // Удаляем записи из files
+    await db.delete(files).where(inArray(files.id, ids));
+}
+
 export async function deleteProject(projectId: string) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
+    await deleteProjectFiles(projectId);
     await db.delete(projects).where(eq(projects.id, projectId));
     revalidatePath('/admin');
 }
