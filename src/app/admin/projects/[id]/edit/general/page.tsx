@@ -151,7 +151,7 @@ export default function GeneralPage({
                 constraints: data.constraints || undefined,
                 devices: data.devices || undefined,
                 tags: data.tags || undefined,
-                coverFileId: data.coverFileId || undefined,
+                coverFileId: data.coverFileId || null,
                 figmaPrototypeUrl: data.figmaPrototypeUrl || undefined,
                 webPrototypeUrl: data.webPrototypeUrl || undefined,
                 categoryIds: data.categoryIds ?? [],

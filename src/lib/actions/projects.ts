@@ -37,7 +37,7 @@ export async function updateProjectMeta(
         constraints?: string;
         devices?: string;
         tags?: string;
-        coverFileId?: string;
+        coverFileId?: string | null;
         figmaPrototypeUrl?: string;
         webPrototypeUrl?: string;
         categoryIds?: string[];
@@ -53,7 +53,8 @@ export async function updateProjectMeta(
         projectFields.slug = slugify(projectFields.title);
     }
 
-    // Удаляем старую обложку, если она была заменена или убрана
+    // Запоминаем старую обложку до обновления
+    let oldCoverId: string | null = null;
     if (data.coverFileId !== undefined) {
         const current = await db
             .select({ coverFileId: projects.coverFileId })
@@ -61,10 +62,7 @@ export async function updateProjectMeta(
             .where(eq(projects.id, projectId))
             .get();
 
-        const oldCoverId = current?.coverFileId ?? null;
-        if (oldCoverId && oldCoverId !== data.coverFileId) {
-            await deleteFilesByIds([oldCoverId]);
-        }
+        oldCoverId = current?.coverFileId ?? null;
     }
 
     await db.batch([
@@ -79,6 +77,12 @@ export async function updateProjectMeta(
             db.insert(projectCategories).values({ projectId, categoryId }),
         ),
     ]);
+
+    // Удаляем старую обложку ПОСЛЕ обновления проекта, чтобы не нарушить
+    // внешний ключ (projects.coverFileId -> files.id)
+    if (oldCoverId && oldCoverId !== data.coverFileId) {
+        await deleteFilesByIds([oldCoverId]);
+    }
 
     revalidatePath(`/admin/projects/${projectId}`);
 }
@@ -115,15 +119,20 @@ async function deleteFilesByIds(fileIds: string[]) {
         .where(inArray(files.id, fileIds))
         .all();
 
-    await Promise.all(
-        fileRows.map((f) =>
-            env.MY_BUCKET.delete(f.r2Key).catch(() => {
-                /* ignore */
-            }),
-        ),
-    );
+    for (const f of fileRows) {
+        // Сначала удаляем запись из БД. Если файл всё ещё используется
+        // (внешний ключ), удаление не пройдёт — тогда не трогаем и R2.
+        try {
+            await db.delete(files).where(eq(files.id, f.id));
+        } catch {
+            continue; // файл всё ещё на что-то ссылается
+        }
 
-    await db.delete(files).where(inArray(files.id, fileIds));
+        // Запись удалена — теперь можно удалить объект из R2
+        await env.MY_BUCKET.delete(f.r2Key).catch(() => {
+            /* ignore */
+        });
+    }
 }
 
 // ---- Categories ----
@@ -937,7 +946,7 @@ export async function getProjectReview(projectId: string) {
  * и записи из таблицы files. Вызывается перед удалением проекта, чтобы не
  * оставлять «осиротевшие» файлы в хранилище.
  */
-async function deleteProjectFiles(projectId: string) {
+async function collectProjectFileIds(projectId: string): Promise<string[]> {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
@@ -982,33 +991,25 @@ async function deleteProjectFiles(projectId: string) {
     }
     for (const row of reviews) if (row.fileId) fileIds.add(row.fileId);
 
-    if (fileIds.size === 0) return;
-
-    const ids = [...fileIds];
-    const fileRows = await db
-        .select({ id: files.id, r2Key: files.r2Key })
-        .from(files)
-        .where(inArray(files.id, ids))
-        .all();
-
-    // Удаляем объекты из R2 (best-effort, не блокируем удаление проекта)
-    await Promise.all(
-        fileRows.map((f) =>
-            env.MY_BUCKET.delete(f.r2Key).catch(() => {
-                /* ignore */
-            }),
-        ),
-    );
-
-    // Удаляем записи из files
-    await db.delete(files).where(inArray(files.id, ids));
+    return [...fileIds];
 }
 
 export async function deleteProject(projectId: string) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    await deleteProjectFiles(projectId);
+    // 1. Собираем fileId ДО удаления проекта (пока ссылки ещё существуют)
+    const fileIds = await collectProjectFileIds(projectId);
+
+    // 2. Удаляем проект — каскадно удалятся projectAssets, projectPersonas,
+    //    projectComparisons, projectReviews. Ссылка projects.coverFileId
+    //    исчезнет вместе со строкой проекта.
     await db.delete(projects).where(eq(projects.id, projectId));
+
+    // 3. Теперь файлы осиротели — удаляем их из R2 и из таблицы files
+    if (fileIds.length > 0) {
+        await deleteFilesByIds(fileIds);
+    }
+
     revalidatePath('/admin');
 }
