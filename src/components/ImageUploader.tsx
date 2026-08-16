@@ -1,4 +1,4 @@
-адают в локальную БД, а не в прол'use client';
+'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
