@@ -8,28 +8,15 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ColorRolePicker from '@/components/ColorRolePicker';
-import {
-    updateProjectDesign,
-    getProjectColorRoles,
-    getProjectDesign,
-} from '@/lib/actions/projects';
+import { updateProjectDesign, getProjectDesign } from '@/lib/actions/projects';
 
 const formSchema = z.object({
     visualDirection: z.string().optional().or(z.literal('')),
     displayFont: z.string().optional().or(z.literal('')),
     bodyFont: z.string().optional().or(z.literal('')),
     designApproach: z.string().optional().or(z.literal('')),
-    colorRoles: z
-        .array(
-            z.object({
-                roleId: z.string(),
-                order: z.number().int(),
-            }),
-        )
-        .optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -48,25 +35,15 @@ export default function DesignPage({
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    const { register, handleSubmit, setValue, watch } = useForm<FormData>({
+    const { register, handleSubmit, setValue } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
             visualDirection: '',
             displayFont: '',
             bodyFont: '',
             designApproach: '',
-            colorRoles: [],
         },
     });
-
-    const colorRoles = watch('colorRoles') ?? [];
-
-    useEffect(() => {
-        if (!projectId) return;
-        getProjectColorRoles(projectId)
-            .then((roles) => setValue('colorRoles', roles))
-            .catch(() => setValue('colorRoles', []));
-    }, [projectId, setValue]);
 
     useEffect(() => {
         if (!projectId) return;
@@ -90,7 +67,6 @@ export default function DesignPage({
                 displayFont: data.displayFont || undefined,
                 bodyFont: data.bodyFont || undefined,
                 designApproach: data.designApproach || undefined,
-                colorRoles: data.colorRoles ?? [],
             });
             router.push(`/admin/projects/${projectId}/edit/showcase`);
         } catch (e) {
@@ -136,10 +112,13 @@ export default function DesignPage({
 
                 <div>
                     <Label>Color Roles</Label>
-                    <ColorRolePicker
-                        value={colorRoles}
-                        onChange={(roles) => setValue('colorRoles', roles)}
-                    />
+                    {projectId ? (
+                        <ColorRolePicker projectId={projectId} />
+                    ) : (
+                        <p className='text-body-sm text-on-surface-variant'>
+                            Загрузка...
+                        </p>
+                    )}
                 </div>
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}

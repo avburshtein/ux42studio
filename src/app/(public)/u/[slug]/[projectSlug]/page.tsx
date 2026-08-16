@@ -8,7 +8,7 @@ import {
     projectComparisons,
     projectReviews,
     projectItems,
-    projectColorRoles,
+    colorRoles,
 } from '@/db/schema';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
@@ -104,9 +104,8 @@ export default async function ProjectPage({ params }: PageProps) {
             where: { projectId: project.id },
             orderBy: { order: 'asc' },
         }),
-        db.query.projectColorRoles.findMany({
+        db.query.colorRoles.findMany({
             where: { projectId: project.id },
-            with: { role: true },
             orderBy: { order: 'asc' },
         }),
     ]);
@@ -516,81 +515,76 @@ export default async function ProjectPage({ params }: PageProps) {
                                     Color Roles
                                 </h3>
                                 <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
-                                    {colorRolesData
-                                        .filter((cr) => cr.role !== null)
-                                        .map((cr) => {
-                                            const role = cr.role!;
-                                            return (
-                                                <div
-                                                    key={cr.roleId}
-                                                    className='rounded-xl border border-outline-variant bg-surface p-4 space-y-3'
-                                                >
-                                                    <p className='text-title-sm text-on-surface'>
-                                                        {role.name}
-                                                    </p>
-                                                    <div className='space-y-2'>
-                                                        <div className='flex items-center gap-2'>
-                                                            <span className='text-label-sm text-on-surface-variant w-12'>
-                                                                Light
-                                                            </span>
-                                                            <div className='flex gap-1'>
-                                                                <div
-                                                                    className='w-8 h-8 rounded border border-outline-variant'
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            role.lightColor1,
-                                                                    }}
-                                                                />
-                                                                <div
-                                                                    className='w-8 h-8 rounded border border-outline-variant'
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            role.lightColor2,
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            {role.lightContrastRatio && (
-                                                                <span className='text-label-sm text-on-surface-variant'>
-                                                                    {
-                                                                        role.lightContrastRatio
-                                                                    }
-                                                                    :1
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                        <div className='flex items-center gap-2'>
-                                                            <span className='text-label-sm text-on-surface-variant w-12'>
-                                                                Dark
-                                                            </span>
-                                                            <div className='flex gap-1'>
-                                                                <div
-                                                                    className='w-8 h-8 rounded border border-outline-variant'
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            role.darkColor1,
-                                                                    }}
-                                                                />
-                                                                <div
-                                                                    className='w-8 h-8 rounded border border-outline-variant'
-                                                                    style={{
-                                                                        backgroundColor:
-                                                                            role.darkColor2,
-                                                                    }}
-                                                                />
-                                                            </div>
-                                                            {role.darkContrastRatio && (
-                                                                <span className='text-label-sm text-on-surface-variant'>
-                                                                    {
-                                                                        role.darkContrastRatio
-                                                                    }
-                                                                    :1
-                                                                </span>
-                                                            )}
-                                                        </div>
+                                    {colorRolesData.map((role) => (
+                                        <div
+                                            key={role.id}
+                                            className='rounded-xl border border-outline-variant bg-surface p-4 space-y-3'
+                                        >
+                                            <p className='text-title-sm text-on-surface'>
+                                                {role.name}
+                                            </p>
+                                            <div className='space-y-2'>
+                                                <div className='flex items-center gap-2'>
+                                                    <span className='text-label-sm text-on-surface-variant w-12'>
+                                                        Light
+                                                    </span>
+                                                    <div className='flex gap-1'>
+                                                        <div
+                                                            className='w-8 h-8 rounded border border-outline-variant'
+                                                            style={{
+                                                                backgroundColor:
+                                                                    role.lightColor1,
+                                                            }}
+                                                        />
+                                                        <div
+                                                            className='w-8 h-8 rounded border border-outline-variant'
+                                                            style={{
+                                                                backgroundColor:
+                                                                    role.lightColor2,
+                                                            }}
+                                                        />
                                                     </div>
+                                                    {role.lightContrastRatio && (
+                                                        <span className='text-label-sm text-on-surface-variant'>
+                                                            {
+                                                                role.lightContrastRatio
+                                                            }
+                                                            :1
+                                                        </span>
+                                                    )}
                                                 </div>
-                                            );
-                                        })}
+                                                <div className='flex items-center gap-2'>
+                                                    <span className='text-label-sm text-on-surface-variant w-12'>
+                                                        Dark
+                                                    </span>
+                                                    <div className='flex gap-1'>
+                                                        <div
+                                                            className='w-8 h-8 rounded border border-outline-variant'
+                                                            style={{
+                                                                backgroundColor:
+                                                                    role.darkColor1,
+                                                            }}
+                                                        />
+                                                        <div
+                                                            className='w-8 h-8 rounded border border-outline-variant'
+                                                            style={{
+                                                                backgroundColor:
+                                                                    role.darkColor2,
+                                                            }}
+                                                        />
+                                                    </div>
+                                                    {role.darkContrastRatio && (
+                                                        <span className='text-label-sm text-on-surface-variant'>
+                                                            {
+                                                                role.darkContrastRatio
+                                                            }
+                                                            :1
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}

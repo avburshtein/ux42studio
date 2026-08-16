@@ -10,7 +10,7 @@ import {
 import { categories } from '@/db/schema/categories';
 import { files } from '@/db/schema/files';
 import { profiles } from '@/db/schema/profiles';
-import { projectColorRoles, colorRoles } from '@/db/schema/color-roles';
+import { colorRoles } from '@/db/schema/color-roles';
 import {
     projectPersonas,
     projectKeyMetrics,
@@ -18,7 +18,7 @@ import {
     projectReviews,
     projectItems,
 } from '@/db/schema/project-details';
-import { eq, and, inArray, asc } from 'drizzle-orm';
+import { eq, and, inArray, asc, desc } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { slugify } from '@/lib/utils/slug';
 
@@ -273,48 +273,13 @@ export async function updateProjectDesign(
         displayFont?: string;
         bodyFont?: string;
         designApproach?: string;
-        colorRoles?: Array<{ roleId: string; order: number }>;
     },
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    const { colorRoles: roleSelections, ...projectFields } = data;
-
-    await db.batch([
-        db
-            .update(projects)
-            .set(projectFields)
-            .where(eq(projects.id, projectId)),
-        db
-            .delete(projectColorRoles)
-            .where(eq(projectColorRoles.projectId, projectId)),
-        ...(roleSelections || []).map((r) =>
-            db.insert(projectColorRoles).values({
-                projectId,
-                roleId: r.roleId,
-                order: r.order,
-            }),
-        ),
-    ]);
-
+    await db.update(projects).set(data).where(eq(projects.id, projectId));
     revalidatePath(`/admin/projects/${projectId}`);
-}
-
-export async function getColorRoles() {
-    const { env } = await getCloudflareContext();
-    const db = getDb(env.DB);
-
-    return db
-        .select({
-            id: colorRoles.id,
-            name: colorRoles.name,
-            slug: colorRoles.slug,
-            lightColor: colorRoles.lightColor1,
-            darkColor: colorRoles.darkColor1,
-        })
-        .from(colorRoles)
-        .all();
 }
 
 export async function getProjectColorRoles(projectId: string) {
@@ -323,13 +288,108 @@ export async function getProjectColorRoles(projectId: string) {
 
     return db
         .select({
-            roleId: projectColorRoles.roleId,
-            order: projectColorRoles.order,
+            id: colorRoles.id,
+            name: colorRoles.name,
+            slug: colorRoles.slug,
+            lightColor1: colorRoles.lightColor1,
+            lightColor2: colorRoles.lightColor2,
+            darkColor1: colorRoles.darkColor1,
+            darkColor2: colorRoles.darkColor2,
+            lightContrastRatio: colorRoles.lightContrastRatio,
+            darkContrastRatio: colorRoles.darkContrastRatio,
+            order: colorRoles.order,
         })
-        .from(projectColorRoles)
-        .where(eq(projectColorRoles.projectId, projectId))
-        .orderBy(asc(projectColorRoles.order))
+        .from(colorRoles)
+        .where(eq(colorRoles.projectId, projectId))
+        .orderBy(asc(colorRoles.order))
         .all();
+}
+
+export async function createColorRole(
+    projectId: string,
+    data: {
+        name: string;
+        lightColor1: string;
+        lightColor2: string;
+        darkColor1: string;
+        darkColor2: string;
+        lightContrastRatio?: number | null;
+        darkContrastRatio?: number | null;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const last = await db
+        .select({ order: colorRoles.order })
+        .from(colorRoles)
+        .where(eq(colorRoles.projectId, projectId))
+        .orderBy(desc(colorRoles.order))
+        .limit(1)
+        .get();
+
+    const nextOrder = (last?.order ?? -1) + 1;
+
+    // Генерируем уникальный slug в рамках проекта
+    const baseSlug = slugify(data.name) || `role-${crypto.randomUUID()}`;
+    let slug = baseSlug;
+    let suffix = 1;
+    while (
+        await db
+            .select({ id: colorRoles.id })
+            .from(colorRoles)
+            .where(
+                and(
+                    eq(colorRoles.projectId, projectId),
+                    eq(colorRoles.slug, slug),
+                ),
+            )
+            .get()
+    ) {
+        slug = `${baseSlug}-${suffix++}`;
+    }
+
+    await db.insert(colorRoles).values({
+        id: crypto.randomUUID(),
+        projectId,
+        name: data.name,
+        slug,
+        lightColor1: data.lightColor1,
+        lightColor2: data.lightColor2,
+        darkColor1: data.darkColor1,
+        darkColor2: data.darkColor2,
+        lightContrastRatio: data.lightContrastRatio ?? null,
+        darkContrastRatio: data.darkContrastRatio ?? null,
+        order: nextOrder,
+    });
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function deleteColorRole(roleId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db.delete(colorRoles).where(eq(colorRoles.id, roleId));
+}
+
+export async function reorderColorRoles(projectId: string, roleIds: string[]) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    for (let index = 0; index < roleIds.length; index++) {
+        await db
+            .update(colorRoles)
+            .set({ order: index })
+            .where(
+                and(
+                    eq(colorRoles.id, roleIds[index]),
+                    eq(colorRoles.projectId, projectId),
+                ),
+            );
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
 }
 
 // ---- Section 07: Showcase (db.batch) ----

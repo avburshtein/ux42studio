@@ -2,87 +2,148 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { GripVertical } from 'lucide-react';
+import { GripVertical, Plus, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
+import {
+    getProjectColorRoles,
+    createColorRole,
+    deleteColorRole,
+    reorderColorRoles,
+} from '@/lib/actions/projects';
 
 type ColorRole = {
     id: string;
     name: string;
-    lightColor: string;
-    darkColor: string;
-    description: string | null;
+    lightColor1: string;
+    lightColor2: string;
+    darkColor1: string;
+    darkColor2: string;
+    lightContrastRatio: number | null;
+    darkContrastRatio: number | null;
+    order: number;
 };
 
 type ColorRolePickerProps = {
-    value: Array<{ roleId: string; order: number }>;
-    onChange: (roles: Array<{ roleId: string; order: number }>) => void;
+    projectId: string;
 };
 
-export default function ColorRolePicker({
-    value,
-    onChange,
-}: ColorRolePickerProps) {
+type NewRoleForm = {
+    name: string;
+    lightColor1: string;
+    lightColor2: string;
+    darkColor1: string;
+    darkColor2: string;
+    lightContrastRatio: string;
+    darkContrastRatio: string;
+};
+
+const EMPTY_FORM: NewRoleForm = {
+    name: '',
+    lightColor1: '#0066FF',
+    lightColor2: '#0052CC',
+    darkColor1: '#3385FF',
+    darkColor2: '#66A3FF',
+    lightContrastRatio: '',
+    darkContrastRatio: '',
+};
+
+export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     const [roles, setRoles] = useState<ColorRole[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [dragIndex, setDragIndex] = useState<number | null>(null);
+    const [showForm, setShowForm] = useState(false);
+    const [form, setForm] = useState<NewRoleForm>(EMPTY_FORM);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const loadRoles = useCallback(async () => {
+        try {
+            const data = await getProjectColorRoles(projectId);
+            setRoles(data);
+        } catch {
+            setRoles([]);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [projectId]);
 
     useEffect(() => {
-        const fetchRoles = async () => {
-            try {
-                const res = await fetch('/api/color-roles');
-                if (res.ok) {
-                    const data = (await res.json()) as ColorRole[];
-                    setRoles(data);
-                }
-            } catch {
-                // Silently fail — roles will be empty
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchRoles();
-    }, []);
+        loadRoles();
+    }, [loadRoles]);
 
-    const selectedRoleIds = value.map((v) => v.roleId);
-
-    const toggleRole = useCallback(
-        (roleId: string) => {
-            const isSelected = selectedRoleIds.includes(roleId);
-            if (isSelected) {
-                const filtered = value
-                    .filter((v) => v.roleId !== roleId)
-                    .map((v, i) => ({ ...v, order: i }));
-                onChange(filtered);
-            } else {
-                onChange([...value, { roleId, order: value.length }]);
-            }
-        },
-        [value, onChange, selectedRoleIds],
-    );
-
-    const handleDragStart = (index: number) => {
-        setDragIndex(index);
+    const handleCreate = async () => {
+        if (!form.name.trim()) {
+            setError('Введите название роли');
+            return;
+        }
+        setSaving(true);
+        setError(null);
+        try {
+            await createColorRole(projectId, {
+                name: form.name.trim(),
+                lightColor1: form.lightColor1,
+                lightColor2: form.lightColor2,
+                darkColor1: form.darkColor1,
+                darkColor2: form.darkColor2,
+                lightContrastRatio: form.lightContrastRatio
+                    ? Number(form.lightContrastRatio)
+                    : null,
+                darkContrastRatio: form.darkContrastRatio
+                    ? Number(form.darkContrastRatio)
+                    : null,
+            });
+            setForm(EMPTY_FORM);
+            setShowForm(false);
+            await loadRoles();
+        } catch (err) {
+            setError(
+                err instanceof Error ? err.message : 'Не удалось сохранить',
+            );
+        } finally {
+            setSaving(false);
+        }
     };
+
+    const handleDelete = async (roleId: string) => {
+        try {
+            await deleteColorRole(roleId);
+            await loadRoles();
+        } catch {
+            setError('Не удалось удалить роль');
+        }
+    };
+
+    const handleDragStart = (index: number) => setDragIndex(index);
 
     const handleDragOver = (e: React.DragEvent, index: number) => {
         e.preventDefault();
         if (dragIndex === null || dragIndex === index) return;
 
-        const newValue = [...value];
-        const [dragged] = newValue.splice(dragIndex, 1);
-        newValue.splice(index, 0, dragged);
-        const reordered = newValue.map((v, i) => ({ ...v, order: i }));
-        onChange(reordered);
+        const newRoles = [...roles];
+        const [dragged] = newRoles.splice(dragIndex, 1);
+        newRoles.splice(index, 0, dragged);
+        setRoles(newRoles);
         setDragIndex(index);
     };
 
-    const handleDragEnd = () => {
+    const handleDragEnd = async () => {
         setDragIndex(null);
+        try {
+            await reorderColorRoles(
+                projectId,
+                roles.map((r) => r.id),
+            );
+        } catch {
+            setError('Не удалось сохранить порядок');
+        }
     };
 
     if (isLoading) {
         return (
             <div className='space-y-2'>
-                {Array.from({ length: 4 }).map((_, i) => (
+                {Array.from({ length: 3 }).map((_, i) => (
                     <div
                         key={i}
                         className='h-16 animate-pulse rounded-lg bg-[var(--md-sys-color-surface-variant)]'
@@ -92,110 +153,269 @@ export default function ColorRolePicker({
         );
     }
 
-    if (roles.length === 0) {
-        return (
-            <p className='text-body-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                No color roles available.
-            </p>
-        );
-    }
-
-    const selectedRoles = value
-        .map((v) => {
-            const role = roles.find((r) => r.id === v.roleId);
-            return role ? { ...role, order: v.order } : null;
-        })
-        .filter((r): r is ColorRole & { order: number } => r !== null);
-
     return (
-        <div className='space-y-3' role='list' aria-label='Color roles'>
-            <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2'>
-                {roles.map((role) => {
-                    const isSelected = selectedRoleIds.includes(role.id);
-                    return (
-                        <button
+        <div className='space-y-3'>
+            {roles.length === 0 && !showForm ? (
+                <p className='text-body-sm text-[var(--md-sys-color-on-surface-variant)]'>
+                    Цветовых ролей пока нет. Добавьте первую роль.
+                </p>
+            ) : (
+                <div className='space-y-1' role='list' aria-label='Color roles'>
+                    {roles.map((role, index) => (
+                        <div
                             key={role.id}
-                            type='button'
-                            role='listitem'
-                            aria-pressed={isSelected}
-                            onClick={() => toggleRole(role.id)}
+                            draggable
+                            onDragStart={() => handleDragStart(index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDragEnd={handleDragEnd}
                             className={cn(
-                                'flex flex-col items-center gap-1 rounded-lg border-2 p-3 transition-all focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]',
-                                isSelected
-                                    ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)]/20'
-                                    : 'border-[var(--md-sys-color-outline-variant)] hover:border-[var(--md-sys-color-outline)]',
+                                'flex items-center gap-2 rounded-md border border-[var(--md-sys-color-outline-variant)] bg-[var(--md-sys-color-surface)] p-2 cursor-grab active:cursor-grabbing transition-colors',
+                                dragIndex === index &&
+                                    'opacity-50 border-[var(--md-sys-color-primary)]',
                             )}
+                            role='listitem'
+                            aria-label={`${role.name}, drag to reorder`}
                         >
+                            <GripVertical className='h-4 w-4 text-[var(--md-sys-color-on-surface-variant)] shrink-0' />
                             <div className='flex gap-1'>
                                 <div
-                                    className='h-6 w-6 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{
-                                        backgroundColor: role.lightColor,
+                                        backgroundColor: role.lightColor1,
                                     }}
-                                    title={`${role.name} light`}
+                                    title={`${role.name} light 1`}
                                 />
                                 <div
-                                    className='h-6 w-6 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{
-                                        backgroundColor: role.darkColor,
+                                        backgroundColor: role.lightColor2,
                                     }}
-                                    title={`${role.name} dark`}
+                                    title={`${role.name} light 2`}
+                                />
+                                <div
+                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                    style={{ backgroundColor: role.darkColor1 }}
+                                    title={`${role.name} dark 1`}
+                                />
+                                <div
+                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                    style={{ backgroundColor: role.darkColor2 }}
+                                    title={`${role.name} dark 2`}
                                 />
                             </div>
-                            <span className='text-label-sm text-[var(--md-sys-color-on-surface)] text-center'>
+                            <span className='text-body-sm text-[var(--md-sys-color-on-surface)]'>
                                 {role.name}
                             </span>
-                        </button>
-                    );
-                })}
-            </div>
-
-            {selectedRoles.length > 0 && (
-                <div className='space-y-2 pt-4 border-t border-[var(--md-sys-color-outline-variant)]'>
-                    <p className='text-label-md text-[var(--md-sys-color-on-surface)]'>
-                        Selected order (drag to reorder):
-                    </p>
-                    <div className='space-y-1'>
-                        {selectedRoles.map((role, index) => (
-                            <div
-                                key={role.id}
-                                draggable
-                                onDragStart={() => handleDragStart(index)}
-                                onDragOver={(e) => handleDragOver(e, index)}
-                                onDragEnd={handleDragEnd}
-                                className={cn(
-                                    'flex items-center gap-2 rounded-md border border-[var(--md-sys-color-outline-variant)] bg-[var(--md-sys-color-surface)] p-2 cursor-grab active:cursor-grabbing transition-colors',
-                                    dragIndex === index &&
-                                        'opacity-50 border-[var(--md-sys-color-primary)]',
-                                )}
-                                role='listitem'
-                                aria-label={`${role.name}, drag to reorder`}
+                            <span className='ml-auto text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
+                                #{index + 1}
+                            </span>
+                            <button
+                                type='button'
+                                onClick={() => handleDelete(role.id)}
+                                className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-error)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
+                                aria-label={`Удалить роль ${role.name}`}
                             >
-                                <GripVertical className='h-4 w-4 text-[var(--md-sys-color-on-surface-variant)] shrink-0' />
-                                <div className='flex gap-1'>
-                                    <div
-                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                        style={{
-                                            backgroundColor: role.lightColor,
-                                        }}
-                                    />
-                                    <div
-                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                        style={{
-                                            backgroundColor: role.darkColor,
-                                        }}
-                                    />
-                                </div>
-                                <span className='text-body-sm text-[var(--md-sys-color-on-surface)]'>
-                                    {role.name}
-                                </span>
-                                <span className='ml-auto text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                                    #{index + 1}
-                                </span>
+                                <Trash2 className='h-4 w-4' />
+                            </button>
+                        </div>
+                    ))}
+                </div>
+            )}
+
+            {showForm ? (
+                <div className='space-y-3 rounded-lg border border-[var(--md-sys-color-outline-variant)] p-4'>
+                    <div>
+                        <Label htmlFor='roleName'>Название роли</Label>
+                        <Input
+                            id='roleName'
+                            value={form.name}
+                            onChange={(e) =>
+                                setForm({ ...form, name: e.target.value })
+                            }
+                            placeholder='Например: Primary Accent'
+                        />
+                    </div>
+
+                    <div className='grid grid-cols-2 gap-3'>
+                        <div>
+                            <Label htmlFor='lightColor1'>Light 1</Label>
+                            <div className='flex items-center gap-2'>
+                                <input
+                                    type='color'
+                                    id='lightColor1'
+                                    value={form.lightColor1}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            lightColor1: e.target.value,
+                                        })
+                                    }
+                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                />
+                                <Input
+                                    value={form.lightColor1}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            lightColor1: e.target.value,
+                                        })
+                                    }
+                                />
                             </div>
-                        ))}
+                        </div>
+                        <div>
+                            <Label htmlFor='lightColor2'>Light 2</Label>
+                            <div className='flex items-center gap-2'>
+                                <input
+                                    type='color'
+                                    id='lightColor2'
+                                    value={form.lightColor2}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            lightColor2: e.target.value,
+                                        })
+                                    }
+                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                />
+                                <Input
+                                    value={form.lightColor2}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            lightColor2: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <Label htmlFor='darkColor1'>Dark 1</Label>
+                            <div className='flex items-center gap-2'>
+                                <input
+                                    type='color'
+                                    id='darkColor1'
+                                    value={form.darkColor1}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            darkColor1: e.target.value,
+                                        })
+                                    }
+                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                />
+                                <Input
+                                    value={form.darkColor1}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            darkColor1: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                        <div>
+                            <Label htmlFor='darkColor2'>Dark 2</Label>
+                            <div className='flex items-center gap-2'>
+                                <input
+                                    type='color'
+                                    id='darkColor2'
+                                    value={form.darkColor2}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            darkColor2: e.target.value,
+                                        })
+                                    }
+                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                />
+                                <Input
+                                    value={form.darkColor2}
+                                    onChange={(e) =>
+                                        setForm({
+                                            ...form,
+                                            darkColor2: e.target.value,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className='grid grid-cols-2 gap-3'>
+                        <div>
+                            <Label htmlFor='lightContrast'>
+                                Light contrast
+                            </Label>
+                            <Input
+                                id='lightContrast'
+                                type='number'
+                                step='0.1'
+                                value={form.lightContrastRatio}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        lightContrastRatio: e.target.value,
+                                    })
+                                }
+                                placeholder='4.5'
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='darkContrast'>Dark contrast</Label>
+                            <Input
+                                id='darkContrast'
+                                type='number'
+                                step='0.1'
+                                value={form.darkContrastRatio}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        darkContrastRatio: e.target.value,
+                                    })
+                                }
+                                placeholder='7.1'
+                            />
+                        </div>
+                    </div>
+
+                    {error && (
+                        <p className='text-body-sm text-[var(--md-sys-color-error)]'>
+                            {error}
+                        </p>
+                    )}
+
+                    <div className='flex gap-2'>
+                        <Button
+                            type='button'
+                            disabled={saving}
+                            onClick={handleCreate}
+                        >
+                            {saving ? 'Сохранение...' : 'Добавить роль'}
+                        </Button>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() => {
+                                setShowForm(false);
+                                setError(null);
+                                setForm(EMPTY_FORM);
+                            }}
+                        >
+                            Отмена
+                        </Button>
                     </div>
                 </div>
+            ) : (
+                <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => setShowForm(true)}
+                >
+                    <Plus className='h-4 w-4 mr-1' />
+                    Добавить роль
+                </Button>
             )}
         </div>
     );
