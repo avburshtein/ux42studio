@@ -50,6 +50,7 @@ export default function GeneralPage({
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [slugTouched, setSlugTouched] = useState(false);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
@@ -89,14 +90,13 @@ export default function GeneralPage({
 
     const selectedCategoryIds = watch('categoryIds') ?? [];
     const titleValue = watch('title');
-    const slugValue = watch('slug');
 
-    // Auto-fill slug from title when slug is empty
+    // Auto-fill slug from title until the user manually edits it
     useEffect(() => {
-        if (!slugValue && titleValue) {
+        if (!slugTouched && titleValue) {
             setValue('slug', slugify(titleValue));
         }
-    }, [titleValue, slugValue, setValue]);
+    }, [titleValue, slugTouched, setValue]);
 
     const toggleCategory = (categoryId: string) => {
         const current = selectedCategoryIds;
@@ -150,7 +150,14 @@ export default function GeneralPage({
 
                 <div>
                     <Label htmlFor='slug'>Slug</Label>
-                    <Input id='slug' {...register('slug')} />
+                    <Input
+                        id='slug'
+                        {...register('slug')}
+                        onChange={(e) => {
+                            setSlugTouched(true);
+                            register('slug').onChange(e);
+                        }}
+                    />
                     {errors.slug && (
                         <p className='mt-1 text-body-sm text-error'>
                             {errors.slug.message}
