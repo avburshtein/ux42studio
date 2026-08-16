@@ -37,7 +37,7 @@ export default async function AdminDashboardPage({
 
     const profile = await db.query.profiles.findFirst({
         where: { userId },
-        columns: { id: true },
+        columns: { id: true, slug: true },
     });
 
     if (!profile) {
@@ -139,7 +139,11 @@ export default async function AdminDashboardPage({
                                     className='border-b border-outline-variant last:border-0 hover:bg-surface-variant/30'
                                 >
                                     <td className='px-4 py-3 text-body-sm text-on-surface'>
-                                        {project.title}
+                                        <Link
+                                            href={`/admin/projects/${project.id}/edit/general`}
+                                        >
+                                            {project.title}
+                                        </Link>
                                     </td>
                                     <td className='px-4 py-3'>
                                         <span
@@ -169,6 +173,22 @@ export default async function AdminDashboardPage({
                                     </td>
                                     <td className='px-4 py-3 text-right'>
                                         <div className='flex items-center justify-end gap-2'>
+                                            <form
+                                                action={async () => {
+                                                    'use server';
+                                                    await deleteProject(
+                                                        project.id,
+                                                    );
+                                                }}
+                                            >
+                                                <Button
+                                                    variant='ghost'
+                                                    type='submit'
+                                                    className='text-error'
+                                                >
+                                                    Удалить
+                                                </Button>
+                                            </form>
                                             {project.status === 'published' && (
                                                 <form
                                                     action={async () => {
@@ -205,28 +225,12 @@ export default async function AdminDashboardPage({
                                                 </form>
                                             )}
                                             <Link
-                                                href={`/admin/projects/${project.id}/edit/general`}
+                                                href={`/u/${profile.slug}/${project.slug}`}
                                             >
                                                 <Button variant='ghost'>
-                                                    Ред.
+                                                    Перейти на сайт
                                                 </Button>
                                             </Link>
-                                            <form
-                                                action={async () => {
-                                                    'use server';
-                                                    await deleteProject(
-                                                        project.id,
-                                                    );
-                                                }}
-                                            >
-                                                <Button
-                                                    variant='ghost'
-                                                    type='submit'
-                                                    className='text-error'
-                                                >
-                                                    Удалить
-                                                </Button>
-                                            </form>
                                         </div>
                                     </td>
                                 </tr>
