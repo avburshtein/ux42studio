@@ -35,7 +35,7 @@ export default async function ProjectEditLayout({
     if (!project) notFound();
 
     return (
-        <div className='mx-auto flex max-w-container-page gap-8 px-4 py-8'>
+        <div className='mx-auto flex gap-8'>
             <WizardSidebar projectId={id} projectTitle={project.title} />
             <div className='min-w-0 flex-1'>{children}</div>
         </div>

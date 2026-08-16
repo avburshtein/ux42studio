@@ -166,7 +166,7 @@ export default function ShowcasePage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>Showcase</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
@@ -514,6 +514,6 @@ export default function ShowcasePage({
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

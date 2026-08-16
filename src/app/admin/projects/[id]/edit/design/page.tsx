@@ -101,7 +101,7 @@ export default function DesignPage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>Design</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
@@ -161,6 +161,6 @@ export default function DesignPage({
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

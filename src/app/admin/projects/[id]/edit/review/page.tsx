@@ -154,7 +154,7 @@ export default function ReviewPage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>Review & Publish</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
@@ -384,6 +384,6 @@ export default function ReviewPage({
                     </div>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

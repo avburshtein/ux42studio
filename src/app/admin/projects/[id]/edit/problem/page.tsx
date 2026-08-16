@@ -77,7 +77,7 @@ export default function ProblemPage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>Problem & Audience</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
@@ -129,6 +129,6 @@ export default function ProblemPage({
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

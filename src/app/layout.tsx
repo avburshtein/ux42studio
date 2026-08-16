@@ -26,13 +26,15 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang='ru' suppressHydrationWarning>
+        <html
+            lang='ru'
+            suppressHydrationWarning
+            className={`${poppins.variable} ${inter.variable}`}
+        >
             <head>
                 <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
             </head>
-            <body
-                className={`${poppins.variable} ${inter.variable} antialiased`}
-            >
+            <body className='antialiased'>
                 <ThemeProvider>{children}</ThemeProvider>
             </body>
         </html>

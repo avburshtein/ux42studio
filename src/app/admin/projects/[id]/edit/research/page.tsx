@@ -123,7 +123,7 @@ export default function ResearchPage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>Research</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
@@ -326,6 +326,6 @@ export default function ResearchPage({
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }

@@ -165,7 +165,7 @@ export default function GeneralPage({
     };
 
     return (
-        <Card>
+        <div>
             <Title className='mb-6'>General (Meta)</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
@@ -311,6 +311,6 @@ export default function GeneralPage({
                     </Button>
                 </div>
             </form>
-        </Card>
+        </div>
     );
 }
