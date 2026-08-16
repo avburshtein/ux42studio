@@ -33,5 +33,5 @@ export async function confirmUpload(data: {
         height: data.height ?? null,
     });
 
-    return { fileId, r2Key: data.r2Key, url: `/r2/${data.r2Key}` };
+    return { fileId, r2Key: data.r2Key };
 }
