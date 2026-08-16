@@ -5,8 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ProjectCard from '@/components/ProjectCard';
 
-const ASSET_DOMAIN = 'https://assets.ux42.studio';
-
 export const revalidate = 600;
 
 interface PageProps {
@@ -14,7 +12,7 @@ interface PageProps {
 }
 
 function getImageUrl(r2Key: string): string {
-    return `${ASSET_DOMAIN}/${r2Key}`;
+    return `/r2/${r2Key}`;
 }
 
 export default async function ProfilePage({ params }: PageProps) {

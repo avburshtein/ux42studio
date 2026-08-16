@@ -14,8 +14,6 @@ import { eq, and, asc, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 
-const ASSET_DOMAIN = 'https://assets.ux42.studio';
-
 export const revalidate = 3600;
 
 interface PageProps {
@@ -23,7 +21,7 @@ interface PageProps {
 }
 
 function getImageUrl(r2Key: string): string {
-    return `${ASSET_DOMAIN}/${r2Key}`;
+    return `/r2/${r2Key}`;
 }
 
 function Section({

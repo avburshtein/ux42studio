@@ -1,4 +1,4 @@
-'use client';
+адают в локальную БД, а не в прол'use client';
 
 import React, { useCallback, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -24,8 +24,6 @@ export default function ImageUploader({
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-
-    const ASSET_DOMAIN = 'https://assets.ux42.studio';
 
     const validateFile = (file: File): string | null => {
         if (!file.type.startsWith('image/')) {
@@ -141,7 +139,7 @@ export default function ImageUploader({
         setError(null);
     };
 
-    const getImageUrl = (r2Key: string) => `${ASSET_DOMAIN}/${r2Key}`;
+    const getImageUrl = (r2Key: string) => `/r2/${r2Key}`;
 
     return (
         <div className='space-y-2'>

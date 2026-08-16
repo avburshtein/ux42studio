@@ -25,6 +25,12 @@ export default function cloudflareLoader({
     const paramsString = params.join(',');
 
     // 1. Локальная статика (public/images/...)
+    if (src.startsWith('/r2/')) {
+        // Файлы из R2 отдаются через наш прокси-роут /r2/...
+        // Cloudflare Image Resizing может обработать их напрямую.
+        return `/cdn-cgi/image/${paramsString}${src}`;
+    }
+
     if (src.startsWith('/')) {
         return `/cdn-cgi/image/${paramsString}${src}`;
     }

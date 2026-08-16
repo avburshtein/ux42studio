@@ -1,8 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-const ASSET_DOMAIN = 'https://assets.ux42.studio';
-
 type ProjectCardProps = {
     project: {
         id: string;
@@ -18,7 +16,7 @@ type ProjectCardProps = {
 };
 
 function getImageUrl(r2Key: string): string {
-    return `${ASSET_DOMAIN}/${r2Key}`;
+    return `/r2/${r2Key}`;
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {

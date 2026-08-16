@@ -22,8 +22,6 @@ type AssetGalleryProps = {
     readonly?: boolean;
 };
 
-const ASSET_DOMAIN = 'https://assets.ux42.studio';
-
 const TABS = [
     { value: 'all', label: 'All' },
     { value: 'moodboard', label: 'Moodboard' },
@@ -50,7 +48,7 @@ export default function AssetGallery({
                   .filter((a) => a.assetType === activeTab)
                   .sort((a, b) => a.order - b.order);
 
-    const getImageUrl = (r2Key: string) => `${ASSET_DOMAIN}/${r2Key}`;
+    const getImageUrl = (r2Key: string) => `/r2/${r2Key}`;
 
     const handleDragStart = (index: number) => {
         if (readonly) return;
