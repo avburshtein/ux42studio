@@ -11,7 +11,7 @@ export function ResultsCard({ content, className }: ResultsCardProps) {
     return (
         <div
             className={cn(
-                'flex items-center gap-3 rounded-lg bg-surface-container-low p-5 shadow-card',
+                'flex items-center gap-3.5 rounded-lg bg-surface-container-lowest p-5 shadow-card',
                 className,
             )}
         >

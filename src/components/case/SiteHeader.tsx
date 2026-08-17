@@ -14,7 +14,7 @@ export function SiteHeader({ profileSlug, className }: SiteHeaderProps) {
     return (
         <header
             className={cn(
-                'flex w-full items-center justify-between min-h-[96px] px-8 lg:px-16',
+                'flex min-h-[96px] w-full items-center justify-between bg-background px-8 py-4 lg:px-16',
                 className,
             )}
         >

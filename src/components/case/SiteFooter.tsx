@@ -29,7 +29,7 @@ export function SiteFooter({
     return (
         <footer
             className={cn(
-                'flex flex-col gap-8 px-8 py-12 lg:px-16 lg:py-16',
+                'flex flex-col gap-8 bg-background px-8 py-12 lg:px-16 lg:py-16',
                 className,
             )}
         >

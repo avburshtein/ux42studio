@@ -255,7 +255,7 @@ body {
   );
 }
 
-/* Фолбэк-градиент когда нет hero-изображения */
+/* Фолбэк обложки: тот же токен, что и фон страницы (Schemes/Background) */
 .hero-block-gradient {
-  background: linear-gradient(135deg, rgba(247, 250, 245, 1) 0%, rgba(247, 250, 245, 0.08) 100%);
+  background-color: var(--md-sys-color-background);
 }

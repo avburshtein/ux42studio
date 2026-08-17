@@ -183,29 +183,33 @@ export default async function ProjectPage({ params }: PageProps) {
         : null;
 
     return (
-        <div className='mx-auto w-full max-w-content'>
-            {/* Header [268:163] */}
-            <SiteHeader profileSlug={slug} />
+        <div className='min-h-screen w-full bg-background'>
+            {/* Content column: 1200px centered [198:1310] */}
+            <div className='mx-auto w-full max-w-container-content'>
+                {/* Header [268:163] */}
+                <SiteHeader profileSlug={slug} />
 
-            <main>
-                {/* Hero [198:1312] */}
-                <Hero
-                    title={project.title}
-                    teaser={project.teaser}
-                    coverUrl={
-                        project.coverFile
-                            ? getImageUrl(project.coverFile.r2Key)
-                            : undefined
-                    }
-                    categories={categories}
-                    client={project.client}
-                    timeline={timeline || undefined}
-                    role={project.myRole}
-                    devices={project.devices}
-                />
+                <main>
+                    {/* Hero [198:1312] — Schemes/Background */}
+                    <Hero
+                        title={project.title}
+                        teaser={project.teaser}
+                        coverUrl={
+                            project.coverFile
+                                ? getImageUrl(project.coverFile.r2Key)
+                                : undefined
+                        }
+                        categories={categories}
+                        client={project.client}
+                        timeline={timeline || undefined}
+                        role={project.myRole}
+                        devices={project.devices}
+                    />
 
-                {/* Main Content Sections [199:25] — gap=64, pad=80/64 */}
-                <div className='flex flex-col gap-16 px-8 py-20 sm:px-12 lg:px-16'>
+                    {/* Main Content Sections [199:25] + Next Project [198:1336]
+                        Schemes/Surface Container Lowest, gap=64, pad=80/64 */}
+                    <div className='bg-surface-container-lowest'>
+                        <div className='flex flex-col gap-16 px-8 py-20 sm:px-12 lg:px-16'>
                     {/* Section 01 — Problem & Audience [199:26] */}
                     {showProblem && (
                         <CaseSection
@@ -449,23 +453,25 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
                         </CaseSection>
                     )}
-                </div>
+                        </div>
 
-                {/* Next Project Showcase [198:1336] */}
-                <NextProjectShowcase
-                    nextProject={nextProjectCard}
-                    profileSlug={slug}
-                    contactUrl={null}
-                />
+                        {/* Next Project Showcase [198:1336] */}
+                        <NextProjectShowcase
+                            nextProject={nextProjectCard}
+                            profileSlug={slug}
+                            contactUrl={null}
+                        />
+                    </div>
 
-                {/* Footer [234:1544] */}
-                <SiteFooter
-                    profileSlug={slug}
-                    profileName={profile.fullName}
-                    profileHeadline={null}
-                    socialLinks={[]}
-                />
-            </main>
+                    {/* Footer [234:1544] */}
+                    <SiteFooter
+                        profileSlug={slug}
+                        profileName={profile.fullName}
+                        profileHeadline={null}
+                        socialLinks={[]}
+                    />
+                </main>
+            </div>
         </div>
     );
 }

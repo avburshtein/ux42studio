@@ -29,7 +29,7 @@ export function DesignSystemColors({
                 {roles.map((role) => (
                     <div
                         key={role.name}
-                        className='flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-container-low p-5 shadow-card'
+                        className='flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-card'
                     >
                         <span className='text-label-md font-medium text-on-surface'>
                             {role.name}

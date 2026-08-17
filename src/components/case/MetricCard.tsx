@@ -6,7 +6,7 @@ interface MetricCardProps {
 // Карточка ключевой метрики: крупное значение + подпись
 export function MetricCard({ value, description }: MetricCardProps) {
     return (
-        <div className='flex flex-1 flex-col gap-2 rounded-base bg-surface-container-low p-5 shadow-card'>
+        <div className='flex flex-1 flex-col gap-2 rounded-base bg-surface-container-lowest p-5 shadow-card'>
             <span className='font-display text-[48px] font-medium leading-[56px] text-primary'>
                 {value}
             </span>

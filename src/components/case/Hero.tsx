@@ -29,15 +29,20 @@ export function Hero({
     className,
 }: HeroProps) {
     return (
-        <section className={cn('flex w-full flex-col gap-8', className)}>
-            {/* === Image + Title (1200×555) === */}
-            <div className='relative w-full h-[320px] sm:h-[420px] lg:h-[555px] overflow-hidden bg-surface-variant'>
+        <section
+            className={cn(
+                'flex w-full flex-col gap-8 bg-background pb-8',
+                className,
+            )}
+        >
+            {/* === Image + Title (1200×555) — fill = page background === */}
+            <div className='relative h-[320px] w-full overflow-hidden bg-background sm:h-[420px] lg:h-[555px]'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}
                         alt={title}
                         fill
-                        sizes='100vw'
+                        sizes='(max-width: 1200px) 100vw, 1200px'
                         className='object-cover'
                         priority
                     />
@@ -52,7 +57,7 @@ export function Hero({
                 />
 
                 {/* Title overlay — absolute bottom */}
-                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-3 px-6 pb-8 lg:px-16 lg:pb-12'>
+                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-8 pb-8 sm:px-12 lg:px-16 lg:pb-16'>
                     {categories.length > 0 && (
                         <div className='flex flex-wrap gap-2'>
                             {categories.map((cat) => (

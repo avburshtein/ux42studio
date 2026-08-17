@@ -22,7 +22,7 @@ export function PersonaCard({
     return (
         <div
             className={cn(
-                'flex w-full gap-6 rounded-lg bg-surface-container-low p-6 shadow-card',
+                'flex w-full gap-5 rounded-lg bg-surface-container-lowest p-8 shadow-card',
                 className,
             )}
         >

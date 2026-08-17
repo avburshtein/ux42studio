@@ -21,7 +21,7 @@ export function TypographyScale({
     return (
         <div className={cn('flex flex-col gap-6', className)}>
             <SectionLabel>Type scale</SectionLabel>
-            <div className='flex flex-col overflow-hidden rounded-2xl border border-outline-variant'>
+            <div className='flex flex-col overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest'>
                 {displayFont && (
                     <>
                         {/* Row 1: Display Large */}
