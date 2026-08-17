@@ -53,6 +53,16 @@
   --color-outline: var(--md-sys-color-outline);
   --color-outline-variant: var(--md-sys-color-outline-variant);
 
+  /* Surface Container levels */
+  --color-surface-container-lowest: var(--md-sys-color-surface-container-lowest);
+  --color-surface-container-low: var(--md-sys-color-surface-container-low);
+  --color-surface-container: var(--md-sys-color-surface-container);
+  --color-surface-container-high: var(--md-sys-color-surface-container-high);
+  --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
+
+  /* Shadow */
+  --shadow-card: 0px 2px 12px 0px rgba(0, 0, 0, 0.06);
+
   /* Дополнительные акцентные цвета */
   --color-lime-accent: var(--md-ext-lime-accent);
   --color-on-lime-accent: var(--md-ext-on-lime-accent);
@@ -152,6 +162,13 @@
   --md-sys-color-outline-variant: #c5c6cc;
   --md-sys-color-scrim: #000000;
 
+  /* Surface Container Levels — Light */
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f6f3f4;
+  --md-sys-color-surface-container: #f0edee;
+  --md-sys-color-surface-container-high: #eae7e8;
+  --md-sys-color-surface-container-highest: #e4e2e3;
+
   /* Extended Light Accent Palette */
   --md-ext-lime-accent: #546524;
   --md-ext-on-lime-accent: #ffffff;
@@ -194,6 +211,13 @@
       --md-sys-color-outline: #8f9196;
       --md-sys-color-outline-variant: #44474b;
 
+      /* Surface Container Levels — Dark */
+      --md-sys-color-surface-container-lowest: #0e0e0f;
+      --md-sys-color-surface-container-low: #1b1b1d;
+      --md-sys-color-surface-container: #1f1f21;
+      --md-sys-color-surface-container-high: #2a2a2b;
+      --md-sys-color-surface-container-highest: #353536;
+
       --md-ext-lime-accent: #bbcf81;
       --md-ext-on-lime-accent: #283500;
       --md-ext-lavender-light: #c3c0ff;
@@ -219,4 +243,19 @@ body {
       color-mix(in srgb, var(--md-sys-color-scrim) 72%, transparent),
       color-mix(in srgb, var(--md-sys-color-scrim) 24%, transparent),
       transparent);
+}
+
+/* Scrim для hero-изображения (Figma: On surface gradient) */
+.hero-image-scrim {
+  background: linear-gradient(
+    0deg,
+    rgba(27, 27, 29, 0.75) 14%,
+    rgba(24, 29, 26, 0.16) 50%,
+    rgba(27, 27, 29, 0) 100%
+  );
+}
+
+/* Фолбэк-градиент когда нет hero-изображения */
+.hero-block-gradient {
+  background: linear-gradient(135deg, rgba(247, 250, 245, 1) 0%, rgba(247, 250, 245, 0.08) 100%);
 }
