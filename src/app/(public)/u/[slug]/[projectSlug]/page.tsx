@@ -183,7 +183,7 @@ export default async function ProjectPage({ params }: PageProps) {
         : null;
 
     return (
-        <div className='min-h-screen w-full bg-background'>
+        <div className='min-h-screen w-full bg-surface-container-low'>
             {/* Content column: 1200px centered [198:1310] */}
             <div className='mx-auto w-full max-w-container-content'>
                 {/* Header [268:163] */}
