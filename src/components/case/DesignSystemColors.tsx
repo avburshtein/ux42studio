@@ -1,7 +1,8 @@
 import { cn } from '@/lib/utils';
 
 interface ColorRole {
-    name: string;
+    name1: string;
+    name2: string;
     lightColor1: string;
     lightColor2: string;
     darkColor1: string;
@@ -28,12 +29,17 @@ export function DesignSystemColors({
             <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
                 {roles.map((role) => (
                     <div
-                        key={role.name}
+                        key={role.name2 + role.lightColor1}
                         className='flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-card'
                     >
-                        <span className='text-label-md font-medium text-on-surface'>
-                            {role.name}
-                        </span>
+                        <div className='flex flex-col gap-0.5'>
+                            <span className='text-label-md font-medium text-on-surface'>
+                                {role.name1}
+                            </span>
+                            <span className='text-label-sm text-on-surface-variant'>
+                                {role.name2}
+                            </span>
+                        </div>
 
                         {/* Light scheme swatches */}
                         <div className='flex flex-col gap-1.5'>
