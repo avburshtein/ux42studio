@@ -1,4 +1,12 @@
+'use client';
+
+import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Switch } from '@/components/ui/Switch';
+
+// ---------------------------------------------------------------------------
+// Типы
+// ---------------------------------------------------------------------------
 
 interface ColorRole {
     name1: string;
@@ -16,138 +24,214 @@ interface DesignSystemColorsProps {
     className?: string;
 }
 
-// Цветовые токены из БД (colorRoles)
-// Figma: Color tokens [280:210] — swatches с контрастом
+interface SwatchData {
+    name: string;
+    fill: string;
+    onFill: string;
+    onName: string;
+    contrast: number;
+}
+
+// ---------------------------------------------------------------------------
+// Утилиты
+// ---------------------------------------------------------------------------
+
+function contrastLevel(ratio: number): string {
+    if (ratio >= 7) return 'AAA';
+    if (ratio >= 4.5) return 'AA';
+    return 'AA+';
+}
+
+// ---------------------------------------------------------------------------
+// Вспомогательные компоненты
+// ---------------------------------------------------------------------------
+
+function ContrastBadge({
+    ratio,
+    level,
+    textColor,
+}: {
+    ratio: number;
+    level: string;
+    textColor: string;
+}) {
+    return (
+        <span
+            className='text-[10px] font-medium leading-4'
+            style={{ color: textColor, opacity: 0.7 }}
+        >
+            {ratio.toFixed(1)}:1 {level}
+        </span>
+    );
+}
+
+function SwatchBlock({
+    name,
+    fill,
+    textColor,
+    height,
+    radius = 0,
+    border = false,
+}: {
+    name: string;
+    fill: string;
+    textColor: string;
+    height: number;
+    radius?: string | number;
+    border?: boolean;
+}) {
+    const borderRadius =
+        typeof radius === 'number' ? `${radius}px` : radius;
+    return (
+        <div
+            className={cn(
+                'flex w-full items-end overflow-hidden',
+                border && 'border border-outline-variant',
+            )}
+            style={{
+                backgroundColor: fill,
+                height: `${height}px`,
+                borderRadius,
+                padding: '8px',
+            }}
+        >
+            <span
+                className='text-[10px] font-semibold uppercase leading-4 tracking-[0.5px]'
+                style={{ color: textColor }}
+            >
+                {name}
+            </span>
+        </div>
+    );
+}
+
+/** Колонка-пара: верхний свотч 112px + нижний On-свотч 34px */
+function ColorPairColumn({
+    main,
+    on,
+}: {
+    main: SwatchData;
+    on: SwatchData;
+}) {
+    return (
+        <div className='flex flex-col gap-0.5'>
+            {/* Верхний (основной) свотч — скругления только сверху */}
+            <div
+                className='flex w-full items-end justify-between overflow-hidden border border-outline-variant'
+                style={{
+                    backgroundColor: main.fill,
+                    height: '112px',
+                    borderRadius: '10px 10px 0 0',
+                    padding: '8px',
+                }}
+            >
+                <span
+                    className='text-[10px] font-semibold uppercase leading-4 tracking-[0.5px]'
+                    style={{ color: main.onFill }}
+                >
+                    {main.name}
+                </span>
+                <ContrastBadge
+                    ratio={main.contrast}
+                    level={contrastLevel(main.contrast)}
+                    textColor={main.onFill}
+                />
+            </div>
+
+            {/* Нижний On-свотч — скругления только снизу */}
+            <SwatchBlock
+                name={on.name}
+                fill={on.fill}
+                textColor={on.onFill}
+                height={34}
+                radius='0 0 10px 10px'
+                border
+            />
+        </div>
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Основной компонент
+// ---------------------------------------------------------------------------
+
 export function DesignSystemColors({
     roles,
     className,
 }: DesignSystemColorsProps) {
+    const [darkMode, setDarkMode] = useState(false);
+
     if (roles.length === 0) return null;
 
+    const isDark = darkMode;
+
+    // Только админские роли → Semantic swatches
+    const semanticTokens: SwatchData[] = roles.map((role) => ({
+        name: role.name1,
+        fill: isDark ? role.darkColor1 : role.lightColor1,
+        onFill: isDark ? role.darkColor2 : role.lightColor2,
+        onName: role.name2,
+        contrast: (isDark ? role.darkContrastRatio : role.lightContrastRatio) ?? 0,
+    }));
+
+    // Кол-во колонок в гриде: 1 роль → 1, 2 → 2, 3+ → 4
+    const gridCols =
+        roles.length === 1
+            ? 'grid-cols-1'
+            : roles.length === 2
+              ? 'grid-cols-1 sm:grid-cols-2'
+              : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4';
+
     return (
-        <div className={cn('flex flex-col gap-4', className)}>
-            <div className='grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
-                {roles.map((role) => (
-                    <div
-                        key={role.name2 + role.lightColor1}
-                        className='flex flex-col gap-3 rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-card'
+        <div className={cn('flex w-full flex-col gap-6', className)}>
+            {/* Заголовок «COLOR TOKENS» (раздел 3) */}
+            <p className='text-[11px] font-semibold uppercase leading-4 tracking-[0.5px] text-outline'>
+                Color Tokens
+            </p>
+
+            {/* Карточка (раздел 4) */}
+            <div
+                className='flex w-full flex-col gap-3 rounded-[12px] border px-5'
+                style={{
+                    borderColor: 'rgba(113,118,114,0.1)',
+                    backgroundColor: isDark ? '#0E0E0F' : '#FFFFFF',
+                    paddingTop: '20px',
+                    paddingBottom: '24px',
+                }}
+            >
+                {/* Toggle Dark/Light Scheme (раздел 5) */}
+                <div className='flex items-center gap-8'>
+                    <span
+                        className='text-base font-medium leading-6'
+                        style={{ color: isDark ? '#E4E2E3' : '#1B1B1D' }}
                     >
-                        <div className='flex flex-col gap-0.5'>
-                            <span className='text-label-md font-medium text-on-surface'>
-                                {role.name1}
-                            </span>
-                            <span className='text-label-sm text-on-surface-variant'>
-                                {role.name2}
-                            </span>
-                        </div>
+                        {isDark ? 'Light Scheme' : 'Dark Scheme'}
+                    </span>
+                    <Switch
+                        checked={isDark}
+                        onCheckedChange={setDarkMode}
+                    />
+                </div>
 
-                        {/* Light scheme swatches */}
-                        <div className='flex flex-col gap-1.5'>
-                            <span className='text-label-sm uppercase text-outline'>
-                                Light
-                            </span>
-                            <div className='flex gap-2'>
-                                <div
-                                    className='flex h-20 flex-1 items-end overflow-hidden rounded-base p-2'
-                                    style={{
-                                        backgroundColor: role.lightColor1,
-                                    }}
-                                >
-                                    <span
-                                        className='text-label-sm font-semibold'
-                                        style={{
-                                            color: role.lightColor2,
-                                        }}
-                                    >
-                                        {role.lightColor1.toUpperCase()}
-                                    </span>
-                                </div>
-                                <div
-                                    className='flex h-20 flex-1 items-end overflow-hidden rounded-base p-2'
-                                    style={{
-                                        backgroundColor: role.lightColor2,
-                                    }}
-                                >
-                                    <span
-                                        className='text-label-sm font-semibold'
-                                        style={{
-                                            color: role.lightColor1,
-                                        }}
-                                    >
-                                        {role.lightColor2.toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
-                            {role.lightContrastRatio && (
-                                <div className='flex items-center gap-2'>
-                                    <span className='inline-flex h-6 items-center rounded-full bg-surface-variant px-2 text-label-sm font-medium text-on-surface-variant'>
-                                        {role.lightContrastRatio.toFixed(1)}:1
-                                    </span>
-                                    <span className='text-body-sm text-on-surface-variant'>
-                                        {role.lightContrastRatio >= 7
-                                            ? 'AAA'
-                                            : role.lightContrastRatio >= 4.5
-                                              ? 'AA'
-                                              : 'Fail'}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
+                {/* Spacer 8px */}
+                <div className='h-2' />
 
-                        {/* Dark scheme swatches (Figma: Dark Scheme фрейм) */}
-                        <div className='flex flex-col gap-1.5'>
-                            <span className='text-label-sm uppercase text-outline'>
-                                Dark
-                            </span>
-                            <div className='flex gap-2'>
-                                <div
-                                    className='flex h-14 flex-1 items-end overflow-hidden rounded-base p-2'
-                                    style={{
-                                        backgroundColor: role.darkColor1,
-                                    }}
-                                >
-                                    <span
-                                        className='text-label-sm font-semibold'
-                                        style={{
-                                            color: role.darkColor2,
-                                        }}
-                                    >
-                                        {role.darkColor1.toUpperCase()}
-                                    </span>
-                                </div>
-                                <div
-                                    className='flex h-14 flex-1 items-end overflow-hidden rounded-base p-2'
-                                    style={{
-                                        backgroundColor: role.darkColor2,
-                                    }}
-                                >
-                                    <span
-                                        className='text-label-sm font-semibold'
-                                        style={{
-                                            color: role.darkColor1,
-                                        }}
-                                    >
-                                        {role.darkColor2.toUpperCase()}
-                                    </span>
-                                </div>
-                            </div>
-                            {role.darkContrastRatio && (
-                                <div className='flex items-center gap-2'>
-                                    <span className='inline-flex h-6 items-center rounded-full bg-surface-variant px-2 text-label-sm font-medium text-on-surface-variant'>
-                                        {role.darkContrastRatio.toFixed(1)}:1
-                                    </span>
-                                    <span className='text-body-sm text-on-surface-variant'>
-                                        {role.darkContrastRatio >= 7
-                                            ? 'AAA'
-                                            : role.darkContrastRatio >= 4.5
-                                              ? 'AA'
-                                              : 'Fail'}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                ))}
+                {/* Semantic Tokens — только из админки */}
+                <div className={cn('grid gap-1', gridCols)}>
+                    {semanticTokens.map((token, i) => (
+                        <ColorPairColumn
+                            key={i}
+                            main={token}
+                            on={{
+                                name: token.onName,
+                                fill: token.onFill,
+                                onFill: token.fill,
+                                onName: '',
+                                contrast: 0,
+                            }}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     );
