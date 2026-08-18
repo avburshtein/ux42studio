@@ -13,6 +13,7 @@ import {
     deleteColorRole,
     reorderColorRoles,
 } from '@/lib/actions/projects';
+import { getContrastRatio } from '@/lib/utils/contrast';
 
 type ColorRole = {
     id: string;
@@ -62,6 +63,34 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     const [form, setForm] = useState<NewRoleForm>(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Авто-расчёт контрастности при изменении цветов светлой темы
+    useEffect(() => {
+        if (
+            form.lightColor1.length >= 4 &&
+            form.lightColor2.length >= 4
+        ) {
+            const ratio = getContrastRatio(form.lightColor1, form.lightColor2);
+            setForm((prev) => ({
+                ...prev,
+                lightContrastRatio: ratio.toFixed(1),
+            }));
+        }
+    }, [form.lightColor1, form.lightColor2]);
+
+    // Авто-расчёт контрастности при изменении цветов тёмной темы
+    useEffect(() => {
+        if (
+            form.darkColor1.length >= 4 &&
+            form.darkColor2.length >= 4
+        ) {
+            const ratio = getContrastRatio(form.darkColor1, form.darkColor2);
+            setForm((prev) => ({
+                ...prev,
+                darkContrastRatio: ratio.toFixed(1),
+            }));
+        }
+    }, [form.darkColor1, form.darkColor2]);
 
     const loadRoles = useCallback(async () => {
         try {
@@ -321,7 +350,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             lightColor1: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10 cursor-pointer'
                                 />
                                 <Input
                                     value={form.lightColor1}
@@ -346,7 +375,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             lightColor2: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.lightColor2}
@@ -365,12 +394,8 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='number'
                                 step='0.1'
                                 value={form.lightContrastRatio}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        lightContrastRatio: e.target.value,
-                                    })
-                                }
+                                readOnly
+                                className='bg-[var(--md-sys-color-surface-container)] cursor-default'
                                 placeholder='4.5'
                             />
                         </div>
@@ -392,7 +417,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             darkColor1: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.darkColor1}
@@ -417,7 +442,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             darkColor2: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.darkColor2}
@@ -436,12 +461,8 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='number'
                                 step='0.1'
                                 value={form.darkContrastRatio}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        darkContrastRatio: e.target.value,
-                                    })
-                                }
+                                readOnly
+                                className='bg-[var(--md-sys-color-surface-container)] cursor-default'
                                 placeholder='7.1'
                             />
                         </div>
