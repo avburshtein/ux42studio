@@ -35,11 +35,6 @@ export default async function AdminDashboardPage({
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    const user = await db.query.users.findFirst({
-        where: { id: userId },
-        columns: { role: true },
-    });
-
     const profile = await db.query.profiles.findFirst({
         where: { userId },
         columns: { id: true, slug: true },
@@ -48,8 +43,6 @@ export default async function AdminDashboardPage({
     if (!profile) {
         redirect('/admin/profile');
     }
-
-    const isSuperAdmin = user?.role === 'admin';
 
     const params = await searchParams;
     const statusFilter: StatusFilter = STATUS_TABS.some(
@@ -76,21 +69,10 @@ export default async function AdminDashboardPage({
                     </p>
                 </div>
 
-                <div className='flex items-center gap-8'>
-                    {isSuperAdmin && (
-                        <div className=''>
-                            <Link href='/super-admin'>Суперадминка</Link>
-                        </div>
-                    )}
-
-                    <div className=''>
-                        <Link href='/admin/profile'>Профиль</Link>
-                    </div>
-                    <div>
-                        <Link href='/admin/projects/new'>
-                            <Button>Создать проект</Button>
-                        </Link>
-                    </div>
+                <div>
+                    <Link href='/admin/projects/new'>
+                        <Button>Создать проект</Button>
+                    </Link>
                 </div>
             </div>
 

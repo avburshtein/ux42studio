@@ -23,20 +23,26 @@ export default async function ProjectEditLayout({
 
     const profile = await db.query.profiles.findFirst({
         where: { userId },
-        columns: { id: true },
+        columns: { id: true, slug: true },
     });
 
     if (!profile) redirect('/admin/profile');
 
     const project = await db.query.projects.findFirst({
         where: { id, profileId: profile.id },
+        columns: { id: true, title: true, slug: true },
     });
 
     if (!project) notFound();
 
     return (
         <div className='mx-auto flex gap-8'>
-            <WizardSidebar projectId={id} projectTitle={project.title} />
+            <WizardSidebar
+                projectId={id}
+                projectTitle={project.title}
+                profileSlug={profile.slug}
+                projectSlug={project.slug}
+            />
             <div className='min-w-0 flex-1'>{children}</div>
         </div>
     );

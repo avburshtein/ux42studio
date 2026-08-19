@@ -16,9 +16,13 @@ const STEPS = [
 export function WizardSidebar({
     projectId,
     projectTitle,
+    profileSlug,
+    projectSlug,
 }: {
     projectId: string;
     projectTitle: string;
+    profileSlug?: string;
+    projectSlug?: string;
 }) {
     const pathname = usePathname();
 
@@ -48,7 +52,19 @@ export function WizardSidebar({
                         );
                     })}
                 </ul>
-                <div className='mt-6 border-t border-outline-variant pt-4'>
+                {profileSlug && projectSlug && (
+                    <div className='mt-4 border-t border-outline-variant pt-4'>
+                        <Link
+                            href={`/u/${profileSlug}/${projectSlug}`}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='text-body-sm text-primary hover:text-primary-variant transition-colors'
+                        >
+                            ↗ Просмотр проекта
+                        </Link>
+                    </div>
+                )}
+                <div className='mt-4 border-t border-outline-variant pt-4'>
                     <Link
                         href='/admin'
                         className='text-body-sm text-on-surface-variant hover:text-on-surface'
