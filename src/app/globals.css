@@ -7,6 +7,7 @@
   --font-body: var(--font-inter), sans-serif;
 
   /* Радиусы (rounded-*) */
+  --radius-none: 0px;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -17,6 +18,7 @@
   --radius-3xl: 24px;
   --radius-4xl: 28px;
   --radius-5xl: 48px;
+  --radius-full: 9999px;
 
   /* Размеры контейнеров (max-w-*) */
   --max-width-container-content: 1200px;
@@ -38,9 +40,13 @@
 
   --color-tertiary: var(--md-sys-color-tertiary);
   --color-on-tertiary: var(--md-sys-color-on-tertiary);
+  --color-tertiary-container: var(--md-sys-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
 
   --color-error: var(--md-sys-color-error);
   --color-on-error: var(--md-sys-color-on-error);
+  --color-error-container: var(--md-sys-color-error-container);
+  --color-on-error-container: var(--md-sys-color-on-error-container);
 
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
@@ -71,6 +77,10 @@
   --color-green-accent: var(--md-ext-green-accent);
 
   /* Типографика (text-*) */
+  --text-headline-lg: 48px;
+  --text-headline-lg--line-height: 56px;
+  --text-headline-lg--font-weight: 500;
+
   --text-display-sm: 52px;
   --text-display-sm--line-height: 60px;
   --text-display-sm--font-weight: 500;
@@ -144,6 +154,11 @@
   --md-sys-color-secondary-container: #ff6467;
   --md-sys-color-on-secondary-container: #680010;
 
+  --md-sys-color-tertiary-container: #fbfffa;
+  --md-sys-color-on-tertiary-container: #717672;
+  --md-sys-color-error-container: #d17d00;
+  --md-sys-color-on-error-container: #402300;
+
   --md-sys-color-tertiary: #5b5f5c;
   --md-sys-color-on-tertiary: #ffffff;
 
@@ -193,6 +208,11 @@
       --md-sys-color-on-secondary: #680011;
       --md-sys-color-secondary-container: #ff6467;
       --md-sys-color-on-secondary-container: #680010;
+
+      --md-sys-color-tertiary-container: #dfe4df;
+      --md-sys-color-on-tertiary-container: #616562;
+      --md-sys-color-error-container: #d17d00;
+      --md-sys-color-on-error-container: #402300;
 
       --md-sys-color-tertiary: #ffffff;
       --md-sys-color-on-tertiary: #2d312e;
@@ -258,4 +278,16 @@ body {
 /* Фолбэк обложки: тот же токен, что и фон страницы (Schemes/Background) */
 .hero-block-gradient {
   background-color: var(--md-sys-color-background);
+}
+
+/* Header glass morphism (Spec: hero block gradient + Effects/Blur/Glass Heavy) */
+.header-glass {
+  background: linear-gradient(
+    315deg,
+    var(--md-sys-color-background) 0%,
+    color-mix(in srgb, var(--md-sys-color-background) 8%, transparent) 100%
+  );
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.1);
 }

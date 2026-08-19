@@ -3,7 +3,7 @@ import { getDb } from '@/db';
 import { projects } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
-import { SiteHeader } from '@/components/case/SiteHeader';
+import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
 import { CaseSection } from '@/components/case/CaseSection';
 import { SectionLabel } from '@/components/case/BlockLabel';
@@ -186,10 +186,13 @@ export default async function ProjectPage({ params }: PageProps) {
         <div className='min-h-screen w-full bg-surface-container-low'>
             {/* Content column: 1200px centered [198:1310] */}
             <div className='mx-auto w-full max-w-container-content'>
-                {/* Header [268:163] */}
-                <SiteHeader profileSlug={slug} />
+                {/* Header [245:1632] — Breadcrumb variant with glass effects */}
+                <SiteHeaderBreadcrumb
+                    profileSlug={slug}
+                    currentTitle={project.title}
+                />
 
-                <main>
+                <main className='mt-8'>
                     {/* Hero [198:1312] — Schemes/Background */}
                     <Hero
                         title={project.title}
@@ -465,6 +468,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
                     {/* Footer [234:1544] */}
                     <SiteFooter
+                        className='mt-8'
                         profileSlug={slug}
                         profileName={profile.fullName}
                         profileHeadline={null}

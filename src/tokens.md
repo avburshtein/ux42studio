@@ -1,6 +1,3 @@
-globals.css — CSS Custom Properties
-Generated from Figma variables · material-theme + spacing + radius + sizing + opacity
-Copy the text block below into src/app/globals.css
 :root {
   color-scheme: light dark;
 
@@ -50,7 +47,7 @@ Copy the text block below into src/app/globals.css
   --md-sys-color-surface-dim: #dcd9da;
   --md-sys-color-surface-bright: #fcf8fa;
   --md-sys-color-surface-container-lowest: #ffffff;
-  --md-sys-color-surface-container-low: #ffffff;
+  --md-sys-color-surface-container-low: #f6f3f4;
   --md-sys-color-surface-container: #f0edee;
   --md-sys-color-surface-container-high: #eae7e8;
   --md-sys-color-surface-container-highest: #e4e2e3;
@@ -249,7 +246,6 @@ Copy the text block below into src/app/globals.css
   --text-button: 500 16px/24px var(--font-body);
   --text-button-tracking: 0;
 }
-
 /* Dark Mode + @media fallback + Base Styles */
 
 [data-theme="dark"] {
