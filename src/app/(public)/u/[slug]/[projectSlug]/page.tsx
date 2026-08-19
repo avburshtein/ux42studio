@@ -192,7 +192,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     currentTitle={project.title}
                 />
 
-                <main className='mt-8'>
+                <main>
                     {/* Hero [198:1312] — Schemes/Background */}
                     <Hero
                         title={project.title}
@@ -468,7 +468,6 @@ export default async function ProjectPage({ params }: PageProps) {
 
                     {/* Footer [234:1544] */}
                     <SiteFooter
-                        className='mt-8'
                         profileSlug={slug}
                         profileName={profile.fullName}
                         profileHeadline={null}

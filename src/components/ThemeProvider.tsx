@@ -36,13 +36,23 @@ function getInitialTheme(): Theme {
 }
 
 export default function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setTheme] = useState<Theme>('light');
+    const [theme, setTheme] = useState<Theme>(() => {
+        // Use the data-theme attribute set by the inline script (avoids flash)
+        if (typeof document !== 'undefined') {
+            const attr = document.documentElement.getAttribute('data-theme');
+            if (attr === 'dark') return 'dark';
+        }
+        return 'light';
+    });
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
-        const initial = getInitialTheme();
-        setTheme(initial);
-        document.documentElement.setAttribute('data-theme', initial);
+        // Sync React state with the actual theme (inline script may have set a
+        // different value than our default if no localStorage was present)
+        const actual = getInitialTheme();
+        setTheme(actual);
+        // Ensure data-theme matches (inline script already did this, but be safe)
+        document.documentElement.setAttribute('data-theme', actual);
         setMounted(true);
     }, []);
 
