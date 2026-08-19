@@ -371,7 +371,7 @@ export default function ReviewPage({
                         variant='ghost'
                         onClick={() =>
                             router.push(
-                                `/admin/projects/${projectId}/edit/showcase`,
+                                `/admin/projects/${projectId}/edit/results`,
                             )
                         }
                     >

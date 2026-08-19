@@ -476,16 +476,6 @@ export async function updateProjectShowcase(
             afterText?: string;
             order: number;
         }>;
-        results?: Array<{
-            id?: string;
-            content: string;
-            order: number;
-        }>;
-        tools?: Array<{
-            id?: string;
-            content: string;
-            order: number;
-        }>;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -555,7 +545,45 @@ export async function updateProjectShowcase(
                 order: c.order,
             }),
         ),
+    ]);
 
+    // Удаляем файлы, которые больше не используются в showcase
+    const newFileIds = new Set<string>();
+    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
+    for (const c of data.comparisons || []) {
+        if (c.beforeFileId) newFileIds.add(c.beforeFileId);
+        if (c.afterFileId) newFileIds.add(c.afterFileId);
+    }
+
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Section 07b: Results & Tools ----
+
+export async function updateProjectResults(
+    projectId: string,
+    data: {
+        results?: Array<{
+            id?: string;
+            content: string;
+            order: number;
+        }>;
+        tools?: Array<{
+            id?: string;
+            content: string;
+            order: number;
+        }>;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db.batch([
         // Replace result/tool items (keep next_step items intact)
         db
             .delete(projectItems)
@@ -584,19 +612,6 @@ export async function updateProjectShowcase(
             }),
         ),
     ]);
-
-    // Удаляем файлы, которые больше не используются в showcase
-    const newFileIds = new Set<string>();
-    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
-    for (const c of data.comparisons || []) {
-        if (c.beforeFileId) newFileIds.add(c.beforeFileId);
-        if (c.afterFileId) newFileIds.add(c.afterFileId);
-    }
-
-    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
-    if (staleFileIds.length > 0) {
-        await deleteFilesByIds(staleFileIds);
-    }
 
     revalidatePath(`/admin/projects/${projectId}`);
 }

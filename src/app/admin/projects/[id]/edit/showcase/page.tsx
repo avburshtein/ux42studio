@@ -34,18 +34,10 @@ const comparisonSchema = z.object({
     order: z.number().int(),
 });
 
-const projectItemSchema = z.object({
-    id: z.string().optional(),
-    content: z.string().min(1, 'Content is required'),
-    order: z.number().int(),
-});
-
 const formSchema = z.object({
     finalDescription: z.string().optional().or(z.literal('')),
     assets: z.array(assetSchema),
     comparisons: z.array(comparisonSchema),
-    results: z.array(projectItemSchema),
-    tools: z.array(projectItemSchema),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -78,8 +70,6 @@ export default function ShowcasePage({
             finalDescription: '',
             assets: [],
             comparisons: [],
-            results: [],
-            tools: [],
         },
     });
 
@@ -94,18 +84,6 @@ export default function ShowcasePage({
         append: appendComparison,
         remove: removeComparison,
     } = useFieldArray({ control, name: 'comparisons' });
-
-    const {
-        fields: resultFields,
-        append: appendResult,
-        remove: removeResult,
-    } = useFieldArray({ control, name: 'results' });
-
-    const {
-        fields: toolFields,
-        append: appendTool,
-        remove: removeTool,
-    } = useFieldArray({ control, name: 'tools' });
 
     useEffect(() => {
         if (!projectId) return;
@@ -124,8 +102,6 @@ export default function ShowcasePage({
                         beforeText: c.beforeText ?? '',
                         afterText: c.afterText ?? '',
                     })),
-                    results: s?.results ?? [],
-                    tools: s?.tools ?? [],
                 });
             })
             .catch(() => {});
@@ -149,16 +125,8 @@ export default function ShowcasePage({
                     beforeText: c.beforeText || undefined,
                     afterText: c.afterText || undefined,
                 })),
-                results: data.results.map((r, i) => ({
-                    ...r,
-                    order: i,
-                })),
-                tools: data.tools.map((t, i) => ({
-                    ...t,
-                    order: i,
-                })),
             });
-            router.push(`/admin/projects/${projectId}/edit/review`);
+            router.push(`/admin/projects/${projectId}/edit/results`);
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
         } finally {
@@ -390,104 +358,6 @@ export default function ShowcasePage({
                                     value={index}
                                 />
                             </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* Results */}
-                <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Results</Label>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() =>
-                                appendResult({
-                                    content: '',
-                                    order: resultFields.length,
-                                })
-                            }
-                        >
-                            + Add Result
-                        </Button>
-                    </div>
-                    {resultFields.map((field, index) => (
-                        <div
-                            key={field.id}
-                            className='mb-3 flex items-start gap-3'
-                        >
-                            <div className='flex-1'>
-                                <Input
-                                    {...register(`results.${index}.content`)}
-                                    placeholder='Result description'
-                                />
-                                {errors.results?.[index]?.content && (
-                                    <p className='mt-1 text-body-sm text-error'>
-                                        Required
-                                    </p>
-                                )}
-                            </div>
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                onClick={() => removeResult(index)}
-                            >
-                                Remove
-                            </Button>
-                            <input
-                                type='hidden'
-                                {...register(`results.${index}.order`)}
-                                value={index}
-                            />
-                        </div>
-                    ))}
-                </div>
-
-                {/* Tools */}
-                <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Tools</Label>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() =>
-                                appendTool({
-                                    content: '',
-                                    order: toolFields.length,
-                                })
-                            }
-                        >
-                            + Add Tool
-                        </Button>
-                    </div>
-                    {toolFields.map((field, index) => (
-                        <div
-                            key={field.id}
-                            className='mb-3 flex items-start gap-3'
-                        >
-                            <div className='flex-1'>
-                                <Input
-                                    {...register(`tools.${index}.content`)}
-                                    placeholder='Tool name'
-                                />
-                                {errors.tools?.[index]?.content && (
-                                    <p className='mt-1 text-body-sm text-error'>
-                                        Required
-                                    </p>
-                                )}
-                            </div>
-                            <Button
-                                type='button'
-                                variant='ghost'
-                                onClick={() => removeTool(index)}
-                            >
-                                Remove
-                            </Button>
-                            <input
-                                type='hidden'
-                                {...register(`tools.${index}.order`)}
-                                value={index}
-                            />
                         </div>
                     ))}
                 </div>
