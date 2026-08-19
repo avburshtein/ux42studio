@@ -290,8 +290,8 @@ export async function getProjectColorRoles(projectId: string) {
     return db
         .select({
             id: colorRoles.id,
-            name: colorRoles.name,
-            slug: colorRoles.slug,
+            name1: colorRoles.name1,
+            name2: colorRoles.name2,
             lightColor1: colorRoles.lightColor1,
             lightColor2: colorRoles.lightColor2,
             darkColor1: colorRoles.darkColor1,
@@ -309,7 +309,8 @@ export async function getProjectColorRoles(projectId: string) {
 export async function createColorRole(
     projectId: string,
     data: {
-        name: string;
+        name1: string;
+        name2: string;
         lightColor1: string;
         lightColor2: string;
         darkColor1: string;
@@ -331,30 +332,27 @@ export async function createColorRole(
 
     const nextOrder = (last?.order ?? -1) + 1;
 
-    // Генерируем уникальный slug в рамках проекта
-    const baseSlug = slugify(data.name) || `role-${crypto.randomUUID()}`;
-    let slug = baseSlug;
-    let suffix = 1;
-    while (
-        await db
-            .select({ id: colorRoles.id })
-            .from(colorRoles)
-            .where(
-                and(
-                    eq(colorRoles.projectId, projectId),
-                    eq(colorRoles.slug, slug),
-                ),
-            )
-            .get()
-    ) {
-        slug = `${baseSlug}-${suffix++}`;
+    // Проверяем уникальность name2 в рамках проекта
+    const existing = await db
+        .select({ id: colorRoles.id })
+        .from(colorRoles)
+        .where(
+            and(
+                eq(colorRoles.projectId, projectId),
+                eq(colorRoles.name2, data.name2),
+            ),
+        )
+        .get();
+
+    if (existing) {
+        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
     }
 
     await db.insert(colorRoles).values({
         id: crypto.randomUUID(),
         projectId,
-        name: data.name,
-        slug,
+        name1: data.name1,
+        name2: data.name2,
         lightColor1: data.lightColor1,
         lightColor2: data.lightColor2,
         darkColor1: data.darkColor1,
@@ -370,7 +368,8 @@ export async function createColorRole(
 export async function updateColorRole(
     roleId: string,
     data: {
-        name: string;
+        name1: string;
+        name2: string;
         lightColor1: string;
         lightColor2: string;
         darkColor1: string;
@@ -390,31 +389,27 @@ export async function updateColorRole(
 
     if (!existing) return;
 
-    // Генерируем уникальный slug в рамках проекта
-    const baseSlug = slugify(data.name) || `role-${crypto.randomUUID()}`;
-    let slug = baseSlug;
-    let suffix = 1;
-    while (
-        await db
-            .select({ id: colorRoles.id })
-            .from(colorRoles)
-            .where(
-                and(
-                    eq(colorRoles.projectId, existing.projectId),
-                    eq(colorRoles.slug, slug),
-                    sql`${colorRoles.id} != ${roleId}`,
-                ),
-            )
-            .get()
-    ) {
-        slug = `${baseSlug}-${suffix++}`;
+    // Проверяем уникальность name2 в рамках проекта
+    const duplicate = await db
+        .select({ id: colorRoles.id })
+        .from(colorRoles)
+        .where(
+            and(
+                eq(colorRoles.projectId, existing.projectId),
+                eq(colorRoles.name2, data.name2),
+                sql`${colorRoles.id} != ${roleId}`,
+            ),
+        )
+        .get();
+    if (duplicate) {
+        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
     }
 
     await db
         .update(colorRoles)
         .set({
-            name: data.name,
-            slug,
+            name1: data.name1,
+            name2: data.name2,
             lightColor1: data.lightColor1,
             lightColor2: data.lightColor2,
             darkColor1: data.darkColor1,

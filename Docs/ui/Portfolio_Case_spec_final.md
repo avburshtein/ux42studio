@@ -1,5 +1,5 @@
 # Portfolio Case Page — Final Specification
-Updated: 2026-08-01
+Updated: 2026-08-17
 Figma File: U5OjywCHbtzQgBsi7PU25r
 Page ID: 4:263
 
@@ -181,13 +181,18 @@ Header:
   • Description: "Clean, high-contrast e-commerce aesthetics..."
 Content:
 
-  #### 4a. Moodboard [276:142] — 1072×487
-  • Label: "Paragraph" frame with section label
-  • Container [271:498] — 1072×447, padding=48, radius=20
-    — TypeScale Grid [280:214] — VERTICAL gap=24
-      — TypeScale Row Top [280:215] — 3 type samples, HORIZONTAL gap=4
-      — TypeScale Row Bottom [280:216] — 3 type samples, HORIZONTAL gap=4
-    — Each type sample Container gap=4 (was 3px, fixed to 4px)
+  #### 4a. Moodboard [276:142] — 1072×576, VERTICAL gap=24
+  • Label: "Moodboard" [276:144] — text, material-theme/body/medium
+  • Container [271:498] — 1072×536, CSS GRID layout (auto-fill, min 240px)
+    — 5 image cells in masonry-like grid:
+      — Cell 1 [271:499]: 508×486 (large, spans 2 rows)
+      — Cell 2 [280:199]: 247×238
+      — Cell 3 [280:195]: 247×238
+      — Cell 4 [271:501]: 247×238
+      — Cell 5 [271:505]: 247×238
+    — Each cell: Container > ImageWithFallback frame
+    — Placeholder fill: Schemes/Surface Container High
+    — Grid gap: 16px between cells
 
   #### 4b. Color Tokens [276:148] — 1072×592
   • Label: "Paragraph" frame
@@ -209,8 +214,16 @@ Content:
   • ALL 17+ text labels bound to color variables ✓
   • Theme switcher: toggles material-theme modes (Light ↔ Dark)
 
-  #### 4c. Typography Scale [280:217] — 1072×351
-  • Container:margin [280:220] — type scale reference grid
+  #### 4c. Typography Scale [280:217] — 1072×351, VERTICAL gap=24
+  • Label: "Type scale" [280:219] — text, material-theme/body/medium
+  • Container:margin [280:220] — 1072×311, border 1px Outline Variant, radius=20
+    — Container [280:221] — 1070×309, VERTICAL gap=0
+      — 4 × TypeScale Row (HORIZONTAL gap=12, each ~1070×77):
+        — Row 1 [280:222]: Display Large — Poppins Medium
+        — Row 2 [280:230]: Display Small — Poppins Medium
+        — Row 3 [280:238]: Body Large — Inter Regular
+        — Row 4 [280:246]: Body Small — Inter Regular
+      — Each row: style name (left) + sample text at actual size (right)
 
 ────────────────────────────────────────
 
@@ -415,6 +428,10 @@ Additional improvements:
 | Design Approach                  | Section 03 → Description       |
 | Wireframe Upload                 | Section 03 → Wireframes Grid   |
 | Lo-Fi Prototype Link             | Section 03 → Link Button       |
+| Visual Direction                  | Section 04 → Description       |
+| Moodboard Images                 | Section 04 → Moodboard Grid    |
+| Color Palette (Light/Dark)       | Section 04 → Color tokens      |
+| Typography (Display + Body)      | Section 04 → Type scale        |
 | Testing Process & Findings       | Section 05 → Description       |
 | Before/After blocks              | Section 05 → Before/After (×2) |
 | Final Design Description         | Section 06 → Description       |

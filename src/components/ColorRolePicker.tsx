@@ -13,10 +13,12 @@ import {
     deleteColorRole,
     reorderColorRoles,
 } from '@/lib/actions/projects';
+import { getContrastRatio } from '@/lib/utils/contrast';
 
 type ColorRole = {
     id: string;
-    name: string;
+    name1: string;
+    name2: string;
     lightColor1: string;
     lightColor2: string;
     darkColor1: string;
@@ -31,7 +33,8 @@ type ColorRolePickerProps = {
 };
 
 type NewRoleForm = {
-    name: string;
+    name1: string;
+    name2: string;
     lightColor1: string;
     lightColor2: string;
     darkColor1: string;
@@ -41,7 +44,8 @@ type NewRoleForm = {
 };
 
 const EMPTY_FORM: NewRoleForm = {
-    name: '',
+    name1: '',
+    name2: '',
     lightColor1: '#0066FF',
     lightColor2: '#0052CC',
     darkColor1: '#3385FF',
@@ -59,6 +63,34 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     const [form, setForm] = useState<NewRoleForm>(EMPTY_FORM);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // Авто-расчёт контрастности при изменении цветов светлой темы
+    useEffect(() => {
+        if (
+            form.lightColor1.length >= 4 &&
+            form.lightColor2.length >= 4
+        ) {
+            const ratio = getContrastRatio(form.lightColor1, form.lightColor2);
+            setForm((prev) => ({
+                ...prev,
+                lightContrastRatio: ratio.toFixed(1),
+            }));
+        }
+    }, [form.lightColor1, form.lightColor2]);
+
+    // Авто-расчёт контрастности при изменении цветов тёмной темы
+    useEffect(() => {
+        if (
+            form.darkColor1.length >= 4 &&
+            form.darkColor2.length >= 4
+        ) {
+            const ratio = getContrastRatio(form.darkColor1, form.darkColor2);
+            setForm((prev) => ({
+                ...prev,
+                darkContrastRatio: ratio.toFixed(1),
+            }));
+        }
+    }, [form.darkColor1, form.darkColor2]);
 
     const loadRoles = useCallback(async () => {
         try {
@@ -85,7 +117,8 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     const openEdit = (role: ColorRole) => {
         setEditingId(role.id);
         setForm({
-            name: role.name,
+            name1: role.name1,
+            name2: role.name2,
             lightColor1: role.lightColor1,
             lightColor2: role.lightColor2,
             darkColor1: role.darkColor1,
@@ -98,15 +131,20 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
     };
 
     const handleSubmit = async () => {
-        if (!form.name.trim()) {
-            setError('Введите название роли');
+        if (!form.name1.trim()) {
+            setError('Введите основной цвет');
+            return;
+        }
+        if (!form.name2.trim()) {
+            setError('Введите дополнительный цвет');
             return;
         }
         setSaving(true);
         setError(null);
         try {
             const payload = {
-                name: form.name.trim(),
+                name1: form.name1.trim(),
+                name2: form.name2.trim(),
                 lightColor1: form.lightColor1,
                 lightColor2: form.lightColor2,
                 darkColor1: form.darkColor1,
@@ -203,10 +241,10 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             className={cn(
                                 'flex items-center gap-2 rounded-md border border-[var(--md-sys-color-outline-variant)] bg-[var(--md-sys-color-surface)] p-2 cursor-grab active:cursor-grabbing transition-colors',
                                 dragIndex === index &&
-                                    'opacity-50 border-[var(--md-sys-color-primary)]',
+                                'opacity-50 border-[var(--md-sys-color-primary)]',
                             )}
                             role='listitem'
-                            aria-label={`${role.name}, drag to reorder`}
+                            aria-label={`${role.name1}, drag to reorder`}
                         >
                             <GripVertical className='h-4 w-4 text-[var(--md-sys-color-on-surface-variant)] shrink-0' />
                             <div className='flex gap-1'>
@@ -215,29 +253,34 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                     style={{
                                         backgroundColor: role.lightColor1,
                                     }}
-                                    title={`${role.name} light 1`}
+                                    title={`${role.name1} light 1`}
                                 />
                                 <div
                                     className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{
                                         backgroundColor: role.lightColor2,
                                     }}
-                                    title={`${role.name} light 2`}
+                                    title={`${role.name1} light 2`}
                                 />
                                 <div
                                     className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{ backgroundColor: role.darkColor1 }}
-                                    title={`${role.name} dark 1`}
+                                    title={`${role.name1} dark 1`}
                                 />
                                 <div
                                     className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{ backgroundColor: role.darkColor2 }}
-                                    title={`${role.name} dark 2`}
+                                    title={`${role.name1} dark 2`}
                                 />
                             </div>
-                            <span className='text-body-sm text-[var(--md-sys-color-on-surface)]'>
-                                {role.name}
-                            </span>
+                            <div className='flex flex-col min-w-0'>
+                                <span className='text-body-sm text-[var(--md-sys-color-on-surface)] truncate'>
+                                    {role.name1}
+                                </span>
+                                <span className='text-label-sm text-[var(--md-sys-color-on-surface-variant)] truncate'>
+                                    {role.name2}
+                                </span>
+                            </div>
                             <span className='ml-auto text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
                                 #{index + 1}
                             </span>
@@ -245,7 +288,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='button'
                                 onClick={() => openEdit(role)}
                                 className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
-                                aria-label={`Редактировать роль ${role.name}`}
+                                aria-label={`Редактировать роль ${role.name1}`}
                             >
                                 <Pencil className='h-4 w-4' />
                             </button>
@@ -253,7 +296,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='button'
                                 onClick={() => handleDelete(role.id)}
                                 className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-error)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
-                                aria-label={`Удалить роль ${role.name}`}
+                                aria-label={`Удалить роль ${role.name1}`}
                             >
                                 <Trash2 className='h-4 w-4' />
                             </button>
@@ -264,21 +307,38 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
             {showForm ? (
                 <div className='space-y-3 rounded-lg border border-[var(--md-sys-color-outline-variant)] p-4'>
-                    <div>
-                        <Label htmlFor='roleName'>Название роли</Label>
-                        <Input
-                            id='roleName'
-                            value={form.name}
-                            onChange={(e) =>
-                                setForm({ ...form, name: e.target.value })
-                            }
-                            placeholder='Например: Primary Accent'
-                        />
+                    <div className='grid grid-cols-4 gap-5'>
+                        <div className="">Название</div>
+                        <div>
+                            <Label htmlFor='roleName' className="font-medium text-md pl-2">Основной цвет</Label>
+                            <Input
+                                id='roleName'
+                                value={form.name1}
+                                onChange={(e) =>
+                                    setForm({ ...form, name1: e.target.value })
+                                }
+                                placeholder='Например: Primary'
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='roleName2' className="font-medium text-md pl-2">Дополнительный цвет</Label>
+                            <Input
+                                id='roleName2'
+                                value={form.name2}
+                                onChange={(e) =>
+                                    setForm({ ...form, name2: e.target.value })
+                                }
+                                placeholder='Например: onPrimary'
+                            />
+                        </div>
+                        <div className="">Контраст</div>
                     </div>
 
-                    <div className='grid grid-cols-2 gap-3'>
+                    <hr />
+
+                    <div className='grid grid-cols-4 gap-5 items-center'>
+                        <div className="">Светлый</div>
                         <div>
-                            <Label htmlFor='lightColor1'>Light 1</Label>
                             <div className='flex items-center gap-2'>
                                 <input
                                     type='color'
@@ -290,7 +350,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             lightColor1: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10 cursor-pointer'
                                 />
                                 <Input
                                     value={form.lightColor1}
@@ -304,7 +364,6 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             </div>
                         </div>
                         <div>
-                            <Label htmlFor='lightColor2'>Light 2</Label>
                             <div className='flex items-center gap-2'>
                                 <input
                                     type='color'
@@ -316,7 +375,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             lightColor2: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.lightColor2}
@@ -330,7 +389,23 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             </div>
                         </div>
                         <div>
-                            <Label htmlFor='darkColor1'>Dark 1</Label>
+                            <Input
+                                id='lightContrast'
+                                type='number'
+                                step='0.1'
+                                value={form.lightContrastRatio}
+                                readOnly
+                                className='bg-[var(--md-sys-color-surface-container)] cursor-default'
+                                placeholder='4.5'
+                            />
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div className='grid grid-cols-4 gap-5 items-center'>
+                        <div className="">Темный </div>
+                        <div>
                             <div className='flex items-center gap-2'>
                                 <input
                                     type='color'
@@ -342,7 +417,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             darkColor1: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.darkColor1}
@@ -356,7 +431,6 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             </div>
                         </div>
                         <div>
-                            <Label htmlFor='darkColor2'>Dark 2</Label>
                             <div className='flex items-center gap-2'>
                                 <input
                                     type='color'
@@ -368,7 +442,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                             darkColor2: e.target.value,
                                         })
                                     }
-                                    className='h-10 w-10 rounded border border-[var(--md-sys-color-outline)] cursor-pointer'
+                                    className='h-10 w-10'
                                 />
                                 <Input
                                     value={form.darkColor2}
@@ -381,40 +455,14 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 />
                             </div>
                         </div>
-                    </div>
-
-                    <div className='grid grid-cols-2 gap-3'>
                         <div>
-                            <Label htmlFor='lightContrast'>
-                                Light contrast
-                            </Label>
-                            <Input
-                                id='lightContrast'
-                                type='number'
-                                step='0.1'
-                                value={form.lightContrastRatio}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        lightContrastRatio: e.target.value,
-                                    })
-                                }
-                                placeholder='4.5'
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor='darkContrast'>Dark contrast</Label>
                             <Input
                                 id='darkContrast'
                                 type='number'
                                 step='0.1'
                                 value={form.darkContrastRatio}
-                                onChange={(e) =>
-                                    setForm({
-                                        ...form,
-                                        darkContrastRatio: e.target.value,
-                                    })
-                                }
+                                readOnly
+                                className='bg-[var(--md-sys-color-surface-container)] cursor-default'
                                 placeholder='7.1'
                             />
                         </div>
@@ -426,7 +474,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         </p>
                     )}
 
-                    <div className='flex gap-2'>
+                    <div className='flex gap-2 mt-2'>
                         <Button
                             type='button'
                             disabled={saving}
@@ -435,8 +483,8 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             {saving
                                 ? 'Сохранение...'
                                 : editingId
-                                  ? 'Сохранить'
-                                  : 'Добавить роль'}
+                                    ? 'Сохранить'
+                                    : 'Добавить роль'}
                         </Button>
                         <Button
                             type='button'

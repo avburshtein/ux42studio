@@ -15,8 +15,8 @@ export const colorRoles = sqliteTable(
         projectId: text('project_id')
             .notNull()
             .references(() => projects.id, { onDelete: 'cascade' }),
-        name: text('name').notNull(),
-        slug: text('slug').notNull(),
+        name1: text('name1').notNull(),
+        name2: text('name2').notNull(),
 
         lightColor1: text('light_color1').notNull(),
         lightColor2: text('light_color2').notNull(),
@@ -32,9 +32,9 @@ export const colorRoles = sqliteTable(
             .default(sql`(unixepoch())`),
     },
     (t) => ({
-        unqProjectSlug: uniqueIndex('idx_color_roles_project_slug').on(
+        unqProjectName2: uniqueIndex('idx_color_roles_project_name2').on(
             t.projectId,
-            t.slug,
+            t.name2,
         ),
     }),
 );

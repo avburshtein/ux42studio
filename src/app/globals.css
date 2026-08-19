@@ -7,6 +7,7 @@
   --font-body: var(--font-inter), sans-serif;
 
   /* Радиусы (rounded-*) */
+  --radius-none: 0px;
   --radius-xs: 4px;
   --radius-sm: 8px;
   --radius-md: 10px;
@@ -17,6 +18,7 @@
   --radius-3xl: 24px;
   --radius-4xl: 28px;
   --radius-5xl: 48px;
+  --radius-full: 9999px;
 
   /* Размеры контейнеров (max-w-*) */
   --max-width-container-content: 1200px;
@@ -38,9 +40,13 @@
 
   --color-tertiary: var(--md-sys-color-tertiary);
   --color-on-tertiary: var(--md-sys-color-on-tertiary);
+  --color-tertiary-container: var(--md-sys-color-tertiary-container);
+  --color-on-tertiary-container: var(--md-sys-color-on-tertiary-container);
 
   --color-error: var(--md-sys-color-error);
   --color-on-error: var(--md-sys-color-on-error);
+  --color-error-container: var(--md-sys-color-error-container);
+  --color-on-error-container: var(--md-sys-color-on-error-container);
 
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
@@ -53,6 +59,16 @@
   --color-outline: var(--md-sys-color-outline);
   --color-outline-variant: var(--md-sys-color-outline-variant);
 
+  /* Surface Container levels */
+  --color-surface-container-lowest: var(--md-sys-color-surface-container-lowest);
+  --color-surface-container-low: var(--md-sys-color-surface-container-low);
+  --color-surface-container: var(--md-sys-color-surface-container);
+  --color-surface-container-high: var(--md-sys-color-surface-container-high);
+  --color-surface-container-highest: var(--md-sys-color-surface-container-highest);
+
+  /* Shadow */
+  --shadow-card: 0px 2px 12px 0px rgba(0, 0, 0, 0.06);
+
   /* Дополнительные акцентные цвета */
   --color-lime-accent: var(--md-ext-lime-accent);
   --color-on-lime-accent: var(--md-ext-on-lime-accent);
@@ -61,6 +77,10 @@
   --color-green-accent: var(--md-ext-green-accent);
 
   /* Типографика (text-*) */
+  --text-headline-lg: 48px;
+  --text-headline-lg--line-height: 56px;
+  --text-headline-lg--font-weight: 500;
+
   --text-display-sm: 52px;
   --text-display-sm--line-height: 60px;
   --text-display-sm--font-weight: 500;
@@ -134,6 +154,11 @@
   --md-sys-color-secondary-container: #ff6467;
   --md-sys-color-on-secondary-container: #680010;
 
+  --md-sys-color-tertiary-container: #fbfffa;
+  --md-sys-color-on-tertiary-container: #717672;
+  --md-sys-color-error-container: #d17d00;
+  --md-sys-color-on-error-container: #402300;
+
   --md-sys-color-tertiary: #5b5f5c;
   --md-sys-color-on-tertiary: #ffffff;
 
@@ -152,6 +177,13 @@
   --md-sys-color-outline-variant: #c5c6cc;
   --md-sys-color-scrim: #000000;
 
+  /* Surface Container Levels — Light */
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f6f3f4;
+  --md-sys-color-surface-container: #f0edee;
+  --md-sys-color-surface-container-high: #eae7e8;
+  --md-sys-color-surface-container-highest: #e4e2e3;
+
   /* Extended Light Accent Palette */
   --md-ext-lime-accent: #546524;
   --md-ext-on-lime-accent: #ffffff;
@@ -162,44 +194,104 @@
 }
 
 /* 3. DARK THEME OVERRIDES */
-:where(html[data-theme="dark"]),
-:where(html:not([data-theme="light"])) {
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --md-sys-color-primary: #83d7b1;
-      --md-sys-color-surface-tint: #83d7b1;
-      --md-sys-color-on-primary: #003826;
-      --md-sys-color-primary-container: #0b6e4f;
-      --md-sys-color-on-primary-container: #98edc6;
 
-      --md-sys-color-secondary: #ffb3b1;
-      --md-sys-color-on-secondary: #680011;
-      --md-sys-color-secondary-container: #ff6467;
-      --md-sys-color-on-secondary-container: #680010;
+/* 3a. Explicit dark theme (user toggle) */
+[data-theme="dark"] {
+  --md-sys-color-primary: #83d7b1;
+  --md-sys-color-surface-tint: #83d7b1;
+  --md-sys-color-on-primary: #003826;
+  --md-sys-color-primary-container: #0b6e4f;
+  --md-sys-color-on-primary-container: #98edc6;
 
-      --md-sys-color-tertiary: #ffffff;
-      --md-sys-color-on-tertiary: #2d312e;
+  --md-sys-color-secondary: #ffb3b1;
+  --md-sys-color-on-secondary: #680011;
+  --md-sys-color-secondary-container: #ff6467;
+  --md-sys-color-on-secondary-container: #680010;
 
-      --md-sys-color-error: #ffb86e;
-      --md-sys-color-on-error: #492900;
+  --md-sys-color-tertiary-container: #dfe4df;
+  --md-sys-color-on-tertiary-container: #616562;
+  --md-sys-color-error-container: #d17d00;
+  --md-sys-color-on-error-container: #402300;
 
-      --md-sys-color-background: #101412;
-      --md-sys-color-on-background: #e0e3df;
+  --md-sys-color-tertiary: #ffffff;
+  --md-sys-color-on-tertiary: #2d312e;
 
-      --md-sys-color-surface: #131314;
-      --md-sys-color-on-surface: #e4e2e3;
-      --md-sys-color-surface-variant: #44474b;
-      --md-sys-color-on-surface-variant: #c5c6cc;
+  --md-sys-color-error: #ffb86e;
+  --md-sys-color-on-error: #492900;
 
-      --md-sys-color-outline: #8f9196;
-      --md-sys-color-outline-variant: #44474b;
+  --md-sys-color-background: #101412;
+  --md-sys-color-on-background: #e0e3df;
 
-      --md-ext-lime-accent: #bbcf81;
-      --md-ext-on-lime-accent: #283500;
-      --md-ext-lavender-light: #c3c0ff;
-      --md-ext-lavender-purple: #dbb9f9;
-      --md-ext-green-accent: #98d46f;
-    }
+  --md-sys-color-surface: #131314;
+  --md-sys-color-on-surface: #e4e2e3;
+  --md-sys-color-surface-variant: #44474b;
+  --md-sys-color-on-surface-variant: #c5c6cc;
+
+  --md-sys-color-outline: #8f9196;
+  --md-sys-color-outline-variant: #44474b;
+
+  /* Surface Container Levels — Dark */
+  --md-sys-color-surface-container-lowest: #0e0e0f;
+  --md-sys-color-surface-container-low: #1b1b1d;
+  --md-sys-color-surface-container: #1f1f21;
+  --md-sys-color-surface-container-high: #2a2a2b;
+  --md-sys-color-surface-container-highest: #353536;
+
+  --md-ext-lime-accent: #bbcf81;
+  --md-ext-on-lime-accent: #283500;
+  --md-ext-lavender-light: #c3c0ff;
+  --md-ext-lavender-purple: #dbb9f9;
+  --md-ext-green-accent: #98d46f;
+}
+
+/* 3b. System dark theme fallback (when no explicit choice) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --md-sys-color-primary: #83d7b1;
+    --md-sys-color-surface-tint: #83d7b1;
+    --md-sys-color-on-primary: #003826;
+    --md-sys-color-primary-container: #0b6e4f;
+    --md-sys-color-on-primary-container: #98edc6;
+
+    --md-sys-color-secondary: #ffb3b1;
+    --md-sys-color-on-secondary: #680011;
+    --md-sys-color-secondary-container: #ff6467;
+    --md-sys-color-on-secondary-container: #680010;
+
+    --md-sys-color-tertiary-container: #dfe4df;
+    --md-sys-color-on-tertiary-container: #616562;
+    --md-sys-color-error-container: #d17d00;
+    --md-sys-color-on-error-container: #402300;
+
+    --md-sys-color-tertiary: #ffffff;
+    --md-sys-color-on-tertiary: #2d312e;
+
+    --md-sys-color-error: #ffb86e;
+    --md-sys-color-on-error: #492900;
+
+    --md-sys-color-background: #101412;
+    --md-sys-color-on-background: #e0e3df;
+
+    --md-sys-color-surface: #131314;
+    --md-sys-color-on-surface: #e4e2e3;
+    --md-sys-color-surface-variant: #44474b;
+    --md-sys-color-on-surface-variant: #c5c6cc;
+
+    --md-sys-color-outline: #8f9196;
+    --md-sys-color-outline-variant: #44474b;
+
+    /* Surface Container Levels — Dark */
+    --md-sys-color-surface-container-lowest: #0e0e0f;
+    --md-sys-color-surface-container-low: #1b1b1d;
+    --md-sys-color-surface-container: #1f1f21;
+    --md-sys-color-surface-container-high: #2a2a2b;
+    --md-sys-color-surface-container-highest: #353536;
+
+    --md-ext-lime-accent: #bbcf81;
+    --md-ext-on-lime-accent: #283500;
+    --md-ext-lavender-light: #c3c0ff;
+    --md-ext-lavender-purple: #dbb9f9;
+    --md-ext-green-accent: #98d46f;
   }
 }
 
@@ -224,4 +316,27 @@ body {
 .table-cell-truncate {
   max-width: 0;
   width: 100%;
+}
+
+/* Scrim для hero-изображения (Figma: On surface gradient) */
+.hero-image-scrim {
+  background: linear-gradient(0deg,
+      rgba(27, 27, 29, 0.75) 14%,
+      rgba(24, 29, 26, 0.16) 50%,
+      rgba(27, 27, 29, 0) 100%);
+}
+
+/* Фолбэк обложки: тот же токен, что и фон страницы (Schemes/Background) */
+.hero-block-gradient {
+  background-color: var(--md-sys-color-background);
+}
+
+/* Header glass morphism (Spec: hero block gradient + Effects/Blur/Glass Heavy) */
+.header-glass {
+  background: linear-gradient(315deg,
+      var(--md-sys-color-background) 0%,
+      color-mix(in srgb, var(--md-sys-color-background) 8%, transparent) 100%);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.1);
 }

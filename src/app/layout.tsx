@@ -33,6 +33,11 @@ export default function RootLayout({
         >
             <head>
                 <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);return}if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}})()`,
+                    }}
+                />
             </head>
             <body className='antialiased'>
                 <ThemeProvider>{children}</ThemeProvider>
