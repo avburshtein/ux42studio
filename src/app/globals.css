@@ -220,3 +220,8 @@ body {
       color-mix(in srgb, var(--md-sys-color-scrim) 24%, transparent),
       transparent);
 }
+
+.table-cell-truncate {
+  max-width: 0;
+  width: 100%;
+}

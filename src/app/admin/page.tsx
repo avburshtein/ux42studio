@@ -133,11 +133,13 @@ export default async function AdminDashboardPage({
                                     key={project.id}
                                     className='border-b border-outline-variant last:border-0 hover:bg-surface-variant/30'
                                 >
-                                    <td className='px-4 py-3 text-body-sm text-on-surface'>
+                                    <td className='table-cell-truncate px-4 py-3 text-on-surface'>
                                         <Link
                                             href={`/admin/projects/${project.id}/edit/general`}
                                         >
-                                            {project.title}
+                                            <div className='overflow-hidden text-ellipsis whitespace-nowrap font-medium'>
+                                                {project.title}
+                                            </div>
                                         </Link>
                                     </td>
                                     <td className='px-4 py-3'>
@@ -197,7 +199,7 @@ export default async function AdminDashboardPage({
                                                         variant='ghost'
                                                         type='submit'
                                                     >
-                                                        В архив
+                                                        В&nbsp;архив
                                                     </Button>
                                                 </form>
                                             )}
@@ -223,7 +225,7 @@ export default async function AdminDashboardPage({
                                                 href={`/u/${profile.slug}/${project.slug}`}
                                             >
                                                 <Button variant='ghost'>
-                                                    Перейти на сайт
+                                                    На&nbsp;сайт
                                                 </Button>
                                             </Link>
                                         </div>
