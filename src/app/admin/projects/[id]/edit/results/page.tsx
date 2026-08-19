@@ -20,9 +20,18 @@ const projectItemSchema = z.object({
     order: z.number().int(),
 });
 
+const baCardSchema = z.object({
+    id: z.string().optional(),
+    featureName: z.string().min(1, 'Feature name is required'),
+    beforeText: z.string().min(1, 'Before text is required'),
+    afterText: z.string().min(1, 'After text is required'),
+    order: z.number().int(),
+});
+
 const formSchema = z.object({
     results: z.array(projectItemSchema),
     tools: z.array(projectItemSchema),
+    baCards: z.array(baCardSchema),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -52,6 +61,7 @@ export default function ResultsPage({
         defaultValues: {
             results: [],
             tools: [],
+            baCards: [],
         },
     });
 
@@ -67,6 +77,12 @@ export default function ResultsPage({
         remove: removeTool,
     } = useFieldArray({ control, name: 'tools' });
 
+    const {
+        fields: baCardFields,
+        append: appendBaCard,
+        remove: removeBaCard,
+    } = useFieldArray({ control, name: 'baCards' });
+
     useEffect(() => {
         if (!projectId) return;
         getProjectShowcase(projectId)
@@ -74,6 +90,7 @@ export default function ResultsPage({
                 reset({
                     results: s?.results ?? [],
                     tools: s?.tools ?? [],
+                    baCards: s?.baCards ?? [],
                 });
             })
             .catch(() => {});
@@ -91,6 +108,10 @@ export default function ResultsPage({
                 })),
                 tools: data.tools.map((t, i) => ({
                     ...t,
+                    order: i,
+                })),
+                baCards: data.baCards.map((c, i) => ({
+                    ...c,
                     order: i,
                 })),
             });
@@ -198,6 +219,86 @@ export default function ResultsPage({
                             <input
                                 type='hidden'
                                 {...register(`tools.${index}.order`)}
+                                value={index}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Before/After Cards */}
+                <div>
+                    <div className='mb-3 flex items-center justify-between'>
+                        <Label>Before/After Cards</Label>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            onClick={() =>
+                                appendBaCard({
+                                    featureName: '',
+                                    beforeText: '',
+                                    afterText: '',
+                                    order: baCardFields.length,
+                                })
+                            }
+                        >
+                            + Add Card
+                        </Button>
+                    </div>
+                    {baCardFields.map((field, index) => (
+                        <div
+                            key={field.id}
+                            className='mb-4 rounded-lg border border-outline-variant bg-surface p-4 space-y-3'
+                        >
+                            <div className='flex items-center justify-between'>
+                                <span className='text-label-sm text-on-surface-variant'>
+                                    Card #{index + 1}
+                                </span>
+                                <Button
+                                    type='button'
+                                    variant='ghost'
+                                    onClick={() => removeBaCard(index)}
+                                >
+                                    Remove
+                                </Button>
+                            </div>
+                            <div>
+                                <Input
+                                    {...register(
+                                        `baCards.${index}.featureName`,
+                                    )}
+                                    placeholder='Feature name'
+                                />
+                                {errors.baCards?.[index]?.featureName && (
+                                    <p className='mt-1 text-body-sm text-error'>
+                                        Required
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                <Input
+                                    {...register(`baCards.${index}.beforeText`)}
+                                    placeholder='Before text'
+                                />
+                                {errors.baCards?.[index]?.beforeText && (
+                                    <p className='mt-1 text-body-sm text-error'>
+                                        Required
+                                    </p>
+                                )}
+                            </div>
+                            <div>
+                                <Input
+                                    {...register(`baCards.${index}.afterText`)}
+                                    placeholder='After text'
+                                />
+                                {errors.baCards?.[index]?.afterText && (
+                                    <p className='mt-1 text-body-sm text-error'>
+                                        Required
+                                    </p>
+                                )}
+                            </div>
+                            <input
+                                type='hidden'
+                                {...register(`baCards.${index}.order`)}
                                 value={index}
                             />
                         </div>

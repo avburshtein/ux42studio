@@ -9,6 +9,7 @@ import {
     projectReviews,
     projectItems,
     colorRoles,
+    baCards,
 } from '@/db/schema';
 import { eq, and, asc, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
@@ -76,6 +77,7 @@ export default async function ProjectPage({ params }: PageProps) {
         reviews,
         items,
         colorRolesData,
+        baCardsData,
     ] = await Promise.all([
         db.query.projectAssets.findMany({
             where: { projectId: project.id },
@@ -105,6 +107,10 @@ export default async function ProjectPage({ params }: PageProps) {
             orderBy: { order: 'asc' },
         }),
         db.query.colorRoles.findMany({
+            where: { projectId: project.id },
+            orderBy: { order: 'asc' },
+        }),
+        db.query.baCards.findMany({
             where: { projectId: project.id },
             orderBy: { order: 'asc' },
         }),
@@ -167,7 +173,8 @@ export default async function ProjectPage({ params }: PageProps) {
         project.finalDescription ||
         assets.length > 0 ||
         resultItems.length > 0 ||
-        toolItems.length > 0
+        toolItems.length > 0 ||
+        baCardsData.length > 0
     );
     const hasSection07 = !!(
         project.keyTakeaway ||
@@ -849,6 +856,45 @@ export default async function ProjectPage({ params }: PageProps) {
                                         >
                                             {item.content}
                                         </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Before/After Cards */}
+                        {baCardsData.length > 0 && (
+                            <div>
+                                <h3 className='font-display text-title-lg text-on-surface mb-4'>
+                                    Before/After Cards
+                                </h3>
+                                <div className='space-y-4'>
+                                    {baCardsData.map((card) => (
+                                        <div
+                                            key={card.id}
+                                            className='rounded-xl border border-outline-variant bg-surface p-4 space-y-3'
+                                        >
+                                            <h4 className='text-title-md text-on-surface'>
+                                                {card.featureName}
+                                            </h4>
+                                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                                                <div className='space-y-1'>
+                                                    <span className='text-label-sm text-on-surface-variant'>
+                                                        Before
+                                                    </span>
+                                                    <p className='text-body-md text-on-surface-variant'>
+                                                        {card.beforeText}
+                                                    </p>
+                                                </div>
+                                                <div className='space-y-1'>
+                                                    <span className='text-label-sm text-on-surface-variant'>
+                                                        After
+                                                    </span>
+                                                    <p className='text-body-md text-on-surface-variant'>
+                                                        {card.afterText}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     ))}
                                 </div>
                             </div>

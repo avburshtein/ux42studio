@@ -17,6 +17,7 @@ import {
     projectComparisons,
     projectReviews,
     projectItems,
+    baCards,
 } from '@/db/schema/project-details';
 import { eq, and, inArray, asc, desc, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -578,6 +579,13 @@ export async function updateProjectResults(
             content: string;
             order: number;
         }>;
+        baCards?: Array<{
+            id?: string;
+            featureName: string;
+            beforeText: string;
+            afterText: string;
+            order: number;
+        }>;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -609,6 +617,19 @@ export async function updateProjectResults(
                 type: 'tool',
                 content: t.content,
                 order: t.order,
+            }),
+        ),
+
+        // Replace ba_cards
+        db.delete(baCards).where(eq(baCards.projectId, projectId)),
+        ...(data.baCards || []).map((c) =>
+            db.insert(baCards).values({
+                id: c.id || crypto.randomUUID(),
+                projectId,
+                featureName: c.featureName,
+                beforeText: c.beforeText,
+                afterText: c.afterText,
+                order: c.order,
             }),
         ),
     ]);
@@ -1016,6 +1037,19 @@ export async function getProjectShowcase(projectId: string) {
         .orderBy(asc(projectItems.order))
         .all();
 
+    const baCardsData = await db
+        .select({
+            id: baCards.id,
+            featureName: baCards.featureName,
+            beforeText: baCards.beforeText,
+            afterText: baCards.afterText,
+            order: baCards.order,
+        })
+        .from(baCards)
+        .where(eq(baCards.projectId, projectId))
+        .orderBy(asc(baCards.order))
+        .all();
+
     return {
         finalDescription: project?.finalDescription,
         designApproach: project?.designApproach,
@@ -1024,6 +1058,7 @@ export async function getProjectShowcase(projectId: string) {
         comparisons,
         results,
         tools,
+        baCards: baCardsData,
     };
 }
 
