@@ -2,7 +2,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { projects, profiles } from '@/db/schema';
+import { projects, profiles, users } from '@/db/schema';
 import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
@@ -35,6 +35,11 @@ export default async function AdminDashboardPage({
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
+    const user = await db.query.users.findFirst({
+        where: { id: userId },
+        columns: { role: true },
+    });
+
     const profile = await db.query.profiles.findFirst({
         where: { userId },
         columns: { id: true, slug: true },
@@ -43,6 +48,8 @@ export default async function AdminDashboardPage({
     if (!profile) {
         redirect('/admin/profile');
     }
+
+    const isSuperAdmin = user?.role === 'admin';
 
     const params = await searchParams;
     const statusFilter: StatusFilter = STATUS_TABS.some(
@@ -70,6 +77,12 @@ export default async function AdminDashboardPage({
                 </div>
 
                 <div className='flex items-center gap-8'>
+                    {isSuperAdmin && (
+                        <div className=''>
+                            <Link href='/super-admin'>Суперадминка</Link>
+                        </div>
+                    )}
+
                     <div className=''>
                         <Link href='/admin/profile'>Профиль</Link>
                     </div>
