@@ -68,7 +68,7 @@ export default function DesignPage({
                 bodyFont: data.bodyFont || undefined,
                 designApproach: data.designApproach || undefined,
             });
-            router.push(`/admin/projects/${projectId}/edit/showcase`);
+            router.push(`/admin/projects/${projectId}/edit/gallery`);
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
         } finally {

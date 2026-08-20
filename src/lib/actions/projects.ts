@@ -508,6 +508,80 @@ export async function reorderColorRoles(projectId: string, roleIds: string[]) {
     revalidatePath(`/admin/projects/${projectId}`);
 }
 
+// ---- Section 06b: Gallery (project assets) ----
+
+export async function updateProjectGallery(
+    projectId: string,
+    data: {
+        assets?: Array<{
+            id?: string;
+            fileId: string;
+            assetType: 'moodboard' | 'wireframe' | 'final_gallery';
+            caption?: string;
+            order: number;
+        }>;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    // Собираем старые fileId ассетов до перезаписи
+    const oldAssets = await db
+        .select({ fileId: projectAssets.fileId })
+        .from(projectAssets)
+        .where(eq(projectAssets.projectId, projectId))
+        .all();
+
+    const oldFileIds = new Set<string>();
+    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
+
+    await db.batch([
+        // Replace assets
+        db.delete(projectAssets).where(eq(projectAssets.projectId, projectId)),
+        ...(data.assets || []).map((a) =>
+            db.insert(projectAssets).values({
+                id: a.id || crypto.randomUUID(),
+                projectId,
+                fileId: a.fileId,
+                assetType: a.assetType,
+                caption: a.caption,
+                order: a.order,
+            }),
+        ),
+    ]);
+
+    // Удаляем файлы, которые больше не используются в галерее
+    const newFileIds = new Set<string>();
+    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
+
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function getProjectGallery(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const assets = await db
+        .select({
+            id: projectAssets.id,
+            fileId: projectAssets.fileId,
+            assetType: projectAssets.assetType,
+            caption: projectAssets.caption,
+            order: projectAssets.order,
+        })
+        .from(projectAssets)
+        .where(eq(projectAssets.projectId, projectId))
+        .orderBy(asc(projectAssets.order))
+        .all();
+
+    return { assets };
+}
+
 // ---- Section 07: Showcase (db.batch) ----
 
 export async function updateProjectShowcase(
@@ -516,13 +590,6 @@ export async function updateProjectShowcase(
         finalDescription?: string;
         designApproach?: string;
         testingProcess?: string;
-        assets?: Array<{
-            id?: string;
-            fileId: string;
-            assetType: 'moodboard' | 'wireframe' | 'final_gallery';
-            caption?: string;
-            order: number;
-        }>;
         comparisons?: Array<{
             id?: string;
             featureName: string;
@@ -537,25 +604,17 @@ export async function updateProjectShowcase(
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    // Собираем старые fileId ассетов и сравнений до перезаписи
-    const [oldAssets, oldComparisons] = await Promise.all([
-        db
-            .select({ fileId: projectAssets.fileId })
-            .from(projectAssets)
-            .where(eq(projectAssets.projectId, projectId))
-            .all(),
-        db
-            .select({
-                beforeFileId: projectComparisons.beforeFileId,
-                afterFileId: projectComparisons.afterFileId,
-            })
-            .from(projectComparisons)
-            .where(eq(projectComparisons.projectId, projectId))
-            .all(),
-    ]);
+    // Собираем старые fileId сравнений до перезаписи
+    const oldComparisons = await db
+        .select({
+            beforeFileId: projectComparisons.beforeFileId,
+            afterFileId: projectComparisons.afterFileId,
+        })
+        .from(projectComparisons)
+        .where(eq(projectComparisons.projectId, projectId))
+        .all();
 
     const oldFileIds = new Set<string>();
-    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
     for (const row of oldComparisons) {
         if (row.beforeFileId) oldFileIds.add(row.beforeFileId);
         if (row.afterFileId) oldFileIds.add(row.afterFileId);
@@ -571,19 +630,6 @@ export async function updateProjectShowcase(
                 testingProcess: data.testingProcess,
             })
             .where(eq(projects.id, projectId)),
-
-        // Replace assets
-        db.delete(projectAssets).where(eq(projectAssets.projectId, projectId)),
-        ...(data.assets || []).map((a) =>
-            db.insert(projectAssets).values({
-                id: a.id || crypto.randomUUID(),
-                projectId,
-                fileId: a.fileId,
-                assetType: a.assetType,
-                caption: a.caption,
-                order: a.order,
-            }),
-        ),
 
         // Replace comparisons
         db
@@ -603,9 +649,8 @@ export async function updateProjectShowcase(
         ),
     ]);
 
-    // Удаляем файлы, которые больше не используются в showcase
+    // Удаляем файлы сравнений, которые больше не используются в showcase
     const newFileIds = new Set<string>();
-    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
     for (const c of data.comparisons || []) {
         if (c.beforeFileId) newFileIds.add(c.beforeFileId);
         if (c.afterFileId) newFileIds.add(c.afterFileId);

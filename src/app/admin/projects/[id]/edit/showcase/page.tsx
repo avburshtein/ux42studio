@@ -8,21 +8,12 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     updateProjectShowcase,
     getProjectShowcase,
 } from '@/lib/actions/projects';
-
-const assetSchema = z.object({
-    id: z.string().optional(),
-    fileId: z.string().min(1, 'File ID is required'),
-    assetType: z.enum(['moodboard', 'wireframe', 'final_gallery']),
-    caption: z.string().optional().or(z.literal('')),
-    order: z.number().int(),
-});
 
 const comparisonSchema = z.object({
     id: z.string().optional(),
@@ -36,7 +27,6 @@ const comparisonSchema = z.object({
 
 const formSchema = z.object({
     finalDescription: z.string().optional().or(z.literal('')),
-    assets: z.array(assetSchema),
     comparisons: z.array(comparisonSchema),
 });
 
@@ -68,16 +58,9 @@ export default function ShowcasePage({
         resolver: zodResolver(formSchema),
         defaultValues: {
             finalDescription: '',
-            assets: [],
             comparisons: [],
         },
     });
-
-    const {
-        fields: assetFields,
-        append: appendAsset,
-        remove: removeAsset,
-    } = useFieldArray({ control, name: 'assets' });
 
     const {
         fields: comparisonFields,
@@ -91,10 +74,6 @@ export default function ShowcasePage({
             .then((s) => {
                 reset({
                     finalDescription: s?.finalDescription ?? '',
-                    assets: (s?.assets ?? []).map((a) => ({
-                        ...a,
-                        caption: a.caption ?? '',
-                    })),
                     comparisons: (s?.comparisons ?? []).map((c) => ({
                         ...c,
                         beforeFileId: c.beforeFileId ?? '',
@@ -114,10 +93,6 @@ export default function ShowcasePage({
         try {
             await updateProjectShowcase(projectId, {
                 finalDescription: data.finalDescription || undefined,
-                assets: data.assets.map((a) => ({
-                    ...a,
-                    caption: a.caption || undefined,
-                })),
                 comparisons: data.comparisons.map((c) => ({
                     ...c,
                     beforeFileId: c.beforeFileId || undefined,
@@ -147,100 +122,6 @@ export default function ShowcasePage({
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
-                </div>
-
-                {/* Gallery Assets */}
-                <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Gallery Assets</Label>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() =>
-                                appendAsset({
-                                    fileId: '',
-                                    assetType: 'final_gallery',
-                                    caption: '',
-                                    order: assetFields.length,
-                                })
-                            }
-                        >
-                            + Add Asset
-                        </Button>
-                    </div>
-                    {assetFields.map((field, index) => (
-                        <div
-                            key={field.id}
-                            className='mb-4 rounded-md border border-outline-variant p-4'
-                        >
-                            <div className='mb-3 flex items-center justify-between'>
-                                <span className='text-title-sm text-on-surface'>
-                                    Asset {index + 1}
-                                </span>
-                                <Button
-                                    type='button'
-                                    variant='ghost'
-                                    onClick={() => removeAsset(index)}
-                                >
-                                    Remove
-                                </Button>
-                            </div>
-                            <div className='space-y-3'>
-                                <div>
-                                    <Label>Image *</Label>
-                                    <ImageUploaderField
-                                        value={
-                                            watch(`assets.${index}.fileId`) ||
-                                            null
-                                        }
-                                        onChange={(fileId) =>
-                                            setValue(
-                                                `assets.${index}.fileId`,
-                                                fileId ?? '',
-                                            )
-                                        }
-                                        aspectRatio={4 / 3}
-                                    />
-                                    {errors.assets?.[index]?.fileId && (
-                                        <p className='mt-1 text-body-sm text-error'>
-                                            Required
-                                        </p>
-                                    )}
-                                </div>
-                                <div>
-                                    <Label>Asset Type</Label>
-                                    <select
-                                        {...register(
-                                            `assets.${index}.assetType`,
-                                        )}
-                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
-                                    >
-                                        <option value='moodboard'>
-                                            Moodboard
-                                        </option>
-                                        <option value='wireframe'>
-                                            Wireframe
-                                        </option>
-                                        <option value='final_gallery'>
-                                            Final Gallery
-                                        </option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <Label>Caption</Label>
-                                    <Input
-                                        {...register(`assets.${index}.caption`)}
-                                        placeholder='Optional caption for this image'
-                                    />
-                                </div>
-                                <input
-                                    type='hidden'
-                                    {...register(`assets.${index}.order`)}
-                                    value={index}
-                                />
-                            </div>
-                        </div>
-                    ))}
                 </div>
 
                 {/* Before/After Comparisons */}
@@ -375,7 +256,7 @@ export default function ShowcasePage({
                         variant='ghost'
                         onClick={() =>
                             router.push(
-                                `/admin/projects/${projectId}/edit/design`,
+                                `/admin/projects/${projectId}/edit/gallery`,
                             )
                         }
                     >

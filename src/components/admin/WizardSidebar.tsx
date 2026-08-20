@@ -8,6 +8,7 @@ const STEPS = [
     { key: 'problem', label: 'Problem & Audience', path: 'problem' },
     { key: 'research', label: 'Research', path: 'research' },
     { key: 'design', label: 'Design', path: 'design' },
+    { key: 'gallery', label: 'Gallery', path: 'gallery' },
     { key: 'showcase', label: 'Showcase', path: 'showcase' },
     { key: 'results', label: 'Results', path: 'results' },
     { key: 'review', label: 'Review & Publish', path: 'review' },

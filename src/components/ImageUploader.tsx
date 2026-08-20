@@ -10,6 +10,7 @@ type ImageUploaderProps = {
     accept?: string;
     maxSize?: number;
     aspectRatio?: number;
+    compact?: boolean;
 };
 
 export default function ImageUploader({
@@ -18,6 +19,7 @@ export default function ImageUploader({
     accept = 'image/*',
     maxSize = 10 * 1024 * 1024,
     aspectRatio,
+    compact = false,
 }: ImageUploaderProps) {
     const [isDragging, setIsDragging] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -184,20 +186,35 @@ export default function ImageUploader({
                     }}
                     aria-label='Upload image'
                     className={cn(
-                        'flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors cursor-pointer',
+                        'flex items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors cursor-pointer',
                         'bg-[var(--md-sys-color-surface-input)]',
+                        compact ? 'p-2' : 'flex-col p-8',
                         isDragging
                             ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)]/20'
                             : 'border-[var(--md-sys-color-outline-variant)] hover:border-[var(--md-sys-color-outline)]',
                     )}
                 >
-                    <Upload className='h-8 w-8 text-[var(--md-sys-color-on-surface-variant)]' />
-                    <p className='text-body-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                        Drag & drop an image here, or click to select
+                    <Upload
+                        className={cn(
+                            'text-[var(--md-sys-color-on-surface-variant)]',
+                            compact ? 'h-4 w-4' : 'h-8 w-8',
+                        )}
+                    />
+                    <p
+                        className={cn(
+                            'text-[var(--md-sys-color-on-surface-variant)]',
+                            compact ? 'text-label-sm' : 'text-body-sm',
+                        )}
+                    >
+                        {compact
+                            ? 'Drop image or click'
+                            : 'Drag & drop an image here, or click to select'}
                     </p>
-                    <p className='text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                        Max size: {Math.round(maxSize / (1024 * 1024))}MB
-                    </p>
+                    {!compact && (
+                        <p className='text-label-sm text-[var(--md-sys-color-on-surface-variant)]'>
+                            Max size: {Math.round(maxSize / (1024 * 1024))}MB
+                        </p>
+                    )}
                 </div>
             )}
 
