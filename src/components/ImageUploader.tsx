@@ -185,6 +185,7 @@ export default function ImageUploader({
                     aria-label='Upload image'
                     className={cn(
                         'flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-8 transition-colors cursor-pointer',
+                        'bg-[var(--md-sys-color-surface-input)]',
                         isDragging
                             ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)]/20'
                             : 'border-[var(--md-sys-color-outline-variant)] hover:border-[var(--md-sys-color-outline)]',

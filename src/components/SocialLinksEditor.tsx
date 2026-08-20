@@ -209,7 +209,7 @@ export default function SocialLinksEditor({
                         type='button'
                         onClick={() => removeLink(index)}
                         disabled={busy}
-                        className='flex h-9 w-9 items-center justify-center rounded-md text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-variant)] hover:text-[var(--md-sys-color-error)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)] shrink-0 mt-1'
+                        className='flex h-9 w-9 items-center justify-center rounded-md text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-variant)] hover:text-[var(--md-sys-color-error)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)] shrink-0 mt-1 cursor-pointer'
                         aria-label={`Remove link ${index + 1}`}
                     >
                         <Trash2 className='h-4 w-4' />
