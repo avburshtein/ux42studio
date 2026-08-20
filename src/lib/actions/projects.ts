@@ -154,6 +154,62 @@ export async function getCategories() {
         .all();
 }
 
+export async function createCategory(name: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const slug = slugify(name);
+    const id = crypto.randomUUID();
+
+    // Get max order
+    const last = await db
+        .select({ order: categories.order })
+        .from(categories)
+        .orderBy(desc(categories.order))
+        .limit(1)
+        .get();
+
+    await db.insert(categories).values({
+        id,
+        name: name.trim(),
+        slug,
+        order: (last?.order ?? 0) + 1,
+    });
+
+    revalidatePath('/');
+    return { id, name: name.trim(), slug, order: (last?.order ?? 0) + 1 };
+}
+
+export async function updateCategory(id: string, name: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const slug = slugify(name);
+
+    await db
+        .update(categories)
+        .set({ name: name.trim(), slug })
+        .where(eq(categories.id, id));
+
+    revalidatePath('/');
+}
+
+export async function deleteCategory(id: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    // Delete junction rows first, then the category
+    await db
+        .delete(projectCategories)
+        .where(eq(projectCategories.categoryId, id));
+    await db.delete(categories).where(eq(categories.id, id));
+
+    revalidatePath('/');
+}
+
 // ---- Section 02: Problem & Audience ----
 
 export async function updateProjectProblem(
@@ -345,7 +401,9 @@ export async function createColorRole(
         .get();
 
     if (existing) {
-        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
+        throw new Error(
+            `Роль с name2 "${data.name2}" уже существует в проекте`,
+        );
     }
 
     await db.insert(colorRoles).values({
@@ -402,7 +460,9 @@ export async function updateColorRole(
         )
         .get();
     if (duplicate) {
-        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
+        throw new Error(
+            `Роль с name2 "${data.name2}" уже существует в проекте`,
+        );
     }
 
     await db

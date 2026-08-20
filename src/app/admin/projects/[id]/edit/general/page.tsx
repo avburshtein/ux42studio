@@ -15,6 +15,7 @@ import {
     updateProjectMeta,
     getCategories,
     getProjectMeta,
+    createCategory,
 } from '@/lib/actions/projects';
 import { slugify } from '@/lib/utils/slug';
 
@@ -55,6 +56,8 @@ export default function GeneralPage({
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [slugTouched, setSlugTouched] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [addingCategory, setAddingCategory] = useState(false);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
@@ -134,6 +137,22 @@ export default function GeneralPage({
             ? current.filter((id) => id !== categoryId)
             : [...current, categoryId];
         setValue('categoryIds', next);
+    };
+
+    const handleAddCategory = async () => {
+        const name = newCategoryName.trim();
+        if (!name) return;
+        setAddingCategory(true);
+        try {
+            const created = await createCategory(name);
+            setCategories((prev) => [...prev, created]);
+            setValue('categoryIds', [...selectedCategoryIds, created.id]);
+            setNewCategoryName('');
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Failed to add category');
+        } finally {
+            setAddingCategory(false);
+        }
     };
 
     const onSubmit = async (data: FormData) => {
@@ -254,33 +273,53 @@ export default function GeneralPage({
 
                 <div>
                     <Label>Categories</Label>
-                    {categories.length === 0 ? (
-                        <p className='text-body-sm text-on-surface-variant'>
+                    {categories.length === 0 && (
+                        <p className='text-body-sm text-on-surface-variant mb-2'>
                             No categories available
                         </p>
-                    ) : (
-                        <div className='flex flex-wrap gap-2'>
-                            {categories.map((cat) => {
-                                const selected = selectedCategoryIds.includes(
-                                    cat.id,
-                                );
-                                return (
-                                    <button
-                                        key={cat.id}
-                                        type='button'
-                                        onClick={() => toggleCategory(cat.id)}
-                                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-label-md transition-colors ${
-                                            selected
-                                                ? 'border-primary bg-primary-container text-on-primary-container'
-                                                : 'border-outline-variant text-on-surface-variant hover:border-outline'
-                                        }`}
-                                    >
-                                        {cat.name}
-                                    </button>
-                                );
-                            })}
-                        </div>
                     )}
+                    <div className='flex flex-wrap gap-2 mb-3'>
+                        {categories.map((cat) => {
+                            const selected = selectedCategoryIds.includes(
+                                cat.id,
+                            );
+                            return (
+                                <button
+                                    key={cat.id}
+                                    type='button'
+                                    onClick={() => toggleCategory(cat.id)}
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-label-md transition-colors ${
+                                        selected
+                                            ? 'border-primary bg-primary-container text-on-primary-container'
+                                            : 'border-outline-variant text-on-surface-variant hover:border-outline'
+                                    }`}
+                                >
+                                    {cat.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className='flex gap-2'>
+                        <Input
+                            placeholder='New category name…'
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddCategory();
+                                }
+                            }}
+                        />
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={handleAddCategory}
+                            disabled={addingCategory || !newCategoryName.trim()}
+                        >
+                            {addingCategory ? 'Adding…' : 'Add'}
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
