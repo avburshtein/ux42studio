@@ -162,7 +162,7 @@ export default function ImageUploader({
                     <button
                         type='button'
                         onClick={handleRemove}
-                        className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--md-sys-color-error)] text-[var(--md-sys-color-on-error)] shadow-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)]'
+                        className='absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--md-sys-color-error-container)] text-[var(--md-sys-color-on-error-container)] shadow-md hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)] cursor-pointer'
                         aria-label='Remove image'
                     >
                         <X className='h-3.5 w-3.5' />

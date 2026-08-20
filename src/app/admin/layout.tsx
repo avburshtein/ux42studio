@@ -31,7 +31,7 @@ export default async function AuthLayout({
     const isSuperAdmin = user?.role === 'admin';
 
     return (
-        <div className='min-h-screen bg-surface'>
+        <div className='admin-layout min-h-screen bg-surface'>
             <header className='border-b border-outline-variant bg-surface'>
                 <div className='mx-auto max-w-7xl px-8'>
                     <div className='flex items-center justify-between py-3'>

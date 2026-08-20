@@ -383,7 +383,7 @@ export default function ShowcasePage({
                     </Button>
                     <Button type='submit' disabled={saving}>
                         {saving ? 'Saving...' : 'Save & Next →'}
-                    </Button>
+                    </Button>{' '}
                 </div>
             </form>
         </div>

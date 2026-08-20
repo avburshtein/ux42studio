@@ -10,7 +10,7 @@ const buttonVariants = cva(
                 default:
                     'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] hover:opacity-90',
                 destructive:
-                    'bg-[var(--md-sys-color-error)] text-[var(--md-sys-color-on-error)] hover:opacity-90',
+                    'bg-[var(--md-sys-color-error-container)] text-[var(--md-sys-color-on-error-container)] hover:opacity-90',
                 outline:
                     'border border-[var(--md-sys-color-outline)] bg-transparent text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-variant)]',
                 secondary:
