@@ -143,6 +143,7 @@ export default function ShowcasePage({
                     <textarea
                         id='finalDescription'
                         {...register('finalDescription')}
+                        placeholder='Describe the final delivered solution and its impact…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -229,6 +230,7 @@ export default function ShowcasePage({
                                     <Label>Caption</Label>
                                     <Input
                                         {...register(`assets.${index}.caption`)}
+                                        placeholder='Optional caption for this image'
                                     />
                                 </div>
                                 <input
@@ -286,6 +288,7 @@ export default function ShowcasePage({
                                         {...register(
                                             `comparisons.${index}.featureName`,
                                         )}
+                                        placeholder='Navigation redesign'
                                     />
                                     {errors.comparisons?.[index]
                                         ?.featureName && (
@@ -337,6 +340,7 @@ export default function ShowcasePage({
                                             {...register(
                                                 `comparisons.${index}.beforeText`,
                                             )}
+                                            placeholder='Describe the state before the redesign…'
                                             className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                             rows={2}
                                         />
@@ -347,6 +351,7 @@ export default function ShowcasePage({
                                             {...register(
                                                 `comparisons.${index}.afterText`,
                                             )}
+                                            placeholder='Describe the improvements after the redesign…'
                                             className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                             rows={2}
                                         />

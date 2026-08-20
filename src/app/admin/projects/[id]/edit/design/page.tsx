@@ -85,6 +85,7 @@ export default function DesignPage({
                     <textarea
                         id='visualDirection'
                         {...register('visualDirection')}
+                        placeholder='Describe the visual style, mood, and aesthetic direction…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -92,12 +93,20 @@ export default function DesignPage({
 
                 <div>
                     <Label htmlFor='displayFont'>Display Font</Label>
-                    <Input id='displayFont' {...register('displayFont')} />
+                    <Input
+                        id='displayFont'
+                        {...register('displayFont')}
+                        placeholder='Inter'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='bodyFont'>Body Font</Label>
-                    <Input id='bodyFont' {...register('bodyFont')} />
+                    <Input
+                        id='bodyFont'
+                        {...register('bodyFont')}
+                        placeholder='Roboto'
+                    />
                 </div>
 
                 <div>
@@ -105,6 +114,7 @@ export default function DesignPage({
                     <textarea
                         id='designApproach'
                         {...register('designApproach')}
+                        placeholder='Explain the design methodology, principles, and key decisions…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />

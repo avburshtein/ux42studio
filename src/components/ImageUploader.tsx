@@ -147,7 +147,7 @@ export default function ImageUploader({
                 <div className='relative inline-block'>
                     <div
                         className={cn(
-                            'relative overflow-hidden rounded-lg border border-[var(--md-sys-color-outline-variant)]',
+                            'relative w-40 overflow-hidden rounded-lg border border-[var(--md-sys-color-outline-variant)]',
                             aspectRatio
                                 ? `aspect-[${aspectRatio}]`
                                 : 'aspect-video',

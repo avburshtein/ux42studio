@@ -136,6 +136,7 @@ export default function ResearchPage({
                     <textarea
                         id='researchMethodology'
                         {...register('researchMethodology')}
+                        placeholder='e.g. User interviews, competitive analysis, surveys…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -146,6 +147,7 @@ export default function ResearchPage({
                     <textarea
                         id='userStory'
                         {...register('userStory')}
+                        placeholder='As a [user], I want to [action] so that [benefit]…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -196,6 +198,7 @@ export default function ResearchPage({
                                         {...register(
                                             `personas.${index}.nameAndAge`,
                                         )}
+                                        placeholder='Anna, 34'
                                     />
                                     {errors.personas?.[index]?.nameAndAge && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -224,6 +227,7 @@ export default function ResearchPage({
                                     <Label>Bio *</Label>
                                     <textarea
                                         {...register(`personas.${index}.bio`)}
+                                        placeholder='Short bio describing background, occupation, and lifestyle…'
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
@@ -239,6 +243,7 @@ export default function ResearchPage({
                                         {...register(
                                             `personas.${index}.painPoints`,
                                         )}
+                                        placeholder='Describe a typical scenario: when, where, and why they use the product…'
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
@@ -293,6 +298,7 @@ export default function ResearchPage({
                                         {...register(
                                             `keyMetrics.${index}.value`,
                                         )}
+                                        placeholder='+30%'
                                     />
                                     {errors.keyMetrics?.[index]?.value && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -306,6 +312,7 @@ export default function ResearchPage({
                                         {...register(
                                             `keyMetrics.${index}.description`,
                                         )}
+                                        placeholder='Increase in user engagement'
                                     />
                                     {errors.keyMetrics?.[index]
                                         ?.description && (

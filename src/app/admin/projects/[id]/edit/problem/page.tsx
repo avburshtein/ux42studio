@@ -85,6 +85,7 @@ export default function ProblemPage({
                     <textarea
                         id='problemStatement'
                         {...register('problemStatement')}
+                        placeholder='Describe the problem this project aims to solve…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={5}
                     />
@@ -95,6 +96,7 @@ export default function ProblemPage({
                     <textarea
                         id='projectGoal'
                         {...register('projectGoal')}
+                        placeholder='What is the main goal of this project?'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={5}
                     />
@@ -105,6 +107,7 @@ export default function ProblemPage({
                     <textarea
                         id='targetUsers'
                         {...register('targetUsers')}
+                        placeholder='Who are the target users? Describe their needs and context…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={5}
                     />
