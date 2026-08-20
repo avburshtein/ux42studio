@@ -13,12 +13,14 @@
 		"preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
 		"cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
 		"db:generate": "drizzle-kit generate --config=drizzle.config.ts",
-		"db:migrate:local": "wrangler d1 migrations apply ux42-portfolio-db --local",
-		"db:migrate:remote": "wrangler d1 migrations apply ux42-portfolio-db --remote",
+		"db:migrate:local": "node scripts/apply-migrations.mjs --local",
+		"db:migrate:remote": "node scripts/apply-migrations.mjs --remote",
+		"db:migrate:local:only": "node scripts/apply-migrations.mjs --local --migrations-only",
+		"db:migrate:remote:only": "node scripts/apply-migrations.mjs --remote --migrations-only",
+		"db:seed:local": "node scripts/apply-migrations.mjs --local --seed-only",
+		"db:seed:remote": "node scripts/apply-migrations.mjs --remote --seed-only",
 		"db:studio": "drizzle-kit studio --config=drizzle.config.ts",
-		"db:push": "drizzle-kit push --config=drizzle.config.ts",
-		"db:seed:local": "wrangler d1 execute ux42-portfolio-db --local --file=./drizzle/seed.sql",
-		"db:seed:remote": "wrangler d1 execute ux42-portfolio-db --remote --file=./drizzle/seed.sql"
+		"db:push": "drizzle-kit push --config=drizzle.config.ts"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^5.7.1",
