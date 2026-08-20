@@ -234,7 +234,7 @@ export default function ResearchPage({
                                     )}
                                 </div>
                                 <div>
-                                    <Label>Pain Points *</Label>
+                                    <Label>User Scenario *</Label>
                                     <textarea
                                         {...register(
                                             `personas.${index}.painPoints`,
