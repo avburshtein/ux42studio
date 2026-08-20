@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     updateProjectResearch,
     getProjectResearch,
@@ -57,6 +58,8 @@ export default function ResearchPage({
         handleSubmit,
         control,
         reset,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -201,11 +204,20 @@ export default function ResearchPage({
                                     )}
                                 </div>
                                 <div>
-                                    <Label>Avatar File ID</Label>
-                                    <Input
-                                        {...register(
-                                            `personas.${index}.avatarFileId`,
-                                        )}
+                                    <Label>Avatar</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            watch(
+                                                `personas.${index}.avatarFileId`,
+                                            ) || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                `personas.${index}.avatarFileId`,
+                                                fileId ?? '',
+                                            )
+                                        }
+                                        aspectRatio={1}
                                     />
                                 </div>
                                 <div>
