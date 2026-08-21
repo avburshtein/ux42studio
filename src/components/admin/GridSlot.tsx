@@ -131,7 +131,7 @@ export default function GridSlot({
             {...dropzoneRest}
             className={cn(
                 className,
-                'relative rounded-lg overflow-hidden border-2 transition-all',
+                'relative rounded-lg border-2 transition-all',
                 isFileOver
                     ? 'border-blue-500 bg-blue-50'
                     : isDndOver
@@ -162,12 +162,12 @@ export default function GridSlot({
                     style={dndStyle}
                     {...listeners}
                     {...attributes}
-                    className='w-full h-full cursor-grab active:cursor-grabbing group touch-none'
+                    className='w-full h-full cursor-grab active:cursor-grabbing group touch-none rounded-lg overflow-hidden'
                 >
                     <img
                         src={image.url}
                         alt={`Фото в слоте ${slotIndex}`}
-                        className='w-full h-full object-cover pointer-events-none select-none'
+                        className='w-full h-full object-cover pointer-events-none select-none rounded-lg'
                         draggable={false}
                     />
 

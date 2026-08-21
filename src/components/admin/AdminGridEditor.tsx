@@ -4,7 +4,9 @@ import React, { useState, useCallback, useEffect } from 'react';
 import {
     DndContext,
     DragEndEvent,
-    closestCenter,
+    DragOverlay,
+    DragStartEvent,
+    pointerWithin,
     PointerSensor,
     useSensor,
     useSensors,
@@ -33,6 +35,10 @@ export default function AdminGridEditor({
             ? rawPresetId
             : Object.keys(GRID_PRESETS)[0];
     const preset: GridPreset = GRID_PRESETS[presetId];
+
+    const [activeDragImage, setActiveDragImage] = useState<GridImage | null>(
+        null,
+    );
 
     const [images, setImages] = useState<GridImage[]>(() => {
         if (initialImages.length > 0) return initialImages;
@@ -69,42 +75,56 @@ export default function AdminGridEditor({
         }),
     );
 
-    // Обработчик завершения перетаскивания (Swap)
-    const handleDragEnd = useCallback(
-        (event: DragEndEvent) => {
-            const { active, over } = event;
-
-            if (!over || active.id === over.id) return;
-
-            const activeSlotIndex = active.data.current?.slotIndex as
+    // Запоминаем перетаскиваемое изображение для DragOverlay
+    const handleDragStart = useCallback(
+        (event: DragStartEvent) => {
+            const slotIndex = event.active.data.current?.slotIndex as
                 | number
                 | undefined;
-            const overSlotIndex = over.data.current?.slotIndex as
-                | number
-                | undefined;
-
-            if (activeSlotIndex === undefined || overSlotIndex === undefined) {
-                return;
+            if (slotIndex !== undefined) {
+                const img = images.find(
+                    (i) => i.slotIndex === slotIndex && i.url,
+                );
+                setActiveDragImage(img ?? null);
             }
-
-            setImages((prev) => {
-                const next = prev.map((img) => ({ ...img }));
-                const activeItem = next.find(
-                    (img) => img.slotIndex === activeSlotIndex,
-                );
-                const overItem = next.find(
-                    (img) => img.slotIndex === overSlotIndex,
-                );
-
-                if (activeItem) activeItem.slotIndex = overSlotIndex;
-                if (overItem) overItem.slotIndex = activeSlotIndex;
-
-                onImagesChange?.(next);
-                return next;
-            });
         },
-        [onImagesChange],
+        [images],
     );
+
+    // Обработчик завершения перетаскивания (Swap)
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (!over || active.id === over.id) return;
+
+        const activeSlotIndex = active.data.current?.slotIndex as
+            | number
+            | undefined;
+        const overSlotIndex = over.data.current?.slotIndex as
+            | number
+            | undefined;
+
+        if (activeSlotIndex === undefined || overSlotIndex === undefined) {
+            return;
+        }
+
+        setImages((prev) => {
+            const next = prev.map((img) => ({ ...img }));
+            const activeItem = next.find(
+                (img) => img.slotIndex === activeSlotIndex,
+            );
+            const overItem = next.find(
+                (img) => img.slotIndex === overSlotIndex,
+            );
+
+            if (activeItem) activeItem.slotIndex = overSlotIndex;
+            if (overItem) overItem.slotIndex = activeSlotIndex;
+
+            return next;
+        });
+
+        setActiveDragImage(null);
+    }, []);
 
     // Обработчик загрузки файла в конкретный слот
     const handleFileUpload = useCallback(
@@ -122,11 +142,10 @@ export default function AdminGridEditor({
                     (img) => img.slotIndex !== targetSlotIndex,
                 );
                 const next = [...filtered, newImage];
-                onImagesChange?.(next);
                 return next;
             });
         },
-        [onImagesChange],
+        [],
     );
 
     // Смена пресета
@@ -175,7 +194,8 @@ export default function AdminGridEditor({
 
             {/* Сетка */}
             <DndContext
-                collisionDetection={closestCenter}
+                collisionDetection={pointerWithin}
+                onDragStart={handleDragStart}
                 onDragEnd={handleDragEnd}
                 sensors={sensors}
             >
@@ -195,6 +215,17 @@ export default function AdminGridEditor({
                         );
                     })}
                 </div>
+                <DragOverlay dropAnimation={null}>
+                    {activeDragImage ? (
+                        <div className='w-40 h-40 rounded-lg overflow-hidden opacity-90 shadow-lg ring-2 ring-[var(--md-sys-color-primary)]'>
+                            <img
+                                src={activeDragImage.url}
+                                alt=''
+                                className='w-full h-full object-cover'
+                            />
+                        </div>
+                    ) : null}
+                </DragOverlay>
             </DndContext>
 
             {/* Отладочная информация (можно убрать) */}
