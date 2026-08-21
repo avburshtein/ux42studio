@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import AdminGridEditor from './AdminGridEditor';
 import type { GridImage } from './GridSlot';
 
@@ -18,18 +18,25 @@ export default function MoodboardGridSection({
     onPresetChange,
 }: MoodboardGridSectionProps) {
     const [images, setImages] = useState<GridImage[]>(initialImages);
+    const isInitialMount = useRef(true);
 
+    // Синхронизируем initialImages -> images (только при изменении извне)
     useEffect(() => {
         setImages(initialImages);
     }, [initialImages]);
 
-    const handleImagesChange = useCallback(
-        (newImages: GridImage[]) => {
-            setImages(newImages);
-            onImagesChange?.(newImages);
-        },
-        [onImagesChange],
-    );
+    // Уведомляем родителя об изменениях images (но не при initial mount)
+    useEffect(() => {
+        if (isInitialMount.current) {
+            isInitialMount.current = false;
+            return;
+        }
+        onImagesChange?.(images);
+    }, [images, onImagesChange]);
+
+    const handleImagesChange = useCallback((newImages: GridImage[]) => {
+        setImages(newImages);
+    }, []);
 
     const handlePresetChange = useCallback(
         (newPresetId: string) => {
@@ -40,7 +47,6 @@ export default function MoodboardGridSection({
 
     const handleFileUpload = useCallback(
         async (file: File, slotIndex: number) => {
-            // Создаём локальный URL для превью немедленно
             const objectUrl = URL.createObjectURL(file);
             const tempId = `img-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 
@@ -58,7 +64,6 @@ export default function MoodboardGridSection({
                 return [...filtered, tempImage];
             });
 
-            // Загружаем на сервер
             try {
                 const formData = new FormData();
                 formData.append('file', file);
@@ -96,9 +101,8 @@ export default function MoodboardGridSection({
                     xhr.send(formData);
                 });
 
-                // Обновляем изображение с fileId и r2Key
-                setImages((prev) => {
-                    const next = prev.map((img) =>
+                setImages((prev) =>
+                    prev.map((img) =>
                         img.id === tempId
                             ? {
                                   ...img,
@@ -107,15 +111,13 @@ export default function MoodboardGridSection({
                                   file: undefined,
                               }
                             : img,
-                    );
-                    onImagesChange?.(next);
-                    return next;
-                });
+                    ),
+                );
             } catch (err) {
                 console.error('Upload error:', err);
             }
         },
-        [onImagesChange],
+        [],
     );
 
     return (
