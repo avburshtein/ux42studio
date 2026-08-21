@@ -48,6 +48,7 @@ export const projects = sqliteTable(
         visualDirection: text('visual_direction'), //[cite: 1]
         displayFont: text('display_font'), //[cite: 1]
         bodyFont: text('body_font'), //[cite: 1]
+        moodboardPresetId: text('moodboard_preset_id'), // WYSIWYG grid preset
 
         // Section 05: Process
         designApproach: text('design_approach'), //[cite: 1]

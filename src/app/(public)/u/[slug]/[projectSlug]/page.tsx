@@ -12,6 +12,7 @@ import { MetricCard } from '@/components/case/MetricCard';
 import { PersonaCard } from '@/components/case/PersonaCard';
 import { BeforeAfterComparison } from '@/components/case/BeforeAfterComparison';
 import { GalleryGrid } from '@/components/case/GalleryGrid';
+import { MoodboardGrid } from '@/components/case/MoodboardGrid';
 import { DesignSystemColors } from '@/components/case/DesignSystemColors';
 import { TypographyScale } from '@/components/case/TypographyScale';
 import { LinkButton } from '@/components/case/LinkButton';
@@ -168,13 +169,13 @@ export default async function ProjectPage({ params }: PageProps) {
 
     const nextProjectCard = nextProject
         ? {
-            slug: nextProject.slug,
-            title: nextProject.title,
-            teaser: nextProject.teaser,
-            coverUrl: nextProject.coverFile?.r2Key
-                ? getImageUrl(nextProject.coverFile.r2Key)
-                : undefined,
-        }
+              slug: nextProject.slug,
+              title: nextProject.title,
+              teaser: nextProject.teaser,
+              coverUrl: nextProject.coverFile?.r2Key
+                  ? getImageUrl(nextProject.coverFile.r2Key)
+                  : undefined,
+          }
         : null;
 
     return (
@@ -247,7 +248,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 <MetricCard
                                                     key={metric.id}
                                                     value={metric.value}
-                                                    description={metric.description}
+                                                    description={
+                                                        metric.description
+                                                    }
                                                 />
                                             ))}
                                         </div>
@@ -261,8 +264,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             avatarUrl={
                                                 persona.avatarFile
                                                     ? getImageUrl(
-                                                        persona.avatarFile.r2Key,
-                                                    )
+                                                          persona.avatarFile
+                                                              .r2Key,
+                                                      )
                                                     : undefined
                                             }
                                         />
@@ -318,9 +322,11 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 <SectionLabel>
                                                     Moodboard
                                                 </SectionLabel>
-                                                <GalleryGrid
+                                                <MoodboardGrid
                                                     assets={moodboardAssets}
-                                                    masonry
+                                                    presetId={
+                                                        project.moodboardPresetId
+                                                    }
                                                 />
                                             </div>
                                         )}
@@ -357,17 +363,17 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 beforeUrl={
                                                     comp.beforeFile
                                                         ? getImageUrl(
-                                                            comp.beforeFile
-                                                                .r2Key,
-                                                        )
+                                                              comp.beforeFile
+                                                                  .r2Key,
+                                                          )
                                                         : undefined
                                                 }
                                                 afterUrl={
                                                     comp.afterFile
                                                         ? getImageUrl(
-                                                            comp.afterFile
-                                                                .r2Key,
-                                                        )
+                                                              comp.afterFile
+                                                                  .r2Key,
+                                                          )
                                                         : undefined
                                                 }
                                                 beforeText={comp.beforeText}
@@ -430,7 +436,11 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 </SectionLabel>
                                                 <div className='flex flex-wrap gap-3'>
                                                     {toolItems.map((tool) => (
-                                                        <TagBadge key={tool.id} variant='filled' label={tool.content} />
+                                                        <TagBadge
+                                                            key={tool.id}
+                                                            variant='filled'
+                                                            label={tool.content}
+                                                        />
                                                     ))}
                                                 </div>
                                             </div>

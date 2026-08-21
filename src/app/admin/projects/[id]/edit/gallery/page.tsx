@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
     useForm,
@@ -14,9 +14,12 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
+import MoodboardGridSection from '@/components/admin/MoodboardGridSection';
+import type { GridImage } from '@/components/admin/GridSlot';
 import {
     updateProjectGallery,
     getProjectGallery,
+    getFileR2Key,
 } from '@/lib/actions/projects';
 
 const ASSET_TYPES = ['moodboard', 'wireframe', 'final_gallery'] as const;
@@ -69,6 +72,12 @@ export default function GalleryPage({
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [moodboardPresetId, setMoodboardPresetId] = useState<string | null>(
+        'hero-left',
+    );
+    const [moodboardGridImages, setMoodboardGridImages] = useState<GridImage[]>(
+        [],
+    );
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
@@ -107,7 +116,7 @@ export default function GalleryPage({
     useEffect(() => {
         if (!projectId) return;
         getProjectGallery(projectId)
-            .then((s) => {
+            .then(async (s) => {
                 const byType = (type: AssetType) =>
                     (s?.assets ?? [])
                         .filter((a) => a.assetType === type)
@@ -118,6 +127,29 @@ export default function GalleryPage({
                             caption: a.caption ?? '',
                             order: index,
                         }));
+
+                // Загружаем moodboardPresetId
+                if (s?.moodboardPresetId) {
+                    setMoodboardPresetId(s.moodboardPresetId);
+                }
+
+                // Преобразуем moodboard-ассеты в GridImage[]
+                const moodboardAssets = (s?.assets ?? []).filter(
+                    (a) => a.assetType === 'moodboard',
+                );
+                const gridImages: GridImage[] = await Promise.all(
+                    moodboardAssets.map(async (a, index) => {
+                        const r2Key = await getFileR2Key(a.fileId);
+                        return {
+                            id: a.id,
+                            url: r2Key ? `/r2/${r2Key}` : '',
+                            slotIndex: a.order ?? index,
+                            fileId: a.fileId,
+                        };
+                    }),
+                );
+                setMoodboardGridImages(gridImages);
+
                 reset({
                     moodboard: byType('moodboard'),
                     wireframe: byType('wireframe'),
@@ -132,11 +164,18 @@ export default function GalleryPage({
         setSaving(true);
         setError(null);
         try {
-            const assets = [
-                ...data.moodboard.map((a) => ({
-                    ...a,
+            // Собираем moodboard-ассеты из GridImage (fileId уже есть после загрузки)
+            const moodboardAssetsFromGrid = moodboardGridImages
+                .filter((img) => img.fileId)
+                .map((img, index) => ({
+                    fileId: img.fileId!,
                     assetType: 'moodboard' as const,
-                })),
+                    caption: '',
+                    order: index,
+                }));
+
+            const assets = [
+                ...moodboardAssetsFromGrid,
                 ...data.wireframe.map((a) => ({
                     ...a,
                     assetType: 'wireframe' as const,
@@ -151,7 +190,10 @@ export default function GalleryPage({
                 order: index,
             }));
 
-            await updateProjectGallery(projectId, { assets });
+            await updateProjectGallery(projectId, {
+                assets,
+                moodboardPresetId,
+            });
             router.push(`/admin/projects/${projectId}/edit/showcase`);
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
@@ -159,6 +201,10 @@ export default function GalleryPage({
             setSaving(false);
         }
     };
+
+    const handleMoodboardImagesChange = useCallback((images: GridImage[]) => {
+        setMoodboardGridImages(images);
+    }, []);
 
     const renderSection = (section: (typeof SECTIONS)[number]) => {
         const fa = fieldArrays[section.key];
@@ -247,7 +293,22 @@ export default function GalleryPage({
         <div>
             <Title className='mb-6'>Gallery</Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-                {SECTIONS.map(renderSection)}
+                {/* Moodboard — WYSIWYG Grid Editor */}
+                <div>
+                    <Label className='mb-3 block'>Moodboard</Label>
+                    <MoodboardGridSection
+                        presetId={moodboardPresetId}
+                        initialImages={moodboardGridImages}
+                        onImagesChange={handleMoodboardImagesChange}
+                        onPresetChange={setMoodboardPresetId}
+                    />
+                </div>
+
+                {/* Wireframe */}
+                {renderSection(SECTIONS[1])}
+
+                {/* Final Gallery */}
+                {renderSection(SECTIONS[2])}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
@@ -265,7 +326,7 @@ export default function GalleryPage({
                     </Button>
                     <Button type='submit' disabled={saving}>
                         {saving ? 'Saving...' : 'Save & Next →'}
-                    </Button>{' '}
+                    </Button>
                 </div>
             </form>
         </div>

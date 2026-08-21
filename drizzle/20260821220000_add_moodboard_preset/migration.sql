@@ -1,0 +1,1 @@
+ALTER TABLE `projects` ADD `moodboard_preset_id` text;

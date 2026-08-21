@@ -520,6 +520,7 @@ export async function updateProjectGallery(
             caption?: string;
             order: number;
         }>;
+        moodboardPresetId?: string | null;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -548,6 +549,15 @@ export async function updateProjectGallery(
                 order: a.order,
             }),
         ),
+        // Update moodboardPresetId if provided
+        ...(data.moodboardPresetId !== undefined
+            ? [
+                  db
+                      .update(projects)
+                      .set({ moodboardPresetId: data.moodboardPresetId })
+                      .where(eq(projects.id, projectId)),
+              ]
+            : []),
     ]);
 
     // Удаляем файлы, которые больше не используются в галерее
@@ -566,6 +576,12 @@ export async function getProjectGallery(projectId: string) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
+    const project = await db
+        .select({ moodboardPresetId: projects.moodboardPresetId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
     const assets = await db
         .select({
             id: projectAssets.id,
@@ -579,7 +595,7 @@ export async function getProjectGallery(projectId: string) {
         .orderBy(asc(projectAssets.order))
         .all();
 
-    return { assets };
+    return { assets, moodboardPresetId: project?.moodboardPresetId ?? null };
 }
 
 // ---- Section 07: Showcase (db.batch) ----
