@@ -2,24 +2,26 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
 interface LinkButtonProps {
+    label: string;
     href: string;
-    children: React.ReactNode;
-    external?: boolean;
+    disabled?: boolean;
     className?: string;
 }
 
-// Кнопка-ссылка: «View prototype in Figma», «View Hi-Fi prototype»
-// Figma: Link Button (master 410:535), 262×44, gap=8
+// Plain text link with chevron-right icon
+// Spec: Link Button (604:597) — 4 states: Enabled, Hovered, Focused, Disabled
 export function LinkButton({
+    label,
     href,
-    children,
-    external = false,
+    disabled = false,
     className,
 }: LinkButtonProps) {
+    const isExternal = href.startsWith('http');
+
     const content = (
         <>
-            <span className='text-label-lg font-medium text-primary'>
-                {children}
+            <span className='text-title-md tracking-[0.15px] text-primary'>
+                {label}
             </span>
             <svg
                 width='20'
@@ -30,9 +32,9 @@ export function LinkButton({
                 className='shrink-0 text-primary'
             >
                 <path
-                    d='M4.16669 10H15.8334M15.8334 10L10 4.16669M15.8334 10L10 15.8334'
+                    d='M7.5 3.75L13.75 10L7.5 16.25'
                     stroke='currentColor'
-                    strokeWidth='1.5'
+                    strokeWidth='2'
                     strokeLinecap='round'
                     strokeLinejoin='round'
                 />
@@ -40,16 +42,24 @@ export function LinkButton({
         </>
     );
 
-    if (external) {
+    const styles = cn(
+        'inline-flex h-11 items-center gap-2 py-2.5',
+        'transition-opacity',
+        'hover:opacity-80',
+        'focus-visible:rounded-xs focus-visible:outline-2 focus-visible:outline focus-visible:outline-primary focus-visible:outline-offset-2',
+        disabled && 'pointer-events-none opacity-[0.38]',
+        className,
+    );
+
+    if (isExternal) {
         return (
             <a
-                href={href}
+                href={disabled ? undefined : href}
                 target='_blank'
                 rel='noopener noreferrer'
-                className={cn(
-                    'inline-flex h-11 items-center gap-2 rounded-base border border-outline-variant px-6 transition-colors hover:bg-surface-variant',
-                    className,
-                )}
+                className={styles}
+                aria-disabled={disabled || undefined}
+                tabIndex={disabled ? -1 : undefined}
             >
                 {content}
             </a>
@@ -59,10 +69,9 @@ export function LinkButton({
     return (
         <Link
             href={href}
-            className={cn(
-                'inline-flex h-11 items-center gap-2 rounded-base border border-outline-variant px-6 transition-colors hover:bg-surface-variant',
-                className,
-            )}
+            className={styles}
+            aria-disabled={disabled || undefined}
+            tabIndex={disabled ? -1 : undefined}
         >
             {content}
         </Link>

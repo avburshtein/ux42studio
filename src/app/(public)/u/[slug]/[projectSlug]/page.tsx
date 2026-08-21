@@ -261,6 +261,8 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <PersonaCard
                                     key={persona.id}
                                     nameAndAge={persona.nameAndAge}
+                                    role={persona.role}
+                                    description={persona.description}
                                     avatarUrl={
                                         persona.avatarFile
                                             ? getImageUrl(
@@ -268,8 +270,6 @@ export default async function ProjectPage({ params }: PageProps) {
                                               )
                                             : undefined
                                     }
-                                    bio={persona.bio}
-                                    painPoints={persona.painPoints}
                                 />
                             ))}
                         </CaseSection>
@@ -299,10 +299,8 @@ export default async function ProjectPage({ params }: PageProps) {
                                 {project.webPrototypeUrl && (
                                     <LinkButton
                                         href={project.webPrototypeUrl}
-                                        external
-                                    >
-                                        View Lo-Fi prototype in Figma
-                                    </LinkButton>
+                                        label='View Lo-Fi prototype in Figma'
+                                    />
                                 )}
                             </div>
                         </CaseSection>
@@ -400,10 +398,8 @@ export default async function ProjectPage({ params }: PageProps) {
                                 {project.figmaPrototypeUrl && (
                                     <LinkButton
                                         href={project.figmaPrototypeUrl}
-                                        external
-                                    >
-                                        View Hi-Fi prototype in Figma
-                                    </LinkButton>
+                                        label='View Hi-Fi prototype in Figma'
+                                    />
                                 )}
 
                                 {/* Results — 2-col grid, gap=24 */}
@@ -429,9 +425,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         </SectionLabel>
                                         <div className='flex flex-wrap gap-3'>
                                             {toolItems.map((tool) => (
-                                                <TagBadge key={tool.id}>
-                                                    {tool.content}
-                                                </TagBadge>
+                                                <TagBadge key={tool.id} variant='filled' label={tool.content} />
                                             ))}
                                         </div>
                                     </div>

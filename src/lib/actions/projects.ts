@@ -182,8 +182,8 @@ export async function updateProjectResearch(
             id?: string;
             nameAndAge: string;
             avatarFileId?: string;
-            bio: string;
-            painPoints: string;
+            role: string;
+            description: string;
         }>;
         keyMetrics?: Array<{
             id?: string;
@@ -228,8 +228,8 @@ export async function updateProjectResearch(
                 projectId,
                 nameAndAge: p.nameAndAge,
                 avatarFileId: p.avatarFileId,
-                bio: p.bio,
-                painPoints: p.painPoints,
+                role: p.role,
+                description: p.description,
             }),
         ),
 
@@ -879,8 +879,8 @@ export async function getProjectResearch(projectId: string) {
             id: projectPersonas.id,
             nameAndAge: projectPersonas.nameAndAge,
             avatarFileId: projectPersonas.avatarFileId,
-            bio: projectPersonas.bio,
-            painPoints: projectPersonas.painPoints,
+            role: projectPersonas.role,
+            description: projectPersonas.description,
         })
         .from(projectPersonas)
         .where(eq(projectPersonas.projectId, projectId))

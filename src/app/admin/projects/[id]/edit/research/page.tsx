@@ -19,8 +19,8 @@ const personaSchema = z.object({
     id: z.string().optional(),
     nameAndAge: z.string().min(1, 'Required'),
     avatarFileId: z.string().optional().or(z.literal('')),
-    bio: z.string().min(1, 'Required'),
-    painPoints: z.string().min(1, 'Required'),
+    role: z.string().min(1, 'Required'),
+    description: z.string().min(1, 'Required'),
 });
 
 const keyMetricSchema = z.object({
@@ -160,8 +160,8 @@ export default function ResearchPage({
                                     appendPersona({
                                         nameAndAge: '',
                                         avatarFileId: '',
-                                        bio: '',
-                                        painPoints: '',
+                                        role: '',
+                                        description: '',
                                     })
                                 }
                             >
@@ -209,28 +209,28 @@ export default function ResearchPage({
                                     />
                                 </div>
                                 <div>
-                                    <Label>Bio *</Label>
+                                    <Label>Role *</Label>
                                     <textarea
-                                        {...register(`personas.${index}.bio`)}
+                                        {...register(`personas.${index}.role`)}
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
-                                    {errors.personas?.[index]?.bio && (
+                                    {errors.personas?.[index]?.role && (
                                         <p className='mt-1 text-body-sm text-error'>
                                             Required
                                         </p>
                                     )}
                                 </div>
                                 <div>
-                                    <Label>Pain Points *</Label>
+                                    <Label>Description *</Label>
                                     <textarea
                                         {...register(
-                                            `personas.${index}.painPoints`,
+                                            `personas.${index}.description`,
                                         )}
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
-                                    {errors.personas?.[index]?.painPoints && (
+                                    {errors.personas?.[index]?.description && (
                                         <p className='mt-1 text-body-sm text-error'>
                                             Required
                                         </p>

@@ -6,10 +6,10 @@ import { files } from './files';
 export const projectPersonas = sqliteTable('project_personas', {
   id: text('id').primaryKey(),
   projectId: text('project_id').notNull().references(() => projects.id, { onDelete: 'cascade' }),
-  nameAndAge: text('name_and_age').notNull(), //[cite: 1]
-  avatarFileId: text('avatar_file_id').references(() => files.id), //[cite: 1]
-  bio: text('bio').notNull(), //[cite: 1]
-  painPoints: text('pain_points').notNull(), //[cite: 1]
+  nameAndAge: text('name_and_age').notNull(),
+  avatarFileId: text('avatar_file_id').references(() => files.id),
+  role: text('role').notNull(),
+  description: text('description').notNull(),
 });
 
 // Sec 03: Key Metrics (up to 3)
