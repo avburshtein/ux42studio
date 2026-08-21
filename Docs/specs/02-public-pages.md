@@ -237,7 +237,7 @@ db.update(projects)
 
 - Research Methodology
 - User Story
-- Персоны (карточки: аватар, имя/возраст, био, pain points)
+- Персоны (карточки: аватар, имя/возраст, био, User Scenario)
 - Key Metrics (цифры с описанием)
 
 ### Секция 04: Design Process

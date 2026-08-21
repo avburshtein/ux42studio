@@ -17,6 +17,7 @@ import {
     projectComparisons,
     projectReviews,
     projectItems,
+    baCards,
 } from '@/db/schema/project-details';
 import { eq, and, inArray, asc, desc, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
@@ -151,6 +152,62 @@ export async function getCategories() {
         .from(categories)
         .orderBy(asc(categories.order), asc(categories.name))
         .all();
+}
+
+export async function createCategory(name: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const slug = slugify(name);
+    const id = crypto.randomUUID();
+
+    // Get max order
+    const last = await db
+        .select({ order: categories.order })
+        .from(categories)
+        .orderBy(desc(categories.order))
+        .limit(1)
+        .get();
+
+    await db.insert(categories).values({
+        id,
+        name: name.trim(),
+        slug,
+        order: (last?.order ?? 0) + 1,
+    });
+
+    revalidatePath('/');
+    return { id, name: name.trim(), slug, order: (last?.order ?? 0) + 1 };
+}
+
+export async function updateCategory(id: string, name: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const slug = slugify(name);
+
+    await db
+        .update(categories)
+        .set({ name: name.trim(), slug })
+        .where(eq(categories.id, id));
+
+    revalidatePath('/');
+}
+
+export async function deleteCategory(id: string) {
+    'use server';
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    // Delete junction rows first, then the category
+    await db
+        .delete(projectCategories)
+        .where(eq(projectCategories.categoryId, id));
+    await db.delete(categories).where(eq(categories.id, id));
+
+    revalidatePath('/');
 }
 
 // ---- Section 02: Problem & Audience ----
@@ -344,7 +401,9 @@ export async function createColorRole(
         .get();
 
     if (existing) {
-        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
+        throw new Error(
+            `Роль с name2 "${data.name2}" уже существует в проекте`,
+        );
     }
 
     await db.insert(colorRoles).values({
@@ -401,7 +460,9 @@ export async function updateColorRole(
         )
         .get();
     if (duplicate) {
-        throw new Error(`Роль с name2 "${data.name2}" уже существует в проекте`);
+        throw new Error(
+            `Роль с name2 "${data.name2}" уже существует в проекте`,
+        );
     }
 
     await db
@@ -447,6 +508,80 @@ export async function reorderColorRoles(projectId: string, roleIds: string[]) {
     revalidatePath(`/admin/projects/${projectId}`);
 }
 
+// ---- Section 06b: Gallery (project assets) ----
+
+export async function updateProjectGallery(
+    projectId: string,
+    data: {
+        assets?: Array<{
+            id?: string;
+            fileId: string;
+            assetType: 'moodboard' | 'wireframe' | 'final_gallery';
+            caption?: string;
+            order: number;
+        }>;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    // Собираем старые fileId ассетов до перезаписи
+    const oldAssets = await db
+        .select({ fileId: projectAssets.fileId })
+        .from(projectAssets)
+        .where(eq(projectAssets.projectId, projectId))
+        .all();
+
+    const oldFileIds = new Set<string>();
+    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
+
+    await db.batch([
+        // Replace assets
+        db.delete(projectAssets).where(eq(projectAssets.projectId, projectId)),
+        ...(data.assets || []).map((a) =>
+            db.insert(projectAssets).values({
+                id: a.id || crypto.randomUUID(),
+                projectId,
+                fileId: a.fileId,
+                assetType: a.assetType,
+                caption: a.caption,
+                order: a.order,
+            }),
+        ),
+    ]);
+
+    // Удаляем файлы, которые больше не используются в галерее
+    const newFileIds = new Set<string>();
+    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
+
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+export async function getProjectGallery(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const assets = await db
+        .select({
+            id: projectAssets.id,
+            fileId: projectAssets.fileId,
+            assetType: projectAssets.assetType,
+            caption: projectAssets.caption,
+            order: projectAssets.order,
+        })
+        .from(projectAssets)
+        .where(eq(projectAssets.projectId, projectId))
+        .orderBy(asc(projectAssets.order))
+        .all();
+
+    return { assets };
+}
+
 // ---- Section 07: Showcase (db.batch) ----
 
 export async function updateProjectShowcase(
@@ -455,13 +590,6 @@ export async function updateProjectShowcase(
         finalDescription?: string;
         designApproach?: string;
         testingProcess?: string;
-        assets?: Array<{
-            id?: string;
-            fileId: string;
-            assetType: 'moodboard' | 'wireframe' | 'final_gallery';
-            caption?: string;
-            order: number;
-        }>;
         comparisons?: Array<{
             id?: string;
             featureName: string;
@@ -471,40 +599,22 @@ export async function updateProjectShowcase(
             afterText?: string;
             order: number;
         }>;
-        results?: Array<{
-            id?: string;
-            content: string;
-            order: number;
-        }>;
-        tools?: Array<{
-            id?: string;
-            content: string;
-            order: number;
-        }>;
     },
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    // Собираем старые fileId ассетов и сравнений до перезаписи
-    const [oldAssets, oldComparisons] = await Promise.all([
-        db
-            .select({ fileId: projectAssets.fileId })
-            .from(projectAssets)
-            .where(eq(projectAssets.projectId, projectId))
-            .all(),
-        db
-            .select({
-                beforeFileId: projectComparisons.beforeFileId,
-                afterFileId: projectComparisons.afterFileId,
-            })
-            .from(projectComparisons)
-            .where(eq(projectComparisons.projectId, projectId))
-            .all(),
-    ]);
+    // Собираем старые fileId сравнений до перезаписи
+    const oldComparisons = await db
+        .select({
+            beforeFileId: projectComparisons.beforeFileId,
+            afterFileId: projectComparisons.afterFileId,
+        })
+        .from(projectComparisons)
+        .where(eq(projectComparisons.projectId, projectId))
+        .all();
 
     const oldFileIds = new Set<string>();
-    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
     for (const row of oldComparisons) {
         if (row.beforeFileId) oldFileIds.add(row.beforeFileId);
         if (row.afterFileId) oldFileIds.add(row.afterFileId);
@@ -520,19 +630,6 @@ export async function updateProjectShowcase(
                 testingProcess: data.testingProcess,
             })
             .where(eq(projects.id, projectId)),
-
-        // Replace assets
-        db.delete(projectAssets).where(eq(projectAssets.projectId, projectId)),
-        ...(data.assets || []).map((a) =>
-            db.insert(projectAssets).values({
-                id: a.id || crypto.randomUUID(),
-                projectId,
-                fileId: a.fileId,
-                assetType: a.assetType,
-                caption: a.caption,
-                order: a.order,
-            }),
-        ),
 
         // Replace comparisons
         db
@@ -550,7 +647,51 @@ export async function updateProjectShowcase(
                 order: c.order,
             }),
         ),
+    ]);
 
+    // Удаляем файлы сравнений, которые больше не используются в showcase
+    const newFileIds = new Set<string>();
+    for (const c of data.comparisons || []) {
+        if (c.beforeFileId) newFileIds.add(c.beforeFileId);
+        if (c.afterFileId) newFileIds.add(c.afterFileId);
+    }
+
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Section 07b: Results & Tools ----
+
+export async function updateProjectResults(
+    projectId: string,
+    data: {
+        results?: Array<{
+            id?: string;
+            content: string;
+            order: number;
+        }>;
+        tools?: Array<{
+            id?: string;
+            content: string;
+            order: number;
+        }>;
+        baCards?: Array<{
+            id?: string;
+            featureName: string;
+            beforeText: string;
+            afterText: string;
+            order: number;
+        }>;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db.batch([
         // Replace result/tool items (keep next_step items intact)
         db
             .delete(projectItems)
@@ -578,20 +719,20 @@ export async function updateProjectShowcase(
                 order: t.order,
             }),
         ),
+
+        // Replace ba_cards
+        db.delete(baCards).where(eq(baCards.projectId, projectId)),
+        ...(data.baCards || []).map((c) =>
+            db.insert(baCards).values({
+                id: c.id || crypto.randomUUID(),
+                projectId,
+                featureName: c.featureName,
+                beforeText: c.beforeText,
+                afterText: c.afterText,
+                order: c.order,
+            }),
+        ),
     ]);
-
-    // Удаляем файлы, которые больше не используются в showcase
-    const newFileIds = new Set<string>();
-    for (const a of data.assets || []) if (a.fileId) newFileIds.add(a.fileId);
-    for (const c of data.comparisons || []) {
-        if (c.beforeFileId) newFileIds.add(c.beforeFileId);
-        if (c.afterFileId) newFileIds.add(c.afterFileId);
-    }
-
-    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
-    if (staleFileIds.length > 0) {
-        await deleteFilesByIds(staleFileIds);
-    }
 
     revalidatePath(`/admin/projects/${projectId}`);
 }
@@ -996,6 +1137,19 @@ export async function getProjectShowcase(projectId: string) {
         .orderBy(asc(projectItems.order))
         .all();
 
+    const baCardsData = await db
+        .select({
+            id: baCards.id,
+            featureName: baCards.featureName,
+            beforeText: baCards.beforeText,
+            afterText: baCards.afterText,
+            order: baCards.order,
+        })
+        .from(baCards)
+        .where(eq(baCards.projectId, projectId))
+        .orderBy(asc(baCards.order))
+        .all();
+
     return {
         finalDescription: project?.finalDescription,
         designApproach: project?.designApproach,
@@ -1004,6 +1158,7 @@ export async function getProjectShowcase(projectId: string) {
         comparisons,
         results,
         tools,
+        baCards: baCardsData,
     };
 }
 

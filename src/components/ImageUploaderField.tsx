@@ -12,6 +12,7 @@ type ImageUploaderFieldProps = {
     accept?: string;
     maxSize?: number;
     aspectRatio?: number;
+    compact?: boolean;
 };
 
 export default function ImageUploaderField({
@@ -20,6 +21,7 @@ export default function ImageUploaderField({
     accept,
     maxSize,
     aspectRatio,
+    compact,
 }: ImageUploaderFieldProps) {
     const [uploaded, setUploaded] = useState<UploadedFile | null>(null);
     const [existingR2Key, setExistingR2Key] = useState<string | null>(null);
@@ -61,6 +63,7 @@ export default function ImageUploaderField({
             accept={accept}
             maxSize={maxSize}
             aspectRatio={aspectRatio}
+            compact={compact}
         />
     );
 }

@@ -162,6 +162,7 @@ export default function ReviewPage({
                     <textarea
                         id='keyTakeaway'
                         {...register('keyTakeaway')}
+                        placeholder='Summarise the main lesson or takeaway from this project…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -209,6 +210,7 @@ export default function ReviewPage({
                                     <Label>Text *</Label>
                                     <textarea
                                         {...register(`reviews.${index}.text`)}
+                                        placeholder='What did the reviewer say about the project?'
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
@@ -224,6 +226,7 @@ export default function ReviewPage({
                                         {...register(
                                             `reviews.${index}.authorName`,
                                         )}
+                                        placeholder='John Smith'
                                     />
                                     {errors.reviews?.[index]?.authorName && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -237,6 +240,7 @@ export default function ReviewPage({
                                         {...register(
                                             `reviews.${index}.authorRole`,
                                         )}
+                                        placeholder='Product Manager at Acme Inc.'
                                     />
                                 </div>
                                 <div>
@@ -371,7 +375,7 @@ export default function ReviewPage({
                         variant='ghost'
                         onClick={() =>
                             router.push(
-                                `/admin/projects/${projectId}/edit/showcase`,
+                                `/admin/projects/${projectId}/edit/results`,
                             )
                         }
                     >

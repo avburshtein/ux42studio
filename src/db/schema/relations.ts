@@ -87,6 +87,10 @@ export const relations = defineRelations(schema, (r) => ({
             from: r.projects.id,
             to: r.projectItems.projectId,
         }),
+        baCards: r.many.baCards({
+            from: r.projects.id,
+            to: r.baCards.projectId,
+        }),
         colorRoles: r.many.colorRoles({
             from: r.projects.id,
             to: r.colorRoles.projectId,
@@ -162,6 +166,13 @@ export const relations = defineRelations(schema, (r) => ({
     projectItems: {
         project: r.one.projects({
             from: r.projectItems.projectId,
+            to: r.projects.id,
+        }),
+    },
+
+    baCards: {
+        project: r.one.projects({
+            from: r.baCards.projectId,
             to: r.projects.id,
         }),
     },

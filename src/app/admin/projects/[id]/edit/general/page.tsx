@@ -15,6 +15,7 @@ import {
     updateProjectMeta,
     getCategories,
     getProjectMeta,
+    createCategory,
 } from '@/lib/actions/projects';
 import { slugify } from '@/lib/utils/slug';
 
@@ -55,6 +56,8 @@ export default function GeneralPage({
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [slugTouched, setSlugTouched] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [addingCategory, setAddingCategory] = useState(false);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
@@ -136,6 +139,22 @@ export default function GeneralPage({
         setValue('categoryIds', next);
     };
 
+    const handleAddCategory = async () => {
+        const name = newCategoryName.trim();
+        if (!name) return;
+        setAddingCategory(true);
+        try {
+            const created = await createCategory(name);
+            setCategories((prev) => [...prev, created]);
+            setValue('categoryIds', [...selectedCategoryIds, created.id]);
+            setNewCategoryName('');
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Failed to add category');
+        } finally {
+            setAddingCategory(false);
+        }
+    };
+
     const onSubmit = async (data: FormData) => {
         if (!projectId) return;
         setSaving(true);
@@ -170,7 +189,11 @@ export default function GeneralPage({
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='title'>Title *</Label>
-                    <Input id='title' {...register('title')} />
+                    <Input
+                        id='title'
+                        {...register('title')}
+                        placeholder='My Awesome Project'
+                    />
                     {errors.title && (
                         <p className='mt-1 text-body-sm text-error'>
                             {errors.title.message}
@@ -183,6 +206,7 @@ export default function GeneralPage({
                     <Input
                         id='slug'
                         {...register('slug')}
+                        placeholder='my-awesome-project'
                         onChange={(e) => {
                             setSlugTouched(true);
                             register('slug').onChange(e);
@@ -200,6 +224,7 @@ export default function GeneralPage({
                     <textarea
                         id='teaser'
                         {...register('teaser')}
+                        placeholder='A short teaser describing the project in 1–2 sentences…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={3}
                         maxLength={200}
@@ -208,37 +233,66 @@ export default function GeneralPage({
 
                 <div>
                     <Label htmlFor='client'>Client</Label>
-                    <Input id='client' {...register('client')} />
+                    <Input
+                        id='client'
+                        {...register('client')}
+                        placeholder='Acme Inc.'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='year'>Year</Label>
-                    <Input id='year' type='number' {...register('year')} />
+                    <Input
+                        id='year'
+                        type='number'
+                        {...register('year')}
+                        placeholder='2025'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='duration'>Duration</Label>
-                    <Input id='duration' {...register('duration')} />
+                    <Input
+                        id='duration'
+                        {...register('duration')}
+                        placeholder='3 months'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='myRole'>My Role</Label>
-                    <Input id='myRole' {...register('myRole')} />
+                    <Input
+                        id='myRole'
+                        {...register('myRole')}
+                        placeholder='UX Designer, Frontend Developer'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='constraints'>Constraints</Label>
-                    <Input id='constraints' {...register('constraints')} />
+                    <Input
+                        id='constraints'
+                        {...register('constraints')}
+                        placeholder='Budget, timeline, technical limitations…'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='devices'>Devices</Label>
-                    <Input id='devices' {...register('devices')} />
+                    <Input
+                        id='devices'
+                        {...register('devices')}
+                        placeholder='iOS, Android, Web'
+                    />
                 </div>
 
                 <div>
                     <Label htmlFor='tags'>Tags (comma-separated)</Label>
-                    <Input id='tags' {...register('tags')} />
+                    <Input
+                        id='tags'
+                        {...register('tags')}
+                        placeholder='fintech, dashboard, mobile'
+                    />
                 </div>
 
                 <div>
@@ -254,33 +308,53 @@ export default function GeneralPage({
 
                 <div>
                     <Label>Categories</Label>
-                    {categories.length === 0 ? (
-                        <p className='text-body-sm text-on-surface-variant'>
+                    {categories.length === 0 && (
+                        <p className='text-body-sm text-on-surface-variant mb-2'>
                             No categories available
                         </p>
-                    ) : (
-                        <div className='flex flex-wrap gap-2'>
-                            {categories.map((cat) => {
-                                const selected = selectedCategoryIds.includes(
-                                    cat.id,
-                                );
-                                return (
-                                    <button
-                                        key={cat.id}
-                                        type='button'
-                                        onClick={() => toggleCategory(cat.id)}
-                                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-label-md transition-colors ${
-                                            selected
-                                                ? 'border-primary bg-primary-container text-on-primary-container'
-                                                : 'border-outline-variant text-on-surface-variant hover:border-outline'
-                                        }`}
-                                    >
-                                        {cat.name}
-                                    </button>
-                                );
-                            })}
-                        </div>
                     )}
+                    <div className='flex flex-wrap gap-2 mb-3'>
+                        {categories.map((cat) => {
+                            const selected = selectedCategoryIds.includes(
+                                cat.id,
+                            );
+                            return (
+                                <button
+                                    key={cat.id}
+                                    type='button'
+                                    onClick={() => toggleCategory(cat.id)}
+                                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-label-md transition-colors ${
+                                        selected
+                                            ? 'border-primary bg-primary-container text-on-primary-container'
+                                            : 'border-outline-variant text-on-surface-variant hover:border-outline'
+                                    }`}
+                                >
+                                    {cat.name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className='flex gap-2'>
+                        <Input
+                            placeholder='New category name…'
+                            value={newCategoryName}
+                            onChange={(e) => setNewCategoryName(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddCategory();
+                                }
+                            }}
+                        />
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={handleAddCategory}
+                            disabled={addingCategory || !newCategoryName.trim()}
+                        >
+                            {addingCategory ? 'Adding…' : 'Add'}
+                        </Button>
+                    </div>
                 </div>
 
                 <div>
@@ -291,6 +365,7 @@ export default function GeneralPage({
                         id='figmaPrototypeUrl'
                         type='url'
                         {...register('figmaPrototypeUrl')}
+                        placeholder='https://www.figma.com/proto/…'
                     />
                 </div>
 
@@ -300,6 +375,7 @@ export default function GeneralPage({
                         id='webPrototypeUrl'
                         type='url'
                         {...register('webPrototypeUrl')}
+                        placeholder='https://prototype.example.com'
                     />
                 </div>
 

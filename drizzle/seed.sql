@@ -1,4 +1,4 @@
--- Очистка таблиц перед сидингом
+-- Очистка в ПРАВИЛЬНОМ порядке (сначала дочерние таблицы, потом родительские)
 DELETE FROM color_roles;
 DELETE FROM project_categories;
 DELETE FROM project_assets;
@@ -11,12 +11,12 @@ DELETE FROM users;
 
 -- 1. Пользователь и Профиль
 INSERT INTO users (id, email, password_hash, role, is_active)
-VALUES ('usr_admin_01', 'den.zakh@gmail.com', 'demo_hash_placeholder', 'admin', 1);
+VALUES ('{{ADMIN_ID}}', '{{ADMIN_EMAIL}}', '{{ADMIN_PASSWORD_HASH}}', 'admin', 1);
 
 INSERT INTO profiles (id, user_id, slug, full_name, headline, bio, location, website, is_public)
 VALUES (
   'prf_denis_01',
-  'usr_admin_01',
+  '{{ADMIN_ID}}',
   'denis-zakharchenko',
   'Denis Zakharchenko',
   'Frontend Architect & MedTech Lead',
@@ -52,8 +52,8 @@ VALUES
   'prj_b2b_dashboard',
   'prf_denis_01',
   'b2b-marketplace-analytics',
-  'High-Load B2B Marketplace Analytics',
   'Interactive dashboard suite with interdependent data structures.',
+  'B2B marketplace analytics platform with real-time data processing.',
   'LLC Olkurs',
   2025,
   '8 months',
@@ -62,13 +62,13 @@ VALUES
   1
 );
 
--- 4. Цветовые роли (привязаны к проектам)
-INSERT INTO color_roles (id, project_id, name, slug, light_color1, light_color2, dark_color1, dark_color2, light_contrast_ratio, dark_contrast_ratio, "order")
+-- 4. Цветовые роли
+INSERT INTO color_roles (id, project_id, name1, name2, light_color1, light_color2, dark_color1, dark_color2, light_contrast_ratio, dark_contrast_ratio, "order")
 VALUES
 ('clr_primary', 'prj_clinical_01', 'Primary Accent', 'primary-accent', '#0066FF', '#0052CC', '#3385FF', '#66A3FF', 4.5, 7.1, 0),
 ('clr_accent', 'prj_clinical_01', 'Teal Highlight', 'teal-highlight', '#00B894', '#00A383', '#55EFC4', '#00B894', 3.8, 8.2, 1);
 
--- 5. Связи проектов с категориями
+-- 5. Связи
 INSERT INTO project_categories (project_id, category_id) VALUES
 ('prj_clinical_01', 'cat_medtech'),
 ('prj_clinical_01', 'cat_architecture'),

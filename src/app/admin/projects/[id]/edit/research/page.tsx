@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     updateProjectResearch,
     getProjectResearch,
@@ -57,6 +58,8 @@ export default function ResearchPage({
         handleSubmit,
         control,
         reset,
+        watch,
+        setValue,
         formState: { errors },
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
@@ -94,7 +97,7 @@ export default function ResearchPage({
                     keyMetrics: r?.keyMetrics ?? [],
                 });
             })
-            .catch(() => {});
+            .catch(() => { });
     }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
@@ -133,6 +136,7 @@ export default function ResearchPage({
                     <textarea
                         id='researchMethodology'
                         {...register('researchMethodology')}
+                        placeholder='e.g. User interviews, competitive analysis, surveys…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -143,6 +147,7 @@ export default function ResearchPage({
                     <textarea
                         id='userStory'
                         {...register('userStory')}
+                        placeholder='As a [user], I want to [action] so that [benefit]…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                         rows={4}
                     />
@@ -193,6 +198,7 @@ export default function ResearchPage({
                                         {...register(
                                             `personas.${index}.nameAndAge`,
                                         )}
+                                        placeholder='Anna, 34'
                                     />
                                     {errors.personas?.[index]?.nameAndAge && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -201,17 +207,27 @@ export default function ResearchPage({
                                     )}
                                 </div>
                                 <div>
-                                    <Label>Avatar File ID</Label>
-                                    <Input
-                                        {...register(
-                                            `personas.${index}.avatarFileId`,
-                                        )}
+                                    <Label>Avatar</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            watch(
+                                                `personas.${index}.avatarFileId`,
+                                            ) || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                `personas.${index}.avatarFileId`,
+                                                fileId ?? '',
+                                            )
+                                        }
+                                        aspectRatio={1}
                                     />
                                 </div>
                                 <div>
                                     <Label>Role *</Label>
                                     <textarea
                                         {...register(`personas.${index}.role`)}
+                                        placeholder='Short bio describing background, occupation, and lifestyle…'
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
@@ -227,6 +243,7 @@ export default function ResearchPage({
                                         {...register(
                                             `personas.${index}.description`,
                                         )}
+                                        placeholder='Describe a typical scenario: when, where, and why they use the product…'
                                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
                                         rows={3}
                                     />
@@ -281,6 +298,7 @@ export default function ResearchPage({
                                         {...register(
                                             `keyMetrics.${index}.value`,
                                         )}
+                                        placeholder='+30%'
                                     />
                                     {errors.keyMetrics?.[index]?.value && (
                                         <p className='mt-1 text-body-sm text-error'>
@@ -294,13 +312,14 @@ export default function ResearchPage({
                                         {...register(
                                             `keyMetrics.${index}.description`,
                                         )}
+                                        placeholder='Increase in user engagement'
                                     />
                                     {errors.keyMetrics?.[index]
                                         ?.description && (
-                                        <p className='mt-1 text-body-sm text-error'>
-                                            Required
-                                        </p>
-                                    )}
+                                            <p className='mt-1 text-body-sm text-error'>
+                                                Required
+                                            </p>
+                                        )}
                                 </div>
                             </div>
                         </div>

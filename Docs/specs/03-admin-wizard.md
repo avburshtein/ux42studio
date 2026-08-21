@@ -176,7 +176,7 @@ redirect(`/admin/projects/${id}/edit/general`);
     - Name & Age
     - Avatar (ImageUploader)
     - Bio
-    - Pain Points
+    - User Scenario
 - Key Metrics (динамический список, до 3):
     - Value
     - Description

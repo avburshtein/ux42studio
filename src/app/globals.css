@@ -164,13 +164,13 @@
 
   --md-sys-color-tertiary-container: #fbfffa;
   --md-sys-color-on-tertiary-container: #717672;
-  --md-sys-color-error-container: #d17d00;
-  --md-sys-color-on-error-container: #402300;
+  --md-sys-color-error-container: #ba5f22;
+  --md-sys-color-on-error-container: #fda98d;
 
   --md-sys-color-tertiary: #5b5f5c;
   --md-sys-color-on-tertiary: #ffffff;
 
-  --md-sys-color-error: #8a5100;
+  --md-sys-color-error: #c81e00;
   --md-sys-color-on-error: #ffffff;
 
   --md-sys-color-background: #f7faf5;
@@ -199,6 +199,8 @@
   --md-ext-lavender-purple: #6e528a;
   --md-ext-green-accent: #336210;
 
+  --md-sys-color-surface-input: var(--md-sys-color-surface-container-lowest);
+
 }
 
 /* 3. DARK THEME OVERRIDES */
@@ -224,8 +226,8 @@
   --md-sys-color-tertiary: #ffffff;
   --md-sys-color-on-tertiary: #2d312e;
 
-  --md-sys-color-error: #ffb86e;
-  --md-sys-color-on-error: #492900;
+  --md-sys-color-error: #fd7654;
+  --md-sys-color-on-error: #491600;
 
   --md-sys-color-background: #101412;
   --md-sys-color-on-background: #e0e3df;
@@ -250,6 +252,8 @@
   --md-ext-lavender-light: #c3c0ff;
   --md-ext-lavender-purple: #dbb9f9;
   --md-ext-green-accent: #98d46f;
+
+  --md-sys-color-surface-input: var(--md-sys-color-surface-container-lowest);
 }
 
 /* 3b. System dark theme fallback (when no explicit choice) */
@@ -304,6 +308,13 @@
 }
 
 /* 4. BASE STYLES & UTILITIES */
+
+/* Admin: все input и textarea имеют цвет фона --md-sys-color-surface-input */
+.admin-layout input,
+.admin-layout textarea {
+  background-color: var(--md-sys-color-surface-input);
+}
+
 body {
   font-family: var(--font-body);
   font-size: var(--text-body-md);
@@ -321,14 +332,17 @@ body {
       transparent);
 }
 
+.table-cell-truncate {
+  max-width: 0;
+  width: 100%;
+}
+
 /* Scrim для hero-изображения (Figma: On surface gradient) */
 .hero-image-scrim {
-  background: linear-gradient(
-    0deg,
-    rgba(27, 27, 29, 0.75) 14%,
-    rgba(24, 29, 26, 0.16) 50%,
-    rgba(27, 27, 29, 0) 100%
-  );
+  background: linear-gradient(0deg,
+      rgba(27, 27, 29, 0.75) 14%,
+      rgba(24, 29, 26, 0.16) 50%,
+      rgba(27, 27, 29, 0) 100%);
 }
 
 /* Фолбэк обложки: тот же токен, что и фон страницы (Schemes/Background) */
@@ -338,11 +352,9 @@ body {
 
 /* Header glass morphism (Spec: hero block gradient + Effects/Blur/Glass Heavy) */
 .header-glass {
-  background: linear-gradient(
-    315deg,
-    var(--md-sys-color-background) 0%,
-    color-mix(in srgb, var(--md-sys-color-background) 8%, transparent) 100%
-  );
+  background: linear-gradient(315deg,
+      var(--md-sys-color-background) 0%,
+      color-mix(in srgb, var(--md-sys-color-background) 8%, transparent) 100%);
   backdrop-filter: blur(40px);
   -webkit-backdrop-filter: blur(40px);
   box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.1);
