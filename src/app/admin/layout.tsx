@@ -36,13 +36,10 @@ export default async function AuthLayout({
                 <div className='mx-auto max-w-7xl px-8'>
                     <div className='flex items-center justify-between py-3'>
                         <div className='flex items-center gap-6'>
-                            <Link
-                                href='/admin'
-                                className='text-title-sm text-on-surface font-semibold hover:text-primary transition-colors'
-                            >
+                            <div className='text-title-md text-on-surface font-semibold'>
                                 Admin
-                            </Link>
-                            <nav className='flex gap-1'>
+                            </div>
+                            <nav className='flex gap-1 mr-4'>
                                 {isSuperAdmin && (
                                     <Link
                                         href='/super-admin'
@@ -52,17 +49,23 @@ export default async function AuthLayout({
                                     </Link>
                                 )}
                                 <Link
+                                    href='/admin'
+                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                >
+                                    Ред. проекты
+                                </Link>
+                                <Link
                                     href='/admin/profile'
                                     className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
                                 >
-                                    Профиль
+                                    Ред. профиль
                                 </Link>
                                 {profile?.slug && (
                                     <Link
                                         href={`/u/${profile.slug}`}
                                         className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
                                     >
-                                        u/{profile.slug}
+                                        Мой сайт
                                     </Link>
                                 )}
                             </nav>
