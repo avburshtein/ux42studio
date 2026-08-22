@@ -133,7 +133,10 @@ export async function updateProfile(
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
-    // Удаляем старый аватар/обложку, если они были заменены или убраны
+    // Сначала собираем идентификаторы старых файлов и данные для очистки R2
+    let staleIds: string[] = [];
+    let staleR2Keys: string[] = [];
+
     if (data.avatarFileId !== undefined || data.coverFileId !== undefined) {
         const current = await db
             .select({
@@ -144,45 +147,51 @@ export async function updateProfile(
             .where(eq(profiles.id, profileId))
             .get();
 
-        const staleIds: string[] = [];
+        const ids: string[] = [];
         if (
             data.avatarFileId !== undefined &&
             current?.avatarFileId &&
             current.avatarFileId !== data.avatarFileId
         ) {
-            staleIds.push(current.avatarFileId);
+            ids.push(current.avatarFileId);
         }
         if (
             data.coverFileId !== undefined &&
             current?.coverFileId &&
             current.coverFileId !== data.coverFileId
         ) {
-            staleIds.push(current.coverFileId);
+            ids.push(current.coverFileId);
         }
 
-        if (staleIds.length > 0) {
+        if (ids.length > 0) {
+            staleIds = ids;
             const fileRows = await db
                 .select({ id: files.id, r2Key: files.r2Key })
                 .from(files)
                 .where(inArray(files.id, staleIds))
                 .all();
-
-            await Promise.all(
-                fileRows.map((f) =>
-                    env.MY_BUCKET.delete(f.r2Key).catch(() => {
-                        /* ignore */
-                    }),
-                ),
-            );
-
-            await db.delete(files).where(inArray(files.id, staleIds));
+            staleR2Keys = fileRows.map((f) => f.r2Key);
         }
     }
 
+    // Обновляем профиль ПЕРВЫМ, чтобы снять ссылки (foreign keys) на старые файлы
     await db
         .update(profiles)
         .set({ ...data, updatedAt: Math.floor(Date.now() / 1000) })
         .where(eq(profiles.id, profileId));
+
+    // Теперь, когда профиль больше не ссылается на старые файлы, удаляем их
+    if (staleIds.length > 0) {
+        await Promise.all(
+            staleR2Keys.map((key) =>
+                env.MY_BUCKET.delete(key).catch(() => {
+                    /* ignore */
+                }),
+            ),
+        );
+
+        await db.delete(files).where(inArray(files.id, staleIds));
+    }
 
     revalidatePath('/admin/profile');
 }
