@@ -60,7 +60,7 @@ export default async function AdminDashboardPage({
     });
 
     return (
-        <main className='mx-auto max-w-container-content px-4 py-8'>
+        <main className=''>
             <div className='mb-8 flex items-center justify-between'>
                 <div className=''>
                     <PageTitle>Мои проекты</PageTitle>

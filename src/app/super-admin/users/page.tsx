@@ -30,7 +30,7 @@ export default async function SuperAdminUsersPage({
         .orderBy(desc(users.createdAt));
 
     return (
-        <main className='mx-auto max-w-container-content px-4 py-8'>
+        <main className=''>
             <PageTitle className='mb-6' tag='h1'>
                 Управление пользователями
             </PageTitle>

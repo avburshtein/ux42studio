@@ -37,7 +37,7 @@ export default async function SuperAdminInvitesPage() {
     const now = Math.floor(Date.now() / 1000);
 
     return (
-        <main className='mx-auto max-w-container-content px-4 py-8'>
+        <main className=''>
             <PageTitle className='mb-6' tag='h1'>
                 Генерация и менеджмент инвайтов
             </PageTitle>

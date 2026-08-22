@@ -34,7 +34,7 @@ export default async function SuperAdminProjectsPage() {
         .orderBy(desc(projects.createdAt));
 
     return (
-        <main className='mx-auto max-w-container-content px-4 py-8'>
+        <main className=''>
             <PageTitle className='mb-6' tag='h1'>
                 Модерация всех проектов
             </PageTitle>
