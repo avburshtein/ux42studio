@@ -38,7 +38,7 @@ export default async function SuperAdminInvitesPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <PageTitle className='mb-6'>
+            <PageTitle className='mb-6' tag='h1'>
                 Генерация и менеджмент инвайтов
             </PageTitle>
 

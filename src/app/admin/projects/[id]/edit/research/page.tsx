@@ -97,7 +97,7 @@ export default function ResearchPage({
                     keyMetrics: r?.keyMetrics ?? [],
                 });
             })
-            .catch(() => { });
+            .catch(() => {});
     }, [projectId, reset]);
 
     const onSubmit = async (data: FormData) => {
@@ -127,36 +127,42 @@ export default function ResearchPage({
 
     return (
         <div>
-            <Title className='mb-6'>Research</Title>
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-                <div>
-                    <Label htmlFor='researchMethodology'>
-                        Research Methodology
-                    </Label>
-                    <textarea
-                        id='researchMethodology'
-                        {...register('researchMethodology')}
-                        placeholder='e.g. User interviews, competitive analysis, surveys…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
-                        rows={4}
-                    />
-                </div>
+            <Title className='mb-6' tag='h1'>
+                Research
+            </Title>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col gap-12'
+            >
+                <div className=''>
+                    <div>
+                        <Label htmlFor='researchMethodology'>
+                            Research Methodology
+                        </Label>
+                        <textarea
+                            id='researchMethodology'
+                            {...register('researchMethodology')}
+                            placeholder='e.g. User interviews, competitive analysis, surveys…'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                            rows={4}
+                        />
+                    </div>
 
-                <div>
-                    <Label htmlFor='userStory'>User Story</Label>
-                    <textarea
-                        id='userStory'
-                        {...register('userStory')}
-                        placeholder='As a [user], I want to [action] so that [benefit]…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
-                        rows={4}
-                    />
+                    <div>
+                        <Label htmlFor='userStory'>User Story</Label>
+                        <textarea
+                            id='userStory'
+                            {...register('userStory')}
+                            placeholder='As a [user], I want to [action] so that [benefit]…'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                            rows={4}
+                        />
+                    </div>
                 </div>
-
                 {/* Personas */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Personas (max 5)</Label>
+                        <Title variant='headline-md'>Personas (max 5)</Title>
                         {personaFields.length < 5 && (
                             <Button
                                 type='button'
@@ -177,10 +183,10 @@ export default function ResearchPage({
                     {personaFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className='mb-4 rounded-md border border-outline-variant p-4'
+                            className='mb-4 rounded-md border border-outline-variant p-4 bg-surface-container-high'
                         >
                             <div className='mb-3 flex items-center justify-between'>
-                                <span className='text-title-sm text-on-surface'>
+                                <span className='text-title-lg text-on-surface'>
                                     Persona {index + 1}
                                 </span>
                                 <Button
@@ -261,7 +267,7 @@ export default function ResearchPage({
                 {/* Key Metrics */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Key Metrics (max 3)</Label>
+                        <Title variant='headline-md'>Key Metrics (max 3)</Title>
                         {metricFields.length < 3 && (
                             <Button
                                 type='button'
@@ -277,7 +283,7 @@ export default function ResearchPage({
                     {metricFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className='mb-4 rounded-md border border-outline-variant p-4'
+                            className='mb-4 rounded-md border border-outline-variant p-4 bg-surface-container-high'
                         >
                             <div className='mb-3 flex items-center justify-between'>
                                 <span className='text-title-sm text-on-surface'>
@@ -316,10 +322,10 @@ export default function ResearchPage({
                                     />
                                     {errors.keyMetrics?.[index]
                                         ?.description && (
-                                            <p className='mt-1 text-body-sm text-error'>
-                                                Required
-                                            </p>
-                                        )}
+                                        <p className='mt-1 text-body-sm text-error'>
+                                            Required
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>

@@ -52,7 +52,9 @@ export default async function SuperAdminOverviewPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <PageTitle className='mb-6'>Обзорная статистика</PageTitle>
+            <PageTitle className='mb-6' tag='h1'>
+                Обзорная статистика
+            </PageTitle>
 
             <div className='mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3'>
                 {metrics.map((m) => (

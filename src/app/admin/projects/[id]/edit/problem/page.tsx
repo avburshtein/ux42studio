@@ -78,7 +78,9 @@ export default function ProblemPage({
 
     return (
         <div>
-            <Title className='mb-6'>Problem & Audience</Title>
+            <Title className='mb-6' tag='h1'>
+                Problem & Audience
+            </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='problemStatement'>Problem Statement</Label>

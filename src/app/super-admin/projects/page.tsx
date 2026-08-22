@@ -35,7 +35,9 @@ export default async function SuperAdminProjectsPage() {
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <PageTitle className='mb-6'>Модерация всех проектов</PageTitle>
+            <PageTitle className='mb-6' tag='h1'>
+                Модерация всех проектов
+            </PageTitle>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

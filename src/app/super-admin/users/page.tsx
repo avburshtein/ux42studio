@@ -31,7 +31,9 @@ export default async function SuperAdminUsersPage({
 
     return (
         <main className='mx-auto max-w-container-content px-4 py-8'>
-            <PageTitle className='mb-6'>Управление пользователями</PageTitle>
+            <PageTitle className='mb-6' tag='h1'>
+                Управление пользователями
+            </PageTitle>
 
             <form
                 method='GET'

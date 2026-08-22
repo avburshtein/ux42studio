@@ -14,6 +14,7 @@ import {
     reorderColorRoles,
 } from '@/lib/actions/projects';
 import { getContrastRatio } from '@/lib/utils/contrast';
+import Title from './ui/Title';
 
 type ColorRole = {
     id: string;
@@ -66,10 +67,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
     // Авто-расчёт контрастности при изменении цветов светлой темы
     useEffect(() => {
-        if (
-            form.lightColor1.length >= 4 &&
-            form.lightColor2.length >= 4
-        ) {
+        if (form.lightColor1.length >= 4 && form.lightColor2.length >= 4) {
             const ratio = getContrastRatio(form.lightColor1, form.lightColor2);
             setForm((prev) => ({
                 ...prev,
@@ -80,10 +78,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
     // Авто-расчёт контрастности при изменении цветов тёмной темы
     useEffect(() => {
-        if (
-            form.darkColor1.length >= 4 &&
-            form.darkColor2.length >= 4
-        ) {
+        if (form.darkColor1.length >= 4 && form.darkColor2.length >= 4) {
             const ratio = getContrastRatio(form.darkColor1, form.darkColor2);
             setForm((prev) => ({
                 ...prev,
@@ -239,9 +234,12 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             onDragOver={(e) => handleDragOver(e, index)}
                             onDragEnd={handleDragEnd}
                             className={cn(
-                                'flex items-center gap-2 rounded-md border border-[var(--md-sys-color-outline-variant)] bg-[var(--md-sys-color-surface)] p-2 cursor-grab active:cursor-grabbing transition-colors',
+                                'flex items-center gap-2 rounded-md border border-[var(--md-sys-color-outline-variant)]  p-2 cursor-grab active:cursor-grabbing transition-colors',
+                                role.id === editingId
+                                    ? 'bg-surface-container-highest'
+                                    : 'bg-surface-container-high',
                                 dragIndex === index &&
-                                'opacity-50 border-[var(--md-sys-color-primary)]',
+                                    'opacity-50 border-[var(--md-sys-color-primary)]',
                             )}
                             role='listitem'
                             aria-label={`${role.name1}, drag to reorder`}
@@ -306,11 +304,22 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
             )}
 
             {showForm ? (
-                <div className='space-y-3 rounded-lg border border-[var(--md-sys-color-outline-variant)] p-4'>
+                <div className='space-y-3 rounded-lg border border-[var(--md-sys-color-outline-variant)] p-4 bg-surface-container-highest'>
                     <div className='grid grid-cols-4 gap-5'>
-                        <div className="">Название</div>
+                        <div className=''>
+                            <Title tag='div' variant='title-lg'>
+                                {editingId ? 'Редактирование' : 'Создание'}
+                                <br />
+                                <span>роли</span>
+                            </Title>
+                        </div>
                         <div>
-                            <Label htmlFor='roleName' className="font-medium text-md pl-2">Основной цвет</Label>
+                            <Label
+                                htmlFor='roleName'
+                                className='font-medium text-md pl-2'
+                            >
+                                Основной цвет
+                            </Label>
                             <Input
                                 id='roleName'
                                 value={form.name1}
@@ -321,7 +330,12 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             />
                         </div>
                         <div>
-                            <Label htmlFor='roleName2' className="font-medium text-md pl-2">Дополнительный цвет</Label>
+                            <Label
+                                htmlFor='roleName2'
+                                className='font-medium text-md pl-2'
+                            >
+                                Дополнительный цвет
+                            </Label>
                             <Input
                                 id='roleName2'
                                 value={form.name2}
@@ -331,13 +345,13 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 placeholder='Например: onPrimary'
                             />
                         </div>
-                        <div className="">Контраст</div>
+                        <div className=''>Контраст</div>
                     </div>
 
                     <hr />
 
                     <div className='grid grid-cols-4 gap-5 items-center'>
-                        <div className="">Светлый</div>
+                        <div className=''>Светлый</div>
                         <div>
                             <div className='flex items-center gap-2'>
                                 <input
@@ -404,7 +418,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                     <hr />
 
                     <div className='grid grid-cols-4 gap-5 items-center'>
-                        <div className="">Темный </div>
+                        <div className=''>Темный </div>
                         <div>
                             <div className='flex items-center gap-2'>
                                 <input
@@ -483,8 +497,8 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             {saving
                                 ? 'Сохранение...'
                                 : editingId
-                                    ? 'Сохранить'
-                                    : 'Добавить роль'}
+                                  ? 'Сохранить'
+                                  : 'Добавить роль'}
                         </Button>
                         <Button
                             type='button'

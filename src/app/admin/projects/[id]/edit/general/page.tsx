@@ -185,7 +185,9 @@ export default function GeneralPage({
 
     return (
         <div>
-            <Title className='mb-6'>General (Meta)</Title>
+            <Title className='mb-6' tag='h1'>
+                General (Meta)
+            </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='title'>Title *</Label>

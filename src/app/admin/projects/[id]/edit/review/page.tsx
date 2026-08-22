@@ -155,7 +155,9 @@ export default function ReviewPage({
 
     return (
         <div>
-            <Title className='mb-6'>Review & Publish</Title>
+            <Title className='mb-6' tag='h1'>
+                Review & Publish
+            </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
                 <div>
                     <Label htmlFor='keyTakeaway'>Key Takeaway</Label>
@@ -170,8 +172,8 @@ export default function ReviewPage({
 
                 {/* Reviews */}
                 <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Reviews</Label>
+                    <div className='mb-3 flex items-center justify-between mt-12'>
+                        <Title variant='headline-md'>Reviews</Title>
                         <Button
                             type='button'
                             variant='ghost'
@@ -191,10 +193,10 @@ export default function ReviewPage({
                     {reviewFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className='mb-4 rounded-md border border-outline-variant p-4'
+                            className='mb-4 rounded-md border border-outline-variant p-4 bg-surface-container-high'
                         >
                             <div className='mb-3 flex items-center justify-between'>
-                                <span className='text-title-sm text-on-surface'>
+                                <span className='text-title-lg text-on-surface '>
                                     Review {index + 1}
                                 </span>
                                 <Button
@@ -270,8 +272,8 @@ export default function ReviewPage({
 
                 {/* Next Steps */}
                 <div>
-                    <div className='mb-3 flex items-center justify-between'>
-                        <Label>Next Steps</Label>
+                    <div className='mb-3 flex items-center justify-between mt-12'>
+                        <Title variant='headline-md'>Next Steps</Title>
                         <Button
                             type='button'
                             variant='ghost'
@@ -317,6 +319,8 @@ export default function ReviewPage({
                     ))}
                 </div>
 
+                <div className='mt-12'></div>
+
                 {/* Publish */}
                 <div className='flex items-center gap-2'>
                     <input
@@ -328,46 +332,25 @@ export default function ReviewPage({
                     <Label htmlFor='publish'>Publish project</Label>
                 </div>
 
-                {/* Archive */}
-                {projectStatus === 'published' && (
-                    <div className='flex items-center gap-2'>
-                        <Button
-                            type='button'
-                            variant='outline'
-                            disabled={archiving}
-                            onClick={async () => {
-                                if (!projectId) return;
-                                setArchiving(true);
-                                try {
-                                    await archiveProject(projectId);
-                                    setProjectStatus('archived');
-                                } finally {
-                                    setArchiving(false);
-                                }
-                            }}
-                        >
-                            {archiving ? 'Архивация...' : 'В архив'}
-                        </Button>
+                {/* Reserved helper text space (no layout shift) */}
+                {(error || previewUrl) && (
+                    <div className='min-h-[1.5rem]'>
+                        {error && (
+                            <p className='text-body-sm text-error'>{error}</p>
+                        )}
+                        {previewUrl && (
+                            <p className='text-body-sm text-primary'>
+                                Published!{' '}
+                                <Link
+                                    href={previewUrl}
+                                    className='underline hover:opacity-80'
+                                >
+                                    View live preview
+                                </Link>
+                            </p>
+                        )}
                     </div>
                 )}
-
-                {/* Reserved helper text space (no layout shift) */}
-                <div className='min-h-[1.5rem]'>
-                    {error && (
-                        <p className='text-body-sm text-error'>{error}</p>
-                    )}
-                    {previewUrl && (
-                        <p className='text-body-sm text-primary'>
-                            Published!{' '}
-                            <Link
-                                href={previewUrl}
-                                className='underline hover:opacity-80'
-                            >
-                                View live preview
-                            </Link>
-                        </p>
-                    )}
-                </div>
 
                 <div className='flex justify-between gap-3 pt-4'>
                     <Button

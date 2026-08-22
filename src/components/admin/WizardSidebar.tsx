@@ -1,5 +1,6 @@
 'use client';
 
+import { Eye } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -30,9 +31,11 @@ export function WizardSidebar({
     return (
         <aside className='w-64 shrink-0'>
             <nav className='sticky top-8'>
-                <h2 className='mb-4 text-title-lg text-on-background'>
-                    {projectTitle}
-                </h2>
+                <div className=''>
+                    <h2 className='mb-4 text-title-lg text-on-background'>
+                        {projectTitle}
+                    </h2>
+                </div>
                 <ul className='space-y-1'>
                     {STEPS.map((step) => {
                         const href = `/admin/projects/${projectId}/edit/${step.path}`;
@@ -54,25 +57,20 @@ export function WizardSidebar({
                     })}
                 </ul>
                 {profileSlug && projectSlug && (
-                    <div className='mt-4 border-t border-outline-variant pt-4'>
+                    <div className='mt-8 border-t border-outline-variant pt-4'>
                         <Link
                             href={`/u/${profileSlug}/${projectSlug}`}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='text-body-sm text-primary hover:text-primary-variant transition-colors'
+                            className='text-body-sm text-primary hover:text-primary-variant transition-colors flex gap-1 items-center'
                         >
-                            ↗ Просмотр проекта
+                            <Eye />{' '}
+                            <span className='font-medium'>
+                                Просмотр проекта
+                            </span>
                         </Link>
                     </div>
                 )}
-                <div className='mt-4 border-t border-outline-variant pt-4'>
-                    <Link
-                        href='/admin'
-                        className='text-body-sm text-on-surface-variant hover:text-on-surface'
-                    >
-                        ← Назад к проектам
-                    </Link>
-                </div>
             </nav>
         </aside>
     );

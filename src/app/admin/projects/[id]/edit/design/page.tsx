@@ -78,7 +78,9 @@ export default function DesignPage({
 
     return (
         <div>
-            <Title className='mb-6'>Design</Title>
+            <Title className='mb-6' tag='h1'>
+                Design
+            </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='visualDirection'>Visual Direction</Label>
@@ -120,8 +122,8 @@ export default function DesignPage({
                     />
                 </div>
 
-                <div>
-                    <Label>Color Roles</Label>
+                <div className='mt-12'>
+                    <Title variant='headline-md'>Color Roles</Title>
                     {projectId ? (
                         <ColorRolePicker projectId={projectId} />
                     ) : (
@@ -133,7 +135,7 @@ export default function DesignPage({
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
-                <div className='flex justify-between gap-3 pt-4'>
+                <div className='flex justify-between gap-3 pt-4 mt-6'>
                     <Button
                         type='button'
                         variant='ghost'

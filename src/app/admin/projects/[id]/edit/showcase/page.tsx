@@ -111,8 +111,13 @@ export default function ShowcasePage({
 
     return (
         <div>
-            <Title className='mb-6'>Showcase</Title>
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+            <Title className='mb-6' tag='h1'>
+                Showcase
+            </Title>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col gap-12'
+            >
                 <div>
                     <Label htmlFor='finalDescription'>Final Description</Label>
                     <textarea
@@ -127,7 +132,10 @@ export default function ShowcasePage({
                 {/* Before/After Comparisons */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Before/After Comparisons</Label>
+                        <Title variant='headline-md'>
+                            Before/After Comparisons
+                        </Title>
+                        <Label></Label>
                         <Button
                             type='button'
                             variant='ghost'
@@ -148,7 +156,7 @@ export default function ShowcasePage({
                     {comparisonFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className='mb-4 rounded-md border border-outline-variant p-4'
+                            className='mb-4 rounded-md border border-outline-variant p-4 bg-surface-container-high'
                         >
                             <div className='mb-3 flex items-center justify-between'>
                                 <span className='text-title-sm text-on-surface'>

@@ -125,12 +125,17 @@ export default function ResultsPage({
 
     return (
         <div>
-            <Title className='mb-6'>Results</Title>
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+            <Title className='mb-6' tag='h1'>
+                Results
+            </Title>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col gap-12'
+            >
                 {/* Results */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Results</Label>
+                        <Title variant='headline-md'>Results</Title>
                         <Button
                             type='button'
                             variant='ghost'
@@ -179,7 +184,7 @@ export default function ResultsPage({
                 {/* Tools */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Tools</Label>
+                        <Title variant='headline-md'>Tools</Title>
                         <Button
                             type='button'
                             variant='ghost'
@@ -228,7 +233,9 @@ export default function ResultsPage({
                 {/* Before/After Cards */}
                 <div>
                     <div className='mb-3 flex items-center justify-between'>
-                        <Label>Before/After Cards</Label>
+                        <Title variant='headline-md'>
+                            Before / After Cards
+                        </Title>
                         <Button
                             type='button'
                             variant='ghost'
@@ -247,7 +254,7 @@ export default function ResultsPage({
                     {baCardFields.map((field, index) => (
                         <div
                             key={field.id}
-                            className='mb-4 rounded-lg border border-outline-variant bg-surface p-4 space-y-3'
+                            className='mb-4 rounded-lg border border-outline-variant bg-surface-container-high p-4 space-y-3'
                         >
                             <div className='flex items-center justify-between'>
                                 <span className='text-label-sm text-on-surface-variant'>

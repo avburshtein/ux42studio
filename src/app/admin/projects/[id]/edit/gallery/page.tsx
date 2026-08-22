@@ -212,7 +212,7 @@ export default function GalleryPage({
         return (
             <div key={section.key}>
                 <div className='mb-3 flex items-center justify-between'>
-                    <Label>{section.label}</Label>
+                    <Title variant='headline-md'>{section.label}</Title>
                     <Button
                         type='button'
                         variant='ghost'
@@ -291,11 +291,16 @@ export default function GalleryPage({
 
     return (
         <div>
-            <Title className='mb-6'>Gallery</Title>
-            <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+            <Title className='mb-6' tag='h1'>
+                Gallery
+            </Title>
+            <form
+                onSubmit={handleSubmit(onSubmit)}
+                className='flex flex-col gap-12'
+            >
                 {/* Moodboard — WYSIWYG Grid Editor */}
                 <div>
-                    <Label className='mb-3 block'>Moodboard</Label>
+                    <Title variant='headline-md'>Moodboard</Title>
                     <MoodboardGridSection
                         presetId={moodboardPresetId}
                         initialImages={moodboardGridImages}
