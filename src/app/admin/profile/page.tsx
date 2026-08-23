@@ -19,6 +19,7 @@ import Link from 'next/link';
 import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
+import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 
 const formSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -230,6 +231,14 @@ export default function ProfilePage() {
                                 Loading...
                             </p>
                         )}
+                    </div>
+
+                    {/* Change Password */}
+                    <div className='border-t border-outline-variant pt-6'>
+                        <h2 className='text-title-sm text-on-surface mb-4'>
+                            Смена пароля
+                        </h2>
+                        <ChangePasswordForm />
                     </div>
 
                     {error && (
