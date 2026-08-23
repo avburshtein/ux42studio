@@ -19,7 +19,6 @@ import Link from 'next/link';
 import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
-import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 
 const formSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -157,6 +156,16 @@ export default function ProfilePage() {
                         )}
                     </div>
 
+                    {/* Change Password */}
+                    <div className=''>
+                        <Link
+                            href='/admin/profile/password'
+                            className='text-body-sm text-primary hover:underline'
+                        >
+                            Перейти к смене пароля →
+                        </Link>
+                    </div>
+
                     <div>
                         <Label htmlFor='slug'>Slug *</Label>
                         <Input id='slug' {...register('slug')} />
@@ -231,14 +240,6 @@ export default function ProfilePage() {
                                 Loading...
                             </p>
                         )}
-                    </div>
-
-                    {/* Change Password */}
-                    <div className='border-t border-outline-variant pt-6'>
-                        <h2 className='text-title-sm text-on-surface mb-4'>
-                            Смена пароля
-                        </h2>
-                        <ChangePasswordForm />
                     </div>
 
                     {error && (
