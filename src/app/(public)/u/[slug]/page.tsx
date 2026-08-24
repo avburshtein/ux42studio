@@ -170,11 +170,7 @@ export default async function ProfilePage({ params }: PageProps) {
             <AuthBar profileUserId={profile.userId} />
             <div className='min-h-screen w-full bg-surface-container-low'>
                 <div className='mx-auto w-full max-w-container-content shadow-[8px_8px_20px_0px_rgba(0,0,0,0.1)]'>
-                    <SiteHeader
-                        profileSlug={slug}
-                        ctaLabel='Hire me'
-                        ctaHref='#contact'
-                    />
+                    <SiteHeader ctaLabel='Hire me' ctaHref='#contact' />
                     <HeroSection
                         headlinePart1='I design for the moment '
                         headlineAccent='when everything'

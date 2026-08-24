@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
 interface SiteHeaderProps {
-    profileSlug: string;
+    profileSlug?: string;
     /** CTA button label (default: "Hire me") */
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
@@ -38,7 +38,7 @@ export function SiteHeader({
             </nav>
 
             {/* Center: Logo — 89×64 */}
-            <LogoLink href={`/u/${profileSlug}`} />
+            <LogoLink />
 
             {/* Right zone: Theme Toggle + CTA — gap 24 */}
             <div className='flex items-center justify-end gap-6'>
@@ -77,7 +77,7 @@ export function SiteHeaderBreadcrumb({
     return (
         <header
             className={cn(
-                'header-glass flex w-full items-center justify-between gap-0 lg:px-16 py-4',
+                'header-glass flex w-full items-center justify-between gap-6 lg:px-16 py-4',
                 className,
             )}
         >
@@ -94,15 +94,11 @@ export function SiteHeaderBreadcrumb({
 
                 {/* Breadcrumb Navigation — gap 8 */}
                 <nav
-                    className='flex min-w-0 items-center gap-2'
+                    className='flex min-w-0 items-center gap-2 shrink'
                     aria-label='Breadcrumb'
                 >
                     <BreadcrumbLink href={`/u/${profileSlug}`}>
                         Portfolio
-                    </BreadcrumbLink>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbLink href={`/u/${profileSlug}`}>
-                        Cases
                     </BreadcrumbLink>
                     <BreadcrumbSeparator />
                     <BreadcrumbCurrent>{currentTitle}</BreadcrumbCurrent>
@@ -110,7 +106,7 @@ export function SiteHeaderBreadcrumb({
             </div>
 
             {/* Center: Logo — 89×64 */}
-            <LogoLink href={`/u/${profileSlug}`} />
+            <LogoLink />
 
             {/* Right zone: Theme Toggle + CTA — gap 24 */}
             <div className='flex shrink-0 items-center justify-end gap-6'>
@@ -125,11 +121,11 @@ export function SiteHeaderBreadcrumb({
 // Shared primitives
 // ---------------------------------------------------------------------------
 
-function LogoLink({ href }: { href: string }) {
+function LogoLink({ href = '/' }: { href?: string }) {
     return (
         <Link
             href={href}
-            className='inline-flex h-16 w-[89px] shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary'
+            className='inline-flex h-16 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary'
             aria-label='UX42.studio'
         >
             UX42.studio
@@ -148,7 +144,7 @@ function CtaButton({
     return (
         <Link
             href={href}
-            className='inline-flex h-12 min-w-[123px] items-center justify-center rounded-sm px-4 py-3 text-button font-medium text-[var(--md-sys-color-surface-tint)] transition-colors hover:bg-surface-variant'
+            className='inline-flex h-12  items-center justify-center rounded-sm px-4 py-3 text-button font-medium text-[var(--md-sys-color-surface-tint)] transition-colors hover:bg-surface-variant'
         >
             {children}
         </Link>
@@ -201,15 +197,10 @@ function BreadcrumbSeparator() {
     );
 }
 
-function BreadcrumbCurrent({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+function BreadcrumbCurrent({ children }: { children: React.ReactNode }) {
     return (
-        <span className='truncate text-body-md font-normal text-on-surface'>
+        <span className='min-w-0 truncate text-body-md font-normal text-on-surface'>
             {children}
         </span>
     );
 }
-
