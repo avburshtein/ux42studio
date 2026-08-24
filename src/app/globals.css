@@ -72,6 +72,11 @@
   /* Shadow */
   --shadow-card: 0px 2px 12px 0px rgba(0, 0, 0, 0.06);
 
+  /* Portfolio Card shadows — 3 переменные с разными значениями по mode */
+  --shadow-card-accent: rgba(177, 211, 196, 0.30);   /* green tint */
+  --shadow-card-glow:   rgba(242, 242, 242, 0.86);    /* white lift */
+  --shadow-card-base:   rgba(0, 0, 0, 0.05);          /* soft base */
+
   /* Дополнительные акцентные цвета */
   --color-lime-accent: var(--md-ext-lime-accent);
   --color-on-lime-accent: var(--md-ext-on-lime-accent);
@@ -254,6 +259,11 @@
   --md-ext-green-accent: #98d46f;
 
   --md-sys-color-surface-input: var(--md-sys-color-surface-container-lowest);
+
+  /* Portfolio Card shadows — Dark: all black, no green glow */
+  --shadow-card-accent: rgba(0, 0, 0, 0.30);
+  --shadow-card-glow:   rgba(0, 0, 0, 0.86);
+  --shadow-card-base:   rgba(0, 0, 0, 0.05);
 }
 
 /* 3b. System dark theme fallback (when no explicit choice) */
@@ -304,6 +314,11 @@
     --md-ext-lavender-light: #c3c0ff;
     --md-ext-lavender-purple: #dbb9f9;
     --md-ext-green-accent: #98d46f;
+
+    /* Portfolio Card shadows — Dark */
+    --shadow-card-accent: rgba(0, 0, 0, 0.30);
+    --shadow-card-glow:   rgba(0, 0, 0, 0.86);
+    --shadow-card-base:   rgba(0, 0, 0, 0.05);
   }
 }
 
