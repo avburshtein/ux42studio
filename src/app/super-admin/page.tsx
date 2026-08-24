@@ -52,13 +52,11 @@ export default async function SuperAdminOverviewPage() {
 
     return (
         <main className=''>
-            <PageTitle className='mb-6' tag='h1'>
-                Обзорная статистика
-            </PageTitle>
+            <PageTitle>Обзорная статистика</PageTitle>
 
             <div className='mb-10 grid grid-cols-1 gap-4 sm:grid-cols-3'>
                 {metrics.map((m) => (
-                    <Card key={m.label}>
+                    <Card key={m.label} className='p-4'>
                         <p className='text-label-md text-on-surface-variant'>
                             {m.label}
                         </p>
@@ -70,7 +68,7 @@ export default async function SuperAdminOverviewPage() {
             </div>
 
             <div className='mb-10'>
-                <Title className='mb-4'>Последние пользователи</Title>
+                <Title variant='headline-sm'>Последние пользователи</Title>
                 <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                     <table className='w-full'>
                         <thead>
@@ -129,7 +127,7 @@ export default async function SuperAdminOverviewPage() {
             </div>
 
             <div>
-                <Title className='mb-4'>Последние проекты</Title>
+                <Title variant='headline-sm'>Последние проекты</Title>
                 <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                     <table className='w-full'>
                         <thead>

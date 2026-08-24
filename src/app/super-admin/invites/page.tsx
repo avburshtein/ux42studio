@@ -38,12 +38,12 @@ export default async function SuperAdminInvitesPage() {
 
     return (
         <main className=''>
-            <PageTitle className='mb-6' tag='h1'>
-                Генерация и менеджмент инвайтов
-            </PageTitle>
+            <PageTitle>Генерация и менеджмент инвайтов</PageTitle>
 
-            <Card className='mb-8'>
-                <Title className='mb-4'>Создать инвайт</Title>
+            <div className='mb-8'>
+                <Title className='mb-4' variant='headline-sm'>
+                    Создать инвайт
+                </Title>
                 <form
                     action={async (formData: FormData) => {
                         'use server';
@@ -81,7 +81,7 @@ export default async function SuperAdminInvitesPage() {
                     </div>
                     <Button type='submit'>Generate</Button>
                 </form>
-            </Card>
+            </div>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

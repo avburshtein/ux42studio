@@ -31,9 +31,7 @@ export default async function SuperAdminUsersPage({
 
     return (
         <main className=''>
-            <PageTitle className='mb-6' tag='h1'>
-                Управление пользователями
-            </PageTitle>
+            <PageTitle>Управление пользователями</PageTitle>
 
             <form
                 method='GET'
