@@ -21,6 +21,7 @@ import { TagBadge } from '@/components/case/TagBadge';
 import { NextStepsList } from '@/components/case/NextStepsList';
 import { NextProjectShowcase } from '@/components/case/NextProjectShowcase';
 import { SiteFooter } from '@/components/case/SiteFooter';
+import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 3600;
 
@@ -40,7 +41,13 @@ export default async function ProjectPage({ params }: PageProps) {
     // 1. Найти профиль
     const profile = await db.query.profiles.findFirst({
         where: { slug },
-        columns: { id: true, slug: true, fullName: true, avatarFileId: true },
+        columns: {
+            id: true,
+            userId: true,
+            slug: true,
+            fullName: true,
+            avatarFileId: true,
+        },
     });
     if (!profile) notFound();
 
@@ -180,6 +187,7 @@ export default async function ProjectPage({ params }: PageProps) {
 
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
+            <AuthBar projectId={project?.id} profileUserId={profile?.userId} />
             {/* Content column: 1200px centered [198:1310] */}
             <div className='mx-auto w-full max-w-container-content'>
                 {/* Header [245:1632] — Breadcrumb variant with glass effects */}
