@@ -368,27 +368,26 @@ body {
   background-color: var(--md-sys-color-background);
 }
 
-/* Header glass morphism — рецепт из вердикта ИИ-агента Figma Make
-   (решение 2026-08-27 (5) в Docs/ui/Main_page_Spec.md): диагональный
-   градиент #f7faf5 0.88 → 0.10 (−45°, тает к правому краю), лёгкий
-   blur(4px). История: спека literal — градиент 1.0→0.08 + blur 40px;
-   итерация (3)/(4) — равномерная плашка rgba 0.5→0.9 + blur 12px;
-   архив make-export (Navbar) — rgba(255,255,255,0.5) + blur 12px.
-   Тьма: у нас тема на data-атрибуте, поэтому [data-theme='dark'],
-   а не .dark как в вердикте. */
+/* Header glass — фон и тень (решения 2026-08-27 (7), (8)). Равномерный
+   #F7FAF5 70%: после починки блюра (7) при 88% дымка была деликатной,
+   по фидбэку «хочется заметнее» альфа снижена до 0.70 (история: спека
+   literal — градиент 1.0→0.08 + blur 40px; (3)/(4) — плашка 0.5→0.9;
+   (5) — градиент 0.88→0.10 + blur 4px; (6)/(7) — плашка 0.88).
+   ВНИМАНИЕ: backdrop-filter сюда НЕ возвращать! LightningCSS в пайплайне
+   Tailwind v4 (дефолтные таргеты, Safari < 18) «канонизирует» пару
+   стандартное+префиксное до одного -webkit- — Firefox стандартное свойство
+   не понимает, итого «блюра нет» при формально живом CSS. Блюр живёт
+   utility-классами на <header> в SiteHeader.tsx: backdrop-blur-md
+   (= blur 12px) + backdrop-saturate-[1.8] (= 180%) — Tailwind-утилиты
+   эмитят ОБЕ формы через var(--tw-backdrop-*), LightningCSS их сохраняет.
+   Тьма: тема на data-атрибуте → [data-theme='dark'], не .dark. */
 .header-glass {
-  background: linear-gradient(-45deg,
-      rgba(247, 250, 245, 0.88) 0%,
-      rgba(247, 250, 245, 0.1) 100%);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(247, 250, 245, 0.7);
   box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.08);
 }
 
 [data-theme='dark'] .header-glass {
-  background: linear-gradient(-45deg,
-      rgba(10, 10, 10, 0.88) 0%,
-      rgba(10, 10, 10, 0.1) 100%);
+  background: rgba(10, 10, 10, 0.7);
   box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.25);
 }
 

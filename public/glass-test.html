@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glass test — UX42 header</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .bar {
+    position: sticky; top: 0; z-index: 40;
+    height: 96px; display: flex; align-items: center; gap: 24px;
+    padding: 0 64px;
+    box-shadow: 8px 8px 20px rgba(0,0,0,0.08);
+    font-size: 18px; color: #00543b;
+  }
+  .m88 { background: rgba(247,250,245,0.88); backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); }
+  .m70 { background: rgba(247,250,245,0.70); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); }
+  .m50 { background: rgba(247,250,245,0.50); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); }
+  .m-none { background: rgba(247,250,245,0.88); }
+  .content { background: linear-gradient(120deg, #fff 0%, #eef4ee 55%, #f4f0f5 100%); padding: 8px 64px 200px; }
+  .content h1 { font-size: 110px; line-height: 1.05; margin: 48px 0; color: #44474b; letter-spacing: -2px; }
+  .content h1 b { color: #00543b; }
+  button { font: inherit; padding: 8px 20px; border-radius: 999px; border: 1px solid #0b6e4f; background: #fff; color: #00543b; cursor: pointer; }
+  #hint { color: #44474b; font-size: 14px; max-width: 520px; }
+</style>
+</head>
+<body>
+  <div class="bar m88" id="bar">
+    <span>Glass test</span>
+    <button onclick="cycle()">режим: <b id="lbl">0.88 + blur(12px) saturate(180%)</b> — кликай и скроль</button>
+    <span id="hint"></span>
+  </div>
+  <div class="content">
+    <h1>I design for <b>the moment</b></h1>
+    <h1>when everything <b>just clicks</b></h1>
+    <h1>Glass test <b>one</b></h1>
+    <h1>Glass test <b>two</b></h1>
+    <h1>Glass test <b>three</b></h1>
+    <h1>Glass test <b>four</b></h1>
+  </div>
+<script>
+  var modes = [
+    ['m88', '0.88 + blur(12px) saturate(180%)', 'Как на проде сейчас. Скроль текст под плашку и смотри на края букв.'],
+    ['m70', '0.70 + blur(20px) saturate(180%)', 'Заметно стекляннее. Если тут смаз есть, а на 0.88 нет — блюр работает, просто при 0.88 его почти не видно.'],
+    ['m50', '0.50 + blur(24px) saturate(180%)', 'Максимум стекла, уровень Make.'],
+    ['m-none', '0.88 БЕЗ backdrop-filter (контроль)', 'Эталон «блюра нет». Если контроль выглядит как режим 0.88 — браузер не исполняет backdrop-filter (смотри аппаратное ускорение).']
+  ];
+  var i = 0, bar = document.getElementById('bar');
+  function apply() {
+    modes.forEach(function (m) { bar.classList.remove(m[0]); });
+    bar.classList.add(modes[i][0]);
+    document.getElementById('lbl').textContent = modes[i][1];
+    document.getElementById('hint').textContent = modes[i][2];
+  }
+  function cycle() { i = (i + 1) % modes.length; apply(); }
+  apply();
+</script>
+</body>
+</html>

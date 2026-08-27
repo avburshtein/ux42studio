@@ -16,8 +16,12 @@ interface SiteHeaderProps {
 
 // Header (Component set ID: 245:1632) × паттерн Navbar из Figma Make
 // Sticky top-0 z-40: шапка заморожена, контент скроллится под ней.
-// Стекло → class: header-glass (градиент #f7faf5 0.88→0.10 под −45°,
-// blur 4px — рецепт агента Make, см. Main_page_Spec 2026-08-27 (5)).
+// Стекло: фон/тень → class header-glass (#f7faf5 70%, спека (8));
+// БЛЮР → utility-классы backdrop-blur-md + backdrop-saturate-[1.8]
+// (12px/180%), а НЕ в .header-glass: LightningCSS в пайплайне Tailwind v4
+// вырезает стандартный backdrop-filter из literal-правил, оставляя только
+// -webkit- (молча не работает в Firefox). Утилиты генерируют ОБЕ формы —
+// см. Main_page_Spec 2026-08-27 (7).
 // Высота: 96px (py-16 + контент h-64). Контент — внутри .section-container
 // (max-w 1200, pads 16/32/64) — выровнен по колонкам секций.
 // Зоны: nav | имя дизайнера | theme toggle + CTA
@@ -30,7 +34,7 @@ export function SiteHeader({
 }: SiteHeaderProps) {
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-4 backdrop-blur-md backdrop-saturate-[1.8]', className)}
         >
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container flex w-full items-center justify-between gap-0'>
@@ -83,7 +87,7 @@ export function SiteHeaderBreadcrumb({
 }: SiteHeaderBreadcrumbProps) {
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-4 backdrop-blur-md backdrop-saturate-[1.8]', className)}
         >
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container flex w-full items-center justify-between gap-0'>
