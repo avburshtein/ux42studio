@@ -21,10 +21,10 @@ export default async function AuthBar({
 
     if (!token) {
         return (
-            <div className='fixed top-4 right-4 z-50'>
+            <div className='absolute top-2 right-2 z-50'>
                 <Link
                     href='/login'
-                    className='inline-flex items-center justify-center w-8 h-8 rounded-full opacity-20 hover:opacity-60 transition-opacity'
+                    className='inline-flex items-center justify-center w-8 h-8 rounded-full opacity-10 hover:opacity-70 transition-opacity'
                     title='Войти'
                 >
                     <LogIn className='w-4 h-4 text-on-surface' />
@@ -65,37 +65,40 @@ export default async function AuthBar({
 
     return (
         <div className='bg-surface-variant/60 border-b border-outline-variant'>
-            <div className='max-w-page mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-end gap-3'>
-                <Link
-                    href='/admin'
-                    className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
-                >
-                    Admin
-                </Link>
-                {isSuperAdmin && (
+            <div className='mx-auto w-full max-w-container-content'>
+                <div className='px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-end gap-3'>
+                    {isSuperAdmin && (
+                        <Link
+                            href='/super-admin'
+                            className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
+                        >
+                            Суперадминка
+                        </Link>
+                    )}
                     <Link
-                        href='/super-admin'
+                        href='/admin'
                         className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                     >
-                        Суперадминка
+                        Админка
                     </Link>
-                )}
-                {profile?.slug && (
-                    <Link
-                        href={`/u/${profile.slug}`}
-                        className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
-                    >
-                        Мой профиль
-                    </Link>
-                )}
-                {isOwner && projectId && (
-                    <Link
-                        href={`/admin/projects/${projectId}/edit/general`}
-                        className='text-label-sm text-primary hover:text-primary-variant transition-colors font-medium'
-                    >
-                        Редактировать проект
-                    </Link>
-                )}
+
+                    {profile?.slug && (
+                        <Link
+                            href={`/u/${profile.slug}`}
+                            className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
+                        >
+                            Мой профиль
+                        </Link>
+                    )}
+                    {isOwner && projectId && (
+                        <Link
+                            href={`/admin/projects/${projectId}/edit/general`}
+                            className='text-label-sm text-primary hover:text-primary-variant transition-colors font-medium'
+                        >
+                            Редактировать проект
+                        </Link>
+                    )}
+                </div>
             </div>
         </div>
     );

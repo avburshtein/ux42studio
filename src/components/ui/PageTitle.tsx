@@ -1,4 +1,6 @@
 import { type ReactNode } from 'react';
+import Title from './Title';
+import { cn } from '@/lib/utils';
 
 export default function PageTitle({
     children,
@@ -8,8 +10,8 @@ export default function PageTitle({
     className?: string;
 }) {
     return (
-        <h1 className={`text-display-sm text-on-background ${className}`}>
+        <Title tag='h1' className={cn('mb-8', className)}>
             {children}
-        </h1>
+        </Title>
     );
 }

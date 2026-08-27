@@ -54,7 +54,7 @@ export default async function SuperAdminLayout({
                     </form>
                 </div>
             </header>
-            {children}
+            <div className='mx-auto max-w-7xl px-8 pt-4'>{children}</div>
         </div>
     );
 }

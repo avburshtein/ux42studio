@@ -35,9 +35,7 @@ export default async function SuperAdminProjectsPage() {
 
     return (
         <main className=''>
-            <PageTitle className='mb-6' tag='h1'>
-                Модерация всех проектов
-            </PageTitle>
+            <PageTitle>Модерация всех проектов</PageTitle>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
                 <table className='w-full'>

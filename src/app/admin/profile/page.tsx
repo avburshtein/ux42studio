@@ -134,14 +134,6 @@ export default function ProfilePage() {
         <main className=''>
             <div className='flex items-center justify-between gap-4'>
                 <PageTitle className='mb-8'>Настройки профиля</PageTitle>
-                {profileId && (
-                    <Link
-                        href='/admin'
-                        className='text-body-sm text-primary hover:underline'
-                    >
-                        Дашборд
-                    </Link>
-                )}
             </div>
 
             <FormBox className=''>
@@ -154,6 +146,16 @@ export default function ProfilePage() {
                                 {errors.fullName.message}
                             </p>
                         )}
+                    </div>
+
+                    {/* Change Password */}
+                    <div className=''>
+                        <Link
+                            href='/admin/profile/password'
+                            className='text-body-sm text-primary hover:underline'
+                        >
+                            Перейти к смене пароля →
+                        </Link>
                     </div>
 
                     <div>

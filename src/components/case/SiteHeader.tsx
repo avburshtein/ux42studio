@@ -154,7 +154,7 @@ function LogoLink({ href }: { href: string }) {
     return (
         <Link
             href={href}
-            className='inline-flex h-16 w-[89px] shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary'
+            className='inline-flex h-16 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary'
             aria-label='UX42.studio'
         >
             UX42.studio
@@ -173,7 +173,7 @@ function CtaButton({
     return (
         <Link
             href={href}
-            className='inline-flex h-12 min-w-[123px] items-center justify-center rounded-sm px-4 py-3 text-button font-medium text-[var(--md-sys-color-surface-tint)] transition-colors hover:bg-surface-variant'
+            className='inline-flex h-12  items-center justify-center rounded-sm px-4 py-3 text-button font-medium text-[var(--md-sys-color-surface-tint)] transition-colors hover:bg-surface-variant'
         >
             {children}
         </Link>
@@ -226,15 +226,10 @@ function BreadcrumbSeparator() {
     );
 }
 
-function BreadcrumbCurrent({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
+function BreadcrumbCurrent({ children }: { children: React.ReactNode }) {
     return (
-        <span className='truncate text-body-md font-normal text-on-surface'>
+        <span className='min-w-0 truncate text-body-md font-normal text-on-surface'>
             {children}
         </span>
     );
 }
-
