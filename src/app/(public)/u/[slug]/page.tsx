@@ -17,7 +17,7 @@ export const revalidate = 3600;
 // Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE)
 function NavLabel({ label }: { label: string }) {
   return (
-    <div className="flex w-full items-center gap-4 px-8 py-0 lg:px-16">
+    <div className="section-container flex w-full items-center gap-4 py-0">
       <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant">
         {label}
       </span>
@@ -82,8 +82,7 @@ export default async function ProfilePage({ params }: PageProps) {
 
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
-            <div className='mx-auto w-full max-w-container-content shadow-[8px_8px_20px_0px_rgba(0,0,0,0.1)]'>
-                    <SiteHeader profileSlug={slug} ctaLabel="Hire me" ctaHref="#contact" />
+                    <SiteHeader profileSlug={slug} displayName={profile.fullName} ctaLabel="Hire me" ctaHref="#contact" />
                     <HeroSection
                         headlinePart1="I design for the moment "
                         headlineAccent="when everything"
@@ -135,7 +134,6 @@ export default async function ProfilePage({ params }: PageProps) {
                     profileHeadline={profile.headline}
                     socialLinks={socials}
                 />
-            </div>
         </div>
     );
 }

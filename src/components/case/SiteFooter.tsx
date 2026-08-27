@@ -29,14 +29,23 @@ export function SiteFooter({
     return (
         <footer
             className={cn(
-                'flex flex-col gap-8 bg-background px-8 py-12 lg:px-16 lg:py-16',
+                'flex w-full flex-col gap-8 bg-background py-12 lg:py-16',
                 className,
             )}
         >
+            {/* Контейнер контента: max-w 1200 + px 16/32/64 (mobile/tablet/desktop) */}
+            <div className='section-container flex flex-col gap-8'>
             {/* Main row */}
             <div className='flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between'>
-                {/* Brand info */}
+                {/* Brand: логотип основного сайта + имя дизайнера */}
                 <div className='flex flex-col gap-2'>
+                    <Link
+                        href='/'
+                        className='inline-flex items-center self-start font-display text-title-lg font-medium text-primary'
+                        aria-label='UX42.studio'
+                    >
+                        UX42.studio
+                    </Link>
                     <span className='font-display text-title-lg font-medium text-on-surface'>
                         {profileName}
                     </span>
@@ -104,6 +113,7 @@ export function SiteFooter({
                     © {new Date().getFullYear()} UX42.studio. All rights
                     reserved.
                 </span>
+            </div>
             </div>
         </footer>
     );

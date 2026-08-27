@@ -1,10 +1,14 @@
 import { cn } from '@/lib/utils';
 
 type TagVariant = 'filled' | 'outlined' | 'ghost';
+type TagSize = 'md' | 'lg';
 
 interface TagBadgeProps {
     label: string;
     variant?: TagVariant;
+    /** md = label-md (Inter Medium 13, дефолт). lg = 16/24 — теги Skills/Tools
+     *  на главной портфолио (эталон: Docs/make-export, imports/Html→Body). */
+    size?: TagSize;
     className?: string;
 }
 
@@ -12,12 +16,14 @@ interface TagBadgeProps {
 export function TagBadge({
     label,
     variant = 'outlined',
+    size = 'md',
     className,
 }: TagBadgeProps) {
     return (
         <span
             className={cn(
-                'inline-flex items-center justify-center whitespace-nowrap text-label-md font-medium',
+                'inline-flex items-center justify-center whitespace-nowrap font-medium',
+                size === 'lg' ? 'text-[16px] leading-[24px]' : 'text-label-md',
                 // Filled: bg surface-tint, white text, shadow, pad 8×14, radius 12
                 variant === 'filled' &&
                     'rounded-base bg-surface-tint px-3.5 py-2 text-white shadow-[1px_1px_4px_rgba(0,0,0,0.1)]',

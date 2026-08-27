@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Design Studio Website - Case Study</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.6;
+      color: #1a1a1a;
+      background: #ffffff;
+    }
+
+    .page {
+      width: 1400px;
+      min-height: 1050px;
+      padding: 80px;
+      page-break-after: always;
+      background: #ffffff;
+    }
+
+    /* Cover Page */
+    .cover {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: linear-gradient(135deg, #0B6E4F 0%, #2C5A07 100%);
+      color: white;
+    }
+
+    .cover h1 {
+      font-size: 72px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      letter-spacing: -2px;
+    }
+
+    .cover p {
+      font-size: 24px;
+      opacity: 0.9;
+      max-width: 800px;
+    }
+
+    .cover .meta {
+      margin-top: 60px;
+      display: flex;
+      gap: 40px;
+      font-size: 18px;
+    }
+
+    /* Content Pages */
+    h2 {
+      font-size: 48px;
+      font-weight: 600;
+      margin-bottom: 32px;
+      color: #0B6E4F;
+    }
+
+    h3 {
+      font-size: 32px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: #1a1a1a;
+    }
+
+    p {
+      font-size: 20px;
+      line-height: 1.8;
+      margin-bottom: 20px;
+      color: #4a4a4a;
+    }
+
+    ul {
+      list-style: none;
+      margin: 24px 0;
+    }
+
+    li {
+      font-size: 20px;
+      padding: 12px 0;
+      padding-left: 32px;
+      position: relative;
+    }
+
+    li:before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #0B6E4F;
+      font-weight: bold;
+      font-size: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      margin: 40px 0;
+    }
+
+    .card {
+      padding: 32px;
+      background: #f8f9fa;
+      border-radius: 16px;
+      border-left: 4px solid #0B6E4F;
+    }
+
+    .card h4 {
+      font-size: 24px;
+      margin-bottom: 16px;
+      color: #0B6E4F;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin: 40px 0;
+    }
+
+    .stat {
+      text-align: center;
+      padding: 32px;
+      background: linear-gradient(135deg, #0B6E4F 0%, #2C5A07 100%);
+      border-radius: 16px;
+      color: white;
+    }
+
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 32px 0;
+    }
+
+    .tag {
+      padding: 10px 20px;
+      background: #0B6E4F;
+      color: white;
+      border-radius: 24px;
+      font-size: 16px;
+    }
+
+    .highlight {
+      background: #f0f9f6;
+      padding: 32px;
+      border-radius: 16px;
+      border-left: 4px solid #0B6E4F;
+      margin: 32px 0;
+    }
+
+    .section-divider {
+      width: 100px;
+      height: 4px;
+      background: linear-gradient(90deg, #0B6E4F 0%, #2C5A07 100%);
+      margin: 40px 0;
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 60px;
+      padding-top: 32px;
+      border-top: 2px solid #e0e0e0;
+      text-align: center;
+      font-size: 16px;
+      color: #666;
+    }
+
+    /* Print Styles */
+    @media print {
+      .page {
+        width: 210mm;
+        height: 297mm;
+        padding: 20mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER PAGE -->
+<div class="page cover">
+  <h1>Modern Design Studio<br/>Website</h1>
+  <p>Premium portfolio with animated UI, comprehensive design system, and seamless dark mode</p>
+  <div class="meta">
+    <div>
+      <strong>Role:</strong> Web Designer & Developer
+    </div>
+    <div>
+      <strong>Duration:</strong> 2 weeks
+    </div>
+    <div>
+      <strong>Year:</strong> 2026
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 1: OVERVIEW -->
+<div class="page">
+  <h2>Project Overview</h2>
+  <div class="section-divider"></div>
+  
+  <p>
+    I designed and developed a premium portfolio website for a design studio, featuring cutting-edge animations 
+    and a comprehensive design system. The project showcases modern web design trends combined with performance 
+    optimization and accessibility best practices.
+  </p>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-number">5+</div>
+      <div class="stat-label">Pages</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">8</div>
+      <div class="stat-label">Components</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">3000+</div>
+      <div class="stat-label">Particles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Responsive</div>
+    </div>
+  </div>
+
+  <h3>Key Features</h3>
+  <ul>
+    <li>Animated dot grid background with mouse-follow parallax effect</li>
+    <li>Floating mesh elements with smooth transitions</li>
+    <li>Comprehensive dark mode with ThemeContext</li>
+    <li>Fully responsive design (320px - 4K displays)</li>
+    <li>Complete design system with 30+ color styles</li>
+    <li>8 reusable UI components (TypeScript + CVA)</li>
+    <li>SEO optimized with meta tags and sitemap</li>
+    <li>Performance optimized with 60fps animations</li>
+  </ul>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 2: THE CHALLENGE -->
+<div class="page">
+  <h2>The Challenge</h2>
+  <div class="section-divider"></div>
+
+  <p>
+    Design and develop a modern portfolio website that stands out in a competitive market while maintaining 
+    excellent performance and user experience.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Design Challenge</h4>
+      <p>Create unique visual identity with memorable animations that don't compromise performance</p>
+    </div>
+    <div class="card">
+      <h4>Technical Challenge</h4>
+      <p>Implement complex animations (3000+ particles) while maintaining 60fps on all devices</p>
+    </div>
+    <div class="card">
+      <h4>UX Challenge</h4>
+      <p>Ensure seamless experience across all devices from mobile (320px) to 4K displays</p>
+    </div>
+    <div class="card">
+      <h4>Accessibility Challenge</h4>
+      <p>Create comprehensive dark mode while maintaining WCAG 2.1 compliance</p>
+    </div>
+  </div>
+
+  <div class="highlight">
+    <h3>Goals</h3>
+    <ul>
+      <li>Create visually stunning website with smooth animations</li>
+      <li>Implement comprehensive design system for scalability</li>
+      <li>Ensure 100% responsiveness across all devices</li>
+      <li>Optimize for performance (60fps animations)</li>
+      <li>Make it accessible (WCAG 2.1 compliant)</li>
+      <li>Deploy with SEO optimization</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 3: DESIGN SYSTEM -->
+<div class="page">
+  <h2>Design System</h2>
+  <div class="section-divider"></div>
+
+  <p>
+    Created a comprehensive design system with consistent colors, typography, spacing, and reusable components.
+  </p>
+
+  <h3>Color Palette</h3>
+  <div class="tags">
+    <div class="tag">Primary Green #0B6E4F</div>
+    <div class="tag">Secondary Olive #2C5A07</div>
+    <div class="tag">10 Neutral Shades</div>
+    <div class="tag">Semantic Colors</div>
+    <div class="tag">Dark Mode Variants</div>
+  </div>
+
+  <h3>Typography System</h3>
+  <div class="grid">
+    <div class="card">
+      <h4>Headings</h4>
+      <p><strong>Font:</strong> Poppins Medium<br>
+      <strong>Sizes:</strong> 52px / 42px / 32px / 24px / 20px / 18px<br>
+      <strong>Line Height:</strong> 1.2</p>
+    </div>
+    <div class="card">
+      <h4>Body Text</h4>
+      <p><strong>Font:</strong> Inter Regular<br>
+      <strong>Sizes:</strong> 18px / 16px / 14px<br>
+      <strong>Line Height:</strong> 1.5</p>
+    </div>
+  </div>
+
+  <h3>Component Library</h3>
+  <ul>
+    <li><strong>Button:</strong> 3 variants (Primary, Secondary, Ghost) × 3 sizes (Large, Medium, Small)</li>
+    <li><strong>Card:</strong> Light/Dark variants with shadows and rounded corners</li>
+    <li><strong>Input:</strong> Focus states, error states, disabled states</li>
+    <li><strong>Textarea:</strong> Auto-resize, character counter</li>
+    <li><strong>Badge:</strong> Multiple colors, rounded design</li>
+    <li><strong>Typography:</strong> Semantic HTML elements with custom styles</li>
+    <li><strong>Container:</strong> Responsive max-width container</li>
+    <li><strong>Spacer:</strong> Consistent vertical spacing</li>
+  </ul>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 4: DEVELOPMENT PROCESS -->
+<div class="page">
+  <h2>Development Process</h2>
+  <div class="section-divider"></div>
+
+  <h3>Phase 1: Foundation (3 days)</h3>
+  <div class="highlight">
+    <ul>
+      <li>Set up React + TypeScript + Vite environment</li>
+      <li>Implement Tailwind CSS v4 with custom configuration</li>
+      <li>Create base component structure</li>
+      <li>Set up React Router with data mode pattern</li>
+      <li>Define design tokens (colors, spacing, typography)</li>
+    </ul>
+  </div>
+
+  <h3>Phase 2: Core Features (5 days)</h3>
+  <div class="highlight">
+    <ul>
+      <li>Animated dot grid background with 3000+ particles</li>
+      <li>Mouse-follow parallax effect with smooth interpolation</li>
+      <li>Floating mesh elements with randomized movement</li>
+      <li>Portfolio gallery with modal details</li>
+      <li>Contact form with validation</li>
+    </ul>
+  </div>
+
+  <h3>Phase 3: Dark Mode (2 days)</h3>
+  <div class="highlight">
+    <ul>
+      <li>ThemeContext implementation with React Context API</li>
+      <li>CSS variables for dynamic color switching</li>
+      <li>Theme toggle component with smooth transitions</li>
+      <li>LocalStorage persistence for user preference</li>
+    </ul>
+  </div>
+
+  <h3>Phase 4: Polish & Optimization (4 days)</h3>
+  <div class="highlight">
+    <ul>
+      <li>Responsive layouts for all breakpoints</li>
+      <li>Mobile menu with smooth animations</li>
+      <li>Performance optimization (lazy loading, code splitting)</li>
+      <li>SEO implementation (meta tags, sitemap, robots.txt)</li>
+      <li>Comprehensive documentation (17,000+ words)</li>
+      <li>Deployment configuration for 3 platforms</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 5: TECHNICAL STACK -->
+<div class="page">
+  <h2>Technical Stack</h2>
+  <div class="section-divider"></div>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Frontend</h4>
+      <p>
+        <strong>React 18.3.1</strong> - Modern UI library with hooks<br>
+        <strong>TypeScript</strong> - Type safety and better DX<br>
+        <strong>Vite 6.3.5</strong> - Fast build tool
+      </p>
+    </div>
+    <div class="card">
+      <h4>Styling</h4>
+      <p>
+        <strong>Tailwind CSS v4</strong> - Utility-first CSS<br>
+        <strong>Custom Animations</strong> - RequestAnimationFrame<br>
+        <strong>CSS Variables</strong> - Dynamic theming
+      </p>
+    </div>
+    <div class="card">
+      <h4>Routing & State</h4>
+      <p>
+        <strong>React Router v7</strong> - Client-side routing<br>
+        <strong>Context API</strong> - Theme state management<br>
+        <strong>LocalStorage</strong> - Preference persistence
+      </p>
+    </div>
+    <div class="card">
+      <h4>Development</h4>
+      <p>
+        <strong>ESLint</strong> - Code quality<br>
+        <strong>Git</strong> - Version control<br>
+        <strong>GitHub</strong> - Code hosting
+      </p>
+    </div>
+  </div>
+
+  <h3>Performance Optimizations</h3>
+  <ul>
+    <li><strong>Code Splitting:</strong> Lazy loading for routes and components</li>
+    <li><strong>Image Optimization:</strong> WebP format, lazy loading, proper sizing</li>
+    <li><strong>Bundle Size:</strong> Tree shaking and minification</li>
+    <li><strong>Animation Performance:</strong> GPU acceleration, RequestAnimationFrame</li>
+    <li><strong>Caching:</strong> Service Worker for offline support (optional)</li>
+  </ul>
+
+  <h3>Deployment</h3>
+  <div class="tags">
+    <div class="tag">Vercel Ready</div>
+    <div class="tag">Netlify Ready</div>
+    <div class="tag">GitHub Pages</div>
+    <div class="tag">Auto Deploy</div>
+    <div class="tag">CDN Optimized</div>
+  </div>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 6: RESULTS -->
+<div class="page">
+  <h2>Final Results</h2>
+  <div class="section-divider"></div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-number">60fps</div>
+      <div class="stat-label">Animation Performance</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">100%</div>
+      <div class="stat-label">Responsive</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">30+</div>
+      <div class="stat-label">Color Styles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">17K+</div>
+      <div class="stat-label">Words Documentation</div>
+    </div>
+  </div>
+
+  <h3>Deliverables</h3>
+  <ul>
+    <li><strong>Fully Functional Website:</strong> 5+ pages with routing, animations, and interactions</li>
+    <li><strong>Design System:</strong> 30+ color styles, 8 components, comprehensive documentation</li>
+    <li><strong>Dark Mode:</strong> Complete theme implementation with smooth transitions</li>
+    <li><strong>Responsive Design:</strong> Works perfectly from 320px to 4K displays</li>
+    <li><strong>UI Kit:</strong> Reusable components with TypeScript and CVA</li>
+    <li><strong>Documentation:</strong> 16+ files including design system guide (17,000+ words)</li>
+    <li><strong>Deployment:</strong> Ready for production on 3 platforms</li>
+    <li><strong>SEO:</strong> Meta tags, sitemap, robots.txt</li>
+    <li><strong>Figma Automation:</strong> Tools for importing design to Figma</li>
+  </ul>
+
+  <div class="highlight">
+    <h3>Key Achievements</h3>
+    <ul>
+      <li>Created unique visual identity with 3000+ animated particles</li>
+      <li>Maintained 60fps performance on all devices</li>
+      <li>Built comprehensive design system for scalability</li>
+      <li>Implemented full dark mode support</li>
+      <li>Ensured WCAG 2.1 accessibility compliance</li>
+      <li>Optimized for SEO and performance</li>
+    </ul>
+  </div>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- PAGE 7: TECHNOLOGIES -->
+<div class="page">
+  <h2>Technologies & Tools</h2>
+  <div class="section-divider"></div>
+
+  <div class="tags">
+    <div class="tag">React 18.3.1</div>
+    <div class="tag">TypeScript</div>
+    <div class="tag">Tailwind CSS v4</div>
+    <div class="tag">Vite 6.3.5</div>
+    <div class="tag">React Router v7</div>
+    <div class="tag">CVA</div>
+    <div class="tag">Git</div>
+    <div class="tag">GitHub</div>
+    <div class="tag">Figma</div>
+    <div class="tag">VS Code</div>
+  </div>
+
+  <h3>Libraries Used</h3>
+  <ul>
+    <li><strong>clsx:</strong> Conditional className utility</li>
+    <li><strong>class-variance-authority:</strong> Component variants</li>
+    <li><strong>lucide-react:</strong> Icon library</li>
+    <li><strong>react-router:</strong> Client-side routing</li>
+    <li><strong>unsplash API:</strong> High-quality images</li>
+  </ul>
+
+  <h3>Design Tools</h3>
+  <ul>
+    <li><strong>Figma:</strong> Design and prototyping</li>
+    <li><strong>Design Tokens:</strong> Automated design system import</li>
+    <li><strong>Color Palette:</strong> Custom green gradient theme</li>
+    <li><strong>Google Fonts:</strong> Poppins and Inter</li>
+  </ul>
+
+  <div class="footer">
+    Modern Design Studio Website · 2026
+  </div>
+</div>
+
+<!-- THANK YOU PAGE -->
+<div class="page cover">
+  <h1>Thank You</h1>
+  <p>For viewing this case study</p>
+  <div class="meta" style="flex-direction: column; gap: 16px;">
+    <div style="font-size: 24px;">
+      <strong>Live Website:</strong> your-site.vercel.app
+    </div>
+    <div style="font-size: 24px;">
+      <strong>GitHub:</strong> github.com/yourusername/project
+    </div>
+    <div style="font-size: 24px;">
+      <strong>Contact:</strong> your.email@example.com
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

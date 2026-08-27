@@ -185,6 +185,7 @@ export default async function ProjectPage({ params }: PageProps) {
                 {/* Header [245:1632] — Breadcrumb variant with glass effects */}
                 <SiteHeaderBreadcrumb
                     profileSlug={slug}
+                    displayName={profile.fullName}
                     currentTitle={project.title}
                 />
 

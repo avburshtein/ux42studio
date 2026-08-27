@@ -605,3 +605,152 @@ New BlockLabels: 4 × 17px + slot gaps = +200px approx
 Net change: −185px
 
 Component instances: 69 (same count — 4 Section Tags removed, 4 BlockLabels added)
+
+### 2026-08-27 — Layout Spec review decisions
+
+Resolved during review of the re-derived "Layout Spec — UX42.studio Portfolio (Figma → код)";
+do not reintroduce these as discrepancies:
+
+1. Hero & CTA background = Schemes/Surface Container Lowest (white).
+   Mentions of Schemes/Background for Hero/CTA in §4, §9, §13 are superseded.
+2. Section inside strokes (1px On Surface/Opacity-08, §5 pattern) intentionally
+   not implemented.
+3. BlockLabel labels: color outline-variant (#c5c6cc), letter-spacing 0.5px —
+   overrides the green 1.54px variant described in Addendum A1.
+4. Portfolio grid uses fluid `1fr` columns (~341px cell at 1072 content width);
+   card fills its cell. Fixed 334px is the component intrinsic size only,
+   never the on-page size.
+5. Card image is TOP-aligned, height 256px (the "bottom:170px" reading was an
+   artifact and is ignored).
+6. TagBadge keeps material-theme/label/medium (Inter Medium 13px) as its
+   DEFAULT size — the "16px" was wrong for case-page badges.
+   Refined by Make-export ground truth (Docs/make-export/src/imports/
+   "Html→Body"/index.tsx): Portfolio-page SKILLS & Tools tags ARE
+   Inter Medium 16px / lh 24, white bg + rgba(0,84,59,0.16) border,
+   px≈12.5/py≈6.5, r=10 → TagBadge size="lg".
+7. Only sanctioned hardcode: nav divider rgba(140,213,179,0.16) until a token
+   exists in globals.css.
+8. Hero heading renders as inline flow (no flex wrap); anchor ids
+   `portfolio` / `about` / `contact` exist on sections and are used by header
+   nav (`#about`) and CTAs/FAB (`#contact`).
+
+### 2026-08-27 (2) — New design reference U5OjywCHbtzQgBsi7PU25r + container architecture
+
+Reference: Figma design file **Portfolio UX42** (`U5OjywCHbtzQgBsi7PU25r`),
+node **124:575 "Main Page"** (1200×4785) — read via REST API (file is a regular
+design file, not Make; MCP-server still cached an expired token, direct API works).
+Important: Main Page is assembled in the DARK scheme; Layout/DS components
+(`101:292`) and mobile components show the light scheme. Both map to existing
+M3 semantic tokens (dark tokens in globals.css already match: bg #101412,
+sections #0e0e0f, cards #1b1b1d, accent #83d7b1).
+
+**Architecture (per Den's proposal, confirmed by file structure
+Section → container → Content Slot):**
+
+- Section block = full screen width, carries bg + vertical padding.
+- Inner `.section-container` (globals.css): max-w 1200 centered,
+  horizontal padding by device type:
+  - mobile `<768px`: 16px (Figma `Section Mobile` 286:436 pad 48/16)
+  - tablet `≥768px`: 32px (no tablet component in Figma — assigned by us)
+  - desktop `≥1024px`: 64px (Figma container pad 0/64 → content 1072)
+- Section vertical padding: mobile 48 → md 96 → lg 120 (hero, CTA) / 96 others.
+- Page-level shadowed 1200 column removed (was `max-w-container-content` +
+  shadow); blocks are now full-bleed.
+
+**Header / Footer ownership change (user request):**
+
+- Header keeps glass texture, size, behavior; center slot replaces the
+  UX42.studio logo with the designer name/login (`displayName` prop,
+  Poppins title-lg, primary color). All other header content unchanged.
+- UX42.studio wordmark moved to SiteFooter brand column (links to `/`).
+- Both header variants (default + breadcrumb) and both pages updated;
+  case page keeps its 1200 column wrapper (no visual change: 1200 − 2×64
+  gives the same 1072 content width).
+
+**New elements found in 124:575 — pending product decisions (NOT yet built):**
+
+a. Hero **Stats row** (gap 48): `10+ / MSc / NGO` — value Poppins 26/34
+   accent, label Inter 14/22 ls 0.4, muted (#8f9196 dark).
+b. **Pro Bono Banner** after Skills: full-width card r24 bg surface-container-low,
+   pad 28, text Inter 16/24 ls 0.25 + Secondary button "Get in touch".
+c. CTA second button **WhatsApp** as Button/Ghost (accent text + icon).
+d. Primary buttons use **gradient** `#00543b → #336210` (dark scheme variant).
+e. Filter chips: 13px Medium ls 0.5, selected = accent bg + inverted text
+   (#003826 on #83d7b1); unselected `#131314/8` dark ≈ `surface/8`.
+f. **FAB** in reference: bg #ffb3b1 (secondary), icon #410007, 64×64 —
+   differs from our green FAB.
+g. BlockLabel dividers carry a "next case →" Ghost button on the right.
+h. Footer row: UX42.studio accent Link Button + name·title 13px, socials
+   gap 20, legal links Inter 16/24 ls 0.25, divider white/10 (dark),
+   copyright 13 Medium ls 0.5.
+i. About left column in 124:575 contains decorative floating placeholder art
+   (rounded blobs with micro-copy), not a plain gray rectangle.
+
+**2026-08-27 (3) — Header: sticky + glass (Make recipe) + section container:**
+
+По запросу («нравится текстура/размер/поведение хедера в Make») header
+переведён на паттерн **Navbar из Figma Make** (`HomeDesktop.tsx`, узел
+`Navbar / 3 /`), сохраняя наш состав зон (Work/About · имя дизайнера ·
+тема + Hire me):
+
+1. **Заморозка**: `sticky top-0 z-40` (у Make — absolute на топе страницы,
+   для скролла взят sticky) — контент секций прокручивается под шапкой.
+2. **Стекло** (`.header-glass`, точные значения Make): свет
+   `rgba(255,255,255,0.5)`, тьма `rgba(10,10,10,0.8)`, `backdrop-blur 12px`
+   (Make: backdrop-blur-md), тень прежняя `8/8/20/10%` (в тьме — светлая
+   `rgba(255,255,255,0.05)`). Прежний градиент 315° + blur 40px заменён:
+   он был фактически непрозрачным и стекло не читалось.
+3. **Контейнер**: контент шапки обёрнут в `.section-container`
+   (max-w 1200 + pads 16/32/64) — левая/центральная/правая зоны
+   выровнены по колонкам секций (в Make: Navbar → Container max-w 1280
+   mx-auto; у нас сетка 1200).
+4. **Высота** неизменна: 96px (py-16 + контент h-64).
+5. Якоря: `[id] { scroll-margin-top: 104px }` — переходы
+   #portfolio/#about/#contact не прячут заголовки под sticky-шапкой.
+6. Оба варианта компонента (SiteHeader и SiteHeaderBreadcrumb) переведены
+   на один паттерн. FAB (z-50) выше шапки — конфликта слоёв нет.
+
+**2026-08-27 (4) — Плотность шапки + хиро на высоту экрана:**
+
+По фидбэку («в мейке шапка менее прозрачная, у нас сильно прозрачная;
+хиро растяни на высоту экрана»):
+
+1. **Шапка**. У Make literal-значение фона Navbar — `rgba(255,255,255,0.5)`,
+   но там шапка absolute и всегда лежит на белом хиро, поэтому визуально
+   она выглядит плотной белой плашкой. Наш sticky-вариант с 50% белого
+   просвечивает скроллящимся контентом — впечатление «слишком прозрачная».
+   Фон уплотнён: свет `rgba(255,255,255,0.9)`, тьма `rgba(10,10,10,0.9)`;
+   blur 12px и обе тени — прежние. Стекло сохранено (лёгкое правило
+   границы при скролле), но плашка читается как в Make.
+2. **Hero**. Секция получила `min-h-[calc(100dvh_-_96px)]` (96px — высота
+   sticky-шапки) + `flex items-center`: хиро занимает первый экран целиком,
+   контент центрируется по вертикали. Паддинги py-12/24/30 (48/96/120)
+   остаются как гарантированные отступы на малых экранах, где контент
+   выше вьюпорта. FloatingElements остались абсолютными внутри секции.
+
+**2026-08-27 (5) — Шапка: рецепт агента Make (градиент вместо плашки):**
+
+Принесён вердикт ИИ-агента Figma Make. Его пункты про `header-glass`/
+`section-container` «не определены» относятся к его Make-проекту (Make
+генерирует инлайн Tailwind, классов там нет by design) — у нас оба класса
+есть в globals.css. Существенное — новый рецепт фона. Сверка трёх версий:
+
+| Версия | Фон | Blur |
+|---|---|---|
+| Спека (Figma literal) | градиент −45°: #f7faf5 100% → 0.08 | 40px |
+| Архив make-export (Navbar) | rgba(255,255,255,0.5) равномерно; тьма 0.8 | 12px |
+| **Вердикт агента Make (принято)** | градиент −45°: rgba(247,250,245,0.88) → 0.10; тьма rgba(10,10,10,0.88) → 0.10 | 4px |
+
+Принят вердикт: слева плотная зона (0.88 — навигация читается), вправо
+хедер тает (0.10 — контент просвечивает). Это объясняет фидбэк «в мейке
+менее прозрачный»: градиент против нашей равномерной плашки 0.9.
+
+1. `.header-glass` (globals.css) переписан на градиент 0.88→0.10 (−45°) +
+   blur(4px); тени: свет 8/8/20/8%, тьма 8/8/20/25% (по вердикту).
+   Тёмная тема — через `[data-theme='dark']` (у нас data-атрибут, не `.dark`).
+2. `section-container` уже определён (16/32/64) — пункт вердикта закрыт
+   ранее, изменений не требует.
+3. Условия backdrop-filter проверены: хедер sticky без overflow:hidden;
+   transform/filter/will-change на обёртках (layout, ThemeProvider,
+   страница профиля) отсутствуют — stacking context не изолирован.
+4. Комментарий в SiteHeader.tsx синхронизирован.

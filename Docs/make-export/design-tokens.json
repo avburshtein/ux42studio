@@ -1,0 +1,414 @@
+{
+  "color": {
+    "primary": {
+      "green": {
+        "value": "#0b6e4f",
+        "type": "color",
+        "description": "Основной зелёный цвет бренда"
+      },
+      "green-secondary": {
+        "value": "#2c5a07",
+        "type": "color",
+        "description": "Вторичный зелёный для градиентов"
+      },
+      "green-light": {
+        "value": "rgba(11, 110, 79, 0.2)",
+        "type": "color",
+        "description": "Светлый оттенок для фонов"
+      },
+      "green-accent": {
+        "value": "rgba(177, 211, 196, 0.3)",
+        "type": "color",
+        "description": "Акцентный оттенок для теней"
+      }
+    },
+    "text": {
+      "light": {
+        "primary": {
+          "value": "#070309",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "rgba(18, 21, 14, 0.71)",
+          "type": "color"
+        },
+        "muted": {
+          "value": "rgba(18, 21, 14, 0.5)",
+          "type": "color"
+        }
+      },
+      "dark": {
+        "primary": {
+          "value": "#ffffff",
+          "type": "color"
+        },
+        "secondary": {
+          "value": "rgba(255, 255, 255, 0.7)",
+          "type": "color"
+        },
+        "muted": {
+          "value": "rgba(255, 255, 255, 0.5)",
+          "type": "color"
+        }
+      }
+    },
+    "background": {
+      "light": {
+        "main": {
+          "value": "#ffffff",
+          "type": "color"
+        },
+        "card": {
+          "value": "rgba(255, 255, 255, 0.88)",
+          "type": "color"
+        }
+      },
+      "dark": {
+        "main": {
+          "value": "#252525",
+          "type": "color"
+        },
+        "card": {
+          "value": "rgba(20, 20, 20, 0.95)",
+          "type": "color"
+        }
+      }
+    },
+    "surface": {
+      "input-light": {
+        "value": "#f3f3f5",
+        "type": "color"
+      },
+      "input-dark": {
+        "value": "#1a1a1a",
+        "type": "color"
+      }
+    },
+    "border": {
+      "light": {
+        "value": "rgba(0, 0, 0, 0.1)",
+        "type": "color"
+      },
+      "dark": {
+        "value": "rgba(255, 255, 255, 0.15)",
+        "type": "color"
+      }
+    },
+    "semantic": {
+      "destructive": {
+        "value": "#d4183d",
+        "type": "color"
+      },
+      "success": {
+        "value": "#0b6e4f",
+        "type": "color"
+      },
+      "warning": {
+        "value": "#f59e0b",
+        "type": "color"
+      }
+    }
+  },
+  "typography": {
+    "fontFamily": {
+      "heading": {
+        "value": "Poppins",
+        "type": "fontFamily"
+      },
+      "body": {
+        "value": "Inter",
+        "type": "fontFamily"
+      }
+    },
+    "fontWeight": {
+      "regular": {
+        "value": "400",
+        "type": "fontWeight"
+      },
+      "medium": {
+        "value": "500",
+        "type": "fontWeight"
+      }
+    },
+    "fontSize": {
+      "h1-desktop": {
+        "value": "52px",
+        "type": "fontSize"
+      },
+      "h1-tablet": {
+        "value": "42px",
+        "type": "fontSize"
+      },
+      "h1-mobile": {
+        "value": "32px",
+        "type": "fontSize"
+      },
+      "h2": {
+        "value": "42px",
+        "type": "fontSize"
+      },
+      "h3": {
+        "value": "30px",
+        "type": "fontSize"
+      },
+      "h4": {
+        "value": "22px",
+        "type": "fontSize"
+      },
+      "body-large": {
+        "value": "18px",
+        "type": "fontSize"
+      },
+      "body": {
+        "value": "16px",
+        "type": "fontSize"
+      },
+      "body-small": {
+        "value": "14px",
+        "type": "fontSize"
+      },
+      "caption": {
+        "value": "12px",
+        "type": "fontSize"
+      },
+      "price": {
+        "value": "48px",
+        "type": "fontSize"
+      }
+    },
+    "letterSpacing": {
+      "h1": {
+        "value": "-0.52px",
+        "type": "letterSpacing"
+      },
+      "h2": {
+        "value": "-0.42px",
+        "type": "letterSpacing"
+      },
+      "h3": {
+        "value": "-0.36px",
+        "type": "letterSpacing"
+      },
+      "h4": {
+        "value": "-0.22px",
+        "type": "letterSpacing"
+      },
+      "price": {
+        "value": "-0.72px",
+        "type": "letterSpacing"
+      },
+      "default": {
+        "value": "0px",
+        "type": "letterSpacing"
+      }
+    },
+    "lineHeight": {
+      "tight": {
+        "value": "1.2",
+        "type": "lineHeight"
+      },
+      "normal": {
+        "value": "1.3",
+        "type": "lineHeight"
+      },
+      "relaxed": {
+        "value": "1.4",
+        "type": "lineHeight"
+      },
+      "loose": {
+        "value": "1.5",
+        "type": "lineHeight"
+      }
+    }
+  },
+  "spacing": {
+    "4": {
+      "value": "4px",
+      "type": "spacing",
+      "description": "Минимальный отступ"
+    },
+    "8": {
+      "value": "8px",
+      "type": "spacing"
+    },
+    "12": {
+      "value": "12px",
+      "type": "spacing"
+    },
+    "16": {
+      "value": "16px",
+      "type": "spacing"
+    },
+    "20": {
+      "value": "20px",
+      "type": "spacing"
+    },
+    "24": {
+      "value": "24px",
+      "type": "spacing"
+    },
+    "32": {
+      "value": "32px",
+      "type": "spacing"
+    },
+    "48": {
+      "value": "48px",
+      "type": "spacing"
+    },
+    "64": {
+      "value": "64px",
+      "type": "spacing"
+    },
+    "80": {
+      "value": "80px",
+      "type": "spacing"
+    },
+    "112": {
+      "value": "112px",
+      "type": "spacing"
+    }
+  },
+  "borderRadius": {
+    "card": {
+      "value": "24px",
+      "type": "borderRadius"
+    },
+    "button": {
+      "value": "48px",
+      "type": "borderRadius"
+    },
+    "input": {
+      "value": "48px",
+      "type": "borderRadius"
+    },
+    "badge": {
+      "value": "12px",
+      "type": "borderRadius"
+    },
+    "image": {
+      "value": "16px",
+      "type": "borderRadius"
+    },
+    "minimal": {
+      "value": "6px",
+      "type": "borderRadius"
+    }
+  },
+  "shadow": {
+    "card-light-default": {
+      "value": [
+        {
+          "x": "4",
+          "y": "4",
+          "blur": "2",
+          "spread": "0",
+          "color": "rgba(0, 0, 0, 0.05)"
+        },
+        {
+          "x": "16",
+          "y": "9",
+          "blur": "12",
+          "spread": "-1",
+          "color": "rgba(242, 242, 242, 0.86)"
+        },
+        {
+          "x": "10",
+          "y": "10",
+          "blur": "8",
+          "spread": "-2",
+          "color": "rgba(177, 211, 196, 0.3)"
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "card-light-hover": {
+      "value": [
+        {
+          "x": "6",
+          "y": "6",
+          "blur": "3",
+          "spread": "0",
+          "color": "rgba(0, 0, 0, 0.08)"
+        },
+        {
+          "x": "20",
+          "y": "12",
+          "blur": "16",
+          "spread": "-1",
+          "color": "rgba(242, 242, 242, 0.9)"
+        },
+        {
+          "x": "12",
+          "y": "12",
+          "blur": "10",
+          "spread": "-2",
+          "color": "rgba(177, 211, 196, 0.4)"
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "card-dark": {
+      "value": [
+        {
+          "x": "0",
+          "y": "20",
+          "blur": "40",
+          "spread": "0",
+          "color": "rgba(0, 0, 0, 0.4)"
+        },
+        {
+          "x": "0",
+          "y": "10",
+          "blur": "20",
+          "spread": "0",
+          "color": "rgba(0, 0, 0, 0.3)"
+        }
+      ],
+      "type": "boxShadow"
+    },
+    "button-default": {
+      "value": {
+        "x": "2",
+        "y": "2",
+        "blur": "4",
+        "spread": "0",
+        "color": "rgba(0, 0, 0, 0.1)"
+      },
+      "type": "boxShadow"
+    },
+    "button-hover": {
+      "value": {
+        "x": "4",
+        "y": "4",
+        "blur": "12",
+        "spread": "0",
+        "color": "rgba(11, 110, 79, 0.2)"
+      },
+      "type": "boxShadow"
+    }
+  },
+  "gradient": {
+    "button-primary": {
+      "value": "linear-gradient(107.879deg, #0b6e4f 3.7608%, #2c5a07 98.529%)",
+      "type": "gradient"
+    }
+  },
+  "breakpoint": {
+    "desktop": {
+      "value": "1440px",
+      "type": "dimension"
+    },
+    "laptop": {
+      "value": "1024px",
+      "type": "dimension"
+    },
+    "tablet": {
+      "value": "768px",
+      "type": "dimension"
+    },
+    "mobile": {
+      "value": "375px",
+      "type": "dimension"
+    }
+  }
+}

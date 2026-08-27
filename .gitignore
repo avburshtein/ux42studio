@@ -52,4 +52,7 @@ next-env.d.ts
 
 !.dev.vars.example
 
+# Figma Make export artifacts
+/UX42 Den (Copy).zip
+
 

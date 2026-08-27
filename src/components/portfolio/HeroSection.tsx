@@ -14,7 +14,10 @@ interface HeroSectionProps {
 
 /**
  * Hero Section — Main_page_Spec §4
- * 1200×767, vertical padding 120, Background + bokeh
+ * Высота: 100dvh − 96px (высота sticky-шапки) — хиро заполняет первый
+ * экран целиком (решение 2026-08-27 (4)); контент центрируется по
+ * вертикали, py остаются минимальными отступами на малых экранах.
+ * Background + bokeh, вертикальный паддинг 48/96/120.
  */
 export function HeroSection({
   headlinePart1, headlineAccent, headlinePart2,
@@ -22,17 +25,22 @@ export function HeroSection({
   secondaryCtaLabel, secondaryCtaHref,
 }: HeroSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-surface-container-lowest px-8 py-30 lg:px-16">
+    <section className="relative flex min-h-[calc(100dvh_-_96px)] items-center overflow-hidden bg-surface-container-lowest py-12 md:py-24 lg:py-30">
       <FloatingElements count={20} minBlur={0} maxBlur={20} />
 
-      <div className="relative z-10 flex flex-col gap-16">
+      <div className="section-container relative z-10 flex flex-col gap-16">
         <div className="flex flex-col gap-8">
-          <h1 className="flex flex-wrap font-display text-[68px] font-medium leading-[76px] tracking-[-0.25px] text-on-surface-variant">
-            <span>{headlinePart1}</span>
+          {/* Заголовок в строчном потоке (без flex): пробелы между частями не схлопываются,
+              переносы работают как у обычного текста. В Figma строки абсолютные (left:566) —
+              в код это не переносим. */}
+          <h1 className="font-display text-[68px] font-medium leading-[76px] tracking-[-0.25px] text-on-surface-variant">
+            {headlinePart1.trim()}
+            {' '}
             <span className="bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
-              {headlineAccent}
+              {headlineAccent.trim()}
             </span>
-            <span>{headlinePart2}</span>
+            {' '}
+            {headlinePart2.trim()}
           </h1>
 
           <p className="max-w-[734px] text-body-lg font-normal text-on-surface">

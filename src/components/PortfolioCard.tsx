@@ -25,11 +25,12 @@ export function PortfolioCard({
     <Link
       href={href}
       className={cn(
-        'group flex flex-col justify-end overflow-hidden rounded-[24px]',
+        'group flex w-full flex-col justify-end overflow-hidden rounded-[24px]',
         'bg-surface-container-low',
-        'w-[334px] h-[368px]',
+        // Резиновая ширина: в Figma инстансы растянуты до ячейки сетки (~341px),
+        // фиксированные 334px — только intrinsic-размер мастер-компонента.
+        'h-[368px]',
         'transition-shadow duration-200 ease-out',
-        'hover:scale-[1.02] transition-transform duration-300',
         // Default shadow — 3 слоя через переменные
         'shadow-[10px_10px_8px_-2px_var(--shadow-card-accent),16px_9px_12px_-1px_var(--shadow-card-glow),4px_4px_2px_0_var(--shadow-card-base)]',
         // Hover — больше offset + blur
@@ -39,7 +40,7 @@ export function PortfolioCard({
     >
       {/* Image Container */}
       <div className="relative shrink-0 w-full h-[256px] overflow-hidden">
-        <Image src={imageUrl} alt={title} fill sizes="334px" className="object-cover" />
+        <Image src={imageUrl} alt={title} fill sizes="(min-width: 640px) 341px, 100vw" className="object-cover" />
 
         {/* Gradient Overlay on hover */}
         <div className="absolute inset-0 flex flex-col justify-end p-6

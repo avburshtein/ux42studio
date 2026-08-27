@@ -365,12 +365,66 @@ body {
   background-color: var(--md-sys-color-background);
 }
 
-/* Header glass morphism (Spec: hero block gradient + Effects/Blur/Glass Heavy) */
+/* Header glass morphism — рецепт из вердикта ИИ-агента Figma Make
+   (решение 2026-08-27 (5) в Docs/ui/Main_page_Spec.md): диагональный
+   градиент #f7faf5 0.88 → 0.10 (−45°, тает к правому краю), лёгкий
+   blur(4px). История: спека literal — градиент 1.0→0.08 + blur 40px;
+   итерация (3)/(4) — равномерная плашка rgba 0.5→0.9 + blur 12px;
+   архив make-export (Navbar) — rgba(255,255,255,0.5) + blur 12px.
+   Тьма: у нас тема на data-атрибуте, поэтому [data-theme='dark'],
+   а не .dark как в вердикте. */
 .header-glass {
-  background: linear-gradient(315deg,
-      var(--md-sys-color-background) 0%,
-      color-mix(in srgb, var(--md-sys-color-background) 8%, transparent) 100%);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(
+    -45deg,
+    rgba(247, 250, 245, 0.88) 0%,
+    rgba(247, 250, 245, 0.1) 100%
+  );
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='dark'] .header-glass {
+  background: linear-gradient(
+    -45deg,
+    rgba(10, 10, 10, 0.88) 0%,
+    rgba(10, 10, 10, 0.1) 100%
+  );
+  box-shadow: 8px 8px 20px 0px rgba(0, 0, 0, 0.25);
+}
+
+/*
+ * Контейнер контента внутри полноширинных блоков (паттерн Figma: Section → container → Content Slot).
+ * Блок-секция тянется на всю ширину экрана и несёт фон + вертикальный паддинг,
+ * а контейнер ограничивает содержимое шириной 1200px по центру и держит
+ * собственные боковые паддинги для контента — по типам устройств:
+ *   mobile  (<768px): 16px  (Figma: Section Mobile pad 48/16)
+ *   tablet  (≥768px): 32px  (в Figma планшетный вариант отсутствует — назначено)
+ *   desktop (≥1024px): 64px (Figma: container pad 0/64 → контент 1072 в колонке 1200)
+ */
+.section-container {
+  width: 100%;
+  max-width: var(--max-width-container-content);
+  margin-inline: auto;
+  padding-inline: 16px;
+}
+
+@media (min-width: 768px) {
+  .section-container {
+    padding-inline: 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-container {
+    padding-inline: 64px;
+  }
+}
+
+/*
+ * Sticky-шапка: якорные переходы (#portfolio / #about / #contact) не должны
+ * прятать заголовки секций под ней. Отступ = высота шапки (96px) + 8px.
+ */
+[id] {
+  scroll-margin-top: 104px;
 }

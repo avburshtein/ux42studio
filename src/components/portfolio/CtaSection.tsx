@@ -17,10 +17,10 @@ export function CtaSection({
   emailHref, emailLabel, whatsappHref, whatsappLabel,
 }: CtaSectionProps) {
   return (
-    <section className="relative overflow-hidden bg-surface-container-lowest px-8 py-30 lg:px-16">
+    <section id='contact' className="relative overflow-hidden bg-surface-container-lowest py-12 md:py-24 lg:py-30">
       <FloatingElements count={20} minBlur={0} maxBlur={20} />
 
-      <div className="relative z-10 flex flex-col items-center gap-8 text-center">
+      <div className="section-container relative z-10 flex flex-col items-center gap-8 text-center">
         {label && (
           <span className="text-[11px] font-semibold uppercase tracking-[0.0455em] text-outline-variant">
             {label}

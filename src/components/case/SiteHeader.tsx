@@ -5,6 +5,8 @@ import { ThemeToggle } from './ThemeToggle';
 
 interface SiteHeaderProps {
     profileSlug: string;
+    /** Имя (логин) дизайнера — отображается в центре шапки вместо логотипа UX42 */
+    displayName?: string;
     /** CTA button label (default: "Hire me") */
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
@@ -12,38 +14,40 @@ interface SiteHeaderProps {
     className?: string;
 }
 
-// Header (Component set ID: 245:1632)
-// Width: 1200px FIXED (parent column), Height: HUG
-// Layout: HORIZONTAL, justify-between, align-center, gap: 0
-// Padding: 16px 64px (top/bottom 16, left/right 64)
-// Three zones: left (nav), center (logo), right (theme toggle + CTA)
-// Background + effects → class: header-glass
+// Header (Component set ID: 245:1632) × паттерн Navbar из Figma Make
+// Sticky top-0 z-40: шапка заморожена, контент скроллится под ней.
+// Стекло → class: header-glass (градиент #f7faf5 0.88→0.10 под −45°,
+// blur 4px — рецепт агента Make, см. Main_page_Spec 2026-08-27 (5)).
+// Высота: 96px (py-16 + контент h-64). Контент — внутри .section-container
+// (max-w 1200, pads 16/32/64) — выровнен по колонкам секций.
+// Зоны: nav | имя дизайнера | theme toggle + CTA
 export function SiteHeader({
     profileSlug,
+    displayName,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
     className,
 }: SiteHeaderProps) {
     return (
         <header
-            className={cn(
-                'header-glass flex w-full items-center justify-between gap-0 lg:px-16 py-4',
-                className,
-            )}
+            className={cn('header-glass sticky top-0 z-40 w-full py-4', className)}
         >
-            {/* Left zone: Nav Links — gap 24 */}
-            <nav className='flex items-center gap-6'>
-                <NavLink href={`/u/${profileSlug}`}>Work</NavLink>
-                <NavLink href={`/u/${profileSlug}/about`}>About</NavLink>
-            </nav>
+            {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
+            <div className='section-container flex w-full items-center justify-between gap-0'>
+                {/* Left zone: Nav Links — gap 24 */}
+                <nav className='flex items-center gap-6'>
+                    <NavLink href={`/u/${profileSlug}`}>Work</NavLink>
+                    <NavLink href={`/u/${profileSlug}#about`}>About</NavLink>
+                </nav>
 
-            {/* Center: Logo — 89×64 */}
-            <LogoLink href={`/u/${profileSlug}`} />
+                {/* Center: имя дизайнера — вместо логотипа UX42 (лого ушёл в футер) */}
+                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} />
 
-            {/* Right zone: Theme Toggle + CTA — gap 24 */}
-            <div className='flex items-center justify-end gap-6'>
-                <ThemeToggle />
-                <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                {/* Right zone: Theme Toggle + CTA — gap 24 */}
+                <div className='flex items-center justify-end gap-6'>
+                    <ThemeToggle />
+                    <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                </div>
             </div>
         </header>
     );
@@ -55,6 +59,8 @@ export function SiteHeader({
 
 interface SiteHeaderBreadcrumbProps {
     profileSlug: string;
+    /** Имя (логин) дизайнера — в центре шапки вместо логотипа UX42 */
+    displayName?: string;
     /** Current page title (shown as last breadcrumb item) */
     currentTitle: string;
     /** Label for the back button (default: "Back") */
@@ -68,6 +74,7 @@ interface SiteHeaderBreadcrumbProps {
 
 export function SiteHeaderBreadcrumb({
     profileSlug,
+    displayName,
     currentTitle,
     backLabel = 'Back',
     ctaLabel = 'Hire me',
@@ -76,46 +83,46 @@ export function SiteHeaderBreadcrumb({
 }: SiteHeaderBreadcrumbProps) {
     return (
         <header
-            className={cn(
-                'header-glass flex w-full items-center justify-between gap-0 lg:px-16 py-4',
-                className,
-            )}
+            className={cn('header-glass sticky top-0 z-40 w-full py-4', className)}
         >
-            {/* Left zone: Back + Breadcrumb — gap 24 */}
-            <div className='flex min-w-0 items-center gap-6'>
-                {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8, radius 8 */}
-                <Link
-                    href={`/u/${profileSlug}`}
-                    className='inline-flex h-12 shrink-0 items-center gap-2 rounded-sm px-4 py-3 text-button font-medium text-on-surface-variant transition-colors hover:bg-surface-variant'
-                >
-                    <ArrowLeft size={24} aria-hidden='true' />
-                    {backLabel}
-                </Link>
+            {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
+            <div className='section-container flex w-full items-center justify-between gap-0'>
+                {/* Left zone: Back + Breadcrumb — gap 24 */}
+                <div className='flex min-w-0 items-center gap-6'>
+                    {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8, radius 8 */}
+                    <Link
+                        href={`/u/${profileSlug}`}
+                        className='inline-flex h-12 shrink-0 items-center gap-2 rounded-sm px-4 py-3 text-button font-medium text-on-surface-variant transition-colors hover:bg-surface-variant'
+                    >
+                        <ArrowLeft size={24} aria-hidden='true' />
+                        {backLabel}
+                    </Link>
 
-                {/* Breadcrumb Navigation — gap 8 */}
-                <nav
-                    className='flex min-w-0 items-center gap-2'
-                    aria-label='Breadcrumb'
-                >
-                    <BreadcrumbLink href={`/u/${profileSlug}`}>
-                        Portfolio
-                    </BreadcrumbLink>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbLink href={`/u/${profileSlug}`}>
-                        Cases
-                    </BreadcrumbLink>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbCurrent>{currentTitle}</BreadcrumbCurrent>
-                </nav>
-            </div>
+                    {/* Breadcrumb Navigation — gap 8 */}
+                    <nav
+                        className='flex min-w-0 items-center gap-2'
+                        aria-label='Breadcrumb'
+                    >
+                        <BreadcrumbLink href={`/u/${profileSlug}`}>
+                            Portfolio
+                        </BreadcrumbLink>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbLink href={`/u/${profileSlug}`}>
+                            Cases
+                        </BreadcrumbLink>
+                        <BreadcrumbSeparator />
+                        <BreadcrumbCurrent>{currentTitle}</BreadcrumbCurrent>
+                    </nav>
+                </div>
 
-            {/* Center: Logo — 89×64 */}
-            <LogoLink href={`/u/${profileSlug}`} />
+                {/* Center: имя дизайнера — вместо логотипа UX42 (лого ушёл в футер) */}
+                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} />
 
-            {/* Right zone: Theme Toggle + CTA — gap 24 */}
-            <div className='flex shrink-0 items-center justify-end gap-6'>
-                <ThemeToggle />
-                <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                {/* Right zone: Theme Toggle + CTA — gap 24 */}
+                <div className='flex shrink-0 items-center justify-end gap-6'>
+                    <ThemeToggle />
+                    <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                </div>
             </div>
         </header>
     );
@@ -124,6 +131,24 @@ export function SiteHeaderBreadcrumb({
 // ---------------------------------------------------------------------------
 // Shared primitives
 // ---------------------------------------------------------------------------
+
+/**
+ * Центр шапки: имя (логин) дизайнера вместо логотипа.
+ * Логотип UX42.studio перенесён в футер (SiteFooter).
+ * Без label (legacy) показываем старый логотип.
+ */
+function WordmarkLink({ href, label }: { href: string; label?: string }) {
+    if (!label) return <LogoLink href={href} />;
+    return (
+        <Link
+            href={href}
+            className='inline-flex h-16 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary'
+            aria-label={label}
+        >
+            {label}
+        </Link>
+    );
+}
 
 function LogoLink({ href }: { href: string }) {
     return (
