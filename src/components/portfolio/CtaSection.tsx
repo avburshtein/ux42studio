@@ -42,7 +42,7 @@ export function CtaSection({
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href={emailHref}
-            className="inline-flex h-14 items-center gap-2 rounded-full bg-primary px-8 text-button font-medium text-on-primary hover:opacity-90 transition-opacity"
+            className="inline-flex h-14 items-center gap-2 rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]"
           >
             <Mail size={24} />
             {emailLabel}
@@ -53,7 +53,7 @@ export function CtaSection({
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-12 items-center rounded-base px-4 text-button font-medium text-surface-tint hover:bg-surface-variant transition-colors"
+              className="inline-flex h-14 items-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity,background-color] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90"
             >
               {whatsappLabel}
             </Link>

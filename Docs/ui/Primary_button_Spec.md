@@ -1,3 +1,11 @@
+> ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — реализация осознанно отклоняется от этого
+> Figma-master (решения 2026-08-27 (9)–(11) в Main_page_Spec.md, раздел
+> «Кнопочная система»). Действующие состояния solid-семейства:
+> bg-primary + тень 2/2/4/10% → hover: opacity-90 + тень 4/4/12/20%
+> (transition box-shadow+opacity 150ms); active-состояний нет.
+> Ниже — исходная спека по Figma (историческая справка).
+
+
 # Master Component Spec: Button / Primary
 # Date: 2026-08-19
 # Component set ID: 32:39

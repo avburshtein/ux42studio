@@ -65,7 +65,7 @@ export function SiteFooter({
                                 href={link.url}
                                 target='_blank'
                                 rel='noopener noreferrer'
-                                className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors hover:bg-surface-variant hover:text-on-surface'
+                                className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-opacity hover:opacity-70'
                                 title={link.title}
                             >
                                 <span className='text-label-md font-medium'>
@@ -80,28 +80,28 @@ export function SiteFooter({
                 <div className='flex items-center gap-4'>
                     <Link
                         href='/privacy'
-                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-colors hover:text-on-surface'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
                     >
                         Privacy Policy
                     </Link>
                     <Link
                         href='/terms'
-                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-colors hover:text-on-surface'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
                     >
                         Terms
                     </Link>
                     <Link
                         href='/cookies'
-                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-colors hover:text-on-surface'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
                     >
                         Cookies
                     </Link>
                 </div>
 
-                {/* Back to Gallery */}
+                {/* Back to Gallery — outline-семейство: hover как у secondary */}
                 <Link
                     href={`/u/${profileSlug}`}
-                    className='inline-flex h-12 items-center gap-2 rounded-base border border-outline-variant px-6 text-label-lg font-medium text-primary transition-colors hover:bg-surface-variant'
+                    className='inline-flex h-12 items-center gap-2 rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
                 >
                     Back to Gallery
                 </Link>

@@ -1,3 +1,12 @@
+> ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — шапка переписана: sticky top-0 z-40, стекло
+> .header-glass (rgba(247,250,245,.7) / dark rgba(10,10,10,.7)) + blur 12px /
+> saturate 1.8 (utility-классами backdrop-blur-md backdrop-saturate-[1.8]),
+> контент в .section-container (max-w 1200, px 16/32/64), в центре — имя
+> дизайнера (displayName), логотип UX42 перенесён в футер; Hire me — pill
+> h-14 с border-on-hover. Актуальное описание: Main_page_Spec.md §2 «Header».
+> Ниже — исходная спека по Figma (историческая справка).
+
+
 Вот подробная спецификация компонента Header:
 
 Master Component Spec: Header

@@ -215,7 +215,6 @@ export default async function ProfilePage({ params }: PageProps) {
                                             : '/placeholder-project.svg'
                                     }
                                     href={`/u/${slug}/${project.slug}`}
-                                    overlayTitle={project.title}
                                     overlayTags={catTags}
                                 />
                             );

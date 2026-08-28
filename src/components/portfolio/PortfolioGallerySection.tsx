@@ -40,8 +40,8 @@ export function PortfolioGallerySection({
                 role="radio"
                 aria-checked={i === 0}
                 className={i === 0
-                  ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-all duration-150 ease-out cursor-pointer hover:shadow-[4px_4px_12px_0_rgba(11,110,79,0.20)] hover:-translate-y-px active:shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                  : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-all duration-150 ease-out cursor-pointer hover:bg-on-primary-container/8 hover:text-on-surface-variant hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:-translate-y-px active:bg-on-primary-container/8 active:text-on-surface-variant active:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                  ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out cursor-pointer hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                  : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-colors duration-150 ease-out cursor-pointer hover:bg-[rgba(11,110,79,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
                 }
               >
                 {f}

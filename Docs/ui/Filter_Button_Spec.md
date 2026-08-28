@@ -1,3 +1,10 @@
+> ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — чипы фильтров в реализации (Main_page_Spec.md,
+> «Кнопочная система», решения (9)–(10)): selected = bg-surface-tint + тень,
+> hover opacity-90 + рост тени; unselected = bg-surface/8, hover заливка
+> rgba(11,110,79,0.1) (transition-colors). Форма pill px-24 py-12.
+> Ниже — исходная спека по Figma (историческая справка).
+
+
 # Master Component Spec: Filter Button
 # Date: 2026-08-22
 # Component set ID: 36:18

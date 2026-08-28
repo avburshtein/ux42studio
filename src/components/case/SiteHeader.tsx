@@ -173,11 +173,17 @@ function CtaButton({
     href: string;
     children: React.ReactNode;
 }) {
-    // Button / Ghost Large: 123×48, pad 12×16, radius 8, Surface Tint
+    // Nav CTA "Hire me" — пилюля семейства secondary (решение 2026-08-27 (10)
+    // в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон):
+    // дефолт — только текст (прозрачный фон и бордер); в hover/focus
+    // появляется тонкий бордер primary-container — как у secondary,
+    // + его ховер-фидбек opacity-90. border-transparent держит место —
+    // layout не сдвигается при появлении рамки. Размер как у secondary:
+    // h-14 px-8 (в Make: px-[32px] py-[16px] rounded-[48px]).
     return (
         <Link
             href={href}
-            className='inline-flex h-12  items-center justify-center rounded-sm px-4 py-3 text-button font-medium text-[var(--md-sys-color-surface-tint)] transition-colors hover:bg-surface-variant'
+            className='inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90'
         >
             {children}
         </Link>

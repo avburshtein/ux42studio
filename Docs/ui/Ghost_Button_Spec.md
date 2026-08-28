@@ -1,3 +1,9 @@
+> ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — ghost-семейство в реализации: hover opacity-70
+> (90 на прозрачных фонах не виден); nav-ссылки и ThemeToggle — color-only
+> hover (см. Main_page_Spec.md «Кнопочная система», решения (9)–(11)).
+> Ниже — исходная спека по Figma (историческая справка).
+
+
 # Master Component Spec: Button / Ghost
 # Date: 2026-08-19
 # Component set ID: 34:24

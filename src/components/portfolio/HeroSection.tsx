@@ -51,7 +51,7 @@ export function HeroSection({
         <div className="flex gap-4">
           <Link
             href={primaryCtaHref}
-            className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-button font-medium text-on-primary hover:opacity-90 transition-opacity"
+            className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]"
           >
             {primaryCtaLabel}
           </Link>
@@ -59,7 +59,7 @@ export function HeroSection({
           {secondaryCtaLabel && secondaryCtaHref && (
             <Link
               href={secondaryCtaHref}
-              className="inline-flex h-14 items-center justify-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90 active:shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] active:opacity-85 focus-visible:shadow-[0_0_0_3px_var(--md-sys-color-primary-container),2px_2px_4px_0_rgba(0,0,0,0.10)] focus-visible:opacity-100 focus-visible:outline-none"
+              className="inline-flex h-14 items-center justify-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity,background-color] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90"
             >
               {secondaryCtaLabel}
             </Link>
