@@ -13,11 +13,16 @@ interface HeroSectionProps {
 }
 
 /**
- * Hero Section — Main_page_Spec §4
- * Высота: 100dvh − 64px (mobile, шапка 64px) / − 96px (≥768) — хиро заполняет
- * первый экран целиком (решение 2026-08-27 (4)); контент центрируется по
- * вертикали, py остаются минимальными отступами на малых экранах.
- * Background + bokeh, вертикальный паддинг 48/96/120.
+ * Hero Section — Main_page_Spec §3
+ * Высота: 100dvh — хиро вытянут до самого верха страницы (решение (17)):
+ * −mt-16/−mt-24 = высота sticky-шапки (64/96px, §2), белый фон и
+ * FloatingElements заходят под её стекло. Контент на прежнем месте:
+ * верхний паддинг увеличен ровно на высоту шапки
+ * (64+48=112 → pt-28; 96+96=192 → md:pt-48; 96+120=216 → lg:pt-[216px]) —
+ * контент-бокс и вертикальный центр не сдвинулись, нижний край хиро
+ * по-прежнему на 100dvh (пропорции первого экрана сохранены).
+ * dvh — корректно на мобильных с динамическим адресным баром.
+ * Background + bokeh, нижний паддинг 48/96/120.
  */
 export function HeroSection({
   headlinePart1, headlineAccent, headlinePart2,
@@ -25,7 +30,7 @@ export function HeroSection({
   secondaryCtaLabel, secondaryCtaHref,
 }: HeroSectionProps) {
   return (
-    <section className="relative flex min-h-[calc(100dvh_-_64px)] items-center overflow-hidden bg-surface-container-lowest py-12 md:min-h-[calc(100dvh_-_96px)] md:py-24 lg:py-30">
+    <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-24 md:pb-24 md:pt-48 lg:pb-30 lg:pt-[216px]">
       <FloatingElements count={20} minBlur={0} maxBlur={20} />
 
       <div className="section-container relative z-10 flex flex-col gap-16">
