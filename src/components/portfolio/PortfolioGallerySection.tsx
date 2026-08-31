@@ -43,7 +43,7 @@ export function PortfolioGallerySection({
           <>
             {/* Mobile (<md): одна кнопка-фильтр со значком — раскрывает список чипов.
                 <details> — серверный disclosure без JS (решение 2026-08-29 (13)). */}
-            <details className="group lg:hidden">
+            <details className="group md:hidden">
               <summary className="flex h-14 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] [&::-webkit-details-marker]:hidden">
                 <Filter size={20} aria-hidden="true" />
                 Filters
@@ -85,9 +85,11 @@ export function PortfolioGallerySection({
           </>
         )}
 
-        {/* Mobile (<sm): карусель — flex-стрип со scroll-snap (карточка 85%,
-            пикинг соседних, bleed за края контейнера); ≥sm — сетка 2/3 (решение (13)) */}
-        <div className="-mx-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[85%] [&>*]:snap-center sm:mx-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:px-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
+        {/* Mobile (<sm): карусель — flex-стрип со scroll-snap. Слева карточка
+            выровнена по контейнеру (паддинг 16), справа bleed за край — виден
+            край следующего кейса (peek 32px); карточка = 100% − 32px;
+            ≥sm — сетка 2/3 (решение (13), уточнение (15)) */}
+        <div className="-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-2 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-32px)] [&>*]:snap-start sm:mr-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
           {children}
         </div>
 

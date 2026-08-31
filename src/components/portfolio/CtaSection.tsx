@@ -32,10 +32,10 @@ export function CtaSection({
           ))}
         </div>
 
-        <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
           <Link
             href={emailHref}
-            className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]"
+            className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-primary px-8 text-button font-medium whitespace-nowrap text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]"
           >
             <Mail size={24} />
             {emailLabel}
@@ -46,7 +46,7 @@ export function CtaSection({
               href={whatsappHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-14 items-center justify-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity,background-color] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90"
+              className="inline-flex h-14 items-center justify-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium whitespace-nowrap text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity,background-color] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90"
             >
               {whatsappLabel}
             </Link>

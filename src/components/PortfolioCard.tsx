@@ -40,7 +40,7 @@ export function PortfolioCard({
           src={imageUrl}
           alt={title}
           fill
-          sizes="(min-width: 640px) 341px, 85vw"
+          sizes="(min-width: 640px) 341px, calc(100vw - 48px)"
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
 

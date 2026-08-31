@@ -50,7 +50,8 @@ focus-visible: outline-2 outline-offset-2 outline-primary.
 ## 2. IMAGE CONTAINER
 
 relative, w-full, h-[256px], overflow-hidden.
-Image: fill, object-cover, sizes="(min-width: 640px) 341px, 100vw".
+Image: fill, object-cover, sizes="(min-width: 640px) 341px, calc(100vw - 48px)"
+       (мобильная карусель: карточка 100%−32px + боковые поля контейнера 16px).
 Zoom: group-hover:scale-110, duration-700 ease-out (зум идёт ПОД градиентом).
 
 ---

@@ -99,7 +99,8 @@ Mobile:
   H1 — text-[40px]/[48px] → lg: 68/76 (Poppins Medium, tracking −0.25
   наследуется; 40px вместо 37.5 display-sm — читаемость на 375px);
   subtitle — text-body-lg без уменьшения (body, не заголовок);
-  кнопки — flex-col gap-4, каждая w-full h-14 → sm: flex-row (w-auto);
+  кнопки — flex-col items-center gap-4 → sm: flex-row; hug на всех ширинах
+  (авто-ширина по контенту, решение (14) — w-full не используется);
   min-h: calc(100dvh − 64px) → md: − 96px (высота мобильной шапки 64px, §2).
 
 ---
@@ -130,17 +131,19 @@ Work / About / Skills / Reach (перед первой — обёртка pt-6).
   Grid: grid-cols 1 / 2 (sm) / 3 (lg), gap-24. Ячейка ≈341px = (1072−48)/3.
   Карточка: PortfolioCard — см. Portfolio_Card_Spec.md (переписан 2026-08-28).
 
-Mobile (решение (13)):
-  Карусель <sm: strip с bleed — -mx-4/px-4 (карточки выходят за поля
-  контейнера, пикинг соседних), snap-x snap-mandatory, gap-4, карточки
-  [&>*]:basis-[85%] snap-center shrink-0, скроллбар скрыт; без стрелок/точек.
+Mobile (решения (13), (14)):
+  Карусель <sm: strip с односторонним bleed — слева карточки выровнены по
+  полю контейнера, справа открытый край (-mr-4 + pr-4): карточка шире —
+  w-[calc(100%-32px)] (327px @ 375) и виден краешек следующей (~16px).
+  snap-x snap-mandatory, snap-center, gap-4, shrink-0, скроллбар скрыт;
+  без стрелок/точек.
   ≥sm — grid-cols-2 (gap-4), ≥lg — grid-cols-3 (gap-6).
-  Фильтры <lg: нативный <details> (серверный disclosure, без JS):
+  Фильтры <md: нативный <details> (серверный disclosure, без JS):
     summary — pill h-14 (secondary-стиль): Filter 20 + «Filters» +
     ChevronDown 16 (group-open:rotate-180), hover — зелёная заливка 5%;
     панель — mt-4 rounded-3xl p-6 border outline/40, чипы §10
-    (w-full justify-start, aria radio-модель сохранена);
-  ≥lg — прежний ряд чипов (§10).
+    (justify-start, aria radio-модель сохранена);
+  ≥md — прежний ряд чипов (§10) — планшетам (640–1023) disclosure не показывается.
 
 ---
 
@@ -323,4 +326,15 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        планшетам (640–1024) вернули ряд чипов. Из CTA удалён внутренний
        лейбл «Reach» (проп label + рендер); разделитель NavLabel «Reach»
        над секцией сохранён.
+  (15) 2026-08-29 — Второй виток по фидбэку (скриншот десктопа):
+       Причина распирания «Get in touch» на десктопе — w-full у secondary,
+       оставшийся после (14); снят, primary больше не сжимается флексом
+       (2-строчный перенос текста исчез). Страховка: whitespace-nowrap на
+       всех пилюлях (hero primary/secondary, CTA email/whatsapp). CTA-контейнер
+       получил items-center (кнопки не тянутся в колонке). Back to Gallery —
+       self-start + nowrap (футерная колонка растягивала кнопку и переносила
+       текст на мобильных). Карусель v2: односторонний bleed (слева по
+       контейнеру, справа -mr-4 + pr-4), карточка w-[calc(100%-32px)]
+       (327px @ 375, peek соседа ~16px), snap-center; Image sizes =
+       «(min-width: 640px) 341px, calc(100vw - 48px)» — точно по геометрии.
 

@@ -101,7 +101,7 @@ export function SiteFooter({
                 {/* Back to Gallery — outline-семейство: hover как у secondary */}
                 <Link
                     href={`/u/${profileSlug}`}
-                    className='inline-flex h-12 items-center gap-2 rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
+                    className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
                 >
                     Back to Gallery
                 </Link>
