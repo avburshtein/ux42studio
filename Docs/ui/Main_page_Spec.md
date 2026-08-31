@@ -37,9 +37,21 @@ Make-эталон (хедер/карточки/кнопки): Docs/make-export/ 
 Реализация: SiteHeader.tsx (варианты default и breadcrumb — один паттерн).
 
   Position:   sticky top-0 z-40 (контент скроллится под шапкой)
-  Высота:     96px (py-16 + строка контента h-64)
+  Высота:     96px (py-16 + строка контента h-64) / 64px mobile (<768: py-2 + h-12)
   Контент:    .section-container — выровнен по колонкам секций
   Зоны:       nav Work/About (gap 24) | имя дизайнера (центр) | ThemeToggle + CTA (gap 24)
+
+Mobile (<768) — решение (13):
+  nav и CTA скрыты; имя дизайнера (h-12) слева; справа ThemeToggle + бургер
+  (круг 48, Menu/X 24, hover color-only как ThemeToggle). Бургер открывает
+  панель fixed inset-x-0 top-16: Work / About / Hire me (primary, w-full,
+  тач-цели 48px) + backdrop fixed top-16 h-[calc(100dvh-64px)] bg-black/40.
+  top-16 — потому что backdrop-filter шапки создаёт containing block для
+  fixed-потомков (filter-effects-2); шапка sticky прижата к top:0, поэтому
+  top-16 корректен при любой трактовке CB. Панель и backdrop — внутри <header>
+  (z-10/z-0), рендерятся только в открытом состоянии.
+  Breadcrumb-вариант <768: бэк-кнопка + название кейса вместо wordmark
+  (wordmark и CTA скрыты), ThemeToggle остаётся.
 
 Стекло:
   фон/тень → класс .header-glass (globals.css):
@@ -83,6 +95,13 @@ FloatingElements (20 шт, blur 0–20).
   Subtitle: Inter Regular 18/28 (text-body-lg), max-w 734px, on-surface.
   Кнопки (gap-16): primary solid + secondary outline — состояния в §10.
 
+Mobile:
+  H1 — text-[40px]/[48px] → lg: 68/76 (Poppins Medium, tracking −0.25
+  наследуется; 40px вместо 37.5 display-sm — читаемость на 375px);
+  subtitle — text-body-lg без уменьшения (body, не заголовок);
+  кнопки — flex-col gap-4, каждая w-full h-14 → sm: flex-row (w-auto);
+  min-h: calc(100dvh − 64px) → md: − 96px (высота мобильной шапки 64px, §2).
+
 ---
 
 ## 4. Разделители секций (NavLabel)
@@ -110,6 +129,18 @@ Work / About / Skills / Reach (перед первой — обёртка pt-6).
   состояния в §10.
   Grid: grid-cols 1 / 2 (sm) / 3 (lg), gap-24. Ячейка ≈341px = (1072−48)/3.
   Карточка: PortfolioCard — см. Portfolio_Card_Spec.md (переписан 2026-08-28).
+
+Mobile (решение (13)):
+  Карусель <sm: strip с bleed — -mx-4/px-4 (карточки выходят за поля
+  контейнера, пикинг соседних), snap-x snap-mandatory, gap-4, карточки
+  [&>*]:basis-[85%] snap-center shrink-0, скроллбар скрыт; без стрелок/точек.
+  ≥sm — grid-cols-2 (gap-4), ≥lg — grid-cols-3 (gap-6).
+  Фильтры <lg: нативный <details> (серверный disclosure, без JS):
+    summary — pill h-14 (secondary-стиль): Filter 20 + «Filters» +
+    ChevronDown 16 (group-open:rotate-180), hover — зелёная заливка 5%;
+    панель — mt-4 rounded-3xl p-6 border outline/40, чипы §10
+    (w-full justify-start, aria radio-модель сохранена);
+  ≥lg — прежний ряд чипов (§10).
 
 ---
 
@@ -150,12 +181,12 @@ Backlog: декоративные блобы вместо плоского place
 FloatingElements (20).
 Контент: центр, flex-col gap-32.
 
-  Label «Reach»: 11px Inter SemiBold uppercase tracking 0.0455em,
-  text-outline-variant.
   H2: display-sm, on-surface.
   Body: строки text-body-md on-surface, gap-4.
   Кнопки (gap-16, wrap): Email — primary solid с иконкой Mail 24;
   WhatsApp — outline pill h-14 (secondary-семейство), target=_blank.
+  Все кнопки hug (авто-ширина по контенту) на всех брейкпоинтах —
+  решение (14).
 
 ---
 
@@ -268,3 +299,28 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        (#f7faf5/#101412). Тёплый розоватый оттенок при скролле дают также
        лавандово-лаймовые блобы Hero (#a29ffe/#c084fc/#ccff00) под стеклом —
        отдельное решение, не входящее в (12).
+  (13) 2026-08-29 — Адаптив главной (mobile-first):
+       Hero: H1 40/48 → lg:68/76 (40px — deliberate-отклонение от display-sm
+       37.5 ради читаемости на 375px); кнопки стопкой до sm;
+       min-h −64px (мобильная шапка) → md:−96px.
+       Gallery: <sm карусель (snap-x, bleed −mx-4, basis-85%, snap-center,
+       скроллбар скрыт) → sm:grid-2 → lg:grid-3; фильтры <md — нативный
+       <details>-disclosure (pill + панель чипов, без JS) → md: ряд чипов
+       (уточнено в (14)).
+       About/CTA: H2 32/40 → lg:display-sm; кнопки CTA стопкой до sm.
+       Header: 96 → 64 (<768: py-2, wordmark h-12); nav+CTA скрыты, бургер
+       (круг 48, Menu/X) → панель fixed top-16 + backdrop (учёт containing
+       block от backdrop-filter — см. §2); case-вариант: бэк-кнопка +
+       название кейса вместо wordmark. ThemeToggle/Hire me не изменены.
+       Брейкпоинты по смыслу блоков: sm 640 (кнопки/карусель), md 768
+       (шапка, фильтры), lg 1024 (заголовки, колонки) — между опорными
+       375/1440.
+  (14) 2026-08-29 — Финализация адаптива по фидбэку:
+       Кнопки — hug (авто-ширина по контенту) на всех брейкпоинтах: убраны
+       w-full и sm:w-auto (hero primary/secondary, CTA email/whatsapp, Hire me
+       в мобильном меню); вертикальная стопка на узких сохранена
+       (flex-col → sm:flex-row). Фильтр-disclosure перенесён с <lg на <md —
+       планшетам (640–1024) вернули ряд чипов. Из CTA удалён внутренний
+       лейбл «Reach» (проп label + рендер); разделитель NavLabel «Reach»
+       над секцией сохранён.
+

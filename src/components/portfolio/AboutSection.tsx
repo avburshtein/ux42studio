@@ -13,7 +13,7 @@ export function AboutSection({ title, paragraphs }: AboutSectionProps) {
           <div className="w-full shrink-0 rounded-3xl bg-surface-container-low p-7 lg:w-[516px]" />
 
           <div className="flex w-full flex-col gap-8 lg:w-[516px]">
-            <h2 className="font-display text-display-sm font-medium leading-tight text-on-surface">
+            <h2 className="font-display text-[32px] font-medium leading-[40px] text-on-surface lg:text-display-sm lg:leading-tight">
               {title}
             </h2>
             <div className="flex flex-col gap-4">

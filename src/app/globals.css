@@ -467,5 +467,11 @@ body {
  * прятать заголовки секций под ней. Отступ = высота шапки (96px) + 8px.
  */
 [id] {
-  scroll-margin-top: 104px;
+  scroll-margin-top: 104px; /* desktop: шапка 96px + 8px */
+}
+
+@media (max-width: 767px) {
+  [id] {
+    scroll-margin-top: 72px; /* mobile: шапка 64px + 8px */
+  }
 }
