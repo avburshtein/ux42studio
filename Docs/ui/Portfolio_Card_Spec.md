@@ -51,7 +51,9 @@ focus-visible: outline-2 outline-offset-2 outline-primary.
 
 relative, w-full, h-[256px], overflow-hidden.
 Image: fill, object-cover, sizes="(min-width: 640px) 341px, calc(100vw - 48px)"
-       (мобильная карусель: карточка 100%−32px + боковые поля контейнера 16px).
+       (мобильная карусель <sm: карточка = calc(100vw − 48px) = 100%−16px
+       контента скроллера с bleed; сосед виден на 16px вплотную к краю
+       экрана — решение (16) в Main_page_Spec.md).
 Zoom: group-hover:scale-110, duration-700 ease-out (зум идёт ПОД градиентом).
 
 ---
