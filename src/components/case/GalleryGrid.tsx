@@ -61,7 +61,14 @@ export function GalleryGrid({
 
     if (showcase) {
         return (
-            <div className={cn('flex flex-col gap-6', className)}>
+            // Карусель <sm (слайд = одна showcase-картинка 4/3), ≥sm —
+            // вертикальный стек full-width 1072/420 по спеке
+            <div
+                className={cn(
+                    '-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mr-0 sm:flex-col sm:gap-6 sm:overflow-x-visible sm:pb-0 sm:pr-0 sm:snap-none sm:[&>*]:basis-auto',
+                    className,
+                )}
+            >
                 {assets.map((asset) => (
                     <figure
                         key={asset.id}
@@ -95,10 +102,19 @@ export function GalleryGrid({
             ? 'sm:grid-cols-2 lg:grid-cols-3'
             : columns === 2
               ? 'sm:grid-cols-2'
-              : 'grid-cols-1';
+              : '';
 
+    // Карусель <sm (паттерн главной, решения (15)/(16) Main_page_Spec):
+    // слайд = 100% контент-бокса скроллера − 16px, bleed справа (-mr-4/pr-4),
+    // peek соседа 16px вплотную к краю; ≥sm — сетка по columns.
     return (
-        <div className={cn('grid grid-cols-1 gap-6', colsClass, className)}>
+        <div
+            className={cn(
+                '-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mr-0 sm:grid sm:snap-none sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto',
+                colsClass,
+                className,
+            )}
+        >
             {assets.map((asset) => (
                 <figure
                     key={asset.id}

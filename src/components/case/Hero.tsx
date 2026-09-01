@@ -73,11 +73,14 @@ export function Hero({
                             ))}
                         </div>
                     )}
-                    <h1 className='font-display text-display-sm text-white'>
+                    {/* Пропорциональное уменьшение на мобильных (паттерн главной
+                        40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
+                        заголовок не помещается и оверлей срезается под шапкой. */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
                         {title}
                     </h1>
                     {teaser && (
-                        <p className='max-w-3xl text-body-lg text-white/80'>
+                        <p className='max-w-3xl text-body-md text-white/80 sm:text-body-lg'>
                             {teaser}
                         </p>
                     )}
@@ -88,7 +91,9 @@ export function Hero({
                 Адаптив: на <sm складывается в колонку (Mobile Frame §11
                 «Metadata Grid stacks vertically»), sm 2×2, lg+ — ряд 4×1.
                 section-container: выравнивание 16/32/64 как у шапки/футера. */}
-            <div className='section-container grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
+            {/* 2×2 на мобильных (фидбэк: стопка — слишком много места),
+                sm 2×2 с шагом 24, lg+ ряд 4×1 */}
+            <div className='section-container grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
                 <MetadataCard label='Client' value={client ?? '—'} />
                 <MetadataCard label='Timeline' value={timeline ?? '—'} />
                 <MetadataCard label='My role' value={role ?? '—'} />

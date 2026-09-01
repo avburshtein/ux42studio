@@ -367,7 +367,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                     title='What users taught me.'
                                     description={project.testingProcess}
                                 >
-                                    <div className='flex flex-col gap-8'>
+                                    {/* Карусель <sm: слайд = один Before/After
+                                        блок; ≥sm — вертикальный стек по спеке */}
+                                    <div className='-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mr-0 sm:flex-col sm:gap-8 sm:overflow-x-visible sm:pb-0 sm:pr-0 sm:snap-none sm:[&>*]:basis-auto'>
                                         {comparisons.map((comp) => (
                                             <BeforeAfterComparison
                                                 key={comp.id}
