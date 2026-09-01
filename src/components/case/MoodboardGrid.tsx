@@ -61,30 +61,22 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
     }
 
     // Пресет рассчитан на 8-колоночный грид.
-    // ≥lg — инлайн-композиция на странице (десктоп без изменений); span'ы
-    // с префиксом lg: собираются конкатенацией в рантайме — классы
-    // lg:col-span-{2,3,4,5,8} / lg:row-span-{1,2} сгенерированы в
-    // globals.css через @source inline (сканер Tailwind их не видит).
-    // <lg — кнопка «View moodboard» + полноэкранный оверлей: та же
-    // композиция целиком, пропорционально уменьшенная (фидбэк: мудборд —
-    // единый массив настроения, который нужно видеть целиком).
-    const presetClasses = (cls: string) =>
-        cls
-            .split(/\s+/)
-            .filter(Boolean)
-            .map((c) => `lg:${c}`)
-            .join(' ');
-
+    // ≥lg — инлайн-композиция из литеральных lg:-классов конфига
+    // (layoutClassesLg): сканер Tailwind видит только текст файлов —
+    // рантайм-конкатенация и @source inline в реальной сборке не
+    // сработали (решение (15)). <lg — кнопка «View moodboard» +
+    // полноэкранный оверлей: та же композиция целиком, уменьшенная
+    // пропорционально экрану (базовые литеральные layoutClasses).
     return (
         <>
             {/* ≥lg: инлайн как на десктопе */}
             <div className='hidden auto-rows-[200px] grid-cols-8 gap-4 lg:grid'>
-                {preset.layoutClasses.map((className, index) => {
+                {preset.layoutClassesLg.map((className, index) => {
                     const asset = assets[index];
                     return (
                         <div
                             key={asset?.id ?? index}
-                            className={`${presetClasses(className)} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
+                            className={`${className} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
                         >
                             {asset?.url ? (
                                 <img

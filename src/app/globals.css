@@ -1,11 +1,5 @@
 @import "tailwindcss";
 
-/* Safelist для рантайм-классов MoodboardGrid (страница кейса): пресетные
- * span'ы из grid-presets.config.ts на lg+ получают префикс конкатенацией
- * в рантайме — сканер Tailwind такие классы не видит. @source inline
- * (TW 4.1+) генерирует их явно; десктопная сетка 8 колонок не меняется. */
-@source inline("lg:col-span-2 lg:col-span-3 lg:col-span-4 lg:col-span-5 lg:col-span-8 lg:row-span-1 lg:row-span-2");
-
 /* 1. РЕГИСТРАЦИЯ ПЕРЕМЕННЫХ В СИСТЕМЕ TAILWIND v4 */
 @theme {
   /* Шрифты */
@@ -365,12 +359,25 @@ body {
   width: 100%;
 }
 
-/* Scrim для hero-изображения (Figma: On surface gradient) */
+/* Scrim для hero-изображения (Figma: On surface gradient).
+   <lg — усиленный оверрайд: на низких обложках (320–420px) стоковый
+   градиент выцветал уже на высоте заголовка, текст терял читаемость
+   (решение (16)); тёмная зона растянута до ~85% высоты. */
 .hero-image-scrim {
   background: linear-gradient(0deg,
       rgba(27, 27, 29, 0.75) 14%,
       rgba(24, 29, 26, 0.16) 50%,
       rgba(27, 27, 29, 0) 100%);
+}
+
+@media (max-width: 1023px) {
+  .hero-image-scrim {
+    background: linear-gradient(0deg,
+        rgba(27, 27, 29, 0.8) 22%,
+        rgba(24, 29, 26, 0.45) 55%,
+        rgba(27, 27, 29, 0.12) 85%,
+        rgba(27, 27, 29, 0) 100%);
+  }
 }
 
 /* Фолбэк обложки: токен Background (#f7faf5/#101412 — тон футера).
