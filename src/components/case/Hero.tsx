@@ -38,15 +38,17 @@ export function Hero({
             {/* Паттерн главной: full-bleed band → section-container
                 (max-w 1200 + px 16/32/64) — все блоки кейса одной ширины. */}
             <div className='section-container flex w-full flex-col gap-8'>
-            {/* === Cover-карта — radius 24 по иерархии карточек (deviation
-                от spec «1200, radius=0» — осознанно, фидбэк (13)) === */}
-            <div className='relative h-[320px] w-full overflow-hidden rounded-3xl bg-background sm:h-[420px] lg:h-[555px]'>
+            {/* === Cover: <lg — full-bleed на всю ширину экрана (возврат
+                одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги
+                section-container 16/32), ≥lg — карта 1072 в контейнере:
+                верхние углы прямые, нижние скруглены (24) === */}
+            <div className='relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}
                         alt={title}
                         fill
-                        sizes='(max-width: 767px) calc(100vw - 32px), (max-width: 1263px) calc(100vw - 64px), 1072px'
+                        sizes='(max-width: 1023px) 100vw, (max-width: 1263px) calc(100vw - 128px), 1072px'
                         className='object-cover'
                         priority
                     />
