@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Справочные материалы (Figma Make export) не должны сканироваться:
+ * кандидаты вида font-['Inter:Medium'] из Docs генерируют невалидный
+ * CSS (font-family: \\'Inter:Medium\\') — webpack-сборка падает
+ * («Missed semicolon»), а в dev браузер теряет кусок стилей после
+ * битого правила (решение (17) Portfolio_Case_spec_final §14). */
+@source not "../../Docs";
+
 /* 1. РЕГИСТРАЦИЯ ПЕРЕМЕННЫХ В СИСТЕМЕ TAILWIND v4 */
 @theme {
   /* Шрифты */
