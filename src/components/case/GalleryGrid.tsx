@@ -67,7 +67,8 @@ export function GalleryGrid({
                         key={asset.id}
                         className='flex flex-col gap-3'
                     >
-                        <div className='relative aspect-[1072/420] w-full overflow-hidden rounded-xl bg-surface-variant'>
+                        {/* 4/3 на <sm: 1072/420 даёт плоскую ленту 343×134 */}
+                        <div className='relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-variant sm:aspect-[1072/420]'>
                             {asset.url && (
                                 <Image
                                     src={asset.url}

@@ -441,3 +441,37 @@ Additional improvements:
 | Key Takeaway                     | Section 07 → Description       |
 | Next Steps                       | Section 07 → Steps List        |
 | Testimonial quote card           | ⚠️ Reserved (not yet used)     |
+
+══════════════════════════════════════════════════════════
+
+## 14. Implementation — Responsive (code, 2026-09-01)
+
+Единый принцип: горизонтальный ритм страницы кейса переведён на
+`.section-container` (max-w 1200, padding-inline 16/32/64) — как на главной
+портфолио (Main_page_Spec) и в шапке/футере кейса. Вертикальный ритм — по
+Mobile Frame (§11, gap=32) с выходом на десктопные значения (md/lg).
+
+(1) Metadata Grid (Hero): grid-cols-1 mobile («stacks vertically», §11) →
+    sm 2×2 → lg ряд 4×1; карточки w-full вместо w-[250px] — фикс
+    горизонтального переполнения на 375px (250×2 + gap > viewport).
+(2) Hero title overlay: паддинги по осям section-container
+    (px 16/32/64, pb 24/32/64) — картинка edge-to-edge контейнера,
+    заголовок на одной вертикали с текстом секций на каждом брейкпоинте.
+(3) Main sections wrapper + Next Project Showcase: px-8/12/16 →
+    section-container; вертикаль: gap 32 → md 64 (десктопный gap=64),
+    py 64 → lg 80 (pad=80/64).
+(4) Moodboard preset: span-классы пресета (8-колоночная сетка) действуют
+    только на lg+ (префикс lg: в рантайме); mobile 2 колонки, sm 4.
+    lg:col-span-{2,3,4,5,8} / lg:row-span-{1,2} сгенерированы в
+    globals.css через @source inline (TW 4.2) — сканер не видит
+    рантайм-конкатенацию. Десктоп не изменён. Fallback-сетка (без
+    presetId) — grid-cols-2, адаптив не требовал правок.
+(5) Showcase Image: aspect 4/3 на <sm → sm 1072/420 (на 375px
+    пропорция 1072/420 давала плоскую ленту 343×134).
+(6) Card rows (Goal/Target users, Metrics): sm:flex-row → md:flex-row —
+    единый брейкпоинт перевода в ряд (768), как на главной.
+(7) Next Project Card: p-6/gap-4 mobile → sm p-8/gap-6 → lg p-10.
+(8) Color Tokens grid: xl:grid-cols-4 → lg:grid-cols-4 (контент капнут
+    на 1200 — при 1024 уже достаточно места для 4 колонок).
+Header (breadcrumb-вариант) и Footer: уже адаптивны (section-container,
+burger-меню, stacked-футер) — без изменений.

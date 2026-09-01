@@ -29,7 +29,7 @@ export function NextProjectShowcase({
     return (
         <section
             className={cn(
-                'flex flex-col gap-12 px-8 py-20 sm:px-12 lg:px-16',
+                'section-container flex flex-col gap-8 py-16 md:gap-12 lg:py-20',
                 className,
             )}
         >
@@ -59,7 +59,7 @@ export function NextProjectShowcase({
             {nextProject && (
                 <Link
                     href={`/u/${profileSlug}/${nextProject.slug}`}
-                    className='group flex w-full items-center gap-6 rounded-2xl bg-surface-container-low p-8 shadow-card transition-colors hover:bg-surface-variant lg:p-10'
+                    className='group flex w-full items-center gap-4 rounded-2xl bg-surface-container-low p-6 shadow-card transition-colors hover:bg-surface-variant sm:gap-6 sm:p-8 lg:p-10'
                 >
                     <div className='flex min-w-0 flex-1 flex-col gap-4'>
                         <div className='flex items-center gap-3'>

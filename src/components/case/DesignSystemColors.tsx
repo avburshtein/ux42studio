@@ -180,7 +180,7 @@ export function DesignSystemColors({
             ? 'grid-cols-1'
             : roles.length === 2
               ? 'grid-cols-1 sm:grid-cols-2'
-              : 'grid-cols-1 sm:grid-cols-2 xl:grid-cols-4';
+              : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4';
 
     return (
         <div className={cn('flex w-full flex-col gap-6', className)}>

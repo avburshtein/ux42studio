@@ -38,14 +38,26 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
         );
     }
 
+    // Пресет рассчитан на 8-колоночный грид и действует только на lg+.
+    // Ниже lg: mobile 2 колонки, sm 4 (равномерные ячейки без span'ов).
+    // Классы собираются конкатенацией в рантайме — сканер Tailwind их
+    // не видит, поэтому lg:col-span-{2,3,4,5,8} / lg:row-span-{1,2}
+    // явно сгенерированы в globals.css через @source inline (TW 4.1+).
+    const presetClasses = (cls: string) =>
+        cls
+            .split(/\s+/)
+            .filter(Boolean)
+            .map((c) => `lg:${c}`)
+            .join(' ');
+
     return (
-        <div className='grid grid-cols-8 gap-4 auto-rows-[200px]'>
+        <div className='grid auto-rows-[200px] grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-8'>
             {preset.layoutClasses.map((className, index) => {
                 const asset = assets[index];
                 return (
                     <div
                         key={asset?.id ?? index}
-                        className={`${className} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
+                        className={`${presetClasses(className)} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
                     >
                         {asset?.url ? (
                             <img

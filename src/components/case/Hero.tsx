@@ -56,8 +56,11 @@ export function Hero({
                     aria-hidden='true'
                 />
 
-                {/* Title overlay — absolute bottom */}
-                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-8 pb-8 sm:px-12 lg:px-16 lg:pb-16'>
+                {/* Title overlay — absolute bottom.
+                    Горизонтальные паддинги = осям section-container
+                    (16/32/64): картинка edge-to-edge контейнера, поэтому
+                    заголовок встаёт на одну вертикаль с текстом секций. */}
+                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-4 pb-6 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
                     {categories.length > 0 && (
                         <div className='flex flex-wrap gap-2'>
                             {categories.map((cat) => (
@@ -81,8 +84,11 @@ export function Hero({
                 </div>
             </div>
 
-            {/* === Metadata Grid (1200×172) — 4 cards, gap=24, pad=64 === */}
-            <div className='grid grid-cols-2 gap-4 px-8 sm:gap-6 sm:px-12 lg:grid-cols-4 lg:gap-6 lg:px-16'>
+            {/* === Metadata Grid — 4 cards, gap=24, pad=64 ===
+                Адаптив: на <sm складывается в колонку (Mobile Frame §11
+                «Metadata Grid stacks vertically»), sm 2×2, lg+ — ряд 4×1.
+                section-container: выравнивание 16/32/64 как у шапки/футера. */}
+            <div className='section-container grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
                 <MetadataCard label='Client' value={client ?? '—'} />
                 <MetadataCard label='Timeline' value={timeline ?? '—'} />
                 <MetadataCard label='My role' value={role ?? '—'} />

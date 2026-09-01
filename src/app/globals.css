@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Safelist для рантайм-классов MoodboardGrid (страница кейса): пресетные
+ * span'ы из grid-presets.config.ts на lg+ получают префикс конкатенацией
+ * в рантайме — сканер Tailwind такие классы не видит. @source inline
+ * (TW 4.1+) генерирует их явно; десктопная сетка 8 колонок не меняется. */
+@source inline("lg:col-span-2 lg:col-span-3 lg:col-span-4 lg:col-span-5 lg:col-span-8 lg:row-span-1 lg:row-span-2");
+
 /* 1. РЕГИСТРАЦИЯ ПЕРЕМЕННЫХ В СИСТЕМЕ TAILWIND v4 */
 @theme {
   /* Шрифты */
