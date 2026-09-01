@@ -188,9 +188,11 @@ export default async function ProjectPage({ params }: PageProps) {
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
             <AuthBar projectId={project?.id} profileUserId={profile?.userId} />
-            {/* Content column: 1200px centered [198:1310] */}
-            <div className='mx-auto w-full max-w-container-content'>
-                {/* Header [245:1632] — Breadcrumb variant with glass effects */}
+
+            {/* Header [245:1632] — Breadcrumb variant with glass effects.
+                Паттерн главной: full-bleed ленты + section-container —
+                столбец max-w-container-content удалён (фидбэк (13) §14:
+                «ширину блоков — как на главной, пусть в разрез со спекой»). */}
                 <SiteHeaderBreadcrumb
                     profileSlug={slug}
                     displayName={profile.fullName}
@@ -501,7 +503,6 @@ export default async function ProjectPage({ params }: PageProps) {
                         socialLinks={[]}
                     />
                 </main>
-            </div>
         </div>
     );
 }

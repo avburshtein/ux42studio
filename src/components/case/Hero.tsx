@@ -31,18 +31,22 @@ export function Hero({
     return (
         <section
             className={cn(
-                'flex w-full flex-col gap-8 bg-background pb-8',
+                'flex w-full flex-col bg-background pb-8',
                 className,
             )}
         >
-            {/* === Image + Title (1200×555) — fill = page background === */}
-            <div className='relative h-[320px] w-full overflow-hidden bg-background sm:h-[420px] lg:h-[555px]'>
+            {/* Паттерн главной: full-bleed band → section-container
+                (max-w 1200 + px 16/32/64) — все блоки кейса одной ширины. */}
+            <div className='section-container flex w-full flex-col gap-8'>
+            {/* === Cover-карта — radius 24 по иерархии карточек (deviation
+                от spec «1200, radius=0» — осознанно, фидбэк (13)) === */}
+            <div className='relative h-[320px] w-full overflow-hidden rounded-3xl bg-background sm:h-[420px] lg:h-[555px]'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}
                         alt={title}
                         fill
-                        sizes='(max-width: 1200px) 100vw, 1200px'
+                        sizes='(max-width: 767px) calc(100vw - 32px), (max-width: 1263px) calc(100vw - 64px), 1072px'
                         className='object-cover'
                         priority
                     />
@@ -92,12 +96,14 @@ export function Hero({
                 «Metadata Grid stacks vertically»), sm 2×2, lg+ — ряд 4×1.
                 section-container: выравнивание 16/32/64 как у шапки/футера. */}
             {/* 2×2 на мобильных (фидбэк: стопка — слишком много места),
-                sm 2×2 с шагом 24, lg+ ряд 4×1 */}
-            <div className='section-container grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
+                sm 2×2 с шагом 24, lg+ ряд 4×1. Горизонтальный паддинг даёт
+                обёртка section-container — свой контейнер не нужен. */}
+            <div className='grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
                 <MetadataCard label='Client' value={client ?? '—'} />
                 <MetadataCard label='Timeline' value={timeline ?? '—'} />
                 <MetadataCard label='My role' value={role ?? '—'} />
                 <MetadataCard label='Devices' value={devices ?? '—'} />
+            </div>
             </div>
         </section>
     );
