@@ -6,10 +6,23 @@ import { ArrowLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
+interface NavItem {
+    label: string;
+    href: string;
+}
+
 interface SiteHeaderProps {
-    profileSlug: string;
+    /** Slug дизайнера — строит дефолтные nav-ссылки (/u/{slug}) и Back-поведение.
+     *  На главной ((slug нет) используйте navItems + wordmarkHref. */
+    profileSlug?: string;
     /** Имя (логин) дизайнера — отображается в центре шапки вместо логотипа UX42 */
     displayName?: string;
+    /** Текст в центре шапки (по умолчанию displayName или 'UX42.studio') */
+    wordmarkText?: string;
+    /** Куда ведёт центральный wordmark (по умолчанию /u/{slug} или '/') */
+    wordmarkHref?: string;
+    /** Свои nav-ссылки (по умолчанию Work/About страницы дизайнера) */
+    navItems?: NavItem[];
     /** CTA button label (default: "Hire me") */
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
@@ -34,12 +47,31 @@ interface SiteHeaderProps {
 export function SiteHeader({
     profileSlug,
     displayName,
+    wordmarkText,
+    wordmarkHref,
+    navItems,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
     className,
 }: SiteHeaderProps) {
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
+
+    // Nav: свои ссылки (главная) или дефолт страницы дизайнера
+    const items: NavItem[] =
+        navItems ??
+        (profileSlug
+            ? [
+                  { label: 'Work', href: `/u/${profileSlug}` },
+                  { label: 'About', href: `/u/${profileSlug}#about` },
+              ]
+            : [
+                  { label: 'Work', href: '#work' },
+                  { label: 'About', href: '#studio' },
+              ]);
+    const brandHref =
+        wordmarkHref ?? (profileSlug ? `/u/${profileSlug}` : '/');
+    const brandLabel = wordmarkText ?? displayName ?? 'UX42.studio';
 
     return (
         <header
@@ -62,12 +94,11 @@ export function SiteHeader({
                     />
                     <div className='fixed inset-x-0 top-16 z-10 border-b border-outline/30 bg-surface-container-lowest shadow-[0_16px_32px_0_rgba(0,0,0,0.12)] md:hidden'>
                         <nav className='section-container flex flex-col items-stretch gap-1 py-6'>
-                            <MobileNavLink href={`/u/${profileSlug}`} onClick={closeMenu}>
-                                Work
-                            </MobileNavLink>
-                            <MobileNavLink href={`/u/${profileSlug}#about`} onClick={closeMenu}>
-                                About
-                            </MobileNavLink>
+                            {items.map((item) => (
+                                <MobileNavLink key={item.href} href={item.href} onClick={closeMenu}>
+                                    {item.label}
+                                </MobileNavLink>
+                            ))}
                             <div className='my-3 h-px bg-outline/30' aria-hidden='true' />
                             <Link
                                 href={ctaHref}
@@ -85,12 +116,15 @@ export function SiteHeader({
             <div className='section-container relative flex w-full items-center justify-between'>
                 {/* Left zone: Nav Links — только ≥768 */}
                 <nav className='hidden items-center gap-6 md:flex'>
-                    <NavLink href={`/u/${profileSlug}`}>Work</NavLink>
-                    <NavLink href={`/u/${profileSlug}#about`}>About</NavLink>
+                    {items.map((item) => (
+                        <NavLink key={item.href} href={item.href}>
+                            {item.label}
+                        </NavLink>
+                    ))}
                 </nav>
 
-                {/* Center (desktop) / Left (mobile): имя дизайнера — вместо логотипа UX42 */}
-                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} />
+                {/* Center (desktop) / Left (mobile): имя дизайнера или wordmark студии */}
+                <WordmarkLink href={brandHref} label={brandLabel} />
 
                 {/* Right zone: Theme Toggle + CTA (≥768) + burger (<768) */}
                 <div className='flex items-center justify-end gap-3 md:gap-6'>

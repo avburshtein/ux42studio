@@ -8,8 +8,10 @@ interface SocialLink {
 }
 
 interface SiteFooterProps {
-    profileSlug: string;
-    profileName: string;
+    /** Slug дизайнера — включает кнопку Back to Gallery (на главной не передаётся) */
+    profileSlug?: string;
+    /** Имя дизайнера под брендом (на главной не передаётся) */
+    profileName?: string;
     profileHeadline?: string | null;
     socialLinks: SocialLink[];
     className?: string;
@@ -46,9 +48,11 @@ export function SiteFooter({
                     >
                         UX42.studio
                     </Link>
-                    <span className='font-display text-title-lg font-medium text-on-surface'>
-                        {profileName}
-                    </span>
+                    {profileName && (
+                        <span className='font-display text-title-lg font-medium text-on-surface'>
+                            {profileName}
+                        </span>
+                    )}
                     {profileHeadline && (
                         <span className='text-label-md text-on-surface-variant'>
                             {profileHeadline}
@@ -99,12 +103,16 @@ export function SiteFooter({
                 </div>
 
                 {/* Back to Gallery — outline-семейство: hover как у secondary */}
-                <Link
-                    href={`/u/${profileSlug}`}
-                    className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
-                >
-                    Back to Gallery
-                </Link>
+                {/* Back to Gallery — outline-семейство: hover как у secondary.
+                    Только на страницах дизайнера (profileSlug передан). */}
+                {profileSlug && (
+                    <Link
+                        href={`/u/${profileSlug}`}
+                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
+                    >
+                        Back to Gallery
+                    </Link>
+                )}
             </div>
 
             {/* Copyright bar */}

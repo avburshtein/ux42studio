@@ -372,3 +372,16 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        Mobile 64px не тронут. Зависимости синхронизированы: hero-офсеты
        −mt-24→−mt-[72px], pt 192→168 (md:pt-42) / 216→192 (lg:pt-48);
        scroll-margin-top 104→80px. Контент-бокс хиро не сдвинут.
+  (19) 2026-09-02 — Главная страница пересобрана в визуальном языке
+       страницы дизайнера (root = (public)/page.tsx): AuthBar + SiteHeader
+       (новые опциональные пропсы navItems/wordmarkText/wordmarkHref;
+       profileSlug стал опциональным) → HeroSection (копирайт студии,
+       CTA View our work #work / Get in touch #contact) → Work (NavLabel,
+       H2 32→display-sm, чипы-фильтры категорий 1:1 с галереей дизайнера,
+       grid 1/2/3 из PortfolioCard; tag = имя дизайнера, overlayTags =
+       категории; проекты без coverFile не рендерятся) → Studio (#studio:
+       Stats 10+/MSc/NGO display 52px + Pro Bono Banner bg-primary
+       rounded-24, кнопка Start a project) → CtaSection (email) →
+       SiteFooter (profileSlug/profileName опциональны: на главной без
+       Back to Gallery и имени, только бренд + headline). Старый каталог
+       (ProjectCard/PageTitle) удалён вместе с задачей.
