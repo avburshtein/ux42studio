@@ -385,3 +385,12 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        SiteFooter (profileSlug/profileName опциональны: на главной без
        Back to Gallery и имени, только бренд + headline). Старый каталог
        (ProjectCard/PageTitle) удалён вместе с задачей.
+  (20) 2026-09-02 — Главная: CTA «Hire me» заменён бургер-меню (menuMode):
+       правая slide-over панель для посетителя по исходнику главного сайта —
+       заголовок Menu + nav (Work/About + Contact) + Sign In / Sign Up
+       (/login) + legal (Privacy/Terms/Cookies). Панель рендерится через
+       createPortal(document.body): backdrop-filter шапки создаёт containing
+       block — внутри <header> fixed-панель обрезалась бы до 72px. Старое
+       мобильное dropdown-меню в menuMode отключено (панель универсальна).
+       Заодно убран «блуждающий n» — текстовый узел-остаток склейки файла
+       страницы (фидбэк со скриншота).

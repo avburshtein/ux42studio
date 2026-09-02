@@ -88,7 +88,7 @@ export default async function HomePage({
                     { label: 'Work', href: '#work' },
                     { label: 'About', href: '#studio' },
                 ]}
-                ctaLabel='Hire me'
+                menuMode
                 ctaHref='#contact'
             />
             <main>
@@ -143,7 +143,7 @@ export default async function HomePage({
                             </div>
                         )}
 
-n                        {cards.length === 0 ? (
+                        {cards.length === 0 ? (
                             <p className='py-16 text-body-lg text-on-surface-variant'>
                                 No published projects yet
                             </p>

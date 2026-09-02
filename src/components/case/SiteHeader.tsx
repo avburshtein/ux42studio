@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { ArrowLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -23,6 +24,10 @@ interface SiteHeaderProps {
     wordmarkHref?: string;
     /** Свои nav-ссылки (по умолчанию Work/About страницы дизайнера) */
     navItems?: NavItem[];
+    /** Режим главной: вместо CTA «Hire me» — бургер, открывающий правую
+     *  панель-меню для посетителя (nav + Sign In + legal), как в исходнике
+     *  главного сайта. Решение 2026-09-02 (20). */
+    menuMode?: boolean;
     /** CTA button label (default: "Hire me") */
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
@@ -50,6 +55,7 @@ export function SiteHeader({
     wordmarkText,
     wordmarkHref,
     navItems,
+    menuMode = false,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
     className,
@@ -77,14 +83,14 @@ export function SiteHeader({
         <header
             className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
-            {/* Mobile menu (<768): backdrop + панель под шапкой.
+            {/* Mobile menu (<768, НЕ menuMode): backdrop + панель под шапкой.
                 ВАЖНО: backdrop-filter на <header> создаёт containing block для
                 fixed-потомков (filter-effects-2), поэтому размеры заданы явно:
                 top-16 (64px = высота мобильной шапки) + h-[calc(100dvh-64px)] —
                 результат одинаков и при CB=header, и при CB=viewport,
                 т.к. sticky-шапка всегда прижата к top:0.
                 Решение 2026-08-29 (13) в Main_page_Spec.md. */}
-            {menuOpen && (
+            {!menuMode && menuOpen && (
                 <>
                     <button
                         type='button'
@@ -126,23 +132,120 @@ export function SiteHeader({
                 {/* Center (desktop) / Left (mobile): имя дизайнера или wordmark студии */}
                 <WordmarkLink href={brandHref} label={brandLabel} />
 
-                {/* Right zone: Theme Toggle + CTA (≥768) + burger (<768) */}
+                {/* Right zone: Theme Toggle + CTA/menu-burger */}
                 <div className='flex items-center justify-end gap-3 md:gap-6'>
                     <ThemeToggle />
-                    <div className='hidden md:inline-flex'>
-                        <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
-                    </div>
-                    <button
-                        type='button'
-                        onClick={() => setMenuOpen((v) => !v)}
-                        aria-expanded={menuOpen}
-                        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                        className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary md:hidden'
-                    >
-                        {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
-                    </button>
+                    {menuMode ? (
+                        // Главная: бургер вместо CTA — открывает правую панель
+                        <button
+                            type='button'
+                            onClick={() => setMenuOpen((v) => !v)}
+                            aria-expanded={menuOpen}
+                            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                            className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                        >
+                            {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
+                        </button>
+                    ) : (
+                        <>
+                            <div className='hidden md:inline-flex'>
+                                <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                            </div>
+                            <button
+                                type='button'
+                                onClick={() => setMenuOpen((v) => !v)}
+                                aria-expanded={menuOpen}
+                                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                                className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary md:hidden'
+                            >
+                                {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
+
+            {/* Home menu (menuMode): правая панель для посетителя — как в исходнике
+                главного сайта (nav + Sign In + legal). Рендер через портал:
+                backdrop-filter шапки создаёт containing block для fixed-потомков
+                (см. (13)) — панель обязана жить вне <header>, иначе обрежется
+                до высоты шапки. */}
+            {menuMode &&
+                menuOpen &&
+                createPortal(
+                    <>
+                        <button
+                            type='button'
+                            aria-label='Close menu'
+                            onClick={closeMenu}
+                            className='fixed inset-0 z-50 cursor-default bg-black/40'
+                        />
+                        <div
+                            role='dialog'
+                            aria-label='Menu'
+                            className='fixed inset-y-0 right-0 z-50 flex w-[420px] max-w-[86vw] flex-col overflow-y-auto bg-surface-container-lowest px-8 py-8 shadow-[0_16px_32px_0_rgba(0,0,0,0.12)]'
+                        >
+                            <div className='flex items-center justify-between'>
+                                <span className='font-display text-title-lg font-medium text-on-surface'>
+                                    Menu
+                                </span>
+                                <button
+                                    type='button'
+                                    onClick={closeMenu}
+                                    aria-label='Close menu'
+                                    className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                                >
+                                    <X size={24} aria-hidden='true' />
+                                </button>
+                            </div>
+
+                            <nav className='mt-10 flex flex-col items-start gap-2'>
+                                {[...items, { label: 'Contact', href: ctaHref }].map(
+                                    (item) => (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            onClick={closeMenu}
+                                            className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ),
+                                )}
+                            </nav>
+
+                            <div className='my-6 h-px w-full bg-outline/30' aria-hidden='true' />
+
+                            <Link
+                                href='/login'
+                                onClick={closeMenu}
+                                className='inline-flex items-center py-3 text-title-md font-medium text-primary transition-opacity hover:opacity-80'
+                            >
+                                Sign In / Sign Up
+                            </Link>
+
+                            <div className='my-6 h-px w-full bg-outline/30' aria-hidden='true' />
+
+                            <nav className='flex flex-col items-start gap-2'>
+                                {[
+                                    { label: 'Privacy Policy', href: '/privacy' },
+                                    { label: 'Terms of Service', href: '/terms' },
+                                    { label: 'Cookie Settings', href: '/cookies' },
+                                ].map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={closeMenu}
+                                        className='inline-flex items-center py-2 text-body-md font-normal text-on-surface-variant transition-colors hover:text-on-surface'
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+                    </>,
+                    document.body,
+                )}
         </header>
     );
 }
