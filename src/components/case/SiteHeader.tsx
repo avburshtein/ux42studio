@@ -121,7 +121,15 @@ export function SiteHeader({
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container relative flex w-full items-center justify-between'>
                 {/* Left zone: Nav Links — только ≥768 */}
-                <nav className='hidden items-center gap-6 md:flex'>
+                {/* Left zone: Nav Links — только ≥768; на главной (menuMode)
+                    навигация живёт в панели меню — левая зона пуста */}
+                <nav
+                    className={cn(
+                        'hidden items-center gap-6 md:flex',
+                        menuMode && 'invisible',
+                    )}
+                    aria-hidden={menuMode || undefined}
+                >
                     {items.map((item) => (
                         <NavLink key={item.href} href={item.href}>
                             {item.label}

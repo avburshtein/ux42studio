@@ -121,6 +121,7 @@ export default async function HomePage({
                             <div className='hidden flex-wrap justify-center gap-3 md:flex'>
                                 <Link
                                     href='/'
+                                    scroll={false}
                                     className={chipClass(!selectedCategory)}
                                     aria-current={!selectedCategory || undefined}
                                 >
@@ -132,7 +133,8 @@ export default async function HomePage({
                                     return (
                                         <Link
                                             key={cat.id}
-                                            href={`/?category=${encodeURIComponent(cat.slug)}`}
+                                            href={`/?category=${encodeURIComponent(cat.slug)}#portfolio`}
+                                            scroll={false}
                                             className={chipClass(active)}
                                             aria-current={active || undefined}
                                         >
