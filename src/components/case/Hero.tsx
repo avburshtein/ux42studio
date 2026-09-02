@@ -31,18 +31,24 @@ export function Hero({
     return (
         <section
             className={cn(
-                'flex w-full flex-col gap-8 bg-background pb-8',
+                'flex w-full flex-col bg-background pb-8',
                 className,
             )}
         >
-            {/* === Image + Title (1200×555) — fill = page background === */}
-            <div className='relative h-[320px] w-full overflow-hidden bg-background sm:h-[420px] lg:h-[555px]'>
+            {/* Паттерн главной: full-bleed band → section-container
+                (max-w 1200 + px 16/32/64) — все блоки кейса одной ширины. */}
+            <div className='section-container flex w-full flex-col gap-8'>
+            {/* === Cover: <lg — full-bleed на всю ширину экрана (возврат
+                одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги
+                section-container 16/32), ≥lg — карта 1072 в контейнере:
+                верхние углы прямые, нижние скруглены (24) === */}
+            <div className='relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}
                         alt={title}
                         fill
-                        sizes='(max-width: 1200px) 100vw, 1200px'
+                        sizes='(max-width: 1023px) 100vw, (max-width: 1263px) calc(100vw - 128px), 1072px'
                         className='object-cover'
                         priority
                     />
@@ -56,8 +62,11 @@ export function Hero({
                     aria-hidden='true'
                 />
 
-                {/* Title overlay — absolute bottom */}
-                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-8 pb-8 sm:px-12 lg:px-16 lg:pb-16'>
+                {/* Title overlay — absolute bottom.
+                    Горизонтальные паддинги = осям section-container
+                    (16/32/64): картинка edge-to-edge контейнера, поэтому
+                    заголовок встаёт на одну вертикаль с текстом секций. */}
+                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-4 pb-6 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
                     {categories.length > 0 && (
                         <div className='flex flex-wrap gap-2'>
                             {categories.map((cat) => (
@@ -70,23 +79,33 @@ export function Hero({
                             ))}
                         </div>
                     )}
-                    <h1 className='font-display text-display-sm text-white'>
+                    {/* Пропорциональное уменьшение на мобильных (паттерн главной
+                        40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
+                        заголовок не помещается и оверлей срезается под шапкой. */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
                         {title}
                     </h1>
                     {teaser && (
-                        <p className='max-w-3xl text-body-lg text-white/80'>
+                        <p className='max-w-3xl text-body-md text-white/80 sm:text-body-lg'>
                             {teaser}
                         </p>
                     )}
                 </div>
             </div>
 
-            {/* === Metadata Grid (1200×172) — 4 cards, gap=24, pad=64 === */}
-            <div className='grid grid-cols-2 gap-4 px-8 sm:gap-6 sm:px-12 lg:grid-cols-4 lg:gap-6 lg:px-16'>
+            {/* === Metadata Grid — 4 cards, gap=24, pad=64 ===
+                Адаптив: на <sm складывается в колонку (Mobile Frame §11
+                «Metadata Grid stacks vertically»), sm 2×2, lg+ — ряд 4×1.
+                section-container: выравнивание 16/32/64 как у шапки/футера. */}
+            {/* 2×2 на мобильных (фидбэк: стопка — слишком много места),
+                sm 2×2 с шагом 24, lg+ ряд 4×1. Горизонтальный паддинг даёт
+                обёртка section-container — свой контейнер не нужен. */}
+            <div className='grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-4 lg:gap-6'>
                 <MetadataCard label='Client' value={client ?? '—'} />
                 <MetadataCard label='Timeline' value={timeline ?? '—'} />
                 <MetadataCard label='My role' value={role ?? '—'} />
                 <MetadataCard label='Devices' value={devices ?? '—'} />
+            </div>
             </div>
         </section>
     );

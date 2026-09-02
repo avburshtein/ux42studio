@@ -1,3 +1,7 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { Images, X } from 'lucide-react';
 import { GRID_PRESETS } from '@/lib/grid-presets.config';
 
 interface MoodboardAsset {
@@ -13,7 +17,25 @@ interface MoodboardGridProps {
 }
 
 export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
+    const [expanded, setExpanded] = useState(false);
     const preset = presetId ? GRID_PRESETS[presetId] : null;
+
+    // Оверлей: блокируем скролл страницы, закрываем по Esc
+    useEffect(() => {
+        if (!expanded) return;
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setExpanded(false);
+        };
+        window.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.body.style.overflow = prevOverflow;
+            window.removeEventListener('keydown', onKeyDown);
+        };
+    }, [expanded]);
+
+    if (assets.length === 0) return null;
 
     if (!preset) {
         // Fallback: простая сетка 2 колонки
@@ -38,29 +60,105 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
         );
     }
 
+    // Пресет рассчитан на 8-колоночный грид.
+    // ≥lg — инлайн-композиция из литеральных lg:-классов конфига
+    // (layoutClassesLg): сканер Tailwind видит только текст файлов —
+    // рантайм-конкатенация и @source inline в реальной сборке не
+    // сработали (решение (15)). <lg — кнопка «View moodboard» +
+    // полноэкранный оверлей: та же композиция целиком, уменьшенная
+    // пропорционально экрану (базовые литеральные layoutClasses).
     return (
-        <div className='grid grid-cols-8 gap-4 auto-rows-[200px]'>
-            {preset.layoutClasses.map((className, index) => {
-                const asset = assets[index];
-                return (
-                    <div
-                        key={asset?.id ?? index}
-                        className={`${className} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
-                    >
-                        {asset?.url ? (
-                            <img
-                                src={asset.url}
-                                alt={asset.alt ?? asset.caption ?? ''}
-                                className='w-full h-full object-cover'
-                            />
-                        ) : (
-                            <div className='w-full h-full flex items-center justify-center text-[var(--md-sys-color-on-surface-variant)] text-sm'>
-                                {index + 1}
-                            </div>
-                        )}
+        <>
+            {/* ≥lg: инлайн как на десктопе */}
+            <div className='hidden auto-rows-[200px] grid-cols-8 gap-4 lg:grid'>
+                {preset.layoutClassesLg.map((className, index) => {
+                    const asset = assets[index];
+                    return (
+                        <div
+                            key={asset?.id ?? index}
+                            className={`${className} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
+                        >
+                            {asset?.url ? (
+                                <img
+                                    src={asset.url}
+                                    alt={asset.alt ?? asset.caption ?? ''}
+                                    className='h-full w-full object-cover'
+                                />
+                            ) : (
+                                <div className='flex h-full w-full items-center justify-center text-sm text-[var(--md-sys-color-on-surface-variant)]'>
+                                    {index + 1}
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+
+            {/* <lg: кнопка раскрытия оверлея */}
+            <button
+                type='button'
+                onClick={() => setExpanded(true)}
+                aria-expanded={expanded}
+                className='inline-flex h-12 items-center gap-2 self-start rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-colors duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] lg:hidden'
+            >
+                <Images size={20} aria-hidden='true' />
+                View moodboard
+            </button>
+
+            {/* Полноэкранный оверлей: вся 8-колоночная композиция,
+                уменьшенная пропорционально экрану (тайл ~37×60 @375 /
+                ~70×112 @sm — пропорции десктопных 120×200 сохранены) */}
+            {expanded && (
+                <div
+                    role='dialog'
+                    aria-modal='true'
+                    aria-label='Moodboard'
+                    className='fixed inset-0 z-50 flex flex-col gap-4 bg-[rgba(20,22,20,0.92)] p-4 backdrop-blur-sm sm:p-6'
+                >
+                    <div className='flex items-center justify-between'>
+                        <span className='text-label-lg font-medium uppercase tracking-[0.5px] text-white/80'>
+                            Moodboard
+                        </span>
+                        <button
+                            type='button'
+                            onClick={() => setExpanded(false)}
+                            aria-label='Close moodboard'
+                            className='inline-flex h-12 w-12 items-center justify-center rounded-full text-white/80 transition-colors hover:text-white'
+                        >
+                            <X size={24} aria-hidden='true' />
+                        </button>
                     </div>
-                );
-            })}
-        </div>
+                    <div className='flex flex-1 items-center justify-center'>
+                        <div className='grid w-full auto-rows-[60px] grid-cols-8 gap-1 sm:auto-rows-[112px] sm:gap-2'>
+                            {preset.layoutClasses.map((className, index) => {
+                                const asset = assets[index];
+                                return (
+                                    <div
+                                        key={asset?.id ?? index}
+                                        className={`${className} overflow-hidden rounded-md bg-[var(--md-sys-color-surface-variant)]`}
+                                    >
+                                        {asset?.url ? (
+                                            <img
+                                                src={asset.url}
+                                                alt={
+                                                    asset.alt ??
+                                                    asset.caption ??
+                                                    ''
+                                                }
+                                                className='h-full w-full object-cover'
+                                            />
+                                        ) : (
+                                            <div className='flex h-full w-full items-center justify-center text-[10px] text-white/40'>
+                                                {index + 1}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </>
     );
 }

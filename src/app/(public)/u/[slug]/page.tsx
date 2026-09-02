@@ -18,14 +18,11 @@ export const revalidate = 3600;
 // Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE)
 function NavLabel({ label }: { label: string }) {
     return (
-        <div className='flex w-full items-center gap-4 px-8 py-0 lg:px-16'>
-            <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
+        <div className="section-container flex w-full items-center gap-4 py-0">
+            <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant">
                 {label}
             </span>
-            <span
-                aria-hidden
-                className='h-px flex-1 bg-[rgba(140,213,179,0.16)]'
-            />
+            <span aria-hidden className="h-px flex-1 bg-[rgba(140,213,179,0.16)]" />
         </div>
     );
 }
@@ -166,102 +163,90 @@ export default async function ProfilePage({ params }: PageProps) {
         .map((l) => ({ platform: l.platform, title: l.title, url: l.url }));
 
     return (
-        <>
-            <AuthBar profileUserId={profile.userId} />
-            <div className='min-h-screen w-full bg-surface-container-low'>
-                <div className='mx-auto w-full max-w-container-content shadow-[8px_8px_20px_0px_rgba(0,0,0,0.1)]'>
-                    <SiteHeader ctaLabel='Hire me' ctaHref='#contact' />
-                    <HeroSection
-                        headlinePart1='I design for the moment '
-                        headlineAccent='when everything'
-                        headlinePart2=' just clicks'
-                        subtitle='A psychology degree and 10 years learning how great environments shape human decisions.'
-                        primaryCtaLabel='View case studies'
-                        primaryCtaHref='#portfolio'
-                        secondaryCtaLabel='Get in touch'
-                        secondaryCtaHref='#contact'
-                    />
-                    <main>
-                        <div className='bg-surface-container-lowest'>
-                            <div className='pt-6'>
-                                <NavLabel label='Work' />
-                            </div>
-                            <PortfolioGallerySection
-                                title='Portfolio'
-                                subtitle='Explore my work in web design, UX Research and digital products'
-                                filters={
-                                    categoryFilters.length > 0
-                                        ? [
-                                              'All',
-                                              ...categoryFilters.slice(0, 3),
-                                          ]
-                                        : undefined
-                                }
-                            >
-                                {projects.slice(0, 6).map((project) => {
-                                    const catName =
-                                        project.projectCategories
-                                            .map((pc) => pc.category?.name)
-                                            .filter(Boolean)[0] ?? '';
-                                    const catTags = project.projectCategories
-                                        .map((pc) => pc.category?.name)
-                                        .filter(Boolean)
-                                        .slice(0, 3) as string[];
-                                    return (
-                                        <PortfolioCard
-                                            key={project.id}
-                                            title={project.title}
-                                            tag={catName}
-                                            imageUrl={
+        <div className='min-h-screen w-full bg-surface-container-low'>
+            <SiteHeader profileSlug={slug} displayName={profile.fullName} ctaLabel="Hire me" ctaHref="#contact" />
+            <HeroSection
+                headlinePart1='I design for the moment '
+                headlineAccent='when everything'
+                headlinePart2=' just clicks'
+                subtitle='A psychology degree and 10 years learning how great environments shape human decisions.'
+                primaryCtaLabel='View case studies'
+                primaryCtaHref='#portfolio'
+                secondaryCtaLabel='Get in touch'
+                secondaryCtaHref='#contact'
+            />
+            <main>
+                <div className='bg-surface-container-lowest'>
+                    <div className='pt-6'>
+                        <NavLabel label='Work' />
+                    </div>
+                    <PortfolioGallerySection
+                        title='Portfolio'
+                        subtitle='Explore my work in web design, UX Research and digital products'
+                        filters={
+                            categoryFilters.length > 0
+                                ? [
+                                    'All',
+                                    ...categoryFilters.slice(0, 3),
+                                ]
+                                : undefined
+                        }
+                    >
+                        {projects.slice(0, 6).map((project) => {
+                            const catName =
+                                project.projectCategories
+                                    .map((pc) => pc.category?.name)
+                                    .filter(Boolean)[0] ?? '';
+                            const catTags = project.projectCategories
+                                .map((pc) => pc.category?.name)
+                                .filter(Boolean)
+                                .slice(0, 3) as string[];
+                            return (
+                                <PortfolioCard
+                                    key={project.id}
+                                    title={project.title}
+                                    tag={catName}
+                                    imageUrl={
+                                        project.coverFile
+                                            ? getImageUrl(
                                                 project.coverFile
-                                                    ? getImageUrl(
-                                                          project.coverFile
-                                                              .r2Key,
-                                                      )
-                                                    : '/placeholder-project.svg'
-                                            }
-                                            href={`/u/${slug}/${project.slug}`}
-                                            overlayTitle={project.title}
-                                            overlayTags={catTags}
-                                        />
-                                    );
-                                })}
-                            </PortfolioGallerySection>
-                            <NavLabel label='About' />
-                            {bioParagraphs.length > 0 && (
-                                <AboutSection
-                                    title='People-centered design begins with real curiosity'
-                                    paragraphs={bioParagraphs}
+                                                    .r2Key,
+                                            )
+                                            : '/placeholder-project.svg'
+                                    }
+                                    href={`/u/${slug}/${project.slug}`}
+                                    overlayTags={catTags}
                                 />
-                            )}
-                            <NavLabel label='Skills' />
-                            <SkillsSection
-                                expertiseTags={EXPERTISE_TAGS}
-                                toolTags={TOOL_TAGS}
-                                processSteps={PROCESS_STEPS}
-                            />
-                            <NavLabel label='Reach' />
-                        </div>
-                        <FAB href='#contact' />
-                    </main>
-
-                    <CtaSection
-                        title='Get in touch'
-                        bodyLines={[
-                            'We answer emails fast.',
-                            'Pro bono spots available.',
-                        ]}
-                        emailHref='mailto:hello@ux42.studio'
-                        emailLabel='Send an email'
+                            );
+                        })}
+                    </PortfolioGallerySection>
+                    <NavLabel label='About' />
+                    {bioParagraphs.length > 0 && (
+                        <AboutSection
+                            title='People-centered design begins with real curiosity'
+                            paragraphs={bioParagraphs}
+                        />
+                    )}
+                    <NavLabel label='Skills' />
+                    <SkillsSection
+                        expertiseTags={EXPERTISE_TAGS}
+                        toolTags={TOOL_TAGS}
+                        processSteps={PROCESS_STEPS}
                     />
-                    <SiteFooter
-                        profileSlug={slug}
-                        profileName={profile.fullName}
-                        profileHeadline={profile.headline}
-                        socialLinks={socials}
-                    />
+                    <NavLabel label='Reach' />
                 </div>
-            </div>
-        </>
+                <FAB href='#contact' />
+            </main>
+
+            <CtaSection title="Get in touch"
+                bodyLines={['We answer emails fast.', 'Pro bono spots available.']}
+                emailHref="mailto:hello@ux42.studio" emailLabel="Send an email" />
+            <SiteFooter
+                profileSlug={slug}
+                profileName={profile.fullName}
+                profileHeadline={profile.headline}
+                socialLinks={socials}
+            />
+        </div>
     );
 }

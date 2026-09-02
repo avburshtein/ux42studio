@@ -1,3 +1,9 @@
+> ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — link-элементы в реализации: nav-ссылки —
+> color-only hover (on-surface-variant → on-surface); Back to Gallery —
+> outline pill h-12 rounded-full с hover-заливкой rgba(11,110,79,0.05)
+> (Main_page_Spec.md «Кнопочная система»). Ниже — исходная спека по Figma.
+
+
 # Master Component Spec: Link Button
 # Date: 2026-08-19
 # Component set ID: 604:597

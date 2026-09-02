@@ -188,11 +188,14 @@ export default async function ProjectPage({ params }: PageProps) {
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
             <AuthBar projectId={project?.id} profileUserId={profile?.userId} />
-            {/* Content column: 1200px centered [198:1310] */}
-            <div className='mx-auto w-full max-w-container-content'>
-                {/* Header [245:1632] — Breadcrumb variant with glass effects */}
+
+            {/* Header [245:1632] — Breadcrumb variant with glass effects.
+                Паттерн главной: full-bleed ленты + section-container —
+                столбец max-w-container-content удалён (фидбэк (13) §14:
+                «ширину блоков — как на главной, пусть в разрез со спекой»). */}
                 <SiteHeaderBreadcrumb
                     profileSlug={slug}
+                    displayName={profile.fullName}
                     currentTitle={project.title}
                 />
 
@@ -216,7 +219,10 @@ export default async function ProjectPage({ params }: PageProps) {
                     {/* Main Content Sections [199:25] + Next Project [198:1336]
                         Schemes/Surface Container Lowest, gap=64, pad=80/64 */}
                     <div className='bg-surface-container-lowest'>
-                        <div className='flex flex-col gap-16 px-8 py-20 sm:px-12 lg:px-16'>
+                    {/* section-container: pads 16/32/64 — единая ось с шапкой,
+                        футером и главной. Вертикаль: Mobile Frame §11 gap=32,
+                        десктоп 64; py 64 → lg 80 (pad=80/64). */}
+                        <div className='section-container flex flex-col gap-8 py-16 md:gap-16 lg:py-20'>
                             {/* Section 01 — Problem & Audience [199:26] */}
                             {showProblem && (
                                 <CaseSection
@@ -225,7 +231,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                     title='What problem are we solving?'
                                     description={project.problemStatement}
                                 >
-                                    <div className='flex flex-col gap-6 sm:flex-row'>
+                                    <div className='flex flex-col gap-6 md:flex-row'>
                                         {project.projectGoal && (
                                             <PortfolioCard
                                                 title='Goal'
@@ -251,7 +257,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                     description={project.researchMethodology}
                                 >
                                     {keyMetrics.length > 0 && (
-                                        <div className='flex flex-col gap-6 sm:flex-row'>
+                                        <div className='flex flex-col gap-6 md:flex-row'>
                                             {keyMetrics.map((metric) => (
                                                 <MetricCard
                                                     key={metric.id}
@@ -363,7 +369,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                     title='What users taught me.'
                                     description={project.testingProcess}
                                 >
-                                    <div className='flex flex-col gap-8'>
+                                    {/* Карусель <sm: слайд = один Before/After
+                                        блок; ≥sm — вертикальный стек по спеке */}
+                                    <div className='-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mr-0 sm:flex-col sm:gap-8 sm:overflow-x-visible sm:pb-0 sm:pr-0 sm:snap-none sm:[&>*]:basis-auto'>
                                         {comparisons.map((comp) => (
                                             <BeforeAfterComparison
                                                 key={comp.id}
@@ -495,7 +503,6 @@ export default async function ProjectPage({ params }: PageProps) {
                         socialLinks={[]}
                     />
                 </main>
-            </div>
         </div>
     );
 }

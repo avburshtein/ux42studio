@@ -20,7 +20,7 @@ interface FloatingElementsProps {
 export function FloatingElements({ count = 20, minBlur = 0, maxBlur = 20 }: FloatingElementsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementsRef = useRef<FloatingElement[]>([]);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const mouseRef = useRef({ x: 0, y: 0 });
 
   useEffect(() => {

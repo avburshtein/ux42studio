@@ -1,0 +1,78 @@
+/* Dark mode text and UI overrides */
+
+/* Add smooth transitions for all elements */
+.dark * {
+  transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Override black text colors to white in dark mode */
+.dark p,
+.dark h1,
+.dark h2, 
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark span,
+.dark label {
+  color: white;
+}
+
+/* Override white backgrounds to dark in dark mode */
+.dark [style*="background: white"],
+.dark [style*="background-color: white"],
+.dark [style*="background: rgb(255, 255, 255)"],
+.dark [style*="background: #fff"] {
+  background-color: rgba(30, 30, 30, 0.95) !important;
+}
+
+/* Override linear gradients with light colors */
+.dark [style*="linear-gradient"][style*="rgba(255, 255, 255"],
+.dark [style*="linear-gradient"][style*="rgba(251, 255, 250"] {
+  background-image: linear-gradient(-77.3305deg, rgba(15, 15, 15, 0.7) 1.388%, rgba(26, 26, 26, 0.7) 108.77%) !important;
+}
+
+/* Override card gradients to dark theme */
+.dark [style*="linear-gradient(103.182deg"] {
+  background-image: linear-gradient(103.182deg, rgba(11, 110, 79, 0.1) 0%, rgba(30, 30, 30, 0.9) 98.453%) !important;
+}
+
+/* Override pricing tabs background */
+.dark [style*="linear-gradient(-64.6172deg"] {
+  background-image: linear-gradient(-64.6172deg, rgba(40, 40, 40, 0.8) 34.967%, rgba(60, 60, 60, 0.8) 108.76%) !important;
+}
+
+/* Dark mode cards - override white/light backgrounds */
+.dark .rounded-\[24px\][class*="shadow"] {
+  background-color: rgba(30, 30, 30, 0.9) !important;
+}
+
+/* Testimonial cards in dark mode */
+.dark .bg-\[rgba\(177\,211\,196\,0\.08\)\] {
+  background-color: rgba(30, 30, 30, 0.85) !important;
+}
+
+/* Testimonial card inner content */
+.dark .bg-\[\#00000000\] {
+  background-color: transparent !important;
+}
+
+/* Input fields in dark mode */
+.dark input,
+.dark textarea {
+  background-color: rgba(40, 40, 40, 0.8) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* White buttons in dark mode */
+.dark button.bg-white,
+.dark .bg-white[class*="cursor-pointer"] {
+  background-color: rgba(40, 40, 40, 0.95) !important;
+  color: white !important;
+}

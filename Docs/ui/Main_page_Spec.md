@@ -1,607 +1,367 @@
-# Main Page — Final Specification
-Updated: 2026-08-22
-Figma File: U5OjywCHbtzQgBsi7PU25r
-Page ID: 0:1
-
-══════════════════════════════════════════════════════════
-
-## 1. General Parameters
-
-Root Frame:          Main Page (ID: 124:575)
-Dimensions:          1200 × 5415 px
-Layout:              No Auto Layout (children positioned manually)
-Content width:       1200 px (Page Desktop instance fills root)
-
-Page Instance:       Page Desktop (ID: 124:576) — Instance of Layout component
-Layout:              Vertical Auto Layout, gap = 32
-Slot System:         Header → Slot for section → Footer
-
-Design System:       Material Design 3 (Material You)
-Variable Collection: material-theme (6 modes: Light, Light HC, Light MC, Dark, Dark HC, Dark MC)
-4px Grid:            0, 2, 4, 6, 8, 10, 12, 14, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 112, 120, 160
-Radius Scale:        0(none), 4(xs), 8(sm), 10(md), 12(base), 14(lg), 16(xl), 20(2xl), 24(3xl), 28(4xl), 48(5xl), 9999(full)
-
-Typography:
-  • Headings: Poppins Medium
-  • Body/Labels: Inter Regular / Medium / Semi Bold
-  • All text styles prefixed material-theme/
-  • Text with styles: 82/82 (100%)
-
-Variable Bindings:   252/297 nodes (85%)
-Component Instances: 69
-
-Accessibility:
-  • WCAG 2.2 AA compliant
-  • EAA 2025 compliant
-  • All interactive elements ≥ 44 × 44 px touch target
-  • All semantic color pairs pass AA contrast (min 4.5:1)
-
-══════════════════════════════════════════════════════════
-
-## 2. Top-Level Structure
-
-Main Page [124:575] FRAME 1200×5415 NO-LAYOUT
-└── Page Desktop [124:576] INSTANCE VERTICAL gap=32
-    ├── Header [I124:576;87:3878] — 1200×96
-    ├── Slot for section [I124:576;87:3879] — VERTICAL gap=32
-    │   ├── Hero [I124:576;87:3879;124:757] — 1200×767
-    │   ├── Portfolio Gallery [I124:576;87:3879;124:758] — 1200×1450
-    │   ├── About [I124:576;87:3879;124:759] — 1200×912
-    │   ├── Skills [I124:576;87:3879;234:1488] — 1200×842
-    │   ├── CTA [I124:576;87:3879;124:760] — 1200×708
-    │   └── FAB [I124:576;87:3879;311:2594] — 64×64, ABSOLUTE
-    └── Footer Portfolio [I124:576;87:3880] — 1200×263
-
-══════════════════════════════════════════════════════════
-
-## 3. Header
-
-Instance ID:         I124:576;87:3878
-Component:           Header
-Dimensions:          1200 × 96 px
-Layout:              Horizontal Auto Layout
-Alignment:           SPACE_BETWEEN, cross CENTER
-Padding:             16/64/16/64 (→ spacing/16, spacing/64)
-Background:          Schemes/Background + State Layers/Background/Opacity-08
-
-Children:
-  Nav Container [387×44] HORIZONTAL gap=24
-  logo [89×64] INSTANCE
-  Theme Toggles [195×48] HORIZONTAL gap=24
-
-Nav Container:
-  • Nav Link "Work" — 16px Inter Regular (material-theme/body/medium)
-  • Nav Link "About" — 16px Inter Regular (material-theme/body/medium)
-  • Min touch target: 44×44 px (container minHeight=44)
-
-Theme Toggles:
-  • Switcher/Toggle — sun/moon icon, theme switch
-  • Button/Ghost "Hire me" — 123×48, 16px Inter Medium (material-theme/button/default), radius=8
-
-══════════════════════════════════════════════════════════
-
-## 4. Hero Section
-
-Instance ID:         I124:576;87:3879;124:757
-Dimensions:          1200 × 767 px
-Layout:              Vertical Auto Layout
-Padding:             120/0/120/0 (→ spacing-120)
-Background:          Schemes/Background + State Layers/Background/Opacity-08
-
-Content Slot [1072×393] — VERTICAL gap=64:
-  ├── Text container [1072×273] — VERTICAL gap=32
-  │   ├── Heading [1072×157] — VERTICAL
-  │   │   ├── "I design for the moment " — 68px Poppins Medium
-  │   │   │   Color: Schemes/On Surface Variant
-  │   │   └── Heading Accent [1072×81] — FRAME
-  │   │       ├── "when everything" — 68px Poppins Medium
-  │   │       │   Fill: GRADIENT_LINEAR
-  │   │       │   (Extended Colors/Button Gradient Start → End)
-  │   │       └── " just clicks" — 68px Poppins Medium
-  │   │           Color: Schemes/On Surface Variant
-  │   └── Subtitle — 18px Inter Regular (material-theme/body/large)
-  │       "A psychology degree and 10 years learning how great
-  │        environments shape human decisions. Now I apply that same
-  │        thinking to digital products — interfaces that feel simple,
-  │        elegant, and obvious in hindsight"
-  │       maxWidth=734
-  └── CTA Buttons [424×56] — HORIZONTAL gap=16
-      ├── Button/Primary "View case studies" — 235×56, radius=48
-      └── Button/Secondary "Get in touch" — 173×56, radius=48
-
-Decorative Layer:
-  • floating elements — 20 bokeh circles, absolute positioning
-  • Random sizes 32–92 px, various opacity
-  • Fills: Schemes/Primary Container, Schemes/Secondary Fixed Dim
-
-══════════════════════════════════════════════════════════
-
-## 5. Section Pattern
-
-All content sections follow the same outer structure:
-
-  Section [INSTANCE] 1200×auto
-  ├── Padding: 120/0/120/0 (→ spacing-120)
-  ├── Content Slot: 1072 px wide, centered
-  ├── Background: Schemes/Surface Container Lowest (white sections)
-  │             OR Schemes/Background (dark sections: Hero, CTA)
-  ├── Stroke: 1px INSIDE, State Layers/On Surface/Opacity-08 (white only)
-  └── Layout: VERTICAL
-
-Content width: 1200 − 2×64 = 1072 px
-
-══════════════════════════════════════════════════════════
-
-## 6. Portfolio Gallery Section
-
-Instance ID:         I124:576;87:3879;124:758
-Dimensions:          1200 × 1450 px
-Background:          Schemes/Surface Container Lowest
-Stroke:              1px INSIDE, State Layers/On Surface/Opacity-08
-
-Structure:
-  Content Slot [1072×1210] — VERTICAL gap=64, counterAlign=CENTER
-  ├── Section Header [1072×158] — VERTICAL gap=32
-  │   ├── Label/Section Tag "Work" — 16px Inter Semi Bold, UPPERCASE
-  │   ├── "Portfolio" — 52px Poppins Medium (material-theme/display/small)
-  │   └── "Explore my work in web design, UX Research and digital products"
-  │       — 18px Inter Regular (material-theme/body/large)
-  ├── Filters [486×44] — HORIZONTAL gap=12
-  │   ├── Filter Button "All" (active)
-  │   ├── Filter Button "Web Design"
-  │   ├── Filter Button "App Design"
-  │   └── Filter Button "UX Research"
-  ├── Portfolio Grid [1072×760] — GRID layout
-  │   ├── Columns: 3, Gap: 24×24
-  │   ├── Card size: 341 × 368 px
-  │   └── Cards: 6 × Portfolio Card instances
-  └── Button/Primary "View All Projects" — 224×56, radius=48
-
-══════════════════════════════════════════════════════════
-
-## 7. About Section
-
-Instance ID:         I124:576;87:3879;124:759
-Dimensions:          1200 × 912 px
-Background:          Schemes/Surface Container Lowest
-Stroke:              1px INSIDE
-
-Structure:
-  Content Slot [1072×672] — VERTICAL gap=64
-  ├── Label/Section Tag "About" — UPPERCASE
-  └── Container [1072×584] — HORIZONTAL gap=40
-      ├── My Process [516×584] — VERTICAL gap=32, pad=28
-      │   (empty frame — content moved to Skills section)
-      └── Skills & Tools [516×584] — VERTICAL gap=64
-          └── About Header [516×584] — VERTICAL gap=32
-              ├── "People-centered design begins with real curiosity"
-              │   — 52px Poppins Medium (material-theme/display/small)
-              ├── "My path to design wasn't straight. I studied psychology,
-              │    then spent 10 years at a company obsessed with making
-              │    spaces work for people. That's where I learned to notice
-              │    things — why people stop, where they get confused, what
-              │    makes something feel easy."
-              │   — 18px Inter Regular (material-theme/body/large)
-              ├── "Now I bring that same attention to digital products. I
-              │    design websites, mobile apps and interfaces that just
-              │    make sense — without making people think too hard."
-              │   — 18px Inter Regular (material-theme/body/large)
-              └── "I also work directly in code — which means I can take
-                   a design from Figma all the way to implementation using
-                   AI-assisted tools. No handoff gaps, no lost details."
-                  — 18px Inter Regular (material-theme/body/large)
-
-Note: My Process frame still exists but is empty; the process
-steps have moved to the Skills section (§8).
-
-══════════════════════════════════════════════════════════
-
-## 8. Skills Section (formerly "Expertise")
-
-Instance ID:         I124:576;87:3879;234:1488
-Dimensions:          1200 × 842 px
-Background:          Schemes/Surface Container Lowest
-Stroke:              1px INSIDE
-Content Slot:        VERTICAL gap=40, padding=64/0/64/0
-
-Structure:
-  Content Slot [1072×602] — VERTICAL gap=40
-  ├── Label/Section Tag "Skills" — UPPERCASE
-  └── Container [1072×410] — HORIZONTAL gap=40
-      ├── Left Column [502×410] — VERTICAL gap=32
-      │   ├── Areas of expertise [462×216] — VERTICAL gap=32
-      │   │   ├── "Areas of expertise" — 14px Inter Medium (title/small)
-      │   │   └── Tags — WRAP layout, 10× Tag/Badge (Outlined):
-      │   │       UX Research, Wireframing, Prototyping, Figma Handoff,
-      │   │       Web Design, Mobile Apps, Landing Pages, Psychology-led UX,
-      │   │       Design Engineering, Design-to-code workflow
-      │   └── Tools [502×128] — VERTICAL gap=32
-      │       ├── "Tools" — 14px Inter Medium
-      │       └── Tags — WRAP layout, 9× Tag/Badge (Outlined):
-      │           Figma, FigJam, Maze, Protopie, Webflow,
-      │           Adobe Firefly, Cursor, VS Code, Github
-      └── Right Column [530×410]
-          └── My Process [502×410] — VERTICAL gap=32
-              ├── "My process" — 14px Inter Medium
-              └── Steps Grid [502×358] — VERTICAL
-                  ├── 01 Research & Insight
-                  ├── 02 Wireframe & Structure
-                  ├── 03 Prototype & Test
-                  └── 04 Handoff & Support
-                  Each step:
-                    Badge/Number — 11px Inter Semi Bold (label/small)
-                    Title — 16px Inter Semi Bold (label/large)
-                    Description — 14px Inter Regular (body/small)
-
-Note: Google Cert Badge and Pro Bono Banner removed from this section.
-
-══════════════════════════════════════════════════════════
-
-## 9. CTA Section
-
-Instance ID:         I124:576;87:3879;124:760
-Dimensions:          1200 × 708 px
-Background:          Schemes/Background + State Layers/Background/Opacity-08
-Content Slot:        VERTICAL gap=24
-
-Structure:
-  Content Slot [1072×468] — VERTICAL gap=24, counterAlign=CENTER
-  ├── Label/Section Tag "Reach" — UPPERCASE
-  ├── "Get in touch" — 52px Poppins Medium (display/small)
-  ├── "We answer emails fast. We're also on WhatsApp if you
-  │    prefer to talk directly." — 16px Inter Regular (body/medium)
-  ├── "Pro bono spots available for NGOs and social-impact projects."
-  │   — 16px Inter Regular (body/medium)
-  └── CTA Buttons [368×56] — HORIZONTAL gap=16
-      ├── Button/Primary "Send an email" — 208×56, radius=48, icon: mail
-      └── Button/Ghost "WhatsApp" — 144×48, radius=8
-
-Decorative Layer:
-  • floating elements — 20 bokeh circles (same pattern as Hero)
-
-══════════════════════════════════════════════════════════
-
-## 10. FAB (Floating Action Button)
-
-Instance ID:         I124:576;87:3879;311:2594
-Component:           FAB
-Dimensions:          64 × 64 px
-Positioning:         ABSOLUTE (within Slot for section)
-Background:          Schemes/Secondary Fixed Dim
-Radius:              32/32/0/32 (asymmetric — flat bottom-right corner)
-Icon:                circle-help, 24×24
-
-══════════════════════════════════════════════════════════
-
-## 11. Footer
-
-Instance ID:         I124:576;87:3880
-Component:           Footer Portfolio
-Dimensions:          1200 × 263 px
-Background:          Schemes/Background + State Layers/Background/Opacity-08
-
-Top Container [1200×202] — HORIZONTAL, SPACE_BETWEEN, pad=64:
-
-Left Column [257×74] VERTICAL gap=6:
-  • Link Button "UX42.studio" — instance of Link Button component
-  • "Aleksandra Burshtein · UX/UI Designer" — 13px Inter Medium
-
-Center Column [112×44] HORIZONTAL gap=20:
-  • 3× Social Icons (Dribbble, LinkedIn, Behance), minH=44 each
-
-Right Column [252×44] HORIZONTAL gap=16:
-  • Nav Link "Privacy Policy" — 16px Inter Regular
-  • Nav Link "Terms" — 16px Inter Regular
-  • Link "Cookies" — 16px Inter Regular
-
-Bottom Strip [1200×61]:
-  • "© 2026 UX42.studio. All rights reserved." — 13px Inter Medium
-  • "🔧" link — 13px
-
-══════════════════════════════════════════════════════════
-
-## 12. Component Registry
-
-Component                Count   Notes
-────────────────────────────────────────────────────
-Tag / Badge              19      Skills, tools (10+9 Outlined)
-Layout                    7      Section wrappers
-Portfolio Card            6      Grid items
-lucide icons              6      Various icon instances
-Nav Link                  4      Header + Footer
-Filter Button             4      Portfolio section
-Label / Section Tag       4      Work, About, Skills, Reach
-Tags & Badges             4      Container instances
-Social Icons              4      Footer + misc
-Button / Primary          3      Hero, Portfolio, CTA
-Button / Ghost            2      Hire me, WhatsApp
-Switcher / Toggle         1      Theme switch
-Button / Secondary        1      Hero "Get in touch"
-logo                      1      UX42 logo
-FAB                       1      Floating help button
-Link Button               1      Footer "UX42.studio"
-────────────────────────────────────────────────────
-Total instances:         69
-
-══════════════════════════════════════════════════════════
-
-## 13. Color Token Mapping
-
-Surface Tokens (fills):
-  • Schemes/Background — Header, Hero, CTA, Footer
-  • State Layers/Background/Opacity-08 — layered on Background sections
-  • Schemes/Surface Container Lowest — Portfolio, About, Skills
-  • Schemes/Secondary Fixed Dim — FAB background
-  • State Layers/On Surface/Opacity-08 — section border strokes
-
-Text Tokens (fills):
-  • Schemes/On Surface Variant — heading text, body, labels, tags
-  • Schemes/On Surface — headings, titles
-  • Schemes/On Background — Hero, CTA text
-  • Schemes/Primary Container — accent elements
-  • Schemes/Primary — links, highlights
-  • Extended Colors/Button Gradient Start/End — Hero "when everything"
-  • Extended Colors/Primary Button Text — filled button/tag text
-
-══════════════════════════════════════════════════════════
-
-## 14. Spacing Token Mapping
-
-Token                    Usage
-────────────────────────────────────────────────────
-spacing-120              Section vertical padding (top/bottom)
-spacing/64               Header padding, Footer padding, Skills inner pad
-spacing/32               Slot gap, Section Header gap, Text container gap
-spacing/24               Header nav gap, Grid gap, CTA gap
-spacing/16               Header vertical padding, CTA Buttons gap, Footer links
-spacing/12               Filter Buttons gap
-spacing/8                Button inner icon gap, Card inner gap
-spacing/6                Footer left column gap
-
-══════════════════════════════════════════════════════════
-
-## 15. Text Style Reference
-
-Style                             Font                Size  Usage
-───────────────────────────────────────────────────────────────
-material-theme/display/large      Poppins Medium      68px  Hero heading
-material-theme/display/small      Poppins Medium      52px  Section headings
-title/typography-h4               Poppins Medium      22px  Card titles
-material-theme/body/large         Inter Regular       18px  Subtitles, bio
-material-theme/body/medium        Inter Regular       16px  Nav, CTA body
-material-theme/body/small         Inter Regular       14px  Process descriptions
-material-theme/button/default     Inter Medium        16px  Ghost button labels
-material-theme/label/large        Inter Semi Bold     16px  Section tags, step titles
-material-theme/label/medium       Inter Medium        13px  Filters, badges, credits
-material-theme/label/small        Inter Semi Bold     11px  Badge numbers
-material-theme/title/small        Inter Medium        14px  Subsection headings
-material-theme/title/medium       Inter Medium        16px  Link Button label
-
-══════════════════════════════════════════════════════════
-
-## 16. Change Log
-
-### 2026-08-22 — Content & structure update
-
-Hero:
-  • Heading: "Design rooted in psychology & people."
-    → "I design for the moment when everything just clicks"
-  • Accent: "psychology" (Tertiary) → "when everything" (gradient)
-  • Subtitle: rewritten
-  • CTA: added Button/Secondary "Get in touch"
-  • Primary CTA: "View work" → "View case studies"
-
-Portfolio Gallery:
-  • Subtitle: "our best work" → "my work in web design, UX Research"
-
-About:
-  • Bio completely rewritten (now 3 paragraphs)
-  • New paragraph about code + AI-assisted tools
-  • My Process content moved to Skills section
-
-Skills (was "Expertise"):
-  • Section tag: "About" → "Skills"
-  • My Process moved here from About
-  • +2 tags: Design Engineering, Design-to-code workflow
-  • +2 tools: VS Code, Github
-  • Google Cert Badge and Pro Bono Banner removed
-
-Footer:
-  • Copyright moved to bottom strip with 🔧 link
-  • Link Button "UX42.studio" in left column
-
-Stats: 82/82 text styles (100%), 252/297 bindings (85%), 69 instances
-
-### 2026-08-04 — Initial spec + audit (12 findings resolved)
-
-══════════════════════════════════════════════════════════
-
-## 17. Node ID Quick Reference
-
-Main Page root:          124:575
-Page Desktop instance:   124:576
-Header:                  I124:576;87:3878
-Slot for section:        I124:576;87:3879
-Hero:                    I124:576;87:3879;124:757
-Portfolio Gallery:        I124:576;87:3879;124:758
-About:                   I124:576;87:3879;124:759
-Skills:                  I124:576;87:3879;234:1488
-CTA:                     I124:576;87:3879;124:760
-FAB:                     I124:576;87:3879;311:2594
-Footer Portfolio:        I124:576;87:3880
-
-══════════════════════════════════════════════════════════
-
-## ADDENDUM: Changes 2026-08-22 (v2)
-
-══════════════════════════════════════════════════════════
-
-### A1. NEW: BlockLabel Navigation Components
-
-4 new "BlockLabel next" instances added between sections in the Slot.
-They replace the Label/Section Tag instances that were inside each section.
-
-Component:           BlockLabel next (from Navigation component set)
-Dimensions:          992 × 17 px
-Layout:              HORIZONTAL
-
-Structure:
-  BlockLabel next [992×17] HORIZONTAL
-  ├── Text [55×17] — FRAME
-  │   └── Label — 11px Inter Semi Bold, UPPERCASE
-  │       Letter spacing: 1.54px
-  │       Color: Schemes/Surface Tint (rgba(131,215,177,1) in Dark)
-  └── Line [937×1] — FRAME (thin separator line)
-
-Instances in Slot for section (in order):
-  1. "Work"   [I124:576;87:3879;631:1285] — AUTO, before Portfolio Gallery
-  2. "About"  [I124:576;87:3879;631:1300] — AUTO, before About section
-  3. "Skills" [I124:576;87:3879;631:1302] — AUTO, before Expertise section
-  4. "Reach"  [I124:576;87:3879;631:1308] — ABSOLUTE, near CTA
-
-CSS equivalent:
-  display: flex;
-  align-items: center;
-  gap: 0;
-  width: 992px; /* or container-relative */
-
-  .label {
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 11px;
-    letter-spacing: 1.54px;
-    text-transform: uppercase;
-    color: var(--md-sys-color-surface-tint);
-  }
-
-  .line {
-    flex: 1;
-    height: 1px;
-    background: /* separator color from line strokes */;
-  }
-
-──────────────────────────────────────────────────
-
-### A2. Label/Section Tags REMOVED from sections
-
-All 4 Label/Section Tag instances removed from inside sections:
-  ✗ "Work" — was in Portfolio Gallery > Section Header
-  ✗ "About" — was in About > Content Slot
-  ✗ "Skills" — was in Skills > Content Slot
-  ✗ "Reach" — was in CTA > Content Slot
-
-Navigation labels now live OUTSIDE sections as BlockLabel components
-in the parent Slot for section.
-
-Impact on CSS:
-  • Remove <span class="section-tag"> from inside each <section>
-  • Add BlockLabel as a standalone element between <section> blocks
-  • Or implement as scroll-spy anchor labels in the page layout
-
-──────────────────────────────────────────────────
-
-### A3. Updated Top-Level Structure
-
-Main Page [124:575] FRAME 1200×5230 NO-LAYOUT
-└── Page Desktop [124:576] INSTANCE VERTICAL gap=32
-    ├── Header [I124:576;87:3878] — 1200×96
-    ├── Slot for section [I124:576;87:3879] — VERTICAL gap=32
-    │   ├── Hero — 1200×767
-    │   ├── BlockLabel "Work" — 992×17         ← NEW
-    │   ├── Portfolio Gallery — 1200×1346       (was 1450)
-    │   ├── BlockLabel "About" — 992×17        ← NEW
-    │   ├── About — 1200×776                   (was 912)
-    │   ├── BlockLabel "Skills" — 992×17       ← NEW
-    │   ├── Expertise — 1200×602               (was 842)
-    │   ├── CTA — 1200×660                     (was 708)
-    │   ├── FAB — 64×64, ABSOLUTE
-    │   └── BlockLabel "Reach" — 992×17, ABS   ← NEW
-    └── Footer Portfolio — 1200×263
-
-──────────────────────────────────────────────────
-
-### A4. Section Padding Changes
-
-About and Skills/Expertise sections:
-  • Vertical padding: 120px → 96px (top and bottom)
-  • CSS: padding-top/bottom from spacing-120 → 96px
-  • Hero and CTA unchanged (still 120px)
-
-Skills/Expertise content slot:
-  • Inner padding removed: was 64/0/64/0, now 0/0/0/0
-  • Content fills entire slot height
-
-──────────────────────────────────────────────────
-
-### A5. Portfolio Gallery Section Header
-
-Label/Section Tag "Work" removed from header.
-Section Header [1072×102] now contains only 2 children (was 3):
-
-  Before:                          After:
-  ├── Label/Section Tag "Work"     (removed)
-  ├── "Portfolio" 52px             ├── "Portfolio" 52px
-  └── Subtitle 18px               └── Subtitle 18px
-
-Height: 158px → 102px
-Section total: 1450px → 1346px
-
-──────────────────────────────────────────────────
-
-### A6. About Section Simplified
-
-Label/Section Tag "About" removed.
-Content Slot now has 1 child (was 2: Tag + Container).
-
-Height: 912px → 776px
-Padding: 120px → 96px top/bottom
-
-──────────────────────────────────────────────────
-
-### A7. Skills/Expertise Section Simplified
-
-Node name: "Expertise" (was displayed as "Skills" via Section Tag)
-Label/Section Tag "Skills" removed.
-Content Slot now has 1 child (Container only).
-Content Slot inner padding: was 64/0/64/0, now 0/0/0/0.
-
-Height: 842px → 602px
-Padding: 120px → 96px top/bottom
-
-──────────────────────────────────────────────────
-
-### A8. CTA Section Restructured
-
-Label/Section Tag "Reach" removed.
-Content Slot gap: 24px → 32px
-Body texts wrapped in "Frame 1" [484×80] VERTICAL container.
-
-New structure:
-  Content Slot [1072×420] — VERTICAL gap=32
-  ├── CTA Heading [318×60]
-  │   └── "Get in touch" — 52px Poppins Medium
-  ├── Frame 1 [484×80] — VERTICAL
-  │   ├── "We answer emails fast..." — 16px Inter Regular
-  │   └── "Pro bono spots available..." — 16px Inter Regular
-  └── CTA Buttons [368×56] — HORIZONTAL gap=16
-
-Height: 708px → 660px
-
-──────────────────────────────────────────────────
-
-### A9. Summary of Size Changes
-
-Section              Before    After     Delta
-──────────────────   ────────  ────────  ──────
-Root frame           5415px    5230px    −185
-Portfolio Gallery    1450px    1346px    −104
-About                912px     776px     −136
-Skills/Expertise     842px     602px     −240
-CTA                  708px     660px      −48
-Hero                 767px     767px       0
-Footer               263px     263px       0
-
-New BlockLabels: 4 × 17px + slot gaps = +200px approx
-Net change: −185px
-
-Component instances: 69 (same count — 4 Section Tags removed, 4 BlockLabels added)
+# Main Page — Layout Specification (актуализированная)
+Updated: 2026-08-28 — тело переписано по фактическому состоянию кода
+Figma-эталон: Portfolio UX42 (U5OjywCHbtzQgBsi7PU25r), узел 124:575 «Main Page»
+Make-эталон (хедер/карточки/кнопки): Docs/make-export/ (архив «UX42 Den (Copy)»)
+
+СТАТУС: тело спеки = текущий код, это источник правды. История решений — §13
+(сжатый архив). Пер-компонентные спеки Docs/ui/*_Spec.md описывают Figma-
+происхождение; где реализация осознанно отклоняется, в начале файла стоит
+баннер-указатель на действующий раздел этого документа.
+
+---
+
+## 1. Архитектура страницы (контейнерная модель)
+
+Паттерн Figma: Section (full-bleed) → container → Content Slot.
+Предложение Дениса, подтверждено структурой эталона 124:575.
+
+- Блок-секция тянется на всю ширину экрана, несёт фон + вертикальный паддинг:
+  py 48px (mobile) / 96px (desktop); hero и CTA — 120px (desktop).
+- Контент — внутри .section-container (globals.css):
+  max-width 1200px, margin-inline auto;
+  padding-inline: 16px mobile (<768) / 32px tablet (>=768) / 64px desktop (>=1024).
+  Планшетный паддинг в Figma отсутствует — 32 назначено, зафиксировано решением (2).
+- Старая теневая колонка (max-w-container-content + box-shadow) со страницы
+  убрана; кейс-страницы пока на прежней колонке — визуальной разницы нет
+  (1200 − 2×64 = 1072 = тот же контент).
+- Якоря секций: #portfolio / #about / #contact; глобально
+  [id] { scroll-margin-top: 104px } — 96px шапка + воздух (решение (3)).
+- Канвас страницы (body) = surface-container-lowest — тот же цвет, что у
+  блоков (свет #ffffff / тьма #0e0e0f), решение (12). Футер остаётся на
+  --background (#f7faf5 / #101412).
+
+---
+
+## 2. Header — sticky glass
+
+Реализация: SiteHeader.tsx (варианты default и breadcrumb — один паттерн).
+
+  Position:   sticky top-0 z-40 (контент скроллится под шапкой)
+  Высота:     96px (py-16 + строка контента h-64) / 64px mobile (<768: py-2 + h-12)
+  Контент:    .section-container — выровнен по колонкам секций
+  Зоны:       nav Work/About (gap 24) | имя дизайнера (центр) | ThemeToggle + CTA (gap 24)
+
+Mobile (<768) — решение (13):
+  nav и CTA скрыты; имя дизайнера (h-12) слева; справа ThemeToggle + бургер
+  (круг 48, Menu/X 24, hover color-only как ThemeToggle). Бургер открывает
+  панель fixed inset-x-0 top-16: Work / About / Hire me (primary, w-full,
+  тач-цели 48px) + backdrop fixed top-16 h-[calc(100dvh-64px)] bg-black/40.
+  top-16 — потому что backdrop-filter шапки создаёт containing block для
+  fixed-потомков (filter-effects-2); шапка sticky прижата к top:0, поэтому
+  top-16 корректен при любой трактовке CB. Панель и backdrop — внутри <header>
+  (z-10/z-0), рендерятся только в открытом состоянии.
+  Breadcrumb-вариант <768: бэк-кнопка + название кейса вместо wordmark
+  (wordmark и CTA скрыты), ThemeToggle остаётся.
+
+Стекло:
+  фон/тень → класс .header-glass (globals.css):
+    light rgba(247,250,245,0.70); dark rgba(10,10,10,0.70) ([data-theme='dark']);
+    тень 8/8/20/8% (light), 8/8/20/25% (dark).
+  blur → ТОЛЬКО utility-классами на <header>:
+    backdrop-blur-md (=12px) + backdrop-saturate-[1.8].
+    ВНИМАНИЕ: backdrop-filter в .header-glass не возвращать — LightningCSS
+    (Tailwind v4, таргеты Safari<18) схлопывает пару «стандартное+префиксное»
+    до одного -webkit- → блюр молча умирает в Firefox. Утилиты эмитят ОБЕ
+    формы свойства (решение (7)).
+  Шкала альфы: 0.88 деликатная / 0.70 текущая / 0.50 «как в Make» (решение (8)).
+
+Содержимое:
+  NavLink «Work» → /u/[slug]; «About» → /u/[slug]#about.
+  Inter Regular 16/24 (text-body-md), on-surface-variant; hover color-only → on-surface.
+  Центр: имя (логин) дизайнера — displayName, Poppins Medium title-lg, text-primary,
+  link на /u/[slug]. Логотипа UX42 в шапке нет — перенесён в футер (§9).
+  ThemeToggle: круг 48×48, иконка 24 (Sun/Moon), on-surface-variant;
+  hover color-only → text-primary (150ms). Без заливок и рамок (решение (11)).
+  CTA «Hire me» → #contact: пилюля h-14 px-8, text-primary, фон/бордер прозрачны;
+  hover: появляется border-primary-container + opacity-90 (border-transparent
+  держит место — layout не сдвигается), 150ms (решение (10)).
+
+---
+
+## 3. Hero
+
+Реализация: HeroSection.tsx. Фон surface-container-lowest (белый, решение (1)),
+FloatingElements (20 шт, blur 0–20).
+
+  height: 100dvh — хиро вытянут до самого верха страницы, под sticky-шапку
+  (решение (17)): −mt-16/−mt-24 = высота шапки (64/96px, §2) — белый фон
+  и bokeh-элементы видны сквозь её стекло.
+  Контент на прежнем месте: pt = высота шапки + прежний py
+  (112 / 192 / 216), pb 48/96/120 — контент-бокс не сдвинут, центр
+  вертикального центрирования (items-center) совпадает с прежним;
+  нижний край хиро по-прежнему на 100dvh.
+  dvh — корректно на мобильных с динамическим адресным баром.
+
+Контент (.section-container, flex-col gap-64):
+  H1: Poppins Medium 68/76, tracking −0.25px, on-surface-variant;
+      accent-часть — градиентная заливка текста primary (bg-clip-text);
+      строчный поток с явными пробелами (абсолютное left:566 из Figma не переносится).
+  Subtitle: Inter Regular 18/28 (text-body-lg), max-w 734px, on-surface.
+  Кнопки (gap-16): primary solid + secondary outline — состояния в §10.
+
+Mobile:
+  H1 — text-[40px]/[48px] → lg: 68/76 (Poppins Medium, tracking −0.25
+  наследуется; 40px вместо 37.5 display-sm — читаемость на 375px);
+  subtitle — text-body-lg без уменьшения (body, не заголовок);
+  кнопки — flex-col items-center gap-4 → sm: flex-row; hug на всех ширинах
+  (авто-ширина по контенту, решение (14) — w-full не используется);
+  min-h: 100dvh — хиро до потолка под шапкой (решение (17)).
+
+---
+
+## 4. Разделители секций (NavLabel)
+
+Реализация: локальный компонент NavLabel в page.tsx. Ставится между секциями
+Work / About / Skills / Reach (перед первой — обёртка pt-6).
+
+  Контейнер: .section-container, flex items-center gap-16px, py-0
+  Label:     Inter SemiBold 11px, uppercase, leading-4,
+             tracking 0.0455em (~0.5px), text-outline-variant (#c5c6cc)
+  Divider:   flex-1, h-1px, bg rgba(140,213,179,0.16) — единственный
+             санкционированный хардкод (до появления токена в globals.css)
+
+---
+
+## 5. Portfolio Gallery
+
+Реализация: PortfolioGallerySection.tsx. id="portfolio".
+Секция: bg-surface-container-lowest, py 48/96.
+Контейнер: flex-col items-center gap-64.
+
+  Header (центр, gap-32): H2 «Portfolio» — Poppins Medium display-sm (52/65);
+  subtitle — text-body-lg, on-surface-variant.
+  Filters (gap-12, flex-wrap): чипы pill px-24 py-12, text-label-md —
+  состояния в §10.
+  Grid: grid-cols 1 / 2 (sm) / 3 (lg), gap-24. Ячейка ≈341px = (1072−48)/3.
+  Карточка: PortfolioCard — см. Portfolio_Card_Spec.md (переписан 2026-08-28).
+
+Mobile (решения (13)–(16)):
+  Карусель <sm: strip с односторонним bleed — слева карточки выровнены по
+  полю контейнера, справа bleed до самого края экрана без правого поля
+  (-mr-4 + pr-4): карточка шире — w-[calc(100%-16px)] (327px @ 375),
+  за ней gap-4 и краешек следующей (16px) вплотную к краю экрана.
+  snap-x snap-mandatory, snap-start, gap-4, shrink-0, скроллбар скрыт;
+  без стрелок/точек. Тень карточки (вылет ~20px вниз) не срезается
+  скроллером: pb-7 внутри + −mb-5 снаружи (ритм прежний), sm:mb-0 — сброс.
+  ≥sm — grid-cols-2 (gap-4), ≥lg — grid-cols-3 (gap-6).
+  Фильтры <md: нативный <details> (серверный disclosure, без JS):
+    summary — pill h-14 (secondary-стиль): Filter 20 + «Filters» +
+    ChevronDown 16 (group-open:rotate-180), hover — зелёная заливка 5%;
+    панель — mt-4 rounded-3xl p-6 border outline/40, чипы §10
+    (justify-start, aria radio-модель сохранена);
+  ≥md — прежний ряд чипов (§10) — планшетам (640–1023) disclosure не показывается.
+
+---
+
+## 6. About
+
+Реализация: AboutSection.tsx. id="about". bg белый, py 48/96.
+Колонки: 516px + gap-40 + 516px = 1072 ✓ (lg; на мобиле — стопка).
+
+  Left:  placeholder rounded-3xl bg-surface-container-low p-7,
+         растягивается по высоте правой колонки.
+  Right: H2 display-sm on-surface; параграфы text-body-lg
+         on-surface-variant, gap-16.
+
+Backlog: декоративные блобы вместо плоского placeholder — §12/i.
+
+---
+
+## 7. Skills
+
+Реализация: SkillsSection.tsx. bg белый, py 48/96.
+Колонки: 502 + 40 + 530 = 1072 ✓ (lg).
+
+  Заголовки колонок: title-sm, on-surface-variant
+  («Areas of expertise», «Tools», «My process»).
+  Теги: TagBadge variant="outlined" size="lg" — Inter Medium 16/24,
+  bg white (surface-container-lowest), border primary/16,
+  px-12 py-6, radius 10, on-surface-variant (эталон make-export;
+  дефолт 13px — только case-страницы, см. Tag_Badge_Spec.md).
+  Process: бейдж 32×32 круг, border-2 primary, bg-surface, номер 11px
+  semibold tracking 0.5; title label-lg semibold on-surface;
+  description body-sm on-surface-variant; шаги gap-24.
+
+---
+
+## 8. CTA «Get in touch»
+
+Реализация: CtaSection.tsx. id="contact". bg белый, py 48/96/120,
+FloatingElements (20).
+Контент: центр, flex-col gap-32.
+
+  H2: display-sm, on-surface.
+  Body: строки text-body-md on-surface, gap-4.
+  Кнопки (gap-16, wrap): Email — primary solid с иконкой Mail 24;
+  WhatsApp — outline pill h-14 (secondary-семейство), target=_blank.
+  Все кнопки hug (авто-ширина по контенту) на всех брейкпоинтах —
+  решение (14).
+
+---
+
+## 9. Footer
+
+Реализация: SiteFooter.tsx. bg-background (#f7faf5), py 48/64,
+.section-container, flex-col gap-32.
+
+  Row 1 (justify-between, items-start):
+    Бренд: логотип «UX42.studio» → / (Poppins title-lg text-primary;
+    перенесён из шапки, решение (2)); имя дизайнера (title-lg on-surface);
+    headline (label-md on-surface-variant).
+    Соц-иконки: круги 44, ghost → hover opacity-70.
+    Legal: Privacy / Terms / Cookies (h-44, text-body-md), ghost → opacity-70.
+    Back to Gallery: outline pill h-12 px-6 rounded-full, border-outline-variant,
+    label-lg text-primary → hover заливка rgba(11,110,79,0.05) + opacity-90.
+  Row 2: border-t outline-variant, pt-24 —
+    «© YYYY UX42.studio. All rights reserved.» (label-md).
+
+---
+
+## 10. Кнопочная система — единый паттерн состояний
+
+Осознанное отклонение от Figma-спек кнопок (Primary/Secondary/Ghost/Filter/Link)
+— решения (9)–(11). Референс — primary: hover opacity-90, transition 150ms
+ease-out; active-состояний нет; focus-visible только где был (чипы, карточка).
+Тёмная тема: отдельных dark-заливок нет — opacity и тени работают в обеих темах.
+
+  SOLID (primary hero, email CTA, view-all, выбранный чип):
+    bg-primary (чип — bg-surface-tint #056c4d), text-on-primary,
+    тень 2/2/4/10% → hover: opacity-90 + тень 4/4/12/20%.
+    transition [box-shadow, opacity].
+  OUTLINE (hero secondary, WhatsApp, Back to Gallery):
+    border-primary-container (Back to Gallery — outline-variant), белая заливка,
+    та же тень → hover: заливка rgba(11,110,79,0.05) + opacity-90 + рост тени.
+    transition [box-shadow, opacity, background-color].
+  PILL-GHOST-BORDER (Hire me):
+    прозрачные фон и бордер → hover: border-primary-container + opacity-90.
+    transition [border-color, opacity]. border-transparent держит место.
+  GHOST (legal-ссылки, соц-иконки):
+    hover opacity-70 (90 на прозрачных фонах не виден).
+  COLOR-ONLY (nav-ссылки, ThemeToggle):
+    hover меняет только цвет: nav on-surface-variant → on-surface;
+    toggle on-surface-variant → primary.
+
+Чипы фильтров: selected = SOLID-семейство; unselected = bg-surface/8,
+hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
+
+---
+
+## 11. FAB
+
+Реализация: FAB.tsx — зелёный (розовый #ffb3b1 из эталона не переносился,
+§12/f), 64×64, rounded-full, z-50 (выше шапки z-40), ведёт на #contact.
+
+---
+
+## 12. Backlog — находки эталона 124:575, не перенесённые в код
+
+  a. Hero Stats row (gap 48): «10+ / MSc / NGO» — значение Poppins 26/34
+     accent, подпись Inter 14/22 ls 0.4, muted.
+  b. Pro Bono Banner после Skills: full-width card r24, bg
+     surface-container-low, pad 28, Inter 16/24 ls 0.25 + Secondary.
+  c. CTA WhatsApp — РЕАЛИЗОВАНО (outline pill, §8).
+  d. Градиентные primary-кнопки #00543b → #336210 — в коде solid.
+  e. Чипы фильтров 13px Medium ls 0.5, selected = инверсия
+     (#003826 на #83d7b1) — в коде label-md (14px) + solid tint.
+  f. Розовый FAB (#ffb3b1, иконка #410007) — в коде зелёный.
+  g. «next case →» Ghost-кнопка в BlockLabel-разделителях.
+  h. Footer по эталону: socials gap 20, legal Inter 16/24 ls 0.25,
+     divider white/10 (dark), copyright 13 Medium ls 0.5.
+  i. About: декоративные блобы с микро-копией вместо плоского placeholder.
+
+---
+
+## 13. История решений — архив 2026-08-27 (сжато)
+
+Полные формулировки — в предыдущих ревизиях файла (git-история, бэкап).
+
+  (1)  Первая сверка: фон Hero/CTA = белый; страйки секций не реализованы;
+       BlockLabel #c5c6cc / 0.5px; карточка резиновая (334 — intrinsic);
+       картинка top-aligned h-256; хардкод divider; hero-заголовок inline-flow;
+       якоря #portfolio/#about/#contact.
+  (2)  Новый эталон 124:575 + контейнерная архитектура .section-container
+       (16/32/64); header: displayName в центр, лого → футер; backlog a–i (§12).
+  (3)  Header sticky + стекло по рецепту Make (blur-md) + .section-container
+       внутри; scroll-margin-top 104px.
+  (4)  Плотность шапки (0.9/0.9 — позже пересмотрено); Hero = 100dvh − 96px.
+  (5)  Стекло по вердикту агента Make: градиент 0.88→0.10, blur 4px, тёмная
+       тень 25%.
+  (6)  Диагноз Дениса: оба края 0.88 (равномерная плашка), blur 12px +
+       saturate 180%.
+  (7)  Блюра не было вовсе: LightningCSS (таргеты Safari<18) вырезал
+       стандартный backdrop-filter из literal-правила, оставив только
+       -webkit- (мёртво в Firefox). Fix: blur/saturate — utility-классами
+       на <header>; .header-glass = только фон/тень.
+  (8)  Альфа 0.88 → 0.70 (обе темы).
+  (9)  Карточки по make-export (белый корпус, scale 1.02/500ms, zoom 110/700ms,
+       градиент from .9 / via .5, overlay-заголовок убран) + кнопки: единый
+       opacity-паттерн (solid/outline 90, ghost 70), WhatsApp и
+       Back to Gallery — pill.
+  (10) Тени уравнены (primary = secondary: 2/2/4/10 → 4/4/12/20); secondary
+       hover = заливка 5%; чипы unselected = заливка 10%; Hire me — pill h-14
+       + border-on-hover; карточки: flex-1 у текстовой зоны + truncate.
+  (11) ThemeToggle: сначала border-паттерн Hire me, финал — color-only hover
+       (hover:text-primary), без заливок и рамок.
+  (12) 2026-08-28: канвас страницы (body) → surface-container-lowest — тот же
+       цвет, что у блоков (свет #ffffff / тьма #0e0e0f). Фидбэк: стык стеклянной
+       шапки с белым хиро читался грязновато; футер остался на --background
+       (#f7faf5/#101412). Тёплый розоватый оттенок при скролле дают также
+       лавандово-лаймовые блобы Hero (#a29ffe/#c084fc/#ccff00) под стеклом —
+       отдельное решение, не входящее в (12).
+  (13) 2026-08-29 — Адаптив главной (mobile-first):
+       Hero: H1 40/48 → lg:68/76 (40px — deliberate-отклонение от display-sm
+       37.5 ради читаемости на 375px); кнопки стопкой до sm;
+       min-h −64px (мобильная шапка) → md:−96px.
+       Gallery: <sm карусель (snap-x, bleed −mx-4, basis-85%, snap-center,
+       скроллбар скрыт) → sm:grid-2 → lg:grid-3; фильтры <md — нативный
+       <details>-disclosure (pill + панель чипов, без JS) → md: ряд чипов
+       (уточнено в (14)).
+       About/CTA: H2 32/40 → lg:display-sm; кнопки CTA стопкой до sm.
+       Header: 96 → 64 (<768: py-2, wordmark h-12); nav+CTA скрыты, бургер
+       (круг 48, Menu/X) → панель fixed top-16 + backdrop (учёт containing
+       block от backdrop-filter — см. §2); case-вариант: бэк-кнопка +
+       название кейса вместо wordmark. ThemeToggle/Hire me не изменены.
+       Брейкпоинты по смыслу блоков: sm 640 (кнопки/карусель), md 768
+       (шапка, фильтры), lg 1024 (заголовки, колонки) — между опорными
+       375/1440.
+  (14) 2026-08-29 — Финализация адаптива по фидбэку:
+       Кнопки — hug (авто-ширина по контенту) на всех брейкпоинтах: убраны
+       w-full и sm:w-auto (hero primary/secondary, CTA email/whatsapp, Hire me
+       в мобильном меню); вертикальная стопка на узких сохранена
+       (flex-col → sm:flex-row). Фильтр-disclosure перенесён с <lg на <md —
+       планшетам (640–1024) вернули ряд чипов. Из CTA удалён внутренний
+       лейбл «Reach» (проп label + рендер); разделитель NavLabel «Reach»
+       над секцией сохранён.
+  (15) 2026-08-29 — Второй виток по фидбэку (скриншот десктопа):
+       Причина распирания «Get in touch» на десктопе — w-full у secondary,
+       оставшийся после (14); снят, primary больше не сжимается флексом
+       (2-строчный перенос текста исчез). Страховка: whitespace-nowrap на
+       всех пилюлях (hero primary/secondary, CTA email/whatsapp). CTA-контейнер
+       получил items-center (кнопки не тянутся в колонке). Back to Gallery —
+       self-start + nowrap (футерная колонка растягивала кнопку и переносила
+       текст на мобильных). Карусель v2: односторонний bleed (слева по
+       контейнеру, справа -mr-4 + pr-4), карточка w-[calc(100%-32px)]
+       (327px @ 375, peek соседа ~16px), snap-center; Image sizes =
+       «(min-width: 640px) 341px, calc(100vw - 48px)» — точно по геометрии.
+  (16) 2026-08-31 — Карусель v3 по фидбэку (мобильный скриншот). Зелёная
+       пометка — левое поле контейнера ок (не тронуто). Оранжевая — карточку
+       шире, «паддинг справа» убрать совсем, сосед виден хоть немного:
+       причина — ошибка расчёта basis, 100% резолвился от контент-бокса
+       скроллера уже С УЧЁТОМ bleed −mr-4 (pr-4 в % не входит) → фактически
+       карточка была 311px @ 375, а не 327. Новый basis = calc(100%−16px):
+       карточка 327px, справа только gap-4 и 16px соседа вплотную к краю
+       экрана (белой полосы перед ним больше нет). Красная — тень карточки
+       срезалась скроллером (overflow-x-auto + pb-2=8px при вылете тени
+       ~20px вниз): pb-7 (28px) внутри + компенсация −mb-5 снаружи — тень
+       видна, вертикальный ритм (8+64) сохранён; на ≥sm сброс sm:mb-0.
+       Image sizes «calc(100vw − 48px)» совпал с новой шириной — без правок.
+  (17) 2026-08-31 — Хиро «до потолка» (фидбэк: bokeh-элементы должны быть
+       видны и под стеклянной шапкой). −mt-16/−mt-24 (= высота sticky-шапки
+       64/96, §2) + min-h 100dvh: фон и FloatingElements заходят под стекло.
+       Контент не сдвинут: верхний паддинг увеличен ровно на высоту шапки
+       (pt 112/192/216 = шапка + прежние py 48/96/120) — контент-бокс и
+       центр items-center совпадают с прежними на всех брейкпоинтах, нижний
+       край хиро остался на 100dvh (пропорции первого экрана те же).
+       Шапка z-40 поверх (hero z-auto); overflow-hidden hero обрезает bokeh
+       по новой верхней границе y=0.
+

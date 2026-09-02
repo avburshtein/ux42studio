@@ -326,3 +326,23 @@ interface TagBadgeProps {
   backdrop-filter: blur(4px);
   color: var(--md-sys-color-on-primary);
 }
+
+────────────────────────────────────────────────────────────────
+## 2026-08-28 — Size variant "lg" (актуализация)
+────────────────────────────────────────────────────────────────
+
+Make-export ground truth: теги Skills & Tools на главной портфолио —
+Inter Medium 16px / lh 24 (а не 13px).
+
+Реализация (src/components/case/TagBadge.tsx): props.size = 'md' | 'lg'.
+
+  size="lg": 16px / 24px, letter-spacing 0; геометрия — по variant.
+    На главной используется outlined: bg surface-container-lowest (white),
+    border primary/16 (= rgba(0,84,59,0.16)), px-12 py-6, radius 10,
+    цвет on-surface-variant.
+
+  size="md" (дефолт): 13px / 20px, ls 0.5 (label-md) — как в §3 выше;
+    применяется на case-страницах.
+
+Использование: SkillsSection (expertise + tools) —
+variant="outlined" size="lg".

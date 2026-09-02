@@ -19,20 +19,20 @@ interface SkillsSectionProps {
  * 1200×842, Surface Container Lowest, border top
  */
 export function SkillsSection({
-  label = 'Skills', expertiseTags, toolTags, processSteps,
+  expertiseTags, toolTags, processSteps,
 }: SkillsSectionProps) {
   if (expertiseTags.length === 0 && toolTags.length === 0 && processSteps.length === 0) return null;
 
   return (
-    <section className="bg-surface-container-lowest px-8 py-24 lg:px-16">
-      <div className="flex flex-col gap-16">
+    <section className="bg-surface-container-lowest py-12 md:py-24">
+      <div className="section-container flex flex-col gap-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-10">
           <div className="flex w-full flex-col gap-8 lg:w-[502px]">
             {expertiseTags.length > 0 && (
               <div className="flex flex-col gap-8">
                 <h3 className="text-title-sm font-medium text-on-surface-variant">Areas of expertise</h3>
                 <div className="flex flex-wrap gap-3">
-                  {expertiseTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" />)}
+                  {expertiseTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
                 </div>
               </div>
             )}
@@ -41,7 +41,7 @@ export function SkillsSection({
               <div className="flex flex-col gap-8">
                 <h3 className="text-title-sm font-medium text-on-surface-variant">Tools</h3>
                 <div className="flex flex-wrap gap-3">
-                  {toolTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" />)}
+                  {toolTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
                 </div>
               </div>
             )}

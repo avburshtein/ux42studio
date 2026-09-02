@@ -1,0 +1,157 @@
+/* Slick Carousel custom styles for dark mode */
+
+/* Arrows */
+.slick-prev,
+.slick-next {
+  z-index: 1;
+  width: 40px;
+  height: 40px;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 40px;
+  color: #0B6E4F;
+  opacity: 1;
+}
+
+.dark .slick-prev:before,
+.dark .slick-next:before {
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+.slick-prev {
+  left: -45px;
+}
+
+.slick-next {
+  right: -45px;
+}
+
+/* Mobile arrows positioning */
+@media (max-width: 768px) {
+  .slick-prev {
+    left: 10px;
+  }
+  
+  .slick-next {
+    right: 10px;
+  }
+  
+  .slick-prev:before,
+  .slick-next:before {
+    font-size: 30px;
+  }
+}
+
+/* Dots */
+.slick-dots li button:before {
+  font-size: 12px;
+  color: #0B6E4F;
+  opacity: 0.5;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #0B6E4F;
+  opacity: 1;
+}
+
+.dark .slick-dots li button:before {
+  color: #ffffff;
+  opacity: 0.3;
+}
+
+.dark .slick-dots li.slick-active button:before {
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+/* Slide spacing */
+.slick-slide {
+  padding: 0;
+}
+
+.slick-slide > div {
+  padding: 0 10px;
+}
+
+/* Ensure slides don't overlap */
+.slick-track {
+  display: flex !important;
+  align-items: stretch;
+}
+
+.slick-slide {
+  height: inherit !important;
+  display: flex !important;
+  align-items: stretch;
+}
+
+.slick-slide > div {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Custom arrow buttons */
+.custom-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(11, 110, 79, 0.9);
+  color: white;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.custom-arrow:hover {
+  background: rgba(11, 110, 79, 1);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.dark .custom-arrow {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.dark .custom-arrow:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.custom-arrow.prev {
+  left: 10px;
+}
+
+.custom-arrow.next {
+  right: 10px;
+}
+
+.custom-arrow:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Mobile custom arrows */
+@media (max-width: 768px) {
+  .custom-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .custom-arrow.prev {
+    left: 5px;
+  }
+  
+  .custom-arrow.next {
+    right: 5px;
+  }
+}
