@@ -25,7 +25,8 @@ interface SiteHeaderProps {
 // вырезает стандартный backdrop-filter из literal-правил, оставляя только
 // -webkit- (молча не работает в Firefox). Утилиты генерируют ОБЕ формы —
 // см. Main_page_Spec 2026-08-27 (7).
-// Высота: 96px desktop (py-16 + контент h-16=64) / 64px mobile (<768: py-2 + h-12).
+// Высота: 72px desktop (py-2*2 + контент h-14=56, стандарт индустрии 56–72px,
+// решение 2026-09-02 (18) в Main_page_Spec.md) / 64px mobile (<768: py-2 + h-12).
 // Контент — внутри .section-container (max-w 1200, pads 16/32/64).
 // Mobile (<768): nav скрыт, имя слева, справа ThemeToggle + бургер; бургер
 // открывает панель Work/About/Hire me (backdrop + absolute top-full под шапкой).
@@ -42,7 +43,7 @@ export function SiteHeader({
 
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
             {/* Mobile menu (<768): backdrop + панель под шапкой.
                 ВАЖНО: backdrop-filter на <header> создаёт containing block для
@@ -142,7 +143,7 @@ export function SiteHeaderBreadcrumb({
 }: SiteHeaderBreadcrumbProps) {
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container flex w-full items-center justify-between gap-0'>
@@ -212,7 +213,7 @@ function WordmarkLink({
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary md:h-16',
+                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary md:h-14',
                 className,
             )}
             aria-label={label}
@@ -227,7 +228,7 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary md:h-16',
+                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary md:h-14',
                 className,
             )}
             aria-label='UX42.studio'

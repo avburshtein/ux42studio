@@ -484,10 +484,10 @@ body {
 
 /*
  * Sticky-шапка: якорные переходы (#portfolio / #about / #contact) не должны
- * прятать заголовки секций под ней. Отступ = высота шапки (96px) + 8px.
+ * прятать заголовки секций под ней. Отступ = высота шапки (72px) + 8px.
  */
 [id] {
-  scroll-margin-top: 104px; /* desktop: шапка 96px + 8px */
+  scroll-margin-top: 80px; /* desktop: шапка 72px + 8px (решение (18)) */
 }
 
 @media (max-width: 767px) {

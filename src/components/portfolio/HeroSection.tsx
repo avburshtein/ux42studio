@@ -15,10 +15,10 @@ interface HeroSectionProps {
 /**
  * Hero Section — Main_page_Spec §3
  * Высота: 100dvh — хиро вытянут до самого верха страницы (решение (17)):
- * −mt-16/−mt-24 = высота sticky-шапки (64/96px, §2), белый фон и
+ * −mt-16/−mt-[72px] = высота sticky-шапки (64/72px, §2 решение (18)), белый фон и
  * FloatingElements заходят под её стекло. Контент на прежнем месте:
  * верхний паддинг увеличен ровно на высоту шапки
- * (64+48=112 → pt-28; 96+96=192 → md:pt-48; 96+120=216 → lg:pt-[216px]) —
+ * (64+48=112 → pt-28; 72+96=168 → md:pt-42; 72+120=192 → lg:pt-48) —
  * контент-бокс и вертикальный центр не сдвинулись, нижний край хиро
  * по-прежнему на 100dvh (пропорции первого экрана сохранены).
  * dvh — корректно на мобильных с динамическим адресным баром.
@@ -30,7 +30,7 @@ export function HeroSection({
   secondaryCtaLabel, secondaryCtaHref,
 }: HeroSectionProps) {
   return (
-    <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-24 md:pb-24 md:pt-48 lg:pb-30 lg:pt-[216px]">
+    <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
       <FloatingElements count={20} minBlur={0} maxBlur={20} />
 
       <div className="section-container relative z-10 flex flex-col gap-16">
