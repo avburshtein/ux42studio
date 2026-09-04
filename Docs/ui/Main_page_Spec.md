@@ -394,3 +394,18 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        мобильное dropdown-меню в menuMode отключено (панель универсальна).
        Заодно убран «блуждающий n» — текстовый узел-остаток склейки файла
        страницы (фидбэк со скриншота).
+
+  (21) 2026-09-04 — Главная пересобрана по исходнику главного сайта
+       (HomeDesktop): взяты секции Hero (2), Approach (4, паттерн Layout2
+       «Human insight meets intelligent tools») и CTA (10). Блоки Work/Studio
+       и карточки каталога сняты до отдельного решения (фидбэк: «карточки
+       пока не берём»). Новый компонент ApproachSection (portfolio/):
+       тэглайн Approach (label-md uppercase) + градиентный H2
+       (from-primary → #2C5A07, 32→52px) + текст + primary-пилюля
+       Start a project (#contact); справа/сверху (mobile order-1) —
+       градиентная панель rounded-24 с FloatingElements вместо фото (ассетов
+       в public нет). Адаптив — по странице дизайнера: mobile — визуал
+       сверху, текст снизу; lg — 2 колонки (текст слева). Hero: primary-CTA
+       теперь «Our approach» → #approach (якоря #work/#studio удалены).
+       Nav: Approach/Contact. page.tsx больше не обращается к БД
+       (revalidate/db-импорты сняты), страница статическая.
