@@ -409,3 +409,10 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        теперь «Our approach» → #approach (якоря #work/#studio удалены).
        Nav: Approach/Contact. page.tsx больше не обращается к БД
        (revalidate/db-импорты сняты), страница статическая.
+  (22) 2026-09-04 — Каталог возвращён по фидбэку («верни галерею»):
+       Work (фильтры + PortfolioCard) и Studio (Stats + Pro Bono) полностью
+       восстановлены из коммита b0e8dca~1 (решение (19)). Approach остался
+       между Hero и Work. Итоговый состав: Header → Hero (View our work
+       → #work) → Approach → Work (#work) → Studio (#studio) → CTA → Footer.
+       Страница снова серверная (db, revalidate = 300).
+
