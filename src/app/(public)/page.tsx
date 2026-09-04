@@ -105,8 +105,6 @@ export default async function HomePage({
                     secondaryCtaHref='#contact'
                 />
 
-                <ApproachSection />
-
                 {/* Work — каталог проектов (Main_page_Spec §6 паттерн) */}
                 <section id='work' className='bg-surface-container-lowest py-12 md:py-24'>
                     <div className='section-container flex flex-col items-center gap-16'>
@@ -175,6 +173,8 @@ export default async function HomePage({
                         )}
                     </div>
                 </section>
+
+                <ApproachSection />
 
                 {/* Studio — stats (эталон: Stats-блок) + Pro Bono Banner */}
                 <section id='studio' className='bg-surface-container-lowest py-12 md:py-24'>

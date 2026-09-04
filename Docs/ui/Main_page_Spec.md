@@ -416,3 +416,9 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        → #work) → Approach → Work (#work) → Studio (#studio) → CTA → Footer.
        Страница снова серверная (db, revalidate = 300).
 
+
+  (23) 2026-09-04 — Approach перенесён после Work (порядок: Hero → Work →
+       Approach → Studio). Фон Approach сменён на bg-surface-container-lowest
+       (= Work), сверху добавлен NavLabel-разделитель «Approach» — 1:1 с
+       блоком Work (label 11px uppercase outline-variant + линия
+       rgba(140,213,179,0.16)).
