@@ -11,16 +11,21 @@ export function AboutSection({ title, paragraphs, imageUrl }: AboutSectionProps)
   return (
     <section id='about' className="scroll-mt-20 bg-surface-container-lowest py-12 md:py-24">
       <div className="section-container flex flex-col gap-16">
-        <div className="flex flex-col gap-10 lg:flex-row lg:gap-10">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt=''
-              className='aspect-[516/495] w-full shrink-0 rounded-3xl bg-surface-container-low object-cover lg:w-[516px]'
-            />
-          ) : (
-            <div className='w-full shrink-0 rounded-3xl bg-surface-container-low p-7 lg:w-[516px]' />
-          )}
+        {/* lg: две колонки одной высоты — картинка тянется по высоте текстового
+            блока (align-items: stretch), верх текста = верх картинки.
+            Figma-эталон: ~516×495; min-h защищает пропорцию при коротком тексте. */}
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10">
+          {/* Image: высоту держит wrapper (aspect на мобиле, stretch на lg) */}
+          <div className='aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-surface-container-low lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
+            {imageUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={imageUrl}
+                alt=''
+                className='h-full w-full object-cover'
+              />
+            )}
+          </div>
 
           <div className="flex w-full flex-col gap-8 lg:w-[516px]">
             <h2 className="font-display text-[32px] font-medium leading-[40px] text-on-surface lg:text-display-sm lg:leading-tight">

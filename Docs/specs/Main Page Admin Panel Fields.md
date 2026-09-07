@@ -450,3 +450,11 @@ UI в админке:
    на следующую сессию (план: @material/material-color-utilities, схема
    из seed-цвета по M3, переопределение CSS-переменных токенов;
    floating: color + shape circle/blob/square/ring, дефолт — как есть).
+
+РЕШЕНИЕ 5 (2026-09-07) — About: выравнивание колонок.
+ • Изображение и текстовый блок — одной высоты на lg: flex-row +
+   items-stretch; высоту картинки держит wrapper (aspect 516/495 на
+   мобиле, lg:aspect-auto + min-h-[495px] + stretch по высоте текста),
+   img h-full w-full object-cover.
+ • Заголовок — на верхней линии изображения (оба блока стартуют сверху).
+ • Пустая заглушка без imageUrl — тот же wrapper (сохраняет пропорцию).
