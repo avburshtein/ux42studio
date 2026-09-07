@@ -17,6 +17,7 @@ import {
 import Link from 'next/link';
 import { Eye } from 'lucide-react';
 import FormBox from '@/components/ui/FormBox';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
 import { getMyMainPageContent } from '@/lib/actions/profile';
@@ -29,6 +30,8 @@ const formSchema = z.object({
     location: z.string().optional().or(z.literal('')),
     website: z.string().url().optional().or(z.literal('')),
     slug: z.string().min(1, 'Slug is required'),
+    ogImageFileId: z.string().optional().or(z.literal('')),
+    faviconFileId: z.string().optional().or(z.literal('')),
 });
 
 // Разделы левого сайдбара (как в редакторе кейса портфолио)
@@ -64,12 +67,18 @@ export default function ProfilePage() {
     // Активный раздел сайдбара
     const [section, setSection] = useState<SectionId>('profile');
     // Аватар/обложка редактируются в разделе Hero (MainPageContentEditor)
-    const [initialFiles, setInitialFiles] = useState({ avatar: '', cover: '' });
+    const [initialFiles, setInitialFiles] = useState({
+        avatar: '',
+        cover: '',
+        og: '',
+        favicon: '',
+    });
 
     const {
         register,
         handleSubmit,
         reset,
+        setValue,
         watch,
         formState: { errors },
     } = useForm<FormData>({
@@ -81,6 +90,8 @@ export default function ProfilePage() {
             location: '',
             website: '',
             slug: '',
+            ogImageFileId: '',
+            faviconFileId: '',
         },
     });
 
@@ -103,6 +114,8 @@ export default function ProfilePage() {
                 setInitialFiles({
                     avatar: profile.avatarFileId ?? '',
                     cover: profile.coverFileId ?? '',
+                    og: profile.ogImageFileId ?? '',
+                    favicon: profile.faviconFileId ?? '',
                 });
                 setSocialLinks(
                     profile.socialLinks.map((link) => ({
@@ -136,6 +149,8 @@ export default function ProfilePage() {
                 bio: data.bio || undefined,
                 location: data.location || undefined,
                 website: data.website || undefined,
+                ogImageFileId: data.ogImageFileId || null,
+                faviconFileId: data.faviconFileId || null,
             });
             setSuccess(true);
             router.refresh();
@@ -254,6 +269,36 @@ export default function ProfilePage() {
                             type='url'
                             {...register('website')}
                         />
+                    </div>
+
+                    {/* SEO: OG-обложка и фавикон страницы дизайнера */}
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <div>
+                            <Label>OG Cover (1200×630)</Label>
+                            <ImageUploaderField
+                                value={watch('ogImageFileId') || null}
+                                onChange={(fileId) =>
+                                    setValue('ogImageFileId', fileId ?? '')
+                                }
+                                aspectRatio={1200 / 630}
+                            />
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Превью ссылки в соцсетях и мессенджерах.
+                            </p>
+                        </div>
+                        <div>
+                            <Label>Favicon (square)</Label>
+                            <ImageUploaderField
+                                value={watch('faviconFileId') || null}
+                                onChange={(fileId) =>
+                                    setValue('faviconFileId', fileId ?? '')
+                                }
+                                aspectRatio={1}
+                            />
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Иконка во вкладке браузера (32×32+).
+                            </p>
+                        </div>
                     </div>
 
                     {/* Social Links */}

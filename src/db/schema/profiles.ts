@@ -17,6 +17,9 @@ export const profiles = sqliteTable('profiles', {
   website: text('website'),
   // Контент главной страницы дизайнера (Docs/specs/Main Page Admin Panel Fields.md)
   mainPageContent: text('main_page_content', { mode: 'json' }).$type<MainPageContent>(),
+  // SEO-брендинг профиля: OG-обложка и фавикон (files.id)
+  ogImageFileId: text('og_image_file_id').references(() => files.id),
+  faviconFileId: text('favicon_file_id').references(() => files.id),
   isPublic: integer('is_public').notNull().default(1),
   createdAt: integer('created_at').notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at').notNull().default(sql`(unixepoch())`),

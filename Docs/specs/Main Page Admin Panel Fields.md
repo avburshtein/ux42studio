@@ -432,3 +432,21 @@ UI в админке:
    кнопкой Save Main Page Content (updateProfile после saveMainPageContent).
  • Bio остаётся в разделе Profile; используется как fallback абзацев About
    (normalizeMainPageContent), пока paragraphs 1–3 не заданы.
+
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 4) — правки по фидбэку 3
+═══════════════════════════════════════════════════════════
+ • OG-обложка и фавикон в разделе Profile: новые колонки
+   profiles.og_image_file_id / favicon_file_id (миграция
+   20260907100000_add_profile_og_favicon), relations ogFile/faviconFile.
+   Сохраняются в форме Profile (updateProfile, null = снять ссылку;
+   старый файл из R2 не удаляется — допустимо для MVP).
+   /u/[slug] generateMetadata: openGraph.images + icons.icon → /r2/ URL.
+ • Выравнивание: legend секций редактора — w-full + text-left (браузер
+   центрировал legend по умолчанию).
+ • Карточки галереи одной высоты: обёртка items — flex, карточка
+   растягивается по высоте grid-ячейки (строки выровнены по самой высокой).
+ • Пункт «цветовая тема + форма/цвет floating elements» — запланирован
+   на следующую сессию (план: @material/material-color-utilities, схема
+   из seed-цвета по M3, переопределение CSS-переменных токенов;
+   floating: color + shape circle/blob/square/ring, дефолт — как есть).

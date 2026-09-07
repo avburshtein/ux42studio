@@ -35,6 +35,8 @@ export type ProfileData = {
     slug: string;
     avatarFileId: string | null;
     coverFileId: string | null;
+    ogImageFileId: string | null;
+    faviconFileId: string | null;
     socialLinks: Array<{
         id: string;
         platform: string;
@@ -69,6 +71,8 @@ export async function getMyProfile(): Promise<ProfileData | null> {
         slug: profile.slug,
         avatarFileId: profile.avatarFileId,
         coverFileId: profile.coverFileId,
+        ogImageFileId: profile.ogImageFileId,
+        faviconFileId: profile.faviconFileId,
         socialLinks: profile.socialLinks.map((link) => ({
             id: link.id,
             platform: link.platform,
@@ -170,6 +174,9 @@ export async function updateProfile(
         // null = явное удаление (снимаем ссылку и чистим R2)
         avatarFileId?: string | null;
         coverFileId?: string | null;
+        /** SEO: OG-обложка и фавикон (null = удалить ссылку; старый файл в R2 не трогаем) */
+        ogImageFileId?: string | null;
+        faviconFileId?: string | null;
         location?: string;
         website?: string;
         isPublic?: number;

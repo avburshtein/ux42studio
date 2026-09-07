@@ -115,7 +115,11 @@ export function PortfolioGallerySection({
         <div className="-mr-4 -mb-5 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mb-0 sm:mr-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
           {visibleItems
             ? visibleItems.map((it, i) => (
-                <div key={`${it.category}-${i}`}>{it.node}</div>
+                // flex: карточка растягивается по высоте grid-ячейки —
+                // все карточки строки выровнены по самой высокой
+                <div key={`${it.category}-${i}`} className='flex [&>*]:w-full'>
+                  {it.node}
+                </div>
               ))
             : children}
         </div>
