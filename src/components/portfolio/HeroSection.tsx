@@ -1,5 +1,6 @@
-import Link from 'next/link';
 import { FloatingElements } from '../FloatingElements';
+import { CtaButton } from './CtaButton';
+import type { ButtonVariant } from '@/lib/mainPageContent';
 
 interface HeroSectionProps {
   headlinePart1: string;
@@ -8,8 +9,17 @@ interface HeroSectionProps {
   subtitle: string;
   primaryCtaLabel: string;
   primaryCtaHref: string;
+  primaryCtaVariant?: ButtonVariant;
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
+  secondaryCtaVariant?: ButtonVariant;
+  /** Аватар дизайнера (из профиля) — круглая аватарка над заголовком */
+  avatarUrl?: string;
+  /** Cover дизайнера (из профиля) — фон Hero с оверлеем для читаемости */
+  coverUrl?: string;
+  displayName?: string;
+  /** Декоративные Floating Elements (bokeh) — отключаются из админки */
+  floatingElements?: boolean;
 }
 
 /**
@@ -27,14 +37,34 @@ interface HeroSectionProps {
 export function HeroSection({
   headlinePart1, headlineAccent, headlinePart2,
   subtitle, primaryCtaLabel, primaryCtaHref,
+  primaryCtaVariant = 'primary',
   secondaryCtaLabel, secondaryCtaHref,
+  secondaryCtaVariant = 'secondary',
+  avatarUrl, coverUrl, displayName,
+  floatingElements = true,
 }: HeroSectionProps) {
   return (
     <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
-      <FloatingElements count={20} minBlur={0} maxBlur={20} />
+      {/* Cover — фон Hero (из профиля); оверлей сохраняет читаемость текста */}
+      {coverUrl && (
+        <div className="absolute inset-0" aria-hidden="true">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={coverUrl} alt="" className="h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-surface-container-lowest/70" />
+        </div>
+      )}
+      {floatingElements && <FloatingElements count={20} minBlur={0} maxBlur={20} />}
 
       <div className="section-container relative z-10 flex flex-col gap-16">
         <div className="flex flex-col gap-8">
+          {avatarUrl && (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={avatarUrl}
+              alt={displayName ?? 'Designer avatar'}
+              className="h-20 w-20 rounded-full border border-outline-variant object-cover shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)]"
+            />
+          )}
           {/* Заголовок в строчном потоке (без flex): пробелы между частями не схлопываются,
               переносы работают как у обычного текста. В Figma строки абсолютные (left:566) —
               в код это не переносим. */}
@@ -54,20 +84,14 @@ export function HeroSection({
         </div>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
-          <Link
-            href={primaryCtaHref}
-            className="inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-button font-medium whitespace-nowrap text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]"
-          >
+          <CtaButton href={primaryCtaHref} variant={primaryCtaVariant}>
             {primaryCtaLabel}
-          </Link>
+          </CtaButton>
 
           {secondaryCtaLabel && secondaryCtaHref && (
-            <Link
-              href={secondaryCtaHref}
-              className="inline-flex h-14 items-center justify-center rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium whitespace-nowrap text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity,background-color] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] hover:opacity-90"
-            >
+            <CtaButton href={secondaryCtaHref} variant={secondaryCtaVariant}>
               {secondaryCtaLabel}
-            </Link>
+            </CtaButton>
           )}
         </div>
       </div>

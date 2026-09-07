@@ -5,15 +5,30 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import PageTitle from '@/components/ui/PageTitle';
-import FormBox from '@/components/ui/FormBox';
 import { Plus, Trash2 } from 'lucide-react';
-import { saveMainPageContent } from '@/lib/actions/profile';
+import { saveMainPageContent, updateProfile } from '@/lib/actions/profile';
 import ImageUploaderField from '@/components/ImageUploaderField';
-import type { MainPageContent } from '@/lib/mainPageContent';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/Select';
+import type {
+    ButtonVariant,
+    MainPageContent,
+    ProcessStep,
+} from '@/lib/mainPageContent';
 
 type Props = {
     profileId: string;
     initialContent: MainPageContent;
+    /** Аватар/обложка профиля ( редактируются в разделе Hero) */
+    avatarFileId: string;
+    coverFileId: string;
+    /** Активный раздел сайдбара — рендерим только его */
+    visibleSection: string;
 };
 
 const textareaClass =
@@ -79,22 +94,168 @@ function TagList({
     );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+const VARIANT_OPTIONS: { value: ButtonVariant; label: string }[] = [
+    { value: 'primary', label: 'Primary (solid)' },
+    { value: 'secondary', label: 'Secondary (outline)' },
+    { value: 'ghost', label: 'Ghost (text only)' },
+    { value: 'link', label: 'Link (underline)' },
+];
+
+/** Выбор варианта кнопки (семейства: primary/secondary/ghost/link). */
+function VariantSelect({
+    id,
+    label,
+    value,
+    onChange,
+}: {
+    id: string;
+    label: string;
+    value: ButtonVariant;
+    onChange: (v: ButtonVariant) => void;
+}) {
+    return (
+        <div>
+            <Label htmlFor={id}>{label}</Label>
+            <Select
+                value={value}
+                onValueChange={(v) => onChange(v as ButtonVariant)}
+            >
+                <SelectTrigger id={id}>
+                    <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                    {VARIANT_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                        </SelectItem>
+                    ))}
+                </SelectContent>
+            </Select>
+        </div>
+    );
+}
+
+/** Редактор этапов работы (My process): заголовок + описание. */
+function StepsEditor({
+    label,
+    steps,
+    onChange,
+}: {
+    label: string;
+    steps: ProcessStep[];
+    onChange: (steps: ProcessStep[]) => void;
+}) {
+    const update = (i: number, patch: Partial<ProcessStep>) =>
+        onChange(steps.map((s, j) => (j === i ? { ...s, ...patch } : s)));
+
+    return (
+        <div>
+            <Label>{label}</Label>
+            <div className='space-y-3'>
+                {steps.map((step, i) => (
+                    <div
+                        key={i}
+                        className='space-y-2 rounded-lg border border-outline-variant p-3'
+                    >
+                        <div className='flex items-center gap-2'>
+                            <span className='shrink-0 text-body-sm text-on-surface-variant'>
+                                {String(i + 1).padStart(2, '0')}
+                            </span>
+                            <Input
+                                value={step.title}
+                                onChange={(e) => update(i, { title: e.target.value })}
+                                placeholder='Step title'
+                                aria-label={`Step ${i + 1} title`}
+                            />
+                            <button
+                                type='button'
+                                onClick={() =>
+                                    onChange(steps.filter((_, j) => j !== i))
+                                }
+                                className='flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-on-surface-variant hover:bg-surface-variant hover:text-error'
+                                aria-label={`Remove step ${i + 1}`}
+                            >
+                                <Trash2 className='h-4 w-4' />
+                            </button>
+                        </div>
+                        <textarea
+                            rows={2}
+                            className={textareaClass}
+                            value={step.description}
+                            onChange={(e) =>
+                                update(i, { description: e.target.value })
+                            }
+                            placeholder='Step description'
+                            aria-label={`Step ${i + 1} description`}
+                        />
+                    </div>
+                ))}
+            </div>
+            <Button
+                type='button'
+                variant='outline'
+                size='sm'
+                className='mt-2 w-full'
+                onClick={() => onChange([...steps, { title: '', description: '' }])}
+            >
+                <Plus className='mr-1 h-4 w-4' /> Add step
+            </Button>
+        </div>
+    );
+}
+
+function Section({
+    title,
+    visible,
+    onVisibleChange,
+    children,
+}: {
+    title: string;
+    visible?: boolean;
+    onVisibleChange?: (v: boolean) => void;
+    children: React.ReactNode;
+}) {
     return (
         <fieldset className='rounded-xl border border-outline-variant p-4'>
-            <legend className='px-2 text-title-sm font-semibold text-on-surface'>
-                {title}
+            <legend className='flex items-center gap-3 px-2'>
+                <span className='text-title-sm font-semibold text-on-surface'>
+                    {title}
+                </span>
+                {onVisibleChange && (
+                    <label className='flex cursor-pointer items-center gap-1.5 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={visible ?? true}
+                            onChange={(e) => onVisibleChange(e.target.checked)}
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Show on page
+                    </label>
+                )}
             </legend>
             <div className='space-y-4'>{children}</div>
         </fieldset>
     );
 }
 
-export default function MainPageContentEditor({ profileId, initialContent }: Props) {
+export default function MainPageContentEditor({
+    profileId,
+    initialContent,
+    avatarFileId: initialAvatar,
+    coverFileId: initialCover,
+    visibleSection,
+}: Props) {
     const [content, setContent] = useState<MainPageContent>(initialContent);
+    const [avatarFileId, setAvatarFileId] = useState(initialAvatar);
+    const [coverFileId, setCoverFileId] = useState(initialCover);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // Обёртка секции: показываем только активный раздел сайдбара
+    const wrap = (id: string, node: React.ReactNode) => (
+        <div className={visibleSection === id ? '' : 'hidden'}>{node}</div>
+    );
 
     const set = <S extends keyof MainPageContent>(
         section: S,
@@ -112,6 +273,11 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
         setSuccess(false);
         try {
             await saveMainPageContent(profileId, content);
+            // Аватар/обложка (раздел Hero): null = явное удаление
+            await updateProfile(profileId, {
+                avatarFileId: avatarFileId || null,
+                coverFileId: coverFileId || null,
+            });
             setSuccess(true);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Save failed');
@@ -121,14 +287,42 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
     };
 
     return (
-        <FormBox className='mt-8'>
-            <PageTitle className='mb-4'>Main Page Content</PageTitle>
-            <p className='mb-6 text-body-sm text-on-surface-variant'>
-                Контент главной страницы дизайнера (/u/[slug]). Пустые поля
-                используют значения по умолчанию.
-            </p>
-            <form onSubmit={onSubmit} className='space-y-6'>
-                <Section title='01 · Hero'>
+        <form onSubmit={onSubmit} className='space-y-6'>
+                {wrap('hero', (
+                <Section
+                    title='01 · Hero'
+                    visible={content.hero.visible}
+                    onVisibleChange={(v) => set('hero', { visible: v })}
+                >
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <div>
+                            <Label>Avatar</Label>
+                            <ImageUploaderField
+                                value={avatarFileId || null}
+                                onChange={(fileId) => setAvatarFileId(fileId ?? '')}
+                                aspectRatio={1}
+                            />
+                        </div>
+                        <div>
+                            <Label>Cover</Label>
+                            <ImageUploaderField
+                                value={coverFileId || null}
+                                onChange={(fileId) => setCoverFileId(fileId ?? '')}
+                                aspectRatio={16 / 5}
+                            />
+                        </div>
+                    </div>
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.hero.floatingElements}
+                            onChange={(e) =>
+                                set('hero', { floatingElements: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Floating elements (bokeh)
+                    </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                         <div>
                             <Label htmlFor='mp-h1'>Heading line 1 *</Label>
@@ -166,6 +360,13 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         />
                     </div>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <VariantSelect
+                            id='mp-hpv'
+                            label='CTA primary — button style'
+                            value={content.hero.ctaPrimaryVariant}
+                            onChange={(v) => set('hero', { ctaPrimaryVariant: v })}
+                        />
+                        <div />
                         <div>
                             <Label htmlFor='mp-hpl'>CTA primary — label</Label>
                             <Input
@@ -182,6 +383,13 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                                 onChange={(e) => set('hero', { ctaPrimaryUrl: e.target.value })}
                             />
                         </div>
+                        <VariantSelect
+                            id='mp-hsv'
+                            label='CTA secondary — button style'
+                            value={content.hero.ctaSecondaryVariant}
+                            onChange={(v) => set('hero', { ctaSecondaryVariant: v })}
+                        />
+                        <div />
                         <div>
                             <Label htmlFor='mp-hsl'>CTA secondary — label</Label>
                             <Input
@@ -200,8 +408,14 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
-                <Section title='02 · Portfolio Gallery'>
+                {wrap('portfolio', (
+                <Section
+                    title='02 · Portfolio Gallery'
+                    visible={content.portfolio.visible}
+                    onVisibleChange={(v) => set('portfolio', { visible: v })}
+                >
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
                             <Label htmlFor='mp-pt'>Section title *</Label>
@@ -235,10 +449,22 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                                 onChange={(e) => set('portfolio', { ctaUrl: e.target.value })}
                             />
                         </div>
+                        <VariantSelect
+                            id='mp-pcv'
+                            label='CTA button — style'
+                            value={content.portfolio.ctaVariant}
+                            onChange={(v) => set('portfolio', { ctaVariant: v })}
+                        />
                     </div>
                 </Section>
+                ))}
 
-                <Section title='03 · About'>
+                {wrap('about', (
+                <Section
+                    title='03 · About'
+                    visible={content.about.visible}
+                    onVisibleChange={(v) => set('about', { visible: v })}
+                >
                     <div>
                         <Label htmlFor='mp-ah'>About heading *</Label>
                         <Input
@@ -288,8 +514,14 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         />
                     </div>
                 </Section>
+                ))}
 
-                <Section title='04 · Expertise'>
+                {wrap('expertise', (
+                <Section
+                    title='04 · Expertise'
+                    visible={content.expertise.visible}
+                    onVisibleChange={(v) => set('expertise', { visible: v })}
+                >
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
                             <Label htmlFor='mp-esl'>Skills label</Label>
@@ -326,11 +558,22 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                             onChange={(e) => set('expertise', { processLabel: e.target.value })}
                         />
                     </div>
-                    <TagList
+                    <StepsEditor
                         label='Process steps'
-                        tags={content.expertise.processSteps}
+                        steps={content.expertise.processSteps}
                         onChange={(processSteps) => set('expertise', { processSteps })}
                     />
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.expertise.proBonoVisible}
+                            onChange={(e) =>
+                                set('expertise', { proBonoVisible: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Pro Bono — show banner on page
+                    </label>
                     <div>
                         <Label htmlFor='mp-epb'>Pro Bono text</Label>
                         <textarea
@@ -342,6 +585,13 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         />
                     </div>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <VariantSelect
+                            id='mp-epbv'
+                            label='Pro Bono CTA — button style'
+                            value={content.expertise.proBonoCtaVariant}
+                            onChange={(v) => set('expertise', { proBonoCtaVariant: v })}
+                        />
+                        <div />
                         <div>
                             <Label htmlFor='mp-epbl'>Pro Bono CTA — label</Label>
                             <Input
@@ -360,8 +610,14 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
-                <Section title='05 · CTA (Get in Touch)'>
+                {wrap('cta', (
+                <Section
+                    title='05 · CTA (Get in Touch)'
+                    visible={content.cta.visible}
+                    onVisibleChange={(v) => set('cta', { visible: v })}
+                >
                     <div>
                         <Label htmlFor='mp-ch'>CTA heading *</Label>
                         <Input
@@ -370,6 +626,17 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                             onChange={(e) => set('cta', { heading: e.target.value })}
                         />
                     </div>
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.cta.floatingElements}
+                            onChange={(e) =>
+                                set('cta', { floatingElements: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Floating elements (bokeh)
+                    </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
                             <Label htmlFor='mp-cd1'>Description line 1</Label>
@@ -387,6 +654,13 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                                 onChange={(e) => set('cta', { description2: e.target.value })}
                             />
                         </div>
+                        <VariantSelect
+                            id='mp-cev'
+                            label='Email button — style'
+                            value={content.cta.emailVariant}
+                            onChange={(v) => set('cta', { emailVariant: v })}
+                        />
+                        <div />
                         <div>
                             <Label htmlFor='mp-cel'>Email button — label</Label>
                             <Input
@@ -404,6 +678,13 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                                 onChange={(e) => set('cta', { emailAddress: e.target.value })}
                             />
                         </div>
+                        <VariantSelect
+                            id='mp-cwv'
+                            label='WhatsApp button — style'
+                            value={content.cta.whatsappVariant}
+                            onChange={(v) => set('cta', { whatsappVariant: v })}
+                        />
+                        <div />
                         <div>
                             <Label htmlFor='mp-cwl'>WhatsApp button — label</Label>
                             <Input
@@ -422,6 +703,7 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
                 {success && (
@@ -436,7 +718,6 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                     </Button>
                 </div>
             </form>
-        </FormBox>
     );
 }
 

@@ -167,8 +167,9 @@ export async function updateProfile(
         fullName?: string;
         headline?: string;
         bio?: string;
-        avatarFileId?: string;
-        coverFileId?: string;
+        // null = явное удаление (снимаем ссылку и чистим R2)
+        avatarFileId?: string | null;
+        coverFileId?: string | null;
         location?: string;
         website?: string;
         isPublic?: number;

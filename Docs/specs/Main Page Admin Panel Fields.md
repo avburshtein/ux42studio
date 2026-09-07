@@ -385,3 +385,50 @@ UI в админке:
      реализованы — берутся из проектов в БД; отдельная задача.
    – Pro bono поля сохраняются, но баннер на /u/[slug] пока не рендерится.
    – Header/Footer (сквозные) не входят в этот блок — отдельная задача.
+
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 2) — правки по фидбэку
+═══════════════════════════════════════════════════════════
+ • Process steps → этапы работы {title, description} (как в Figma):
+   StepsEditor в админке (номер/заголовок/описание, add/remove);
+   SkillsSection рендерит описания, дефолт — 4 этапа Research & Insight /
+   Wireframe & Structure / Prototype & Test / Handoff & Support.
+ • Фильтры галереи работают: PortfolioGallerySection → 'use client',
+   карточки передаются как items {category, node}, чипы с состоянием
+   (active, aria-checked), мобильный disclosure + десктоп-ряд.
+ • Avatar/Cover из профиля выведены на страницу: Avatar — круглая аватарка
+   над заголовком Hero; Cover — фон Hero с оверлеем surface-lowest/70.
+ • Варианты кнопок: новый CtaButton (primary solid / secondary outline /
+   ghost / link — по семействам спек кнопок) + VariantSelect в админке для
+   hero primary/secondary, portfolio CTA, pro bono CTA, email, WhatsApp.
+ • Hide-флаги: visible у hero/portfolio/about/expertise/cta + proBonoVisible;
+   чекбоксы «Show on page» в легендах секций; NavLabel-разделители и FAB
+   скрываются вместе с секциями.
+ • Pro Bono Banner рендерится при proBonoVisible (эталон make-export
+   PortfolioPage: текст слева + CTA справа, bg surface-container-low).
+ • Иконки соцсетей в футере: инлайн SVG брендов (GitHub/LinkedIn/Instagram/
+   X/YouTube/Telegram/Dribbble/Behance/Medium; бренд-иконки удалены из
+   lucide-react), fallback — Globe вместо буквы платформы.
+ • Якоря шапки: на /u/[slug] navItems Work→#work / About→#about /
+   Contact→#contact; id секции галереи — 'work'; scroll-mt-20 на секциях
+   (work/about/contact) против перекрытия sticky-шапкой.
+
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 3) — правки по фидбэку 2
+═══════════════════════════════════════════════════════════
+ • Фикс удаления Avatar/Cover: в updateProfile тип avatarFileId/
+   coverFileId расширен до string | null (null = явное удаление — снимаем
+   ссылку + чистим R2); раньше пустая строка превращалась в undefined и
+   Drizzle не обновлял колонку («обложка возвращалась»).
+ • Floating Elements отключаемые: hero.floatingElements и
+   cta.floatingElements (дефолт true), чекбоксы в разделах Hero и CTA;
+   проп floatingElements в HeroSection/CtaSection.
+ • /admin/profile — разделы слева как в редакторе кейса (WizardSidebar-
+   паттерн): Profile / 01 Hero / 02 Portfolio / 03 About / 04 Expertise /
+   05 CTA. На мобильных — горизонтальный скролл-ряд. Обе формы смонтированы
+   постоянно (состояние сохраняется), виден активный раздел; ссылка
+   «Просмотр страницы» → /u/{slug}.
+ • Avatar/Cover перенесены из формы профиля в раздел Hero; сохраняются
+   кнопкой Save Main Page Content (updateProfile после saveMainPageContent).
+ • Bio остаётся в разделе Profile; используется как fallback абзацев About
+   (normalizeMainPageContent), пока paragraphs 1–3 не заданы.
