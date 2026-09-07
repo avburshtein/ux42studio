@@ -13,16 +13,18 @@ export function AboutSection({ title, paragraphs, imageUrl }: AboutSectionProps)
       <div className="section-container flex flex-col gap-16">
         {/* lg: две колонки одной высоты — картинка тянется по высоте текстового
             блока (align-items: stretch), верх текста = верх картинки.
-            Figma-эталон: ~516×495; min-h защищает пропорцию при коротком тексте. */}
+            Figma-эталон: ~516×495; min-h защищает пропорцию при коротком тексте.
+            img — absolute, чтобы не влиять на высоту ряда: высоту определяет
+            только текст (или min-h). */}
         <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10">
           {/* Image: высоту держит wrapper (aspect на мобиле, stretch на lg) */}
-          <div className='aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-surface-container-low lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
+          <div className='relative aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-surface-container-low lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
             {imageUrl && (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={imageUrl}
                 alt=''
-                className='h-full w-full object-cover'
+                className='absolute inset-0 h-full w-full object-cover'
               />
             )}
           </div>

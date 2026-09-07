@@ -128,9 +128,9 @@ export function SiteFooter({
                 {/* Social icons */}
                 {socialLinks.length > 0 && (
                     <div className='flex items-center gap-5'>
-                        {socialLinks.map((link) => (
+                        {socialLinks.map((link, i) => (
                             <a
-                                key={link.url}
+                                key={`${link.platform}-${link.title}-${i}`}
                                 href={link.url}
                                 target='_blank'
                                 rel='noopener noreferrer'

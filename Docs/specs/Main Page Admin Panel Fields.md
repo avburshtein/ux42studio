@@ -458,3 +458,14 @@ UI в админке:
    img h-full w-full object-cover.
  • Заголовок — на верхней линии изображения (оба блока стартуют сверху).
  • Пустая заглушка без imageUrl — тот же wrapper (сохраняет пропорцию).
+
+РЕШЕНИЕ 6 (2026-09-07) — фиксы по фидбэку 4.
+ • About: img переведён в absolute inset-0 внутри wrapper — высота ряда
+   определяется ТОЛЬКО текстом (или min-h 495): высота картинки теперь
+   гарантированно = высоте текстового блока, верх заголовка = верх картинки.
+ • SiteFooter: ключи соц-иконок platform-title-index (были link.url —
+   дубли пустых url ломали reconciler: «two children with the same key»).
+ • next/image warnings (next-image-missing-loader-width) в dev: в dev
+   /cdn-cgi/image недоступен, loader возвращал src без width. Фикс:
+   images.unoptimized = NODE_ENV==='development' в next.config (prod не
+   затронут); в image-loader width = 0 по умолчанию.

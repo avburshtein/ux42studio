@@ -4,7 +4,7 @@ const assetDomain = 'https://assets.ux42.studio';
 
 export default function cloudflareLoader({
     src,
-    width,
+    width = 0,
     quality,
 }: ImageLoaderProps) {
     if (process.env.NODE_ENV === 'development') {

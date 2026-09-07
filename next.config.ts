@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
     images: {
         loader: 'custom',
         loaderFile: './image-loader.ts',
+        // В dev /cdn-cgi/image недоступен — loader возвращает src без width,
+        // и Next 16 сыплет предупреждениями next-image-missing-loader-width.
+        unoptimized: process.env.NODE_ENV === 'development',
         deviceSizes: [828, 1920],
         remotePatterns: [
             {
