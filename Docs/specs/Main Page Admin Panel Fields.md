@@ -412,3 +412,23 @@ UI в админке:
  • Якоря шапки: на /u/[slug] navItems Work→#work / About→#about /
    Contact→#contact; id секции галереи — 'work'; scroll-mt-20 на секциях
    (work/about/contact) против перекрытия sticky-шапкой.
+
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 3) — правки по фидбэку 2
+═══════════════════════════════════════════════════════════
+ • Фикс удаления Avatar/Cover: в updateProfile тип avatarFileId/
+   coverFileId расширен до string | null (null = явное удаление — снимаем
+   ссылку + чистим R2); раньше пустая строка превращалась в undefined и
+   Drizzle не обновлял колонку («обложка возвращалась»).
+ • Floating Elements отключаемые: hero.floatingElements и
+   cta.floatingElements (дефолт true), чекбоксы в разделах Hero и CTA;
+   проп floatingElements в HeroSection/CtaSection.
+ • /admin/profile — разделы слева как в редакторе кейса (WizardSidebar-
+   паттерн): Profile / 01 Hero / 02 Portfolio / 03 About / 04 Expertise /
+   05 CTA. На мобильных — горизонтальный скролл-ряд. Обе формы смонтированы
+   постоянно (состояние сохраняется), виден активный раздел; ссылка
+   «Просмотр страницы» → /u/{slug}.
+ • Avatar/Cover перенесены из формы профиля в раздел Hero; сохраняются
+   кнопкой Save Main Page Content (updateProfile после saveMainPageContent).
+ • Bio остаётся в разделе Profile; используется как fallback абзацев About
+   (normalizeMainPageContent), пока paragraphs 1–3 не заданы.

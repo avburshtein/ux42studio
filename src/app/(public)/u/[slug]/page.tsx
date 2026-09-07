@@ -200,6 +200,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     avatarUrl={avatarUrl}
                     coverUrl={coverUrl}
                     displayName={profile.fullName}
+                    floatingElements={mpc.hero.floatingElements}
                 />
             )}
             <main>
@@ -280,6 +281,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     whatsappHref={mpc.cta.whatsappUrl || undefined}
                     whatsappLabel={mpc.cta.whatsappLabel || undefined}
                     whatsappVariant={mpc.cta.whatsappVariant}
+                    floatingElements={mpc.cta.floatingElements}
                 />
             )}
             <SiteFooter

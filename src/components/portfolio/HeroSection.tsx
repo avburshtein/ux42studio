@@ -18,6 +18,8 @@ interface HeroSectionProps {
   /** Cover дизайнера (из профиля) — фон Hero с оверлеем для читаемости */
   coverUrl?: string;
   displayName?: string;
+  /** Декоративные Floating Elements (bokeh) — отключаются из админки */
+  floatingElements?: boolean;
 }
 
 /**
@@ -39,6 +41,7 @@ export function HeroSection({
   secondaryCtaLabel, secondaryCtaHref,
   secondaryCtaVariant = 'secondary',
   avatarUrl, coverUrl, displayName,
+  floatingElements = true,
 }: HeroSectionProps) {
   return (
     <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
@@ -50,7 +53,7 @@ export function HeroSection({
           <div className="absolute inset-0 bg-surface-container-lowest/70" />
         </div>
       )}
-      <FloatingElements count={20} minBlur={0} maxBlur={20} />
+      {floatingElements && <FloatingElements count={20} minBlur={0} maxBlur={20} />}
 
       <div className="section-container relative z-10 flex flex-col gap-16">
         <div className="flex flex-col gap-8">

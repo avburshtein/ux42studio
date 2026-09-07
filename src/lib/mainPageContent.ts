@@ -13,6 +13,8 @@ export type ProcessStep = {
 export type HeroContent = {
   /** Показ блока на странице */
   visible: boolean;
+  /** Декоративные Floating Elements (bokeh) */
+  floatingElements: boolean;
   /** hero_heading_line1 */
   headingLine1: string;
   /** hero_heading_accent (градиентный акцент) */
@@ -79,6 +81,8 @@ export type ExpertiseContent = {
 
 export type CtaContent = {
   visible: boolean;
+  /** Декоративные Floating Elements (bokeh) */
+  floatingElements: boolean;
   /** cta_heading */
   heading: string;
   /** cta_description_1 / cta_description_2 */
@@ -105,6 +109,7 @@ export type MainPageContent = {
 export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   hero: {
     visible: true,
+    floatingElements: true,
     headingLine1: 'I design for the moment',
     headingAccent: 'when everything',
     headingLine2: 'just clicks',
@@ -192,6 +197,7 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   },
   cta: {
     visible: true,
+    floatingElements: true,
     heading: 'Get in touch',
     description1: 'We answer emails fast.',
     description2: 'Pro bono spots available.',
@@ -249,6 +255,7 @@ export function normalizeMainPageContent(
   return {
     hero: {
       visible: bool(src.hero?.visible),
+      floatingElements: bool(src.hero?.floatingElements),
       headingLine1: str(src.hero?.headingLine1, d.hero.headingLine1),
       headingAccent: str(src.hero?.headingAccent, d.hero.headingAccent),
       headingLine2: str(src.hero?.headingLine2, d.hero.headingLine2),
@@ -295,6 +302,7 @@ export function normalizeMainPageContent(
     },
     cta: {
       visible: bool(src.cta?.visible),
+      floatingElements: bool(src.cta?.floatingElements),
       heading: str(src.cta?.heading, d.cta.heading),
       description1: str(src.cta?.description1, d.cta.description1),
       description2: str(src.cta?.description2, d.cta.description2),

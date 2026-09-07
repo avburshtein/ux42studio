@@ -8,7 +8,6 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import PageTitle from '@/components/ui/PageTitle';
 import {
     updateProfile,
@@ -16,8 +15,8 @@ import {
     getMyProfile,
 } from '@/lib/actions/profile';
 import Link from 'next/link';
+import { Eye } from 'lucide-react';
 import FormBox from '@/components/ui/FormBox';
-import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
 import { getMyMainPageContent } from '@/lib/actions/profile';
@@ -30,9 +29,19 @@ const formSchema = z.object({
     location: z.string().optional().or(z.literal('')),
     website: z.string().url().optional().or(z.literal('')),
     slug: z.string().min(1, 'Slug is required'),
-    avatarFileId: z.string().optional().or(z.literal('')),
-    coverFileId: z.string().optional().or(z.literal('')),
 });
+
+// Разделы левого сайдбара (как в редакторе кейса портфолио)
+const SECTIONS = [
+    { id: 'profile', label: 'Profile' },
+    { id: 'hero', label: '01 · Hero' },
+    { id: 'portfolio', label: '02 · Portfolio Gallery' },
+    { id: 'about', label: '03 · About' },
+    { id: 'expertise', label: '04 · Expertise' },
+    { id: 'cta', label: '05 · CTA (Get in Touch)' },
+] as const;
+
+type SectionId = (typeof SECTIONS)[number]['id'];
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -52,12 +61,15 @@ export default function ProfilePage() {
     const [profileId, setProfileId] = useState<string | null>(null);
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
     const [mainContent, setMainContent] = useState<MainPageContent | null>(null);
+    // Активный раздел сайдбара
+    const [section, setSection] = useState<SectionId>('profile');
+    // Аватар/обложка редактируются в разделе Hero (MainPageContentEditor)
+    const [initialFiles, setInitialFiles] = useState({ avatar: '', cover: '' });
 
     const {
         register,
         handleSubmit,
         reset,
-        setValue,
         watch,
         formState: { errors },
     } = useForm<FormData>({
@@ -69,8 +81,6 @@ export default function ProfilePage() {
             location: '',
             website: '',
             slug: '',
-            avatarFileId: '',
-            coverFileId: '',
         },
     });
 
@@ -89,8 +99,10 @@ export default function ProfilePage() {
                     location: profile.location ?? '',
                     website: profile.website ?? '',
                     slug: profile.slug,
-                    avatarFileId: profile.avatarFileId ?? '',
-                    coverFileId: profile.coverFileId ?? '',
+                });
+                setInitialFiles({
+                    avatar: profile.avatarFileId ?? '',
+                    cover: profile.coverFileId ?? '',
                 });
                 setSocialLinks(
                     profile.socialLinks.map((link) => ({
@@ -124,8 +136,6 @@ export default function ProfilePage() {
                 bio: data.bio || undefined,
                 location: data.location || undefined,
                 website: data.website || undefined,
-                avatarFileId: data.avatarFileId || undefined,
-                coverFileId: data.coverFileId || undefined,
             });
             setSuccess(true);
             router.refresh();
@@ -136,12 +146,55 @@ export default function ProfilePage() {
         }
     };
 
+    const slug = watch('slug');
+
     return (
         <main className=''>
             <div className='flex items-center justify-between gap-4'>
                 <PageTitle className='mb-8'>Настройки профиля</PageTitle>
             </div>
 
+            <div className='flex flex-col gap-8 md:flex-row'>
+                {/* Сайдбар разделов — как в редакторе кейса (WizardSidebar) */}
+                <aside className='w-full shrink-0 md:w-64'>
+                    <nav className='md:sticky md:top-8'>
+                        <ul className='flex gap-1 overflow-x-auto pb-2 md:flex-col md:space-y-1 md:overflow-visible md:pb-0'>
+                            {SECTIONS.map((s) => (
+                                <li key={s.id} className='shrink-0 md:shrink'>
+                                    <button
+                                        type='button'
+                                        onClick={() => setSection(s.id)}
+                                        className={`block w-full whitespace-nowrap rounded-md px-3 py-2 text-body-sm transition-colors cursor-pointer ${
+                                            section === s.id
+                                                ? 'bg-primary-container text-on-primary-container font-medium'
+                                                : 'text-on-surface-variant hover:bg-surface-variant/50'
+                                        }`}
+                                    >
+                                        {s.label}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                        {slug && (
+                            <div className='mt-8 hidden border-t border-outline-variant pt-4 md:block'>
+                                <Link
+                                    href={`/u/${slug}`}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='flex items-center gap-1 text-body-sm text-primary transition-colors hover:text-primary-variant'
+                                >
+                                    <Eye />{' '}
+                                    <span className='font-medium'>
+                                        Просмотр страницы
+                                    </span>
+                                </Link>
+                            </div>
+                        )}
+                    </nav>
+                </aside>
+
+                <div className='min-w-0 flex-1'>
+                <div className={section === 'profile' ? '' : 'hidden'}>
             <FormBox className=''>
                 <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                     <div>
@@ -203,28 +256,6 @@ export default function ProfilePage() {
                         />
                     </div>
 
-                    <div>
-                        <Label>Avatar</Label>
-                        <ImageUploaderField
-                            value={watch('avatarFileId') || null}
-                            onChange={(fileId) =>
-                                setValue('avatarFileId', fileId ?? '')
-                            }
-                            aspectRatio={1}
-                        />
-                    </div>
-
-                    <div>
-                        <Label>Cover</Label>
-                        <ImageUploaderField
-                            value={watch('coverFileId') || null}
-                            onChange={(fileId) =>
-                                setValue('coverFileId', fileId ?? '')
-                            }
-                            aspectRatio={16 / 5}
-                        />
-                    </div>
-
                     {/* Social Links */}
                     <div>
                         <Label>Social Links</Label>
@@ -263,15 +294,25 @@ export default function ProfilePage() {
                     </div>
                 </form>
             </FormBox>
+                </div>
 
-            {/* Редактор контента главной страницы дизайнера (/u/[slug]) —
-                спека: Docs/specs/Main Page Admin Panel Fields.md */}
-            {profileId && mainContent && (
-                <MainPageContentEditor
-                    profileId={profileId}
-                    initialContent={mainContent}
-                />
-            )}
+                {/* Редактор контента главной страницы дизайнера (/u/[slug]) —
+                    спека: Docs/specs/Main Page Admin Panel Fields.md.
+                    Рендерится всегда (состояние форм сохраняется при
+                    переключении разделов), видим только активный раздел. */}
+                {profileId && mainContent && (
+                    <div className={section === 'profile' ? 'hidden' : ''}>
+                        <MainPageContentEditor
+                            profileId={profileId}
+                            initialContent={mainContent}
+                            avatarFileId={initialFiles.avatar}
+                            coverFileId={initialFiles.cover}
+                            visibleSection={section}
+                        />
+                    </div>
+                )}
+                </div>
+            </div>
         </main>
     );
 }

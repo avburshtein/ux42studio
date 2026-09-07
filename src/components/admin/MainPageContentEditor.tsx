@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import PageTitle from '@/components/ui/PageTitle';
-import FormBox from '@/components/ui/FormBox';
 import { Plus, Trash2 } from 'lucide-react';
-import { saveMainPageContent } from '@/lib/actions/profile';
+import { saveMainPageContent, updateProfile } from '@/lib/actions/profile';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     Select,
@@ -25,6 +24,11 @@ import type {
 type Props = {
     profileId: string;
     initialContent: MainPageContent;
+    /** Аватар/обложка профиля ( редактируются в разделе Hero) */
+    avatarFileId: string;
+    coverFileId: string;
+    /** Активный раздел сайдбара — рендерим только его */
+    visibleSection: string;
 };
 
 const textareaClass =
@@ -234,11 +238,24 @@ function Section({
     );
 }
 
-export default function MainPageContentEditor({ profileId, initialContent }: Props) {
+export default function MainPageContentEditor({
+    profileId,
+    initialContent,
+    avatarFileId: initialAvatar,
+    coverFileId: initialCover,
+    visibleSection,
+}: Props) {
     const [content, setContent] = useState<MainPageContent>(initialContent);
+    const [avatarFileId, setAvatarFileId] = useState(initialAvatar);
+    const [coverFileId, setCoverFileId] = useState(initialCover);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // Обёртка секции: показываем только активный раздел сайдбара
+    const wrap = (id: string, node: React.ReactNode) => (
+        <div className={visibleSection === id ? '' : 'hidden'}>{node}</div>
+    );
 
     const set = <S extends keyof MainPageContent>(
         section: S,
@@ -256,6 +273,11 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
         setSuccess(false);
         try {
             await saveMainPageContent(profileId, content);
+            // Аватар/обложка (раздел Hero): null = явное удаление
+            await updateProfile(profileId, {
+                avatarFileId: avatarFileId || null,
+                coverFileId: coverFileId || null,
+            });
             setSuccess(true);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Save failed');
@@ -265,18 +287,42 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
     };
 
     return (
-        <FormBox className='mt-8'>
-            <PageTitle className='mb-4'>Main Page Content</PageTitle>
-            <p className='mb-6 text-body-sm text-on-surface-variant'>
-                Контент главной страницы дизайнера (/u/[slug]). Пустые поля
-                используют значения по умолчанию.
-            </p>
-            <form onSubmit={onSubmit} className='space-y-6'>
+        <form onSubmit={onSubmit} className='space-y-6'>
+                {wrap('hero', (
                 <Section
                     title='01 · Hero'
                     visible={content.hero.visible}
                     onVisibleChange={(v) => set('hero', { visible: v })}
                 >
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <div>
+                            <Label>Avatar</Label>
+                            <ImageUploaderField
+                                value={avatarFileId || null}
+                                onChange={(fileId) => setAvatarFileId(fileId ?? '')}
+                                aspectRatio={1}
+                            />
+                        </div>
+                        <div>
+                            <Label>Cover</Label>
+                            <ImageUploaderField
+                                value={coverFileId || null}
+                                onChange={(fileId) => setCoverFileId(fileId ?? '')}
+                                aspectRatio={16 / 5}
+                            />
+                        </div>
+                    </div>
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.hero.floatingElements}
+                            onChange={(e) =>
+                                set('hero', { floatingElements: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Floating elements (bokeh)
+                    </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                         <div>
                             <Label htmlFor='mp-h1'>Heading line 1 *</Label>
@@ -362,7 +408,9 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
+                {wrap('portfolio', (
                 <Section
                     title='02 · Portfolio Gallery'
                     visible={content.portfolio.visible}
@@ -409,7 +457,9 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         />
                     </div>
                 </Section>
+                ))}
 
+                {wrap('about', (
                 <Section
                     title='03 · About'
                     visible={content.about.visible}
@@ -464,7 +514,9 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         />
                     </div>
                 </Section>
+                ))}
 
+                {wrap('expertise', (
                 <Section
                     title='04 · Expertise'
                     visible={content.expertise.visible}
@@ -558,7 +610,9 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
+                {wrap('cta', (
                 <Section
                     title='05 · CTA (Get in Touch)'
                     visible={content.cta.visible}
@@ -572,6 +626,17 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                             onChange={(e) => set('cta', { heading: e.target.value })}
                         />
                     </div>
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.cta.floatingElements}
+                            onChange={(e) =>
+                                set('cta', { floatingElements: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Floating elements (bokeh)
+                    </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
                             <Label htmlFor='mp-cd1'>Description line 1</Label>
@@ -638,6 +703,7 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                         </div>
                     </div>
                 </Section>
+                ))}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
                 {success && (
@@ -652,7 +718,6 @@ export default function MainPageContentEditor({ profileId, initialContent }: Pro
                     </Button>
                 </div>
             </form>
-        </FormBox>
     );
 }
 
