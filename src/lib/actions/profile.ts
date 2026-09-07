@@ -7,6 +7,7 @@ import { files } from '@/db/schema/files';
 import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
+import { normalizeMainPageContent, type MainPageContent } from '@/lib/mainPageContent';
 
 export async function getMyProfileId(): Promise<string | null> {
     const headersList = await headers();
@@ -114,6 +115,49 @@ export async function getOrCreateProfileId(): Promise<string | null> {
     });
 
     return id;
+}
+
+export async function getMyMainPageContent(): Promise<MainPageContent | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { userId },
+        columns: { mainPageContent: true, bio: true },
+    });
+    if (!profile) return null;
+
+    const bioParagraphs = profile.bio
+        ? profile.bio.split(/\n\n/).filter(Boolean)
+        : [];
+
+    return normalizeMainPageContent(profile.mainPageContent, bioParagraphs);
+}
+
+export async function saveMainPageContent(
+    profileId: string,
+    content: MainPageContent,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const current = await db
+        .select({ slug: profiles.slug })
+        .from(profiles)
+        .where(eq(profiles.id, profileId))
+        .get();
+
+    await db
+        .update(profiles)
+        .set({ mainPageContent: content, updatedAt: Math.floor(Date.now() / 1000) })
+        .where(eq(profiles.id, profileId));
+
+    revalidatePath('/admin/profile');
+    if (current?.slug) revalidatePath(`/u/${current.slug}`);
 }
 
 export async function updateProfile(

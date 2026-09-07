@@ -19,6 +19,9 @@ import Link from 'next/link';
 import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
+import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
+import { getMyMainPageContent } from '@/lib/actions/profile';
+import { DEFAULT_MAIN_PAGE_CONTENT, type MainPageContent } from '@/lib/mainPageContent';
 
 const formSchema = z.object({
     fullName: z.string().min(1, 'Full name is required'),
@@ -48,6 +51,7 @@ export default function ProfilePage() {
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+    const [mainContent, setMainContent] = useState<MainPageContent | null>(null);
 
     const {
         register,
@@ -97,6 +101,8 @@ export default function ProfilePage() {
                         order: link.order,
                     })),
                 );
+                const mpc = await getMyMainPageContent();
+                setMainContent(mpc ?? DEFAULT_MAIN_PAGE_CONTENT);
             }
         };
         fetchProfile();
@@ -257,6 +263,15 @@ export default function ProfilePage() {
                     </div>
                 </form>
             </FormBox>
+
+            {/* Редактор контента главной страницы дизайнера (/u/[slug]) —
+                спека: Docs/specs/Main Page Admin Panel Fields.md */}
+            {profileId && mainContent && (
+                <MainPageContentEditor
+                    profileId={profileId}
+                    initialContent={mainContent}
+                />
+            )}
         </main>
     );
 }

@@ -1,15 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { ArrowLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ThemeToggle } from './ThemeToggle';
 
+interface NavItem {
+    label: string;
+    href: string;
+}
+
 interface SiteHeaderProps {
-    profileSlug: string;
+    /** Slug дизайнера — строит дефолтные nav-ссылки (/u/{slug}) и Back-поведение.
+     *  На главной ((slug нет) используйте navItems + wordmarkHref. */
+    profileSlug?: string;
     /** Имя (логин) дизайнера — отображается в центре шапки вместо логотипа UX42 */
     displayName?: string;
+    /** Текст в центре шапки (по умолчанию displayName или 'UX42.studio') */
+    wordmarkText?: string;
+    /** Куда ведёт центральный wordmark (по умолчанию /u/{slug} или '/') */
+    wordmarkHref?: string;
+    /** Свои nav-ссылки (по умолчанию Work/About страницы дизайнера) */
+    navItems?: NavItem[];
+    /** Режим главной: вместо CTA «Hire me» — бургер, открывающий правую
+     *  панель-меню для посетителя (nav + Sign In + legal), как в исходнике
+     *  главного сайта. Решение 2026-09-02 (20). */
+    menuMode?: boolean;
     /** CTA button label (default: "Hire me") */
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
@@ -25,7 +43,8 @@ interface SiteHeaderProps {
 // вырезает стандартный backdrop-filter из literal-правил, оставляя только
 // -webkit- (молча не работает в Firefox). Утилиты генерируют ОБЕ формы —
 // см. Main_page_Spec 2026-08-27 (7).
-// Высота: 96px desktop (py-16 + контент h-16=64) / 64px mobile (<768: py-2 + h-12).
+// Высота: 72px desktop (py-2*2 + контент h-14=56, стандарт индустрии 56–72px,
+// решение 2026-09-02 (18) в Main_page_Spec.md) / 64px mobile (<768: py-2 + h-12).
 // Контент — внутри .section-container (max-w 1200, pads 16/32/64).
 // Mobile (<768): nav скрыт, имя слева, справа ThemeToggle + бургер; бургер
 // открывает панель Work/About/Hire me (backdrop + absolute top-full под шапкой).
@@ -33,6 +52,10 @@ interface SiteHeaderProps {
 export function SiteHeader({
     profileSlug,
     displayName,
+    wordmarkText,
+    wordmarkHref,
+    navItems,
+    menuMode = false,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
     className,
@@ -40,18 +63,34 @@ export function SiteHeader({
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
 
+    // Nav: свои ссылки (главная) или дефолт страницы дизайнера
+    const items: NavItem[] =
+        navItems ??
+        (profileSlug
+            ? [
+                  { label: 'Work', href: `/u/${profileSlug}` },
+                  { label: 'About', href: `/u/${profileSlug}#about` },
+              ]
+            : [
+                  { label: 'Work', href: '#work' },
+                  { label: 'About', href: '#studio' },
+              ]);
+    const brandHref =
+        wordmarkHref ?? (profileSlug ? `/u/${profileSlug}` : '/');
+    const brandLabel = wordmarkText ?? displayName ?? 'UX42.studio';
+
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
-            {/* Mobile menu (<768): backdrop + панель под шапкой.
+            {/* Mobile menu (<768, НЕ menuMode): backdrop + панель под шапкой.
                 ВАЖНО: backdrop-filter на <header> создаёт containing block для
                 fixed-потомков (filter-effects-2), поэтому размеры заданы явно:
                 top-16 (64px = высота мобильной шапки) + h-[calc(100dvh-64px)] —
                 результат одинаков и при CB=header, и при CB=viewport,
                 т.к. sticky-шапка всегда прижата к top:0.
                 Решение 2026-08-29 (13) в Main_page_Spec.md. */}
-            {menuOpen && (
+            {!menuMode && menuOpen && (
                 <>
                     <button
                         type='button'
@@ -61,12 +100,11 @@ export function SiteHeader({
                     />
                     <div className='fixed inset-x-0 top-16 z-10 border-b border-outline/30 bg-surface-container-lowest shadow-[0_16px_32px_0_rgba(0,0,0,0.12)] md:hidden'>
                         <nav className='section-container flex flex-col items-stretch gap-1 py-6'>
-                            <MobileNavLink href={`/u/${profileSlug}`} onClick={closeMenu}>
-                                Work
-                            </MobileNavLink>
-                            <MobileNavLink href={`/u/${profileSlug}#about`} onClick={closeMenu}>
-                                About
-                            </MobileNavLink>
+                            {items.map((item) => (
+                                <MobileNavLink key={item.href} href={item.href} onClick={closeMenu}>
+                                    {item.label}
+                                </MobileNavLink>
+                            ))}
                             <div className='my-3 h-px bg-outline/30' aria-hidden='true' />
                             <Link
                                 href={ctaHref}
@@ -83,31 +121,139 @@ export function SiteHeader({
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container relative flex w-full items-center justify-between'>
                 {/* Left zone: Nav Links — только ≥768 */}
-                <nav className='hidden items-center gap-6 md:flex'>
-                    <NavLink href={`/u/${profileSlug}`}>Work</NavLink>
-                    <NavLink href={`/u/${profileSlug}#about`}>About</NavLink>
+                {/* Left zone: Nav Links — только ≥768; на главной (menuMode)
+                    навигация живёт в панели меню — левая зона пуста */}
+                <nav
+                    className={cn(
+                        'hidden items-center gap-6 md:flex',
+                        menuMode && 'invisible',
+                    )}
+                    aria-hidden={menuMode || undefined}
+                >
+                    {items.map((item) => (
+                        <NavLink key={item.href} href={item.href}>
+                            {item.label}
+                        </NavLink>
+                    ))}
                 </nav>
 
-                {/* Center (desktop) / Left (mobile): имя дизайнера — вместо логотипа UX42 */}
-                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} />
+                {/* Center (desktop) / Left (mobile): имя дизайнера или wordmark студии */}
+                <WordmarkLink href={brandHref} label={brandLabel} />
 
-                {/* Right zone: Theme Toggle + CTA (≥768) + burger (<768) */}
+                {/* Right zone: Theme Toggle + CTA/menu-burger */}
                 <div className='flex items-center justify-end gap-3 md:gap-6'>
                     <ThemeToggle />
-                    <div className='hidden md:inline-flex'>
-                        <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
-                    </div>
-                    <button
-                        type='button'
-                        onClick={() => setMenuOpen((v) => !v)}
-                        aria-expanded={menuOpen}
-                        aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                        className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary md:hidden'
-                    >
-                        {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
-                    </button>
+                    {menuMode ? (
+                        // Главная: бургер вместо CTA — открывает правую панель
+                        <button
+                            type='button'
+                            onClick={() => setMenuOpen((v) => !v)}
+                            aria-expanded={menuOpen}
+                            aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                            className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                        >
+                            {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
+                        </button>
+                    ) : (
+                        <>
+                            <div className='hidden md:inline-flex'>
+                                <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                            </div>
+                            <button
+                                type='button'
+                                onClick={() => setMenuOpen((v) => !v)}
+                                aria-expanded={menuOpen}
+                                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                                className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary md:hidden'
+                            >
+                                {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
+                            </button>
+                        </>
+                    )}
                 </div>
             </div>
+
+            {/* Home menu (menuMode): правая панель для посетителя — как в исходнике
+                главного сайта (nav + Sign In + legal). Рендер через портал:
+                backdrop-filter шапки создаёт containing block для fixed-потомков
+                (см. (13)) — панель обязана жить вне <header>, иначе обрежется
+                до высоты шапки. */}
+            {menuMode &&
+                menuOpen &&
+                createPortal(
+                    <>
+                        <button
+                            type='button'
+                            aria-label='Close menu'
+                            onClick={closeMenu}
+                            className='fixed inset-0 z-50 cursor-default bg-black/40'
+                        />
+                        <div
+                            role='dialog'
+                            aria-label='Menu'
+                            className='fixed inset-y-0 right-0 z-50 flex w-[420px] max-w-[86vw] flex-col overflow-y-auto bg-surface-container-lowest px-8 py-8 shadow-[0_16px_32px_0_rgba(0,0,0,0.12)]'
+                        >
+                            <div className='flex items-center justify-between'>
+                                <span className='font-display text-title-lg font-medium text-on-surface'>
+                                    Menu
+                                </span>
+                                <button
+                                    type='button'
+                                    onClick={closeMenu}
+                                    aria-label='Close menu'
+                                    className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                                >
+                                    <X size={24} aria-hidden='true' />
+                                </button>
+                            </div>
+
+                            <nav className='mt-10 flex flex-col items-start gap-2'>
+                                {[...items, { label: 'Contact', href: ctaHref }].map(
+                                    (item) => (
+                                        <Link
+                                            key={item.label}
+                                            href={item.href}
+                                            onClick={closeMenu}
+                                            className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    ),
+                                )}
+                            </nav>
+
+                            <div className='my-6 h-px w-full bg-outline/30' aria-hidden='true' />
+
+                            <Link
+                                href='/login'
+                                onClick={closeMenu}
+                                className='inline-flex items-center py-3 text-title-md font-medium text-primary transition-opacity hover:opacity-80'
+                            >
+                                Sign In / Sign Up
+                            </Link>
+
+                            <div className='my-6 h-px w-full bg-outline/30' aria-hidden='true' />
+
+                            <nav className='flex flex-col items-start gap-2'>
+                                {[
+                                    { label: 'Privacy Policy', href: '/privacy' },
+                                    { label: 'Terms of Service', href: '/terms' },
+                                    { label: 'Cookie Settings', href: '/cookies' },
+                                ].map((item) => (
+                                    <Link
+                                        key={item.href}
+                                        href={item.href}
+                                        onClick={closeMenu}
+                                        className='inline-flex items-center py-2 text-body-md font-normal text-on-surface-variant transition-colors hover:text-on-surface'
+                                    >
+                                        {item.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+                    </>,
+                    document.body,
+                )}
         </header>
     );
 }
@@ -142,7 +288,7 @@ export function SiteHeaderBreadcrumb({
 }: SiteHeaderBreadcrumbProps) {
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-4', className)}
+            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
             {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
             <div className='section-container flex w-full items-center justify-between gap-0'>
@@ -212,7 +358,7 @@ function WordmarkLink({
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary md:h-16',
+                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary md:h-14',
                 className,
             )}
             aria-label={label}
@@ -227,7 +373,7 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary md:h-16',
+                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary md:h-14',
                 className,
             )}
             aria-label='UX42.studio'
