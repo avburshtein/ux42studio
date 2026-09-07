@@ -10,6 +10,7 @@ import { PortfolioCard } from '@/components/PortfolioCard';
 import { AboutSection } from '@/components/portfolio/AboutSection';
 import { SkillsSection } from '@/components/portfolio/SkillsSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
+import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
 import AuthBar from '@/components/AuthBar';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
@@ -131,106 +132,156 @@ export default async function ProfilePage({ params }: PageProps) {
         .slice(0, 3)
         .map((l) => ({ platform: l.platform, title: l.title, url: l.url }));
 
+    // Avatar/Cover дизайнера — из профиля (R2 → /r2/ URL)
+    const avatarUrl = profile.avatarFile
+        ? getImageUrl(profile.avatarFile.r2Key)
+        : undefined;
+    const coverUrl = profile.coverFile
+        ? getImageUrl(profile.coverFile.r2Key)
+        : undefined;
+
+    // Якорная навигация шапки: Work/About/Contact — скролл к секциям страницы
+    const navItems = [
+        { label: 'Work', href: '#work' },
+        { label: 'About', href: '#about' },
+        { label: 'Contact', href: '#contact' },
+    ];
+
+    // Карточки галереи: категория для фильтра + карточка
+    const galleryItems = projects.slice(0, 6).map((project) => {
+        const catName =
+            project.projectCategories
+                .map((pc) => pc.category?.name)
+                .filter(Boolean)[0] ?? '';
+        const catTags = project.projectCategories
+            .map((pc) => pc.category?.name)
+            .filter(Boolean)
+            .slice(0, 3) as string[];
+        return {
+            category: catName,
+            node: (
+                <PortfolioCard
+                    key={project.id}
+                    title={project.title}
+                    tag={catName}
+                    imageUrl={
+                        project.coverFile
+                            ? getImageUrl(project.coverFile.r2Key)
+                            : '/placeholder-project.svg'
+                    }
+                    href={`/u/${slug}/${project.slug}`}
+                    overlayTags={catTags}
+                />
+            ),
+        };
+    });
+
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
-            <SiteHeader profileSlug={slug} displayName={profile.fullName} ctaLabel="Hire me" ctaHref="#contact" />
-            <HeroSection
-                headlinePart1={mpc.hero.headingLine1}
-                headlineAccent={mpc.hero.headingAccent}
-                headlinePart2={mpc.hero.headingLine2}
-                subtitle={mpc.hero.description}
-                primaryCtaLabel={mpc.hero.ctaPrimaryLabel}
-                primaryCtaHref={mpc.hero.ctaPrimaryUrl || '#portfolio'}
-                secondaryCtaLabel={mpc.hero.ctaSecondaryLabel}
-                secondaryCtaHref={mpc.hero.ctaSecondaryUrl || '#contact'}
+            <SiteHeader
+                profileSlug={slug}
+                displayName={profile.fullName}
+                navItems={navItems}
+                ctaLabel="Hire me"
+                ctaHref="#contact"
             />
+            {mpc.hero.visible && (
+                <HeroSection
+                    headlinePart1={mpc.hero.headingLine1}
+                    headlineAccent={mpc.hero.headingAccent}
+                    headlinePart2={mpc.hero.headingLine2}
+                    subtitle={mpc.hero.description}
+                    primaryCtaLabel={mpc.hero.ctaPrimaryLabel}
+                    primaryCtaHref={mpc.hero.ctaPrimaryUrl || '#work'}
+                    primaryCtaVariant={mpc.hero.ctaPrimaryVariant}
+                    secondaryCtaLabel={mpc.hero.ctaSecondaryLabel}
+                    secondaryCtaHref={mpc.hero.ctaSecondaryUrl || '#contact'}
+                    secondaryCtaVariant={mpc.hero.ctaSecondaryVariant}
+                    avatarUrl={avatarUrl}
+                    coverUrl={coverUrl}
+                    displayName={profile.fullName}
+                />
+            )}
             <main>
                 <div className='bg-surface-container-lowest'>
-                    <div className='pt-6'>
-                        <NavLabel label='Work' />
-                    </div>
-                    <PortfolioGallerySection
-                        title={mpc.portfolio.title}
-                        subtitle={mpc.portfolio.subtitle || undefined}
-                        viewAllLabel={
-                            mpc.portfolio.ctaUrl ? mpc.portfolio.ctaLabel : undefined
-                        }
-                        viewAllHref={mpc.portfolio.ctaUrl || undefined}
-                        filters={
-                            categoryFilters.length > 0
-                                ? [
-                                    'All',
-                                    ...categoryFilters.slice(0, 3),
-                                ]
-                                : undefined
-                        }
-                    >
-                        {projects.slice(0, 6).map((project) => {
-                            const catName =
-                                project.projectCategories
-                                    .map((pc) => pc.category?.name)
-                                    .filter(Boolean)[0] ?? '';
-                            const catTags = project.projectCategories
-                                .map((pc) => pc.category?.name)
-                                .filter(Boolean)
-                                .slice(0, 3) as string[];
-                            return (
-                                <PortfolioCard
-                                    key={project.id}
-                                    title={project.title}
-                                    tag={catName}
-                                    imageUrl={
-                                        project.coverFile
-                                            ? getImageUrl(
-                                                project.coverFile
-                                                    .r2Key,
-                                            )
-                                            : '/placeholder-project.svg'
-                                    }
-                                    href={`/u/${slug}/${project.slug}`}
-                                    overlayTags={catTags}
-                                />
-                            );
-                        })}
-                    </PortfolioGallerySection>
-                    <NavLabel label='About' />
-                    {aboutParagraphs.length > 0 && (
-                        <AboutSection
-                            title={mpc.about.heading}
-                            paragraphs={aboutParagraphs}
-                            imageUrl={
-                                processImage ? getImageUrl(processImage.r2Key) : undefined
-                            }
+                    {mpc.portfolio.visible && (
+                        <>
+                            <div className='pt-6'>
+                                <NavLabel label='Work' />
+                            </div>
+                            <PortfolioGallerySection
+                                title={mpc.portfolio.title}
+                                subtitle={mpc.portfolio.subtitle || undefined}
+                                viewAllLabel={
+                                    mpc.portfolio.ctaUrl ? mpc.portfolio.ctaLabel : undefined
+                                }
+                                viewAllHref={mpc.portfolio.ctaUrl || undefined}
+                                viewAllVariant={mpc.portfolio.ctaVariant}
+                                filters={
+                                    categoryFilters.length > 0
+                                        ? categoryFilters.slice(0, 3)
+                                        : undefined
+                                }
+                                items={galleryItems}
+                            />
+                        </>
+                    )}
+                    {mpc.about.visible && aboutParagraphs.length > 0 && (
+                        <>
+                            <NavLabel label='About' />
+                            <AboutSection
+                                title={mpc.about.heading}
+                                paragraphs={aboutParagraphs}
+                                imageUrl={
+                                    processImage ? getImageUrl(processImage.r2Key) : undefined
+                                }
+                            />
+                        </>
+                    )}
+                    {mpc.expertise.visible && (
+                        <>
+                            <NavLabel label='Skills' />
+                            <SkillsSection
+                                skillsLabel={mpc.expertise.skillsLabel}
+                                expertiseTags={mpc.expertise.skills}
+                                toolsLabel={mpc.expertise.toolsLabel}
+                                toolTags={mpc.expertise.tools}
+                                processLabel={mpc.expertise.processLabel}
+                                processSteps={mpc.expertise.processSteps.map((step, i) => ({
+                                    number: String(i + 1).padStart(2, '0'),
+                                    title: step.title,
+                                    description: step.description,
+                                }))}
+                            />
+                        </>
+                    )}
+                    {mpc.expertise.proBonoVisible && (
+                        <ProBonoBanner
+                            text={mpc.expertise.proBonoText}
+                            ctaLabel={mpc.expertise.proBonoCtaLabel}
+                            ctaUrl={mpc.expertise.proBonoCtaUrl || '#contact'}
+                            ctaVariant={mpc.expertise.proBonoCtaVariant}
                         />
                     )}
-                    <NavLabel label='Skills' />
-                    <SkillsSection
-                        skillsLabel={mpc.expertise.skillsLabel}
-                        expertiseTags={mpc.expertise.skills}
-                        toolsLabel={mpc.expertise.toolsLabel}
-                        toolTags={mpc.expertise.tools}
-                        processLabel={mpc.expertise.processLabel}
-                        processSteps={mpc.expertise.processSteps.map((title, i) => ({
-                            number: String(i + 1).padStart(2, '0'),
-                            title,
-                            description: '',
-                        }))}
-                    />
-                    <NavLabel label='Reach' />
+                    {mpc.cta.visible && <NavLabel label='Reach' />}
                 </div>
-                <FAB href='#contact' />
+                {mpc.cta.visible && <FAB href='#contact' />}
             </main>
 
-            <CtaSection
-                title={mpc.cta.heading}
-                bodyLines={[mpc.cta.description1, mpc.cta.description2].filter(
-                    (l) => l.length > 0,
-                )}
-                emailHref={`mailto:${mpc.cta.emailAddress}`}
-                emailLabel={mpc.cta.emailLabel}
-                whatsappHref={mpc.cta.whatsappUrl || undefined}
-                whatsappLabel={mpc.cta.whatsappLabel || undefined}
-            />
+            {mpc.cta.visible && (
+                <CtaSection
+                    title={mpc.cta.heading}
+                    bodyLines={[mpc.cta.description1, mpc.cta.description2].filter(
+                        (l) => l.length > 0,
+                    )}
+                    emailHref={`mailto:${mpc.cta.emailAddress}`}
+                    emailLabel={mpc.cta.emailLabel}
+                    emailVariant={mpc.cta.emailVariant}
+                    whatsappHref={mpc.cta.whatsappUrl || undefined}
+                    whatsappLabel={mpc.cta.whatsappLabel || undefined}
+                    whatsappVariant={mpc.cta.whatsappVariant}
+                />
+            )}
             <SiteFooter
                 profileSlug={slug}
                 profileName={profile.fullName}

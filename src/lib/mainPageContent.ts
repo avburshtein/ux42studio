@@ -3,7 +3,16 @@
 // Хранение: JSON-колонка profiles.main_page_content. Отсутствующие/нулевые
 // значения дополняются дефолтами через normalizeMainPageContent().
 
+export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link';
+
+export type ProcessStep = {
+  title: string;
+  description: string;
+};
+
 export type HeroContent = {
+  /** Показ блока на странице */
+  visible: boolean;
   /** hero_heading_line1 */
   headingLine1: string;
   /** hero_heading_accent (градиентный акцент) */
@@ -12,15 +21,18 @@ export type HeroContent = {
   headingLine2: string;
   /** hero_description */
   description: string;
-  /** hero_cta_primary_label / hero_cta_primary_url */
+  /** hero_cta_primary_label / _url / вариант кнопки */
   ctaPrimaryLabel: string;
   ctaPrimaryUrl: string;
-  /** hero_cta_secondary_label / hero_cta_secondary_url */
+  ctaPrimaryVariant: ButtonVariant;
+  /** hero_cta_secondary_label / _url / вариант кнопки */
   ctaSecondaryLabel: string;
   ctaSecondaryUrl: string;
+  ctaSecondaryVariant: ButtonVariant;
 };
 
 export type PortfolioContent = {
+  visible: boolean;
   /** portfolio_title */
   title: string;
   /** portfolio_subtitle */
@@ -28,9 +40,11 @@ export type PortfolioContent = {
   /** portfolio_cta_label / portfolio_cta_url («View All Projects») */
   ctaLabel: string;
   ctaUrl: string;
+  ctaVariant: ButtonVariant;
 };
 
 export type AboutContent = {
+  visible: boolean;
   /** about_heading */
   heading: string;
   /** about_paragraph_1..3 */
@@ -42,6 +56,7 @@ export type AboutContent = {
 };
 
 export type ExpertiseContent = {
+  visible: boolean;
   /** expertise_skills_label */
   skillsLabel: string;
   /** expertise_skills */
@@ -52,26 +67,31 @@ export type ExpertiseContent = {
   tools: string[];
   /** expertise_process_label */
   processLabel: string;
-  /** expertise_process_steps */
-  processSteps: string[];
-  /** expertise_probono_text / _cta_label / _cta_url */
+  /** expertise_process_steps — этапы работы: заголовок + описание */
+  processSteps: ProcessStep[];
+  /** expertise_probono_text / _cta_label / _cta_url / вариант кнопки / видимость */
+  proBonoVisible: boolean;
   proBonoText: string;
   proBonoCtaLabel: string;
   proBonoCtaUrl: string;
+  proBonoCtaVariant: ButtonVariant;
 };
 
 export type CtaContent = {
+  visible: boolean;
   /** cta_heading */
   heading: string;
   /** cta_description_1 / cta_description_2 */
   description1: string;
   description2: string;
-  /** cta_email_label / cta_email_address */
+  /** cta_email_label / cta_email_address / вариант кнопки */
   emailLabel: string;
   emailAddress: string;
-  /** cta_whatsapp_label / cta_whatsapp_url */
+  emailVariant: ButtonVariant;
+  /** cta_whatsapp_label / cta_whatsapp_url / вариант кнопки */
   whatsappLabel: string;
   whatsappUrl: string;
+  whatsappVariant: ButtonVariant;
 };
 
 export type MainPageContent = {
@@ -84,6 +104,7 @@ export type MainPageContent = {
 
 export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   hero: {
+    visible: true,
     headingLine1: 'I design for the moment',
     headingAccent: 'when everything',
     headingLine2: 'just clicks',
@@ -91,16 +112,21 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
       'A psychology degree and 10 years learning how great environments shape human decisions.',
     ctaPrimaryLabel: 'View case studies',
     ctaPrimaryUrl: '#portfolio',
+    ctaPrimaryVariant: 'primary',
     ctaSecondaryLabel: 'Get in touch',
     ctaSecondaryUrl: '#contact',
+    ctaSecondaryVariant: 'secondary',
   },
   portfolio: {
+    visible: true,
     title: 'Portfolio',
     subtitle: 'Explore my work in web design, UX Research and digital products',
     ctaLabel: 'View All Projects',
     ctaUrl: '',
+    ctaVariant: 'primary',
   },
   about: {
+    visible: true,
     heading: 'People-centered design begins with real curiosity',
     paragraph1: '',
     paragraph2: '',
@@ -108,6 +134,7 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     processImageFileId: null,
   },
   expertise: {
+    visible: true,
     skillsLabel: 'Areas of expertise',
     skills: [
       'UX Research',
@@ -134,20 +161,46 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
       'Github',
     ],
     processLabel: 'My process',
-    processSteps: ['Empathize', 'Define', 'Ideate', 'Prototype', 'Test'],
+    processSteps: [
+      {
+        title: 'Research & Insight',
+        description:
+          'I start by understanding the problem, users, and business context through interviews and competitive analysis.',
+      },
+      {
+        title: 'Wireframe & Structure',
+        description:
+          'I create low-fidelity wireframes and information architecture to map the user journey.',
+      },
+      {
+        title: 'Prototype & Test',
+        description:
+          'I build interactive prototypes and test with real users to validate assumptions and refine the experience.',
+      },
+      {
+        title: 'Handoff & Support',
+        description:
+          'I deliver production-ready designs with detailed specs and support developers through implementation.',
+      },
+    ],
+    proBonoVisible: false,
     proBonoText:
       'Open to pro bono projects for NGOs — a great way to create real impact together while building meaningful portfolio cases.',
     proBonoCtaLabel: 'Get in touch',
     proBonoCtaUrl: '#contact',
+    proBonoCtaVariant: 'primary',
   },
   cta: {
+    visible: true,
     heading: 'Get in touch',
     description1: 'We answer emails fast.',
     description2: 'Pro bono spots available.',
     emailLabel: 'Send an email',
     emailAddress: 'hello@ux42.studio',
+    emailVariant: 'primary',
     whatsappLabel: 'WhatsApp',
     whatsappUrl: '',
+    whatsappVariant: 'secondary',
   },
 };
 
@@ -161,6 +214,21 @@ const strArr = (v: unknown, fallback: string[]): string[] =>
 
 const strOrNull = (v: unknown, fallback: string | null): string | null =>
   typeof v === 'string' && v.length > 0 ? v : fallback;
+
+const bool = (v: unknown, fallback = true): boolean =>
+  typeof v === 'boolean' ? v : fallback;
+
+const VARIANT_VALUES: ButtonVariant[] = ['primary', 'secondary', 'ghost', 'link'];
+const variant = (v: unknown, fallback: ButtonVariant): ButtonVariant =>
+  VARIANT_VALUES.includes(v as ButtonVariant) ? (v as ButtonVariant) : fallback;
+
+const steps = (v: unknown, fallback: ProcessStep[]): ProcessStep[] =>
+  Array.isArray(v)
+    ? v.map((s) => ({
+        title: str((s as ProcessStep)?.title, ''),
+        description: str((s as ProcessStep)?.description, ''),
+      }))
+    : fallback;
 
 /** Дополняет неполный/битый JSON из БД дефолтами (null-safe). */
 export function normalizeMainPageContent(
@@ -180,22 +248,28 @@ export function normalizeMainPageContent(
 
   return {
     hero: {
+      visible: bool(src.hero?.visible),
       headingLine1: str(src.hero?.headingLine1, d.hero.headingLine1),
       headingAccent: str(src.hero?.headingAccent, d.hero.headingAccent),
       headingLine2: str(src.hero?.headingLine2, d.hero.headingLine2),
       description: str(src.hero?.description, d.hero.description),
       ctaPrimaryLabel: str(src.hero?.ctaPrimaryLabel, d.hero.ctaPrimaryLabel),
       ctaPrimaryUrl: str(src.hero?.ctaPrimaryUrl, d.hero.ctaPrimaryUrl),
+      ctaPrimaryVariant: variant(src.hero?.ctaPrimaryVariant, d.hero.ctaPrimaryVariant),
       ctaSecondaryLabel: str(src.hero?.ctaSecondaryLabel, d.hero.ctaSecondaryLabel),
       ctaSecondaryUrl: str(src.hero?.ctaSecondaryUrl, d.hero.ctaSecondaryUrl),
+      ctaSecondaryVariant: variant(src.hero?.ctaSecondaryVariant, d.hero.ctaSecondaryVariant),
     },
     portfolio: {
+      visible: bool(src.portfolio?.visible),
       title: str(src.portfolio?.title, d.portfolio.title),
       subtitle: str(src.portfolio?.subtitle, d.portfolio.subtitle),
       ctaLabel: str(src.portfolio?.ctaLabel, d.portfolio.ctaLabel),
       ctaUrl: str(src.portfolio?.ctaUrl, d.portfolio.ctaUrl),
+      ctaVariant: variant(src.portfolio?.ctaVariant, d.portfolio.ctaVariant),
     },
     about: {
+      visible: bool(src.about?.visible),
       heading: str(src.about?.heading, d.about.heading),
       paragraph1: hasParagraphs ? paragraphs[0] : (bioParagraphs[0] ?? ''),
       paragraph2: hasParagraphs ? paragraphs[1] : (bioParagraphs[1] ?? ''),
@@ -206,24 +280,30 @@ export function normalizeMainPageContent(
       ),
     },
     expertise: {
+      visible: bool(src.expertise?.visible),
       skillsLabel: str(src.expertise?.skillsLabel, d.expertise.skillsLabel),
       skills: strArr(src.expertise?.skills, d.expertise.skills),
       toolsLabel: str(src.expertise?.toolsLabel, d.expertise.toolsLabel),
       tools: strArr(src.expertise?.tools, d.expertise.tools),
       processLabel: str(src.expertise?.processLabel, d.expertise.processLabel),
-      processSteps: strArr(src.expertise?.processSteps, d.expertise.processSteps),
+      processSteps: steps(src.expertise?.processSteps, d.expertise.processSteps),
+      proBonoVisible: bool(src.expertise?.proBonoVisible, false),
       proBonoText: str(src.expertise?.proBonoText, d.expertise.proBonoText),
       proBonoCtaLabel: str(src.expertise?.proBonoCtaLabel, d.expertise.proBonoCtaLabel),
       proBonoCtaUrl: str(src.expertise?.proBonoCtaUrl, d.expertise.proBonoCtaUrl),
+      proBonoCtaVariant: variant(src.expertise?.proBonoCtaVariant, d.expertise.proBonoCtaVariant),
     },
     cta: {
+      visible: bool(src.cta?.visible),
       heading: str(src.cta?.heading, d.cta.heading),
       description1: str(src.cta?.description1, d.cta.description1),
       description2: str(src.cta?.description2, d.cta.description2),
       emailLabel: str(src.cta?.emailLabel, d.cta.emailLabel),
       emailAddress: str(src.cta?.emailAddress, d.cta.emailAddress),
+      emailVariant: variant(src.cta?.emailVariant, d.cta.emailVariant),
       whatsappLabel: str(src.cta?.whatsappLabel, d.cta.whatsappLabel),
       whatsappUrl: str(src.cta?.whatsappUrl, d.cta.whatsappUrl),
+      whatsappVariant: variant(src.cta?.whatsappVariant, d.cta.whatsappVariant),
     },
   };
 }

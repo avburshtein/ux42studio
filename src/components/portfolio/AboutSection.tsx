@@ -9,7 +9,7 @@ export function AboutSection({ title, paragraphs, imageUrl }: AboutSectionProps)
   if (!paragraphs || paragraphs.length === 0) return null;
 
   return (
-    <section id='about' className="bg-surface-container-lowest py-12 md:py-24">
+    <section id='about' className="scroll-mt-20 bg-surface-container-lowest py-12 md:py-24">
       <div className="section-container flex flex-col gap-16">
         <div className="flex flex-col gap-10 lg:flex-row lg:gap-10">
           {imageUrl ? (
