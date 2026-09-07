@@ -364,3 +364,24 @@ UI в админке:
  • Dropdown «Sort by» с вариантами: Default / Date / Alphabetical / Category / Color Gradient
  • При выборе «Color Gradient» — показывать preview палитры текущих карточек
  • Color picker для ручной корректировки dominant_color каждой карточки
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 1)
+═══════════════════════════════════════════════════════════
+ • Хранение: JSON-колонка `profiles.main_page_content` (миграция
+   drizzle/20260907000000_add_main_page_content). Типы и дефолты —
+   src/lib/mainPageContent.ts (MainPageContent, normalizeMainPageContent —
+   null-safe мерж с дефолтами, fallback абзацев About на bio).
+ • Админка: /admin/profile → блок «Main Page Content»
+   (src/components/admin/MainPageContentEditor.tsx), секции 01–05,
+   actions: getMyMainPageContent / saveMainPageContent
+   (src/lib/actions/profile.ts). Сохранение инвалидирует /u/[slug].
+ • Публичная страница /u/[slug] читает контент из БД; захардкоженные
+   EXPERTISE_TAGS / TOOL_TAGS / PROCESS_STEPS / тексты Hero/About/CTA удалены.
+ • Отклонения от спеки:
+   – Hero разбит на 3 поля (line1 / accent / line2) по структуре HeroSection.
+   – processSteps — массив строк (по спеке); SkillsSection рендерит их
+     нумерованными шагами без описаний (описания старого хардкода удалены).
+   – Фильтры/сортировка/карточки портфолио (Section 02, repeating) не
+     реализованы — берутся из проектов в БД; отдельная задача.
+   – Pro bono поля сохраняются, но баннер на /u/[slug] пока не рендерится.
+   – Header/Footer (сквозные) не входят в этот блок — отдельная задача.

@@ -2,6 +2,7 @@ import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 import { sql } from 'drizzle-orm';
 import { users } from './users';
 import { files } from './files';
+import type { MainPageContent } from '@/lib/mainPageContent';
 
 export const profiles = sqliteTable('profiles', {
   id: text('id').primaryKey(),
@@ -14,6 +15,8 @@ export const profiles = sqliteTable('profiles', {
   coverFileId: text('cover_file_id').references(() => files.id),
   location: text('location'),
   website: text('website'),
+  // Контент главной страницы дизайнера (Docs/specs/Main Page Admin Panel Fields.md)
+  mainPageContent: text('main_page_content', { mode: 'json' }).$type<MainPageContent>(),
   isPublic: integer('is_public').notNull().default(1),
   createdAt: integer('created_at').notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at').notNull().default(sql`(unixepoch())`),

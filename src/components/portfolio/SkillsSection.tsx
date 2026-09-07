@@ -7,9 +7,11 @@ interface ProcessStep {
 }
 
 interface SkillsSectionProps {
-  label?: string;
+  skillsLabel?: string;
   expertiseTags: string[];
+  toolsLabel?: string;
   toolTags: string[];
+  processLabel?: string;
   processSteps: ProcessStep[];
 }
 
@@ -17,9 +19,10 @@ interface SkillsSectionProps {
  * Skills Section — Main_page_Spec §8
  * Instance ID: I124:576;87:3879;234:1488
  * 1200×842, Surface Container Lowest, border top
+ * Лейблы секций редактируются в админке (/admin/profile → Main Page Content).
  */
 export function SkillsSection({
-  expertiseTags, toolTags, processSteps,
+  skillsLabel, expertiseTags, toolsLabel, toolTags, processLabel, processSteps,
 }: SkillsSectionProps) {
   if (expertiseTags.length === 0 && toolTags.length === 0 && processSteps.length === 0) return null;
 
@@ -30,7 +33,7 @@ export function SkillsSection({
           <div className="flex w-full flex-col gap-8 lg:w-[502px]">
             {expertiseTags.length > 0 && (
               <div className="flex flex-col gap-8">
-                <h3 className="text-title-sm font-medium text-on-surface-variant">Areas of expertise</h3>
+                <h3 className="text-title-sm font-medium text-on-surface-variant">{skillsLabel ?? 'Areas of expertise'}</h3>
                 <div className="flex flex-wrap gap-3">
                   {expertiseTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
                 </div>
@@ -39,7 +42,7 @@ export function SkillsSection({
 
             {toolTags.length > 0 && (
               <div className="flex flex-col gap-8">
-                <h3 className="text-title-sm font-medium text-on-surface-variant">Tools</h3>
+                <h3 className="text-title-sm font-medium text-on-surface-variant">{toolsLabel ?? 'Tools'}</h3>
                 <div className="flex flex-wrap gap-3">
                   {toolTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
                 </div>
@@ -49,7 +52,7 @@ export function SkillsSection({
 
           {processSteps.length > 0 && (
             <div className="flex w-full flex-col gap-8 lg:w-[530px]">
-              <h3 className="text-title-sm font-medium text-on-surface-variant">My process</h3>
+              <h3 className="text-title-sm font-medium text-on-surface-variant">{processLabel ?? 'My process'}</h3>
               <div className="flex flex-col gap-6">
                 {processSteps.map((step) => (
                   <div key={step.number} className="flex items-start gap-4">
@@ -60,9 +63,11 @@ export function SkillsSection({
                       <span className="text-label-lg font-semibold leading-snug text-on-surface">
                         {step.title}
                       </span>
-                      <span className="text-body-sm font-normal text-on-surface-variant">
-                        {step.description}
-                      </span>
+                      {step.description && (
+                        <span className="text-body-sm font-normal text-on-surface-variant">
+                          {step.description}
+                        </span>
+                      )}
                     </div>
                   </div>
                 ))}
