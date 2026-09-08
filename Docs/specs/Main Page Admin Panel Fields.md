@@ -432,3 +432,40 @@ UI в админке:
    кнопкой Save Main Page Content (updateProfile после saveMainPageContent).
  • Bio остаётся в разделе Profile; используется как fallback абзацев About
    (normalizeMainPageContent), пока paragraphs 1–3 не заданы.
+
+═══════════════════════════════════════════════════════════
+РЕАЛИЗАЦИЯ (2026-09-07, решение 4) — правки по фидбэку 3
+═══════════════════════════════════════════════════════════
+ • OG-обложка и фавикон в разделе Profile: новые колонки
+   profiles.og_image_file_id / favicon_file_id (миграция
+   20260907100000_add_profile_og_favicon), relations ogFile/faviconFile.
+   Сохраняются в форме Profile (updateProfile, null = снять ссылку;
+   старый файл из R2 не удаляется — допустимо для MVP).
+   /u/[slug] generateMetadata: openGraph.images + icons.icon → /r2/ URL.
+ • Выравнивание: legend секций редактора — w-full + text-left (браузер
+   центрировал legend по умолчанию).
+ • Карточки галереи одной высоты: обёртка items — flex, карточка
+   растягивается по высоте grid-ячейки (строки выровнены по самой высокой).
+ • Пункт «цветовая тема + форма/цвет floating elements» — запланирован
+   на следующую сессию (план: @material/material-color-utilities, схема
+   из seed-цвета по M3, переопределение CSS-переменных токенов;
+   floating: color + shape circle/blob/square/ring, дефолт — как есть).
+
+РЕШЕНИЕ 5 (2026-09-07) — About: выравнивание колонок.
+ • Изображение и текстовый блок — одной высоты на lg: flex-row +
+   items-stretch; высоту картинки держит wrapper (aspect 516/495 на
+   мобиле, lg:aspect-auto + min-h-[495px] + stretch по высоте текста),
+   img h-full w-full object-cover.
+ • Заголовок — на верхней линии изображения (оба блока стартуют сверху).
+ • Пустая заглушка без imageUrl — тот же wrapper (сохраняет пропорцию).
+
+РЕШЕНИЕ 6 (2026-09-07) — фиксы по фидбэку 4.
+ • About: img переведён в absolute inset-0 внутри wrapper — высота ряда
+   определяется ТОЛЬКО текстом (или min-h 495): высота картинки теперь
+   гарантированно = высоте текстового блока, верх заголовка = верх картинки.
+ • SiteFooter: ключи соц-иконок platform-title-index (были link.url —
+   дубли пустых url ломали reconciler: «two children with the same key»).
+ • next/image warnings (next-image-missing-loader-width) в dev: в dev
+   /cdn-cgi/image недоступен, loader возвращал src без width. Фикс:
+   images.unoptimized = NODE_ENV==='development' в next.config (prod не
+   затронут); в image-loader width = 0 по умолчанию.

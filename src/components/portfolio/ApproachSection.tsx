@@ -53,7 +53,7 @@ export function ApproachSection() {
 
             <Link
               href='#contact'
-              className='inline-flex h-14 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)]'
+              className='inline-flex h-14 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)]'
             >
               Start a project
             </Link>

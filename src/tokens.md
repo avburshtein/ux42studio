@@ -173,7 +173,7 @@
   --sizing-input-lg: 56px;
 
   /* --- Sizing — Containers --- */
-  --sizing-container-content: 1200px;
+  --sizing-container-content: 1280px; /* 1:1 с Make max-w-[1280px] (Main_page_Spec (24)) */
   --sizing-container-form: 850px;
   --sizing-container-narrow: 768px;
   --sizing-container-page: 1440px;

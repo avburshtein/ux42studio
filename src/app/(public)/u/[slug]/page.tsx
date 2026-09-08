@@ -47,15 +47,22 @@ export async function generateMetadata({
     const p = await db.query.profiles.findFirst({
         where: { slug },
         columns: { fullName: true, headline: true },
+        with: { ogFile: true, faviconFile: true },
     });
     if (!p) return { title: 'UX42 Studio' };
+
+    const ogImageUrl = p.ogFile ? `/r2/${p.ogFile.r2Key}` : undefined;
+    const faviconUrl = p.faviconFile ? `/r2/${p.faviconFile.r2Key}` : undefined;
+
     return {
         title: `${p.fullName} — UX42 Studio`,
         description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
+        icons: faviconUrl ? { icon: faviconUrl } : undefined,
         openGraph: {
             title: `${p.fullName} — UX42 Studio`,
             description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
             type: 'profile',
+            images: ogImageUrl ? [{ url: ogImageUrl }] : undefined,
         },
     };
 }

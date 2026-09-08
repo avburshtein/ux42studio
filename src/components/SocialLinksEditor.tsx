@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -15,6 +15,7 @@ import { GripVertical, Plus, Trash2 } from 'lucide-react';
 import {
     addSocialLink,
     removeSocialLink,
+    updateSocialLink,
     updateSocialLinkOrder,
 } from '@/lib/actions/profile';
 
@@ -51,9 +52,19 @@ export default function SocialLinksEditor({
     const [links, setLinks] = useState<SocialLink[]>(initialLinks);
     const [dragIndex, setDragIndex] = useState<number | null>(null);
     const [busy, setBusy] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // Родитель монтирует редактор до завершения загрузки профиля, а useState
+    // фиксирует только первый снимок initialLinks (пустой) — догоняем данные
+    // из БД, когда они приходят (Main_page_Spec (26)). Локальные правки не
+    // теряем: если пользователь уже успел что-то добавить — не затираем.
+    useEffect(() => {
+        setLinks((prev) => (prev.length === 0 ? initialLinks : prev));
+    }, [initialLinks]);
 
     const addLink = async () => {
         setBusy(true);
+        setError(null);
         try {
             const id = await addSocialLink(profileId, {
                 platform: 'custom',
@@ -71,6 +82,8 @@ export default function SocialLinksEditor({
                     order: prev.length,
                 },
             ]);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : 'Failed to add link');
         } finally {
             setBusy(false);
         }
@@ -80,6 +93,7 @@ export default function SocialLinksEditor({
         const link = links[index];
         if (!link) return;
         setBusy(true);
+        setError(null);
         try {
             if (link.id) {
                 await removeSocialLink(link.id);
@@ -89,6 +103,10 @@ export default function SocialLinksEditor({
                 .map((l, i) => ({ ...l, order: i }));
             setLinks(updated);
             await persistOrder(updated);
+        } catch (e) {
+            setError(
+                e instanceof Error ? e.message : 'Failed to remove link',
+            );
         } finally {
             setBusy(false);
         }
@@ -103,6 +121,21 @@ export default function SocialLinksEditor({
             prev.map((link, i) =>
                 i === index ? { ...link, [field]: fieldValue } : link,
             ),
+        );
+    };
+
+    // Правка поля сохраняется в БД сразу: Select — по change, Inputs — по blur.
+    // Раньше экшена обновления не существовало и правки жили только в
+    // локальном state — в БД оставались пустые строки (Main_page_Spec (26)).
+    const persistField = (
+        index: number,
+        field: 'platform' | 'title' | 'url',
+        value: string,
+    ) => {
+        const link = links[index];
+        if (!link?.id) return;
+        updateSocialLink(link.id, { [field]: value }).catch((e) =>
+            setError(e instanceof Error ? e.message : 'Failed to save link'),
         );
     };
 
@@ -166,9 +199,10 @@ export default function SocialLinksEditor({
                     <div className='flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2'>
                         <Select
                             value={link.platform}
-                            onValueChange={(v) =>
-                                updateLink(index, 'platform', v)
-                            }
+                            onValueChange={(v) => {
+                                updateLink(index, 'platform', v);
+                                persistField(index, 'platform', v);
+                            }}
                         >
                             <SelectTrigger aria-label='Platform'>
                                 <SelectValue placeholder='Platform' />
@@ -190,6 +224,9 @@ export default function SocialLinksEditor({
                             onChange={(e) =>
                                 updateLink(index, 'title', e.target.value)
                             }
+                            onBlur={(e) =>
+                                persistField(index, 'title', e.target.value)
+                            }
                             placeholder='Title'
                             aria-label='Link title'
                         />
@@ -198,6 +235,9 @@ export default function SocialLinksEditor({
                             value={link.url}
                             onChange={(e) =>
                                 updateLink(index, 'url', e.target.value)
+                            }
+                            onBlur={(e) =>
+                                persistField(index, 'url', e.target.value)
                             }
                             placeholder='https://...'
                             type='url'
@@ -216,6 +256,8 @@ export default function SocialLinksEditor({
                     </button>
                 </div>
             ))}
+
+            {error && <p className='text-body-sm text-error'>{error}</p>}
 
             <Button
                 type='button'

@@ -447,7 +447,8 @@ Additional improvements:
 ## 14. Implementation — Responsive (code, 2026-09-01)
 
 Единый принцип: горизонтальный ритм страницы кейса переведён на
-`.section-container` (max-w 1200, padding-inline 16/32/64) — как на главной
+`.section-container` (max-w 1280, padding-inline 24/48/64 — с 2026-09-05,
+Main_page_Spec (24); до этого — 1200 и 16/32/64) — как на главной
 портфолио (Main_page_Spec) и в шапке/футере кейса. Вертикальный ритм — по
 Mobile Frame (§11, gap=32) с выходом на десктопные значения (md/lg).
 

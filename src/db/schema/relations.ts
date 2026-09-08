@@ -34,6 +34,14 @@ export const relations = defineRelations(schema, (r) => ({
             from: r.profiles.coverFileId,
             to: r.files.id,
         }),
+        ogFile: r.one.files({
+            from: r.profiles.ogImageFileId,
+            to: r.files.id,
+        }),
+        faviconFile: r.one.files({
+            from: r.profiles.faviconFileId,
+            to: r.files.id,
+        }),
     },
 
     socialLinks: {

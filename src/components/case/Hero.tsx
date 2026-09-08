@@ -36,7 +36,7 @@ export function Hero({
             )}
         >
             {/* Паттерн главной: full-bleed band → section-container
-                (max-w 1200 + px 16/32/64) — все блоки кейса одной ширины. */}
+                (max-w 1280 + px 24/48/64) — все блоки кейса одной ширины. */}
             <div className='section-container flex w-full flex-col gap-8'>
             {/* === Cover: <lg — full-bleed на всю ширину экрана (возврат
                 одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги

@@ -217,7 +217,7 @@ function Section({
 }) {
     return (
         <fieldset className='rounded-xl border border-outline-variant p-4'>
-            <legend className='flex items-center gap-3 px-2'>
+            <legend className='flex w-full items-center gap-3 px-2 text-left'>
                 <span className='text-title-sm font-semibold text-on-surface'>
                     {title}
                 </span>

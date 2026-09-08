@@ -227,7 +227,7 @@ ease-out; active-состояний нет; focus-visible только где б
 
   SOLID (primary hero, email CTA, view-all, выбранный чип):
     bg-primary (чип — bg-surface-tint #056c4d), text-on-primary,
-    тень 2/2/4/10% → hover: opacity-90 + тень 4/4/12/20%.
+    мягкая тень 0/4/8/15% → hover: opacity-90 + тень 0/8/16/20% (27).
     transition [box-shadow, opacity].
   OUTLINE (hero secondary, WhatsApp, Back to Gallery):
     border-primary-container (Back to Gallery — outline-variant), белая заливка,
@@ -422,3 +422,58 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        (= Work), сверху добавлен NavLabel-разделитель «Approach» — 1:1 с
        блоком Work (label 11px uppercase outline-variant + линия
        rgba(140,213,179,0.16)).
+
+  (24) 2026-09-05 — Масштаб страницы выровнен с исходником Make (фидбэк:
+       «сайт мелковат — паддинги по бокам больше, чем в макете, шрифты
+       выглядят мельче»). Причина найдена в контейнере: .section-container
+       был max-w 1200 + pads 16/32/64 (контент 1072px), в Make — Container
+       max-w-[1280px] + px 24/48/64 (контент 1152px). Глобально
+       (globals.css): --max-width-container-content 1200 → 1280px, pads
+       section-container 16/32 → 24/48 (desktop 64 без изменений). Оси
+       контента выровнялись на всех страницах (шапка, футер, главная,
+       /u/[slug], кейсы). Шрифты не менялись — nav/body-md 16/24 = Make
+       Inter 16/24, «мельче» было оптикой более узкого контента. H1 Hero
+       поднят до 1:1 с Make: 42 → 62 → 72px (было 40 → 68), leading 1.2,
+       tracking −0.42/−0.62/−0.72 (HeroSection.tsx).
+
+  (25) 2026-09-05 — Иконки соцсетей (футер + шапка профиля) вместо
+       глобусов. Причина: в админке «Add Link» создаёт ссылки с платформой
+       'custom' по умолчанию → рендерился fallback Globe; в ProfileHeader
+       карта была только из 4 платформ (fallback ExternalLink). Общий
+       компонент SocialIcon (src/components/SocialIcon.tsx): резолв
+       платформа (trim/lowercase + алиасы x→twitter, vkontakte→vk…) →
+       домен URL (instagram.com, t.me, x.com, vk.com, behance.net, …,
+       subdomain-safe) → Globe для неизвестных. Набор: GitHub, LinkedIn,
+       Instagram, X, YouTube, Telegram, Dribbble, Behance, Medium, VK,
+       WhatsApp (Simple Icons, fill: currentColor). Цвет иконок —
+       зелёный text-primary (hover opacity-70), фидбэк: «иконки должны
+       быть зеленые». SiteFooter/ProfileHeader переключены на общий
+       компонент (дубли SVG удалены).
+
+  (26) 2026-09-05 — Фикс сохранения соцссылок в админке (фидбэк: добавляю
+       ссылки → Save Profile → на сайте глобусы, в админке «No social
+       links added yet»). Две причины. (1) SocialLinksEditor монтировался
+       сразу после setProfileId — ДО завершения getMyProfile — и useState
+       фиксировал пустой initialLinks навсегда: данные из БД игнорировались,
+       при каждом возврате в админку список выглядел пустым. (2) У правок
+       полей (platform/title/url) не было серверного экшена — они жили
+       только в локальном state, в БД оставались пустые строки
+       (custom/' '/' ') → на /u/[slug] рендерились глобусы (пустой url не
+       резолвится по домену). Фиксы: редактор монтируется только после
+       загрузки профиля (profileLoaded + «Loading...», try/finally);
+       новый экшен updateSocialLink (platform/title/url по id); поля
+       сохраняются сразу — Select по change, Inputs по onBlur; ошибки
+       экшенов показываются в UI (раньше падали молча в консоль);
+       getMyProfile защищён от undefined socialLinks. Пустые тестовые
+       строки в локальной D1 почищены.
+
+  (27) 2026-09-05 — Тени кнопок стали «парящими» (FullStory-style, фидбэк:
+       «хочу такие же мягкие тени у кнопок, как на fullstory.com»).
+       Значения сняты с CSS самого fullstory.com (круглая кнопка
+       border-radius:50% и submenu): вместо материальной тени со смещением
+       вбок 2/2/4/10% → 4/4/12/20% теперь rest 0 4px 8px rgba(0,0,0,0.15)
+       → hover 0 8px 16px rgba(0,0,0,0.20) (offset X=0 — тень стелется
+       под кнопкой, hover поднимает её вдвое). Применено ко всем кнопкам
+       с тенью: CtaButton primary/secondary, CTA в Approach, выбранный
+       чип фильтров, summary-кнопка мобильных фильтров. Спеки
+       Primary/Secondary_Button актуализированы (Figma-история не тронута).

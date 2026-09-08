@@ -1,8 +1,10 @@
 > ⚠️ АКТУАЛИЗАЦИЯ 2026-08-28 — реализация осознанно отклоняется (Main_page_Spec.md,
 > «Кнопочная система», решения (9)–(11)). Действующие состояния outline-семейства
 > (hero secondary, WhatsApp, Back to Gallery): border-primary-container + белая
-> заливка + тень 2/2/4/10% → hover: заливка rgba(11,110,79,0.05) + opacity-90 +
-> рост тени 4/4/12/20% (transition box-shadow+opacity+background-color 150ms).
+> заливка + мягкая тень 0/4/8/15% → hover: заливка rgba(11,110,79,0.05) + opacity-90 +
+> рост тени 0/8/16/20% (transition box-shadow+opacity+background-color 150ms).
+> Актуализация 2026-09-05 (27): геометрия тени FullStory-style (offset X=0) —
+> была 2/2/4/10% → 4/4/12/20%.
 > Ниже — исходная спека по Figma (историческая справка).
 
 

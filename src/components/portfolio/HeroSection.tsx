@@ -65,10 +65,10 @@ export function HeroSection({
               className="h-20 w-20 rounded-full border border-outline-variant object-cover shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)]"
             />
           )}
-          {/* Заголовок в строчном потоке (без flex): пробелы между частями не схлопываются,
-              переносы работают как у обычного текста. В Figma строки абсолютные (left:566) —
-              в код это не переносим. */}
-          <h1 className="font-display text-[40px] font-medium leading-[48px] tracking-[-0.25px] text-on-surface-variant lg:text-[68px] lg:leading-[76px]">
+          {/* Масштаб 1:1 с Make (решение (24)): 42/62/72px, leading 1.2,
+              tracking −0.42/−0.62/−0.72. Переносы — строчным потоком.
+              В Figma строки абсолютные (left:566) — в код это не переносим. */}
+          <h1 className="font-display text-[42px] font-medium leading-[1.2] tracking-[-0.42px] text-on-surface-variant md:text-[62px] md:tracking-[-0.62px] lg:text-[72px] lg:tracking-[-0.72px]">
             {headlinePart1.trim()}
             {' '}
             <span className="bg-gradient-to-r from-primary to-primary bg-clip-text text-transparent">
