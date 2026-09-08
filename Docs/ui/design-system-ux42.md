@@ -418,7 +418,7 @@
 ### Контейнеры (ширина)
 | Токен | Значение | Применение |
 |-------|----------|------------|
-| sizing/container/content | 1200px | Основной контент |
+| sizing/container/content | 1280px | Основной контент (1:1 с Make, Main_page_Spec (24)) |
 | sizing/container/form | 850px | Ширина формы (case-template) |
 | sizing/container/narrow | 768px | Узкий контент (заголовки секций) |
 | sizing/container/page | 1440px | Viewport страницы |

@@ -422,3 +422,16 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        (= Work), сверху добавлен NavLabel-разделитель «Approach» — 1:1 с
        блоком Work (label 11px uppercase outline-variant + линия
        rgba(140,213,179,0.16)).
+
+  (24) 2026-09-05 — Масштаб страницы выровнен с исходником Make (фидбэк:
+       «сайт мелковат — паддинги по бокам больше, чем в макете, шрифты
+       выглядят мельче»). Причина найдена в контейнере: .section-container
+       был max-w 1200 + pads 16/32/64 (контент 1072px), в Make — Container
+       max-w-[1280px] + px 24/48/64 (контент 1152px). Глобально
+       (globals.css): --max-width-container-content 1200 → 1280px, pads
+       section-container 16/32 → 24/48 (desktop 64 без изменений). Оси
+       контента выровнялись на всех страницах (шапка, футер, главная,
+       /u/[slug], кейсы). Шрифты не менялись — nav/body-md 16/24 = Make
+       Inter 16/24, «мельче» было оптикой более узкого контента. H1 Hero
+       поднят до 1:1 с Make: 42 → 62 → 72px (было 40 → 68), leading 1.2,
+       tracking −0.42/−0.62/−0.72 (HeroSection.tsx).

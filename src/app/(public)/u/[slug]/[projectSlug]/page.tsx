@@ -219,7 +219,7 @@ export default async function ProjectPage({ params }: PageProps) {
                     {/* Main Content Sections [199:25] + Next Project [198:1336]
                         Schemes/Surface Container Lowest, gap=64, pad=80/64 */}
                     <div className='bg-surface-container-lowest'>
-                    {/* section-container: pads 16/32/64 — единая ось с шапкой,
+                    {/* section-container: pads 24/48/64 — единая ось с шапкой,
                         футером и главной. Вертикаль: Mobile Frame §11 gap=32,
                         десктоп 64; py 64 → lg 80 (pad=80/64). */}
                         <div className='section-container flex flex-col gap-8 py-16 md:gap-16 lg:py-20'>

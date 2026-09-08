@@ -100,7 +100,7 @@ export function SiteFooter({
                 className,
             )}
         >
-            {/* Контейнер контента: max-w 1200 + px 16/32/64 (mobile/tablet/desktop) */}
+            {/* Контейнер контента: max-w 1280 + px 24/48/64 (mobile/tablet/desktop, решение (24)) */}
             <div className='section-container flex flex-col gap-8'>
             {/* Main row */}
             <div className='flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between'>

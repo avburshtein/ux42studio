@@ -45,7 +45,7 @@ interface SiteHeaderProps {
 // см. Main_page_Spec 2026-08-27 (7).
 // Высота: 72px desktop (py-2*2 + контент h-14=56, стандарт индустрии 56–72px,
 // решение 2026-09-02 (18) в Main_page_Spec.md) / 64px mobile (<768: py-2 + h-12).
-// Контент — внутри .section-container (max-w 1200, pads 16/32/64).
+// Контент — внутри .section-container (max-w 1280, pads 24/48/64 — решение (24)).
 // Mobile (<768): nav скрыт, имя слева, справа ThemeToggle + бургер; бургер
 // открывает панель Work/About/Hire me (backdrop + absolute top-full под шапкой).
 // Зоны: nav | имя дизайнера | theme toggle + CTA (+ burger на мобильных)
@@ -118,7 +118,7 @@ export function SiteHeader({
                 </>
             )}
 
-            {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
+            {/* Контент шапки — в общем контейнере секций (max-w 1280 + pads 24/48/64) */}
             <div className='section-container relative flex w-full items-center justify-between'>
                 {/* Left zone: Nav Links — только ≥768 */}
                 {/* Left zone: Nav Links — только ≥768; на главной (menuMode)
@@ -290,7 +290,7 @@ export function SiteHeaderBreadcrumb({
         <header
             className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
         >
-            {/* Контент шапки — в общем контейнере секций (max-w 1200 + pads 16/32/64) */}
+            {/* Контент шапки — в общем контейнере секций (max-w 1280 + pads 24/48/64) */}
             <div className='section-container flex w-full items-center justify-between gap-0'>
                 {/* Left zone: Back + Breadcrumb — gap 24 */}
                 <div className='flex min-w-0 items-center gap-6'>

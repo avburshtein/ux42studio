@@ -33,7 +33,7 @@ const chipClass = (selected: boolean) =>
 
 /**
  * Portfolio Gallery Section — Main_page_Spec §6 (эталон: U5OjywCHbtzQgBsi7PU25r, узел 124:575)
- * Блок во всю ширину (bg + py 48/96) → .section-container (max-w 1200 + px 16/32/64).
+ * Блок во всю ширину (bg + py 48/96) → .section-container (max-w 1280 + px 24/48/64).
  * Содержимое: Section Header (centered, gap 32) → Filters (gap 12) → Grid 3×, gap 24.
  */
 export function PortfolioGallerySection({
