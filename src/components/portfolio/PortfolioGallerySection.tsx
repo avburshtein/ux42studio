@@ -28,7 +28,7 @@ interface PortfolioGalleryProps {
 // Классы чипа фильтра — общие для мобильного disclosure и десктопного ряда
 const chipClass = (selected: boolean) =>
   selected
-    ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out cursor-pointer hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+    ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out cursor-pointer hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
     : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-colors duration-150 ease-out cursor-pointer hover:bg-[rgba(11,110,79,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
 /**
@@ -83,7 +83,7 @@ export function PortfolioGallerySection({
             {/* Mobile (<md): одна кнопка-фильтр со значком — раскрывает список чипов.
                 Решение 2026-08-29 (13) — disclosure без JS для раскрытия. */}
             <details className="group md:hidden">
-              <summary className="flex h-14 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] [&::-webkit-details-marker]:hidden">
+              <summary className="flex h-14 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-full border border-primary-container bg-surface-container-lowest px-8 text-button font-medium text-on-background shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[background-color,box-shadow] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] [&::-webkit-details-marker]:hidden">
                 <Filter size={20} aria-hidden="true" />
                 Filters
                 <ChevronDown

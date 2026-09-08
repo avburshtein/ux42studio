@@ -227,7 +227,7 @@ ease-out; active-состояний нет; focus-visible только где б
 
   SOLID (primary hero, email CTA, view-all, выбранный чип):
     bg-primary (чип — bg-surface-tint #056c4d), text-on-primary,
-    тень 2/2/4/10% → hover: opacity-90 + тень 4/4/12/20%.
+    мягкая тень 0/4/8/15% → hover: opacity-90 + тень 0/8/16/20% (27).
     transition [box-shadow, opacity].
   OUTLINE (hero secondary, WhatsApp, Back to Gallery):
     border-primary-container (Back to Gallery — outline-variant), белая заливка,
@@ -466,3 +466,14 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        экшенов показываются в UI (раньше падали молча в консоль);
        getMyProfile защищён от undefined socialLinks. Пустые тестовые
        строки в локальной D1 почищены.
+
+  (27) 2026-09-05 — Тени кнопок стали «парящими» (FullStory-style, фидбэк:
+       «хочу такие же мягкие тени у кнопок, как на fullstory.com»).
+       Значения сняты с CSS самого fullstory.com (круглая кнопка
+       border-radius:50% и submenu): вместо материальной тени со смещением
+       вбок 2/2/4/10% → 4/4/12/20% теперь rest 0 4px 8px rgba(0,0,0,0.15)
+       → hover 0 8px 16px rgba(0,0,0,0.20) (offset X=0 — тень стелется
+       под кнопкой, hover поднимает её вдвое). Применено ко всем кнопкам
+       с тенью: CtaButton primary/secondary, CTA в Approach, выбранный
+       чип фильтров, summary-кнопка мобильных фильтров. Спеки
+       Primary/Secondary_Button актуализированы (Figma-история не тронута).
