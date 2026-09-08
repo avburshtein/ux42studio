@@ -435,3 +435,17 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        Inter 16/24, «мельче» было оптикой более узкого контента. H1 Hero
        поднят до 1:1 с Make: 42 → 62 → 72px (было 40 → 68), leading 1.2,
        tracking −0.42/−0.62/−0.72 (HeroSection.tsx).
+
+  (25) 2026-09-05 — Иконки соцсетей (футер + шапка профиля) вместо
+       глобусов. Причина: в админке «Add Link» создаёт ссылки с платформой
+       'custom' по умолчанию → рендерился fallback Globe; в ProfileHeader
+       карта была только из 4 платформ (fallback ExternalLink). Общий
+       компонент SocialIcon (src/components/SocialIcon.tsx): резолв
+       платформа (trim/lowercase + алиасы x→twitter, vkontakte→vk…) →
+       домен URL (instagram.com, t.me, x.com, vk.com, behance.net, …,
+       subdomain-safe) → Globe для неизвестных. Набор: GitHub, LinkedIn,
+       Instagram, X, YouTube, Telegram, Dribbble, Behance, Medium, VK,
+       WhatsApp (Simple Icons, fill: currentColor). Цвет иконок —
+       зелёный text-primary (hover opacity-70), фидбэк: «иконки должны
+       быть зеленые». SiteFooter/ProfileHeader переключены на общий
+       компонент (дубли SVG удалены).
