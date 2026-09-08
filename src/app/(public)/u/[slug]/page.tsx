@@ -217,6 +217,9 @@ export default async function ProfilePage({ params }: PageProps) {
                             <div className='pt-6'>
                                 <NavLabel label='Work' />
                             </div>
+                            {/* PortfolioGallerySection: передаются все категории
+                                дизайнера — раньше обрезалось до 3 (+All = 4 кнопки)
+                                и новые категории «пропадали» (решение (28)) */}
                             <PortfolioGallerySection
                                 title={mpc.portfolio.title}
                                 subtitle={mpc.portfolio.subtitle || undefined}
@@ -227,7 +230,7 @@ export default async function ProfilePage({ params }: PageProps) {
                                 viewAllVariant={mpc.portfolio.ctaVariant}
                                 filters={
                                     categoryFilters.length > 0
-                                        ? categoryFilters.slice(0, 3)
+                                        ? categoryFilters
                                         : undefined
                                 }
                                 items={galleryItems}
