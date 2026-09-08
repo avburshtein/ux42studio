@@ -449,3 +449,20 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        зелёный text-primary (hover opacity-70), фидбэк: «иконки должны
        быть зеленые». SiteFooter/ProfileHeader переключены на общий
        компонент (дубли SVG удалены).
+
+  (26) 2026-09-05 — Фикс сохранения соцссылок в админке (фидбэк: добавляю
+       ссылки → Save Profile → на сайте глобусы, в админке «No social
+       links added yet»). Две причины. (1) SocialLinksEditor монтировался
+       сразу после setProfileId — ДО завершения getMyProfile — и useState
+       фиксировал пустой initialLinks навсегда: данные из БД игнорировались,
+       при каждом возврате в админку список выглядел пустым. (2) У правок
+       полей (platform/title/url) не было серверного экшена — они жили
+       только в локальном state, в БД оставались пустые строки
+       (custom/' '/' ') → на /u/[slug] рендерились глобусы (пустой url не
+       резолвится по домену). Фиксы: редактор монтируется только после
+       загрузки профиля (profileLoaded + «Loading...», try/finally);
+       новый экшен updateSocialLink (platform/title/url по id); поля
+       сохраняются сразу — Select по change, Inputs по onBlur; ошибки
+       экшенов показываются в UI (раньше падали молча в консоль);
+       getMyProfile защищён от undefined socialLinks. Пустые тестовые
+       строки в локальной D1 почищены.

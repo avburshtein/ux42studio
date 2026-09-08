@@ -62,6 +62,9 @@ export default function ProfilePage() {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
+    // Редактор соцсетей монтируем только после загрузки профиля: иначе он
+    // фиксирует пустой initialLinks и игнорирует данные из БД (решение (26))
+    const [profileLoaded, setProfileLoaded] = useState(false);
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
     const [mainContent, setMainContent] = useState<MainPageContent | null>(null);
     // Активный раздел сайдбара
@@ -97,37 +100,43 @@ export default function ProfilePage() {
 
     useEffect(() => {
         const fetchProfile = async () => {
-            const id = await getOrCreateProfileId();
-            setProfileId(id);
-            if (!id) return;
+            try {
+                const id = await getOrCreateProfileId();
+                setProfileId(id);
+                if (!id) return;
 
-            const profile = await getMyProfile();
-            if (profile) {
-                reset({
-                    fullName: profile.fullName,
-                    headline: profile.headline ?? '',
-                    bio: profile.bio ?? '',
-                    location: profile.location ?? '',
-                    website: profile.website ?? '',
-                    slug: profile.slug,
-                });
-                setInitialFiles({
-                    avatar: profile.avatarFileId ?? '',
-                    cover: profile.coverFileId ?? '',
-                    og: profile.ogImageFileId ?? '',
-                    favicon: profile.faviconFileId ?? '',
-                });
-                setSocialLinks(
-                    profile.socialLinks.map((link) => ({
-                        id: link.id,
-                        platform: link.platform,
-                        title: link.title,
-                        url: link.url,
-                        order: link.order,
-                    })),
-                );
-                const mpc = await getMyMainPageContent();
-                setMainContent(mpc ?? DEFAULT_MAIN_PAGE_CONTENT);
+                const profile = await getMyProfile();
+                if (profile) {
+                    reset({
+                        fullName: profile.fullName,
+                        headline: profile.headline ?? '',
+                        bio: profile.bio ?? '',
+                        location: profile.location ?? '',
+                        website: profile.website ?? '',
+                        slug: profile.slug,
+                    });
+                    setInitialFiles({
+                        avatar: profile.avatarFileId ?? '',
+                        cover: profile.coverFileId ?? '',
+                        og: profile.ogImageFileId ?? '',
+                        favicon: profile.faviconFileId ?? '',
+                    });
+                    setSocialLinks(
+                        (profile.socialLinks ?? []).map((link) => ({
+                            id: link.id,
+                            platform: link.platform,
+                            title: link.title,
+                            url: link.url,
+                            order: link.order,
+                        })),
+                    );
+                    const mpc = await getMyMainPageContent();
+                    setMainContent(mpc ?? DEFAULT_MAIN_PAGE_CONTENT);
+                }
+            } finally {
+                // Показываем редактор (даже при ошибке загрузки) — иначе
+                // «Loading...» висит навсегда (решение (26))
+                setProfileLoaded(true);
             }
         };
         fetchProfile();
@@ -304,7 +313,7 @@ export default function ProfilePage() {
                     {/* Social Links */}
                     <div>
                         <Label>Social Links</Label>
-                        {profileId ? (
+                        {profileId && profileLoaded ? (
                             <SocialLinksEditor
                                 profileId={profileId}
                                 initialLinks={socialLinks}

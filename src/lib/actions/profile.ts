@@ -274,6 +274,22 @@ export async function addSocialLink(
     return id;
 }
 
+export async function updateSocialLink(
+    linkId: string,
+    data: {
+        platform?: string;
+        title?: string;
+        url?: string;
+    },
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db.update(socialLinks).set(data).where(eq(socialLinks.id, linkId));
+
+    revalidatePath('/admin/profile');
+}
+
 export async function removeSocialLink(linkId: string) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
