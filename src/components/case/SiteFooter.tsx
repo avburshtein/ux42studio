@@ -80,7 +80,8 @@ export function SiteFooter({
                     </div>
                 )}
 
-                {/* Footer links */}
+                {/* Footer links: на страницах дизайнера (profileSlug) — только
+                    Privacy Policy (решение (29)); на главной — полный набор. */}
                 <div className='flex items-center gap-4'>
                     <Link
                         href='/privacy'
@@ -88,18 +89,22 @@ export function SiteFooter({
                     >
                         Privacy Policy
                     </Link>
-                    <Link
-                        href='/terms'
-                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                    >
-                        Terms
-                    </Link>
-                    <Link
-                        href='/cookies'
-                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                    >
-                        Cookies
-                    </Link>
+                    {!profileSlug && (
+                        <>
+                            <Link
+                                href='/terms'
+                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                            >
+                                Terms
+                            </Link>
+                            <Link
+                                href='/cookies'
+                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                            >
+                                Cookies
+                            </Link>
+                        </>
+                    )}
                 </div>
 
                 {/* Back to Gallery — outline-семейство: hover как у secondary */}

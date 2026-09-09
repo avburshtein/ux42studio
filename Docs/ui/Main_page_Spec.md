@@ -486,3 +486,9 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        по flex-wrap, на мобильных — disclosure-список без ограничений.
        Лимит 6 карточек галереи (projects.slice(0, 6)) и 3 тега на
        карточке не тронуты.
+
+  (29) 2026-09-09 — Футер на страницах дизайнера: убраны Terms и Cookies
+       (фидбэк: «достаточно Privacy Policy»). Terms/Cookies показываются
+       только там, где profileSlug не передан (главная); на страницах
+       дизайнера и кейсов (SiteFooter с profileSlug) — только Privacy
+       Policy.
