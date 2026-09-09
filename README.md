@@ -1,5 +1,7 @@
 # UX42 Studio & Portfolio Platform
 
+[English](README.en.md) | Русский
+
 Мультиарендная платформа портфолио для дизайнеров на Next.js + Cloudflare (D1, R2, Workers).
 
 ## Стек
@@ -9,6 +11,21 @@
 - **Хранилище:** Cloudflare R2
 - **Стили:** Tailwind CSS v4 + Material Design 3 (seed: `#0B6E4F`)
 - **Деплой:** Cloudflare Pages / Workers via `@opennextjs/cloudflare`
+
+## Команда и зоны ответственности
+
+| Кто | Зона ответственности |
+| --- | --- |
+| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Верстка и дизайн-система: публичные страницы (главная дизайнера, страница кейса), компоненты `src/components/portfolio/*` и `src/components/case/*`, дизайн-токены и стили (`src/app/globals.css`, `src/tokens.md`), UI-спеки компонентов (`Docs/ui/`), UI редактора контента в `/admin/profile`. Ветки: `verstka`, `token`, `cursor/*` |
+| **Denis Zakharchenko** (<den.zakh@gmail.com>) | Бэкенд и платформа: аутентификация (`src/middleware.ts`, `src/lib/jwt.ts`, `/api/auth`), Server Actions (`src/lib/actions/`), схема БД и миграции (D1 + Drizzle), ядро админ-панели и суперадмина (`/admin`, `/super-admin`), загрузка файлов в R2, конфигурация Cloudflare/Next.js |
+
+> Активная разработка велась с августа по сентябрь 2026. UI-слой админки (редактор главной страницы) поверх бэкенда — Alex; серверная часть и ядро админки — Denis.
+
+## Ветки
+
+- **`main`** — стабильная ветка, точка интеграции (PR из `verstka`).
+- **`verstka`** — активная разработка UI (Alex), периодически вливается в `main` через PR.
+- **`token`**, **`cursor/case-page-surface-tokens`**, **`cursor/agent-docs-and-guidelines`** — исторические ветки Alex (дизайн-токены, токены страницы кейса, документация для агентов), полностью влиты в `main`.
 
 ## Разработка
 
