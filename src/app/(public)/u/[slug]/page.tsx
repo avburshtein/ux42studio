@@ -12,15 +12,16 @@ import { SkillsSection } from '@/components/portfolio/SkillsSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
-import AuthBar from '@/components/AuthBar';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 
 export const revalidate = 3600;
 
-// Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE)
-function NavLabel({ label }: { label: string }) {
+// Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE).
+// id — якорь для навигации шапки (#about); вертикальный offset при скролле
+// даёт глобальный [id] { scroll-margin-top } = 80/72px (решение (18))
+function NavLabel({ label, id }: { label: string; id?: string }) {
     return (
-        <div className="section-container flex w-full items-center gap-4 py-0">
+        <div id={id} className="section-container flex w-full items-center gap-4 py-0">
             <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant">
                 {label}
             </span>
@@ -56,11 +57,11 @@ export async function generateMetadata({
 
     return {
         title: `${p.fullName} — UX42 Studio`,
-        description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
+        description: p.headline ?? `Portfolio of ${p.fullName}`,
         icons: faviconUrl ? { icon: faviconUrl } : undefined,
         openGraph: {
             title: `${p.fullName} — UX42 Studio`,
-            description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
+            description: p.headline ?? `Portfolio of ${p.fullName}`,
             type: 'profile',
             images: ogImageUrl ? [{ url: ogImageUrl }] : undefined,
         },
@@ -239,7 +240,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     )}
                     {mpc.about.visible && aboutParagraphs.length > 0 && (
                         <>
-                            <NavLabel label='About' />
+                            <NavLabel label='About' id='about' />
                             <AboutSection
                                 title={mpc.about.heading}
                                 paragraphs={aboutParagraphs}

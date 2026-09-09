@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { ArrowLeft, Menu, X } from 'lucide-react';
@@ -63,13 +63,27 @@ export function SiteHeader({
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
 
-    // Nav: свои ссылки (главная) или дефолт страницы дизайнера
+    // Escape закрывает оба меню (панель страницы дизайнера и menuMode-панель
+    // главной) — релиз-гейт B6, стандартное a11y-поведение для overlay
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setMenuOpen(false);
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [menuOpen]);
+
+    // Nav: свои ссылки (главная) или дефолт страницы дизайнера.
+    // Хэш-ссылки внутри страницы (якоря #work/#about/#contact есть на
+    // странице профиля); полные URL не нужны — Work/About живут только
+    // на странице профиля, на кейсах — SiteHeaderBreadcrumb (спека (31))
     const items: NavItem[] =
         navItems ??
         (profileSlug
             ? [
-                  { label: 'Work', href: `/u/${profileSlug}` },
-                  { label: 'About', href: `/u/${profileSlug}#about` },
+                  { label: 'Work', href: '#work' },
+                  { label: 'About', href: '#about' },
               ]
             : [
                   { label: 'Work', href: '#work' },
