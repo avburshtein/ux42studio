@@ -503,3 +503,19 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        /privacy, /terms, /cookies в проекте не существует — все legal-
        ссылки сейчас ведут на 404; создать страницы (или заглушки)
        отдельным решением.
+
+  (31) 2026-09-09 — Релиз-гейт B1/B6 (аудит по чек-листу GLM). Факты:
+       страница профиля УЖЕ передаёт в SiteHeader navItems с хэшами
+       (#work/#about/#contact) — дефолтная ветка с полными URL не
+       использовалась, но приведена к хэшам для единообразия. Реальный
+       баг был в #about: якоря не существовало → NavLabel получил
+       опциональный id, About → id='about' (работа/контакт уже имели
+       якоря: PortfolioGallerySection id='work', CtaSection id='contact',
+       потому «Hire me»/CTA hero/FAB работали). scroll-mt-24 НЕ добавлен:
+       offset даёт глобальный [id] { scroll-margin-top } 80/72px
+       (решение (18), у GLM расходится). B6: Escape закрывает оба меню
+       (SiteHeader, useEffect на keydown). Сервисы: generateMetadata
+       fallback описания → EN «Portfolio of {name}» (description + OG);
+       убран неиспользуемый импорт AuthBar. WhatsApp-кнопка на профиле
+       не рендерится (whatsappUrl очищен в админке) → CtaSection хранит
+       опциональную поддержку, Meta-процессор в PP не требуется.
