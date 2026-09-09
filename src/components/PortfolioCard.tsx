@@ -62,7 +62,7 @@ export function PortfolioCard({
           truncate на строках — страховка от переполнения при длинных
           заголовках (две строки в 112px не помещаются). */}
       <div className="flex flex-1 flex-col gap-2 px-6 py-6">
-        <h4 className="font-display m-0 truncate text-[22px] font-medium leading-[30px] tracking-[-0.22px] text-on-surface-variant">
+        <h4 className="font-display m-0 truncate text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-on-surface-variant sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.22px]">
           {title}
         </h4>
         <span className="truncate text-[16px] leading-[24px] text-primary">

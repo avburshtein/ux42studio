@@ -117,7 +117,7 @@ export function PortfolioGallerySection({
             ? visibleItems.map((it, i) => (
                 // flex: карточка растягивается по высоте grid-ячейки —
                 // все карточки строки выровнены по самой высокой
-                <div key={`${it.category}-${i}`} className='flex [&>*]:w-full'>
+                <div key={`${it.category}-${i}`} className='flex min-w-0 [&>*]:w-full'>
                   {it.node}
                 </div>
               ))
