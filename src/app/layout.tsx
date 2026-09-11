@@ -16,6 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+    metadataBase: new URL('https://ux42.studio'),
     title: 'UX42 Studio',
     description: 'Portfolio management platform',
 };
@@ -32,7 +33,9 @@ export default function RootLayout({
             className={`${poppins.variable} ${inter.variable}`}
         >
             <head>
-                <link rel='icon' href='/favicon.svg' type='image/svg+xml' />
+                {/* Фавикон — file-convention src/app/icon.svg: Next сам вставляет
+                    <link rel="icon">. Ручная ссылка на /favicon.svg удалена —
+                    файла в public/ не было, битый 404 (C1, решение (43)). */}
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);return}if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}})()`,

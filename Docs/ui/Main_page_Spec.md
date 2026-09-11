@@ -705,3 +705,19 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        public/og/og-cover.png (экспорт из Figma); у /u/[slug] per-profile
        OG из БД уже существовал (ogFile/faviconFile) — при C2 добавим
        metadataBase, siteName и twitter-карточку туда же.
+
+  (43) 2026-09-11 — C2 закрыт: OG-обложка сгенерирована агентом (референс
+       пользователя не дошёл — собран ДРАФТ по признакам из чата: домен
+       внизу слева, стык имени с «4», цветные точки палитры; исходник
+       public/og/og-cover.svg → PNG через sharp, 1200×630, 38KB).
+       Поправить по референсу = отредактировать SVG + перегнать
+       sharp-скрипт. Нюанс шрифта: next/font Poppins в SVG-рендер не
+       пробрасывается — сработал системный fallback (Arial); при
+       финализации по референсу перевести текст в кривые. Metadata:
+       корень — metadataBase https://ux42.studio; /u/[slug] OG —
+       per-profile ogFile приоритетен, иначе /og/og-cover.png (alt
+       «{name} — UX/UI Designer»), siteName 'UX42.studio', url /u/{slug};
+       twitter card summary_large_image. Бонус C1: из корневого layout
+       удалена битая ссылка <link rel=icon href=/favicon.svg> — файла
+       favicon.svg в public/ не было (404 в консоли у всех); иконку
+       отдаёт file-convention src/app/icon.svg.

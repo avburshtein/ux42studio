@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- OG-обложка (C2, решение (43)) — ДРАФТ: собран по признакам из чата
+       (домен внизу слева, стык имени с «4», цветные точки), токены бренда.
+       Пересобрать по референсу пользователя при поступлении. -->
+  <rect width="1200" height="630" fill="#F7FAF5"/>
+
+  <!-- цветные точки (палитра: secondary, lime, lavender, primary/primary-container) -->
+  <circle cx="1096" cy="96" r="16" fill="#B12A33"/>
+  <circle cx="1032" cy="140" r="9" fill="#546524"/>
+  <circle cx="1158" cy="182" r="7" fill="#5A5891"/>
+  <circle cx="920" cy="70" r="7" fill="#0B6E4F" opacity="0.45"/>
+  <circle cx="142" cy="540" r="10" fill="#546524" opacity="0.55"/>
+  <circle cx="620" cy="88" r="8" fill="#0B6E4F" opacity="0.3"/>
+  <circle cx="84" cy="118" r="12" fill="#98EDC6"/>
+
+  <!-- крупная «42» справа: имя примыкает к цифре (стык) -->
+  <text x="560" y="560" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="500" fill="#0B6E4F">42</text>
+
+  <!-- overline -->
+  <text x="72" y="226" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="26" letter-spacing="7" fill="#44474B">UX/UI DESIGNER</text>
+
+  <!-- имя в две строки -->
+  <text x="68" y="330" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="92" fill="#1B1B1D">Aleksandra</text>
+  <text x="68" y="432" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="92" fill="#1B1B1D">Burshtein</text>
+
+  <!-- домен внизу слева -->
+  <text x="72" y="566" font-family="Poppins, Arial, sans-serif" font-weight="500" font-size="38" fill="#00543B">ux42.studio</text>
+</svg>

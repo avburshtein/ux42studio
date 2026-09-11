@@ -55,6 +55,19 @@ export async function generateMetadata({
     const ogImageUrl = p.ogFile ? `/r2/${p.ogFile.r2Key}` : undefined;
     const faviconUrl = p.faviconFile ? `/r2/${p.faviconFile.r2Key}` : undefined;
 
+    // C2 (решение (43)): OG — per-profile ogFile приоритетен, иначе
+    // статическая обложка /og/og-cover.png; twitter — summary_large_image.
+    const ogImages = ogImageUrl
+        ? [{ url: ogImageUrl }]
+        : [
+              {
+                  url: '/og/og-cover.png',
+                  width: 1200,
+                  height: 630,
+                  alt: `${p.fullName} — UX/UI Designer`,
+              },
+          ];
+
     return {
         title: `${p.fullName} — UX42 Studio`,
         description: p.headline ?? `Portfolio of ${p.fullName}`,
@@ -63,7 +76,15 @@ export async function generateMetadata({
             title: `${p.fullName} — UX42 Studio`,
             description: p.headline ?? `Portfolio of ${p.fullName}`,
             type: 'profile',
-            images: ogImageUrl ? [{ url: ogImageUrl }] : undefined,
+            url: `/u/${slug}`,
+            siteName: 'UX42.studio',
+            images: ogImages,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${p.fullName} — UX42 Studio`,
+            description: p.headline ?? `Portfolio of ${p.fullName}`,
+            images: ogImages.map((image) => image.url),
         },
     };
 }
