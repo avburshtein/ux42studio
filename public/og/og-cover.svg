@@ -1,28 +1,38 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <!-- OG-обложка (C2, решение (43)) — ДРАФТ: собран по признакам из чата
-       (домен внизу слева, стык имени с «4», цветные точки), токены бренда.
-       Пересобрать по референсу пользователя при поступлении. -->
-  <rect width="1200" height="630" fill="#F7FAF5"/>
+  <!-- OG-обложка (C2) — пересобрана ПО РЕФЕРЕНСУ пользователя
+       (Docs/ui/og-cover-reference.png, спека (44)): белый фон, гигантская
+       «42»-ватермарка #E4EAE6 («2» за правым краем, низ цифр срезан
+       нижней границей), имя одной строкой #0E6741 (хвост «…ein» на «4» —
+       стык), роль #0B6E4F, домен внизу слева, мягкие точки-боke с блюром.
+       Шрифт: Poppins при наличии в системе, иначе Segoe UI/Arial
+       (next/font в SVG-рендер не пробрасывается). -->
+  <defs>
+    <filter id="soft" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="9"/>
+    </filter>
+    <filter id="softer" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
 
-  <!-- цветные точки (палитра: secondary, lime, lavender, primary/primary-container) -->
-  <circle cx="1096" cy="96" r="16" fill="#B12A33"/>
-  <circle cx="1032" cy="140" r="9" fill="#546524"/>
-  <circle cx="1158" cy="182" r="7" fill="#5A5891"/>
-  <circle cx="920" cy="70" r="7" fill="#0B6E4F" opacity="0.45"/>
-  <circle cx="142" cy="540" r="10" fill="#546524" opacity="0.55"/>
-  <circle cx="620" cy="88" r="8" fill="#0B6E4F" opacity="0.3"/>
-  <circle cx="84" cy="118" r="12" fill="#98EDC6"/>
+  <rect width="1200" height="630" fill="#FFFFFF"/>
 
-  <!-- крупная «42» справа: имя примыкает к цифре (стык) -->
-  <text x="560" y="560" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="500" fill="#0B6E4F">42</text>
+  <!-- гигантская «42»: верх ≈ 15, baseline ниже нижней границы — низ срезан;
+       «2» уходит за правый край -->
+  <text x="310" y="645" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="900" fill="#E4EAE6">42</text>
 
-  <!-- overline -->
-  <text x="72" y="226" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="26" letter-spacing="7" fill="#44474B">UX/UI DESIGNER</text>
+  <!-- цветные точки (bokeh): лаванда / лайм / мягкий зелёный -->
+  <rect x="930" y="222" width="58" height="58" rx="10" fill="#C9B6F2" opacity="0.75" transform="rotate(45 959 251)" filter="url(#soft)"/>
+  <circle cx="218" cy="552" r="30" fill="#CFE47C" opacity="0.85" filter="url(#softer)"/>
+  <circle cx="112" cy="462" r="20" fill="#C9B6F2" opacity="0.7" filter="url(#soft)"/>
+  <rect x="1016" y="440" width="62" height="62" rx="12" fill="#8FBFA4" opacity="0.6" transform="rotate(45 1047 471)" filter="url(#softer)"/>
+  <circle cx="830" cy="592" r="20" fill="#7FB894" opacity="0.6" filter="url(#softer)"/>
+  <circle cx="12" cy="588" r="14" fill="#D6E584" opacity="0.6" filter="url(#soft)"/>
 
-  <!-- имя в две строки -->
-  <text x="68" y="330" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="92" fill="#1B1B1D">Aleksandra</text>
-  <text x="68" y="432" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="92" fill="#1B1B1D">Burshtein</text>
+  <!-- имя одной строкой, хвост «…ein» ложится на «4» (стык) -->
+  <text x="68" y="272" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="600" font-size="92" fill="#0E6741">Aleksandra Burshtein</text>
+  <text x="68" y="350" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="500" font-size="32" fill="#0B6E4F">UX/UI Designer</text>
 
   <!-- домен внизу слева -->
-  <text x="72" y="566" font-family="Poppins, Arial, sans-serif" font-weight="500" font-size="38" fill="#00543B">ux42.studio</text>
+  <text x="68" y="560" font-family="Poppins, 'Segoe UI', Arial, sans-serif" font-weight="500" font-size="26" fill="#4E8A6B">ux42.studio</text>
 </svg>

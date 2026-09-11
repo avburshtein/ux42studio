@@ -721,3 +721,18 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        удалена битая ссылка <link rel=icon href=/favicon.svg> — файла
        favicon.svg в public/ не было (404 в консоли у всех); иконку
        отдаёт file-convention src/app/icon.svg.
+
+  (44) 2026-09-11 — Референс OG-обложки получен (public/OG-cover (1).png
+       попал в коммит 6862fe2 через git add -A — пользователь положил
+       его в public/ перед сообщением). og-cover.svg/png пересобраны по
+       референсу: белый фон, «42»-ватермарка #E4EAE6 (font-size 900,
+       «2» уходит за правый край, низ цифр срезан нижней границей), имя
+       одной строкой #0E6741 92px (хвост «…ein» на «4» — стык),
+       «UX/UI Designer» #0B6E4F 32px, ux42.studio #4E8A6B 26px внизу
+       слева, точки-боke через feGaussianBlur (лаванда/лайм/зелёный,
+       ромбы + круги). PNG 1200×630, 79KB (<300). Референс перенесён
+       из public/ в Docs/ui/og-cover-reference.png (public — только
+       прод-ассеты, имя с пробелами недопустимо для URL). Шрифт: Poppins
+       в системе не установлен — рендер пошёл Segoe UI (допустимый
+       fallback по правилу «Poppins → fallback»); для точного Poppins
+       положить TTF в репо и перевести текст обложки в кривые.
