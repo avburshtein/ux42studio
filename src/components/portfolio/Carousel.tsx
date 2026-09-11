@@ -31,7 +31,7 @@ export function Carousel({ children, className }: CarouselProps) {
   return (
     <div
       className={cn(
-        '-mx-6 -mb-5 -mt-3 flex w-[calc(100%_+_48px)] snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pt-3',
+        '-mx-6 -mb-5 -mt-3 flex w-[calc(100%_+_48px)] snap-x snap-mandatory gap-4 overflow-x-auto px-6 pb-7 pt-3',
         'scroll-px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         '[&>*]:min-w-0 [&>*]:shrink-0 [&>*]:basis-full [&>*]:snap-start',
         'sm:mx-0 sm:mb-0 sm:mt-0 sm:grid sm:w-full sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-x-visible sm:px-0 sm:pb-0 sm:pt-0 sm:[&>*]:basis-auto',
