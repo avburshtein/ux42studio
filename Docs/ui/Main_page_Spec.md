@@ -573,3 +573,33 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        не был full-bleed влево (паддинг давал section-container) — при
        переходе на двусторонний full-bleed свой px-6 обязателен.
        Урок: класс-список проверять по факту, не по комментарию.
+
+  (36) 2026-09-11 — Страница /privacy — Privacy Policy EN+ES (релиз-гейт D3:
+       футер уже линкует /privacy (29), роута не было → 404). Роут
+       src/app/(public)/privacy/page.tsx (статический, без БД — prerender),
+       контент src/lib/privacyContent.ts (типизированные секции EN/ES,
+       источник Docs/ui/PP.md), рендерер src/components/legal/
+       PrivacyPolicy.tsx. §6/§7 актуализированы и в PP.md, и на странице
+       (WhatsApp удалён из админки, (31) → Meta из процессоров выпала):
+       единственный процессор — Cloudflare, Inc. (хостинг, CDN, object
+       storage, анонимная аналитика, email routing privacy@ux42.studio);
+       §7 — EU–US Data Privacy Framework (Cloudflare сертифицирован) или
+       SCC. Email унифицирован на privacy@ux42.studio (§1 EN имел
+       «av.butshtein@…» — вероятная опечатка; §8/ES уже использовали
+       privacy@; EN/ES адреса ответственного в §1 остаются разными — так
+       в источнике). Лид-ины списка §8 полужирные (макет). Layout:
+       sticky-панель h-14 (bg-background + shadow-card, section-container):
+       Back (←, href=/) + breadcrumb Main / Privacy Policy + ThemeToggle;
+       SiteHeader не используется (якорная навигация главной). Статья:
+       колонка max-w-5xl (1024px) по центру section-container — уже
+       контента футера, как в макете; H1 headline-lg, секции headline-sm
+       (font-display), текст body-md on-surface-variant, «Last updated»
+       body-sm; таблицы: шапка title-sm на bg-surface-container, ячейки
+       body-sm, первая колонка font-medium on-surface, мобильный
+       overflow-x (min-w-[560px]); разделитель EN/ES — пунктир + пилюля с
+       точкой primary. SiteFooter: profileName/profileHeadline,
+       socialLinks=[] — иконки соцсетей из макета отложены (источник
+       ссылок студии не определён, не хардкодить). ОТКРЫТО: (а) адресат
+       форварда privacy@ux42.studio — если Gmail, добавить Google LLC в
+       §6 EN+ES; (б) Terms/Cookies в футере главной → 404 (30),
+       страница /terms не решена.
