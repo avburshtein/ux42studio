@@ -109,10 +109,12 @@ export function PortfolioGallerySection({
             bleed до самого края экрана без правого поля: карточка =
             100% − 16px (327px @ 375), за ней gap-4 и 16px соседа вплотную
             к краю (решения (15), (16)). Тень карточки (вылет ~20px вниз) не
-            срезается скроллером: pb-7 внутри + компенсация −mb-5 снаружи
-            (вертикальный ритм прежний), sm:mb-0 — сброс в grid-режиме.
-            ≥sm — сетка 2/3 (решение (13)) */}
-        <div className="-mr-4 -mb-5 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mb-0 sm:mr-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
+            срезается скроллером: pb-7 внутри + компенсация −mb-5 снаружи.
+            Верх: hover/pressed scale(1.02) (карточка растёт на ~2% высоты,
+            верхний край поднимается на ~4px; на тачах :hover «залипает»)
+            — pt-3 внутри + −mt-3 снаружи. sm:mb-0/sm:mt-0/sm:pb-0/sm:pt-0 —
+            сброс в grid-режиме. ≥sm — сетка 2/3 (решение (13)) */}
+        <div className="-mr-4 -mb-5 -mt-3 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pr-4 pt-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mb-0 sm:mr-0 sm:mt-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:pt-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
           {visibleItems
             ? visibleItems.map((it, i) => (
                 // flex: карточка растягивается по высоте grid-ячейки —
