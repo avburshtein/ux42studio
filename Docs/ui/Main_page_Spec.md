@@ -736,3 +736,14 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        в системе не установлен — рендер пошёл Segoe UI (допустимый
        fallback по правилу «Poppins → fallback»); для точного Poppins
        положить TTF в репо и перевести текст обложки в кривые.
+
+  (45) 2026-09-11 — ФИНАЛ OG-обложки: пользователь прислал Figma-экспорт
+       «OG-cover final.svg» — весь текст переведён в кривые (path'ы),
+       шрифтовая зависимость снята полностью. Файл заменил драфт:
+       mv → public/og/og-cover.svg (имя без пробелов), из него sharp-скрипт
+       перегнал og-cover.png (1200×630, 72KB). Истина по обложке — теперь
+       этот SVG: любые правки = новый экспорт из Figma → mv в og-cover.svg
+       → sharp-скрипт (node -e sharp(...)). Драфт-версия утрачена (не
+       нужна), Docs/ui/og-cover-reference.png оставлен как растровая
+       справка одобренного дизайна. C2 закрыт полностью: обложка +
+       metadataBase + OG/twitter /u/[slug] + per-profile ogFile fallback.
