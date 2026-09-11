@@ -22,7 +22,7 @@ export const revalidate = 3600;
 function NavLabel({ label, id }: { label: string; id?: string }) {
     return (
         <div id={id} className="section-container flex w-full items-center gap-4 py-0">
-            <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant">
+            <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant">
                 {label}
             </span>
             <span aria-hidden className="h-px flex-1 bg-[rgba(140,213,179,0.16)]" />

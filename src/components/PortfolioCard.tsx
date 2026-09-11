@@ -60,11 +60,13 @@ export function PortfolioCard({
       {/* Text area — flex-1: высота ровно 368−256=112px у ВСЕХ карточек
           (фидбэк: разная высота текстовой зоны выглядела неконсистентно).
           truncate на строках — страховка от переполнения при длинных
-          заголовках (две строки в 112px не помещаются). */}
+          заголовках (две строки в 112px не помещаются).
+          h3, не h4 — heading-order (a11y, спека (46)): секции h2 →
+          карточки h3, без перескока уровня; классы не менялись. */}
       <div className="flex flex-1 flex-col gap-2 px-6 py-6">
-        <h4 className="font-display m-0 truncate text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-on-surface-variant sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.22px]">
+        <h3 className="font-display m-0 truncate text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-on-surface-variant sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.22px]">
           {title}
-        </h4>
+        </h3>
         <span className="truncate text-[16px] leading-[24px] text-primary">
           {tag}
         </span>

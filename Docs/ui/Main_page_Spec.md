@@ -747,3 +747,21 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        нужна), Docs/ui/og-cover-reference.png оставлен как растровая
        справка одобренного дизайна. C2 закрыт полностью: обложка +
        metadataBase + OG/twitter /u/[slug] + per-profile ogFile fallback.
+
+  (46) 2026-09-11 — a11y /u/[slug] (Lighthouse Accessibility 90 → цель ≥95;
+       отчёты пользователя dev desktop+mobile, axe 4.12; нумерация GLM-
+       промпта «(45)» сдвинута — (45) занят OG-обложкой). Три failing-
+       аудита → три фикса: (1) color-contrast ×3 — NavLabel
+       (text-outline-variant #c5c6cc на белом = 1.7:1 при 11px) →
+       text-on-surface-variant (9.7:1 светл. / 12.5:1 тёмн., обе темы
+       ок) — исправлен в ОБОИХ NavLabel (главная + страница дизайнера,
+       один паттерн); декоративная линия лейбла — не текст, не тронута.
+       (2) heading-order — заголовок карточки PortfolioCard h4 → h3
+       (порядок: h1 hero → h2 секции → h3 карточки; класс-список не
+       менялся, визуал тот же). (3) link-name ×2 — соц-иконки SiteFooter
+       (LinkedIn/GitHub): в DOM нет ни текста, ни title (в БД title,
+       судя по axe, пуст) → aria-label={link.title || link.platform}
+       (фолбэк platform notNull). FAB НЕ тронут: aria-label ('Help') уже
+       есть, axe не ругался. Вне скоупа (по ТЗ): perf/CSP/source maps/
+       сжатие картинок. Повторный Lighthouse — прогон пользователя
+       (incognito, Accessibility).

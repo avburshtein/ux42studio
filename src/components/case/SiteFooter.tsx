@@ -71,6 +71,10 @@ export function SiteFooter({
                                 href={link.url}
                                 target='_blank'
                                 rel='noopener noreferrer'
+                                // a11y (спека (46)): у иконок нет текста — имя
+                                // даёт aria-label; фолбэк на platform (notNull),
+                                // если title в админке пуст (axe link-name).
+                                aria-label={link.title || link.platform}
                                 className='inline-flex h-11 w-11 items-center justify-center rounded-full text-primary transition-opacity hover:opacity-70'
                                 title={link.title}
                             >
