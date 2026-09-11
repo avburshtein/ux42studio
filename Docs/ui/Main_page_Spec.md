@@ -765,3 +765,18 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        есть, axe не ругался. Вне скоупа (по ТЗ): perf/CSP/source maps/
        сжатие картинок. Повторный Lighthouse — прогон пользователя
        (incognito, Accessibility).
+
+   (47) 2026-09-11 — ВЕРИФИКАЦИЯ (46), a11y-блок закрыт: 4 отчёта
+       Lighthouse 13.4.1 (dev, axe 4.12) — desktop + mobile × light +
+       dark, /u/aleksandra-burshtein. Accessibility = 100/100 во всех
+       четырёх; Best Practices = 100, SEO = 100. Все три фикса (46)
+       подтверждены (color-contrast обе темы/оба вьюпорта,
+       heading-order, link-name) — failing-аудитов a11y не осталось.
+       Остатки вне скоупа (perf, не фиксировали): mobile perf
+       0.74–0.78 — TBT 790–1020 ms (score 0.26–0.37) + image-delivery
+       ~14,4 MB wasted (портфолио-исходники 2400×1687 и пр. рендерятся
+       в ~728px — кандидат №1 на next/image/размеры, если возьмём
+       perf); desktop 0.92–0.98 (SI 0.41 в dt — шум dev/расширений).
+       valid-source-maps (bp) — вес 0, артефакт dev-режима. runWarnings
+       «Chrome extensions» — для точных perf-цифр прогонять incognito
+       (на a11y/bp/seo не влияет).
