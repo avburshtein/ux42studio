@@ -51,7 +51,7 @@ We store your details only as long as necessary for the specified purposes, util
 
 ## 6. Recipients of data
 
-We do not sell, trade, or rent your personal information to third parties. Personal data you send us by email is processed by: **Cloudflare, Inc.** (web hosting, CDN, object storage, anonymous web analytics, and email routing for the privacy@ux42.studio address), acting as a Data Processor under strict confidentiality agreements.
+We do not sell, trade, or rent your personal information to third parties. Personal data you send us by email is processed by: **Cloudflare, Inc.** (web hosting, CDN, object storage, anonymous web analytics, and email routing for the privacy@ux42.studio address) and **Google LLC** (Gmail — storage of the forwarded correspondence), acting as Data Processors under strict confidentiality agreements.
 
 ## 7. International data transfers
 
@@ -147,7 +147,7 @@ Conservamos su información únicamente durante el período necesario para cumpl
 
 ## 6. Destinatarios de los datos
 
-No vendemos, comerciamos ni alquilamos su información personal a terceros. Los datos personales que nos envía por correo electrónico son tratados por: **Cloudflare, Inc.** (alojamiento web, CDN, almacenamiento de objetos, analítica web anónima y enrutamiento de correo para la dirección privacy@ux42.studio), actuando como Encargado del Tratamiento bajo estrictos acuerdos de confidencialidad.
+No vendemos, comerciamos ni alquilamos su información personal a terceros. Los datos personales que nos envía por correo electrónico son tratados por: **Cloudflare, Inc.** (alojamiento web, CDN, almacenamiento de objetos, analítica web anónima y enrutamiento de correo para la dirección privacy@ux42.studio) y **Google LLC** (Gmail — almacenamiento de la correspondencia reenviada), actuando como Encargados del Tratamiento bajo estrictos acuerdos de confidencialidad.
 
 ## 7. Transferencias internacionales de datos
 

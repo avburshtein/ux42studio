@@ -149,7 +149,7 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
         number: 6,
         title: 'Recipients of data',
         intro: [
-            'We do not sell, trade, or rent your personal information to third parties. Personal data you send us by email is processed by: **Cloudflare, Inc.** (web hosting, CDN, object storage, anonymous web analytics, and email routing for the privacy@ux42.studio address), acting as a Data Processor under strict confidentiality agreements.',
+            'We do not sell, trade, or rent your personal information to third parties. Personal data you send us by email is processed by: **Cloudflare, Inc.** (web hosting, CDN, object storage, anonymous web analytics, and email routing for the privacy@ux42.studio address) and **Google LLC** (Gmail — storage of the forwarded correspondence), acting as Data Processors under strict confidentiality agreements.',
         ],
     },
 
@@ -326,7 +326,7 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
         number: 6,
         title: 'Destinatarios de los datos',
         intro: [
-            'No vendemos, comerciamos ni alquilamos su información personal a terceros. Los datos personales que nos envía por correo electrónico son tratados por: **Cloudflare, Inc.** (alojamiento web, CDN, almacenamiento de objetos, analítica web anónima y enrutamiento de correo para la dirección privacy@ux42.studio), actuando como Encargado del Tratamiento bajo estrictos acuerdos de confidencialidad.',
+            'No vendemos, comerciamos ni alquilamos su información personal a terceros. Los datos personales que nos envía por correo electrónico son tratados por: **Cloudflare, Inc.** (alojamiento web, CDN, almacenamiento de objetos, analítica web anónima y enrutamiento de correo para la dirección privacy@ux42.studio) y **Google LLC** (Gmail — almacenamiento de la correspondencia reenviada), actuando como Encargados del Tratamiento bajo estrictos acuerdos de confidencialidad.',
         ],
     },
 

@@ -603,3 +603,17 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        форварда privacy@ux42.studio — если Gmail, добавить Google LLC в
        §6 EN+ES; (б) Terms/Cookies в футере главной → 404 (30),
        страница /terms не решена.
+
+  (37) 2026-09-11 — §6: добавлен процессор Google LLC (решение пользователя).
+       Почта privacy@ux42.studio = Cloudflare Email Routing (MX домена на
+       Cloudflare) с форвардом на обычный личный @gmail.com: Cloudflare —
+       только транзит и письма не хранит; хранение входящих и исходящих
+       ответов — Gmail. Письмо = ПДн посетителя → хранителя ящика называем
+       в §6 (GDPR, раскрытие обработчиков). §6 EN+ES обновлены в PP.md и
+       privacyContent.ts: «…**Cloudflare, Inc.** (…) and **Google LLC**
+       (Gmail — storage of the forwarded correspondence / almacenamiento de
+       la correspondencia reenviada), acting as Data Processors /
+       Encargados del Tratamiento» (мн. число). Если перейдём на Google
+       Workspace (MX сразу на Google) — Cloudflare из почты выпадет,
+       §6 править снова. Открытым остаётся: Terms/Cookies в футере главной
+       → 404 (спека (30)).
