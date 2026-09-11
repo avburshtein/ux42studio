@@ -1,6 +1,6 @@
 # Privacy Policy
 
-*Last updated: July 28, 2026*
+*Last updated: September 11, 2026*
 
 ## 1. Data Controller
 
@@ -24,9 +24,11 @@ We implement data minimization principles, collecting only what is strictly nece
 
 | Source | Data Collected | Purpose of Processing |
 | --- | --- | --- |
-| Contact Form | Name, email, company, project requirements, custom comments. | To respond to user design inquiries, prepare initial design proposal briefs, and initiate pre-contractual discussions. |
+| Email correspondence | Name, email address, and the content of the message (company, project requirements, custom comments). | To respond to user design inquiries, prepare initial design proposal briefs, and initiate pre-contractual discussions. |
 | Web Analytics | Anonymized, aggregated usage statistics (page views, visit duration, referrer, device type) collected via Cloudflare Web Analytics. | This service does not use cookies and does not collect personal data or device fingerprints. |
 | Server Logs | IP address, request date/time, browser type, request status code, protocol used. | To protect the site's technical integrity, troubleshoot operational errors, and prevent malicious attacks. |
+
+**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless.
 
 ## 4. Legal basis for processing
 
@@ -34,8 +36,8 @@ We only process personal data when we have a valid legal justification. Our proc
 
 | Processing Activity | Legal Basis (GDPR / LOPDGDD) |
 | --- | --- |
-| Contact Form — General Inquiries | Legitimate Interest (Art. 6.1.f GDPR) to attend to information requests submitted voluntarily by users. |
-| Contact Form — Service Requests | Pre-contractual measures (Art. 6.1.b GDPR) to prepare bespoke design estimates and review specifications. |
+| Email correspondence — General Inquiries | Legitimate Interest (Art. 6.1.f GDPR) to attend to information requests submitted voluntarily by users. |
+| Email correspondence — Service Requests | Pre-contractual measures (Art. 6.1.b GDPR) to prepare bespoke design estimates and review specifications. |
 | Web Analytics Tracking | Legitimate Interest (Art. 6.1.f GDPR) — anonymous, cookieless statistics; no personal data or identifiers are processed. |
 | Server Security Logging | Legitimate Interest (Art. 6.1.f GDPR) to maintain security, optimize service delivery, and resolve critical server errors. |
 
@@ -45,7 +47,7 @@ We store your details only as long as necessary for the specified purposes, util
 
 | Data Category | Retention Period Policy |
 | --- | --- |
-| Contact Form Communications | 12 months following last communication, unless a commercial contract is initiated (retained for contract duration). |
+| Email correspondence | 12 months following last communication, unless a commercial contract is initiated (retained for contract duration). |
 | Web Analytics Metrics | 14 months maximum duration, automatically cleared on a rolling monthly cycle. |
 | Server logs & Security metrics | 30 to 90 days, unless a security incident demands extended preservation for legal diagnostics. |
 
@@ -120,9 +122,11 @@ Aplicamos principios de minimización de datos, limitándonos a obtener aquello 
 
 | Origen | Datos Recopilados | Finalidad del Tratamiento |
 | --- | --- | --- |
-| Formulario de Contacto | Nombre, email, empresa, requisitos del proyecto, comentarios personalizados. | Responder a consultas, elaborar presupuestos de diseño iniciales e iniciar gestiones precontractuales. |
+| Correspondencia por correo electrónico | Nombre, email y contenido del mensaje (empresa, requisitos del proyecto, comentarios personalizados). | Responder a consultas, elaborar presupuestos de diseño iniciales e iniciar gestiones precontractuales. |
 | Análisis Web | Estadísticas de uso anónimas y agregadas (páginas vistas, duración, origen, tipo de dispositivo) mediante Cloudflare Web Analytics. | No utiliza cookies ni recopila datos personales. |
 | Logs del Servidor | Dirección IP, fecha/hora de la solicitud, tipo de navegador, código de estado, protocolo. | Proteger la integridad técnica del sitio, solucionar errores y prevenir ataques maliciosos. |
+
+**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies.
 
 ## 4. Base legal para el tratamiento
 
@@ -130,8 +134,8 @@ Solo procesamos datos personales cuando disponemos de una justificación legal v
 
 | Actividad de Tratamiento | Base Legal (RGPD / LOPDGDD) |
 | --- | --- |
-| Contacto — Consultas generales | Interés legítimo (Art. 6.1.f RGPD) para atender solicitudes de información enviadas voluntariamente. |
-| Contacto — Solicitud de servicios | Medidas precontractuales (Art. 6.1.b RGPD) para elaborar propuestas de diseño y revisar especificaciones. |
+| Correspondencia electrónica — Consultas generales | Interés legítimo (Art. 6.1.f RGPD) para atender solicitudes de información enviadas voluntariamente. |
+| Correspondencia electrónica — Solicitud de servicios | Medidas precontractuales (Art. 6.1.b RGPD) para elaborar propuestas de diseño y revisar especificaciones. |
 | Análisis Web | Interés legítimo (Art. 6.1.f RGPD) — estadísticas anónimas sin cookies; no se tratan datos personales. |
 | Logs de Seguridad | Interés legítimo (Art. 6.1.f RGPD) para mantener la seguridad y resolver fallos críticos en el servidor. |
 
@@ -141,7 +145,7 @@ Conservamos su información únicamente durante el período necesario para cumpl
 
 | Categoría de Datos | Plazo de Conservación |
 | --- | --- |
-| Comunicaciones de Contacto | 12 meses desde la última interacción, salvo inicio de relación contractual comercial. |
+| Comunicaciones por correo electrónico | 12 meses desde la última interacción, salvo inicio de relación contractual comercial. |
 | Métricas de Análisis Web | Máximo de 14 meses, eliminándose de forma automática en ciclos mensuales. |
 | Logs de Seguridad | Entre 30 y 90 días, salvo que un incidente de seguridad exija un plazo mayor para análisis legal. |
 

@@ -250,9 +250,11 @@ export function SiteHeader({
 
                             <nav className='flex flex-col items-start gap-2'>
                                 {[
+                                    // Legal: только существующие страницы (решение (39));
+                                    // Cookie Settings удалена — /cookies нет, cookies
+                                    // описаны в PP §3.
                                     { label: 'Privacy Policy', href: '/privacy' },
-                                    { label: 'Terms of Service', href: '/terms' },
-                                    { label: 'Cookie Settings', href: '/cookies' },
+                                    { label: 'Terms of Use', href: '/terms' },
                                 ].map((item) => (
                                     <Link
                                         key={item.href}

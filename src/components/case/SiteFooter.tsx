@@ -80,8 +80,9 @@ export function SiteFooter({
                     </div>
                 )}
 
-                {/* Footer links: на страницах дизайнера (profileSlug) — только
-                    Privacy Policy (решение (29)); на главной — полный набор. */}
+                {/* Footer links: Privacy Policy + Terms of Use — на всех страницах
+                    (решение (39)); /cookies не существует — cookies на сайте нет
+                    (хранение описано в PP §3), Cookie Policy вернётся в Backlog v2. */}
                 <div className='flex items-center gap-4'>
                     <Link
                         href='/privacy'
@@ -89,22 +90,12 @@ export function SiteFooter({
                     >
                         Privacy Policy
                     </Link>
-                    {!profileSlug && (
-                        <>
-                            <Link
-                                href='/terms'
-                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                            >
-                                Terms
-                            </Link>
-                            <Link
-                                href='/cookies'
-                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                            >
-                                Cookies
-                            </Link>
-                        </>
-                    )}
+                    <Link
+                        href='/terms'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                    >
+                        Terms of Use
+                    </Link>
                 </div>
 
                 {/* Back to Gallery — outline-семейство: hover как у secondary */}

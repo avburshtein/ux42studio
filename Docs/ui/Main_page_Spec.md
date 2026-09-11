@@ -617,3 +617,46 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        Workspace (MX сразу на Google) — Cloudflare из почты выпадет,
        §6 править снова. Открытым остаётся: Terms/Cookies в футере главной
        → 404 (спека (30)).
+
+  (38) 2026-09-11 — Страница /terms — «Legal Notice & Terms of Use» EN+ES
+       (источник Docs/ui/Terms of Use.md → контент src/lib/termsContent.ts).
+       Патчи из чата: T1 — реальная дата 2026-09-11 синхронно в PP.md,
+       Terms of Use.md и константах LAST_UPDATED обоих контентов (было
+       «July 28, 2026»); T2 — переименование документа (ES: «Aviso Legal
+       y Condiciones de Uso») и блок идентификации LSSI Art. 10 в §2 EN+ES
+       (Domain/Owner/Location/Contact). Контакт — hello@ux42.studio: это
+       уже видимый контакт сайта (page.tsx mailto +
+       mainPageContent.emailAddress), алиас в Cloudflare Email Routing
+       добавляет Денис — ЗАВИСИМОСТЬ ДЕПЛОЯ: без алиаса письма на hello@
+       не дойдут; T3 — §8 EN без «dynamically» (выровнен по ES); T4 —
+       «restricted administrative panels» оставлено как есть. Рендерер
+       вынесен из legal/PrivacyPolicy.tsx в generic legal/LegalArticle.tsx
+       (props: title/lastUpdated/sections/esSections/esLabel) + оболочка
+       legal/LegalPageShell.tsx (sticky-панель Back+breadcrumb+ThemeToggle
+       и футер — общие для /privacy и /terms); PrivacyPolicy.tsx удалён,
+       /privacy переключён на LegalArticle.
+
+  (39) 2026-09-11 — Legal-контур (решение из чата): Cookie Policy НЕ
+       публикуется — черновик описывает несуществующий сайт (GA-куки,
+       consent-менеджер, ссылка Cookie Settings); /cookies не строим,
+       документ вернётся в Backlog v2 при появлении реальных cookies.
+       Вместо неё — микрораздел «Cookies and local storage» в PP §3 EN+ES
+       (после таблицы; новое поле outro в PrivacySection): strictly
+       necessary storage — auth-token (сессия зарегистрированных),
+       localStorage для темы (проверено в коде: ThemeProvider пишет
+       localStorage 'theme'), security cookies Cloudflare; аналитика
+       cookieless. SiteHeader menuMode: «Terms of Service» → «Terms of
+       Use», строка «Cookie Settings» удалена (меню главной: Privacy
+       Policy + Terms of Use). SiteFooter: Terms of Use теперь на ВСЕХ
+       страницах (было только на главной), ссылка Cookies удалена.
+       Патч PP: «Contact Form» → «Email correspondence» в §3/§4/§5 EN+ES —
+       формы на сайте НЕТ (CtaSection: только mailto + опциональный
+       WhatsApp), обращения идут письмом на hello@.
+
+  (40) 2026-09-11 — Таблицы legal-страниц (<768) рендерятся стопкой:
+       dl-список (dt = первая колонка полужирным, dd = значения с
+       подписями-заголовками колонок), ≥md — таблица как в макете
+       (overflow-x, min-w 560). Мотивация чата — WCAG 1.4.10 (data tables
+       формально исключены из reflow, но горизонтальный скролл legal-
+       таблиц на телефоне — плохой UX). Оба представления в DOM: скрытый
+       display:none не попадает в a11y-дерево — дубля для скринридеров нет.

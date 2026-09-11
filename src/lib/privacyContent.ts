@@ -9,7 +9,7 @@
 // подсвечиваются автолинками в PrivacyPolicy.tsx; в lines (§1) — по макету
 // обычный текст.
 
-export const PRIVACY_LAST_UPDATED = 'July 28, 2026';
+export const PRIVACY_LAST_UPDATED = 'September 11, 2026';
 
 /** Подпись разделителя EN → ES */
 export const PRIVACY_ES_LABEL = 'Español — Política de Privacidad';
@@ -35,6 +35,8 @@ export interface PrivacySection {
     /** Простые строки (§1: имя/адрес/email) — без автолинков */
     lines?: string[];
     table?: PrivacyTable;
+    /** Абзацы после таблицы (микрораздел cookies в §3, решение (39)) */
+    outro?: string[];
     /** Маркированный список */
     bullets?: string[];
     /** Контактный блок ведомства (§9) */
@@ -76,8 +78,8 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Source', 'Data Collected', 'Purpose of Processing'],
             rows: [
                 [
-                    'Contact Form',
-                    'Name, email, company, project requirements, custom comments.',
+                    'Email correspondence',
+                    'Name, email address, and the content of the message (company, project requirements, custom comments).',
                     'To respond to user design inquiries, prepare initial design proposal briefs, and initiate pre-contractual discussions.',
                 ],
                 [
@@ -92,6 +94,9 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
             ],
         },
+        outro: [
+            '**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless.',
+        ],
     },
     {
         number: 4,
@@ -103,11 +108,11 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Processing Activity', 'Legal Basis (GDPR / LOPDGDD)'],
             rows: [
                 [
-                    'Contact Form — General Inquiries',
+                    'Email correspondence — General Inquiries',
                     'Legitimate Interest (Art. 6.1.f GDPR) to attend to information requests submitted voluntarily by users.',
                 ],
                 [
-                    'Contact Form — Service Requests',
+                    'Email correspondence — Service Requests',
                     'Pre-contractual measures (Art. 6.1.b GDPR) to prepare bespoke design estimates and review specifications.',
                 ],
                 [
@@ -131,7 +136,7 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Data Category', 'Retention Period Policy'],
             rows: [
                 [
-                    'Contact Form Communications',
+                    'Email correspondence',
                     '12 months following last communication, unless a commercial contract is initiated (retained for contract duration).',
                 ],
                 [
@@ -252,8 +257,8 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Origen', 'Datos Recopilados', 'Finalidad del Tratamiento'],
             rows: [
                 [
-                    'Formulario de Contacto',
-                    'Nombre, email, empresa, requisitos del proyecto, comentarios personalizados.',
+                    'Correspondencia por correo electrónico',
+                    'Nombre, email y contenido del mensaje (empresa, requisitos del proyecto, comentarios personalizados).',
                     'Responder a consultas, elaborar presupuestos de diseño iniciales e iniciar gestiones precontractuales.',
                 ],
                 [
@@ -268,6 +273,9 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
             ],
         },
+        outro: [
+            '**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies.',
+        ],
     },
 
     {
@@ -280,11 +288,11 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Actividad de Tratamiento', 'Base Legal (RGPD / LOPDGDD)'],
             rows: [
                 [
-                    'Contacto — Consultas generales',
+                    'Correspondencia electrónica — Consultas generales',
                     'Interés legítimo (Art. 6.1.f RGPD) para atender solicitudes de información enviadas voluntariamente.',
                 ],
                 [
-                    'Contacto — Solicitud de servicios',
+                    'Correspondencia electrónica — Solicitud de servicios',
                     'Medidas precontractuales (Art. 6.1.b RGPD) para elaborar propuestas de diseño y revisar especificaciones.',
                 ],
                 [
@@ -308,7 +316,7 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
             headers: ['Categoría de Datos', 'Plazo de Conservación'],
             rows: [
                 [
-                    'Comunicaciones de Contacto',
+                    'Comunicaciones por correo electrónico',
                     '12 meses desde la última interacción, salvo inicio de relación contractual comercial.',
                 ],
                 [
