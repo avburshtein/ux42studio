@@ -95,7 +95,7 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
             ],
         },
         outro: [
-            '**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless.',
+            '**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless. No consent banner is used because no tracking cookies are set.',
         ],
     },
     {
@@ -141,11 +141,11 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
                 [
                     'Web Analytics Metrics',
-                    '14 months maximum duration, automatically cleared on a rolling monthly cycle.',
+                    'Aggregated, non-identifying data only; retention per provider (Cloudflare) defaults.',
                 ],
                 [
                     'Server logs & Security metrics',
-                    '30 to 90 days, unless a security incident demands extended preservation for legal diagnostics.',
+                    'Transient technical logs, kept only as long as needed for security and diagnostics; not used for profiling.',
                 ],
             ],
         },
@@ -274,7 +274,7 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
             ],
         },
         outro: [
-            '**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies.',
+            '**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies. No se utiliza banner de consentimiento porque no se establecen cookies de seguimiento.',
         ],
     },
 
@@ -321,11 +321,11 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
                 [
                     'Métricas de Análisis Web',
-                    'Máximo de 14 meses, eliminándose de forma automática en ciclos mensuales.',
+                    'Datos agregados y no identificativos; conservación según los valores predeterminados del proveedor (Cloudflare).',
                 ],
                 [
                     'Logs de Seguridad',
-                    'Entre 30 y 90 días, salvo que un incidente de seguridad exija un plazo mayor para análisis legal.',
+                    'Registros técnicos transitorios, conservados solo el tiempo necesario para seguridad y diagnóstico; sin fines de perfilado.',
                 ],
             ],
         },

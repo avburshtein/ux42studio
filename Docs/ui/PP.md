@@ -28,7 +28,7 @@ We implement data minimization principles, collecting only what is strictly nece
 | Web Analytics | Anonymized, aggregated usage statistics (page views, visit duration, referrer, device type) collected via Cloudflare Web Analytics. | This service does not use cookies and does not collect personal data or device fingerprints. |
 | Server Logs | IP address, request date/time, browser type, request status code, protocol used. | To protect the site's technical integrity, troubleshoot operational errors, and prevent malicious attacks. |
 
-**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless.
+**Cookies and local storage.** This website uses only strictly necessary technical storage: an authentication session cookie (auth-token) for registered users, browser local storage for interface preferences (e.g., light/dark theme), and strictly necessary security cookies set by Cloudflare. We do not use advertising, profiling, or third-party tracking cookies. Our web analytics (Cloudflare Web Analytics) is cookieless. No consent banner is used because no tracking cookies are set.
 
 ## 4. Legal basis for processing
 
@@ -48,8 +48,8 @@ We store your details only as long as necessary for the specified purposes, util
 | Data Category | Retention Period Policy |
 | --- | --- |
 | Email correspondence | 12 months following last communication, unless a commercial contract is initiated (retained for contract duration). |
-| Web Analytics Metrics | 14 months maximum duration, automatically cleared on a rolling monthly cycle. |
-| Server logs & Security metrics | 30 to 90 days, unless a security incident demands extended preservation for legal diagnostics. |
+| Web Analytics Metrics | Aggregated, non-identifying data only; retention per provider (Cloudflare) defaults. |
+| Server logs & Security metrics | Transient technical logs, kept only as long as needed for security and diagnostics; not used for profiling. |
 
 ## 6. Recipients of data
 
@@ -126,7 +126,7 @@ Aplicamos principios de minimización de datos, limitándonos a obtener aquello 
 | Análisis Web | Estadísticas de uso anónimas y agregadas (páginas vistas, duración, origen, tipo de dispositivo) mediante Cloudflare Web Analytics. | No utiliza cookies ni recopila datos personales. |
 | Logs del Servidor | Dirección IP, fecha/hora de la solicitud, tipo de navegador, código de estado, protocolo. | Proteger la integridad técnica del sitio, solucionar errores y prevenir ataques maliciosos. |
 
-**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies.
+**Cookies y almacenamiento local.** Este sitio web utiliza únicamente almacenamiento técnico estrictamente necesario: una cookie de sesión de autenticación (auth-token) para usuarios registrados, el almacenamiento local del navegador para preferencias de interfaz (p. ej., tema claro/oscuro) y cookies de seguridad estrictamente necesarias establecidas por Cloudflare. No utilizamos cookies publicitarias, de perfilado ni de seguimiento de terceros. Nuestras analíticas web (Cloudflare Web Analytics) no utilizan cookies. No se utiliza banner de consentimiento porque no se establecen cookies de seguimiento.
 
 ## 4. Base legal para el tratamiento
 
@@ -146,8 +146,8 @@ Conservamos su información únicamente durante el período necesario para cumpl
 | Categoría de Datos | Plazo de Conservación |
 | --- | --- |
 | Comunicaciones por correo electrónico | 12 meses desde la última interacción, salvo inicio de relación contractual comercial. |
-| Métricas de Análisis Web | Máximo de 14 meses, eliminándose de forma automática en ciclos mensuales. |
-| Logs de Seguridad | Entre 30 y 90 días, salvo que un incidente de seguridad exija un plazo mayor para análisis legal. |
+| Métricas de Análisis Web | Datos agregados y no identificativos; conservación según los valores predeterminados del proveedor (Cloudflare). |
+| Logs de Seguridad | Registros técnicos transitorios, conservados solo el tiempo necesario para seguridad y diagnóstico; sin fines de perfilado. |
 
 ## 6. Destinatarios de los datos
 
