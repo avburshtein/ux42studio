@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { Mail } from 'lucide-react';
 import { FloatingElements } from '../FloatingElements';
 import { CtaButton } from './CtaButton';
@@ -51,6 +52,17 @@ export function CtaSection({
             </CtaButton>
           )}
         </div>
+
+        {/* C7 (решение (42)): legal-примечание под кнопками CTA */}
+        <p className="text-body-sm text-on-surface-variant">
+          By reaching out you agree to our{' '}
+          <Link
+            href="/privacy"
+            className="text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80"
+          >
+            Privacy Policy
+          </Link>
+        </p>
       </div>
     </section>
   );

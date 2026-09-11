@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <!-- C1 (решение (42)): favicon 64×64, rx 14, primary-container #0B6E4F,
+       знак «42» Poppins → Arial 600 цветом #FBFFFA. Статический ассет —
+       HEX разрешён (CSS-переменные в SVG не пробрасываются). -->
+  <rect width="64" height="64" rx="14" fill="#0B6E4F"/>
+  <text x="32" y="42" text-anchor="middle" font-family="Poppins, Arial, sans-serif" font-weight="600" font-size="28" fill="#FBFFFA">42</text>
+</svg>

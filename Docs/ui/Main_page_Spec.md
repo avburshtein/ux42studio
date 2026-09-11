@@ -660,3 +660,48 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        формально исключены из reflow, но горизонтальный скролл legal-
        таблиц на телефоне — плохой UX). Оба представления в DOM: скрытый
        display:none не попадает в a11y-дерево — дубля для скринридеров нет.
+
+  (41) 2026-09-11 — PP §5, P7-патч (текст предоставлен ревьюером дословно):
+       строка Web Analytics Metrics — вместо «14 months / автоочистка» →
+       «Aggregated, non-identifying data only; retention per provider
+       (Cloudflare) defaults»: мы не управляем retention на стороне
+       Cloudflare, обещать конкретные сроки нельзя. Вторая правка той же
+       таблицы (рекомендация ревьюера, «проверить у Дениса» из первого
+       ревью): Server logs — вместо «30 to 90 days» → «Transient technical
+       logs, kept only as long as needed for security and diagnostics; not
+       used for profiling» (Workers по умолчанию логи не хранит — честно
+       при любой конфигурации). Зеркально ES. В микрораздел cookies §3
+       добавлено «No consent banner is used because no tracking cookies are
+       set» (ES: «No se utiliza banner de consentimiento porque no se
+       establecen cookies de seguimiento») — по чек-листу ревьюера в языке
+       ожидается ровно 1 упоминание banner. Дата не сдвинулась: правки в
+       тот же день (правило «правка = новая дата» даёт ту же 11.09).
+       Мини-верификация пройдена: Google Analytics/_ga/consent_status — 0,
+       Contact Form — 0, Cloudflare Web Analytics — есть (§3/§4),
+       Data Privacy Framework — есть (§7). Пункт чек-листа «EMAIL
+       PROVIDER» уже закрыт (спека (37): Google LLC добавлен в §6).
+
+  (42) 2026-09-11 — Блок C (SEO). C1: favicon src/app/icon.svg (64×64,
+       rx 14, фон #0B6E4F, «42» Poppins→Arial 600 #FBFFFA; HEX в
+       статических ассетах разрешён — CSS-переменные в SVG не
+       пробрасываются; дублей favicon.ico в src/app нет). C3: robots.ts
+       (allow /, disallow /admin /super-admin /login /register /api,
+       sitemap-ссылка) + sitemap.ts: статика / /privacy /terms + динамика
+       — публичные профили (isPublic) и published-проекты публичных
+       профилей из D1 через getCloudflareContext/getDb; force-dynamic —
+       prerender на билде заморозил бы динамическую часть (биндингов нет);
+       try/catch — без БД отдаётся только статика; lastModified из
+       projects.updatedAt (unixepoch × 1000). C4: noindex/nofollow в
+       robots-metadata трёх layouts приватных зон — (auth) покрывает
+       /login и /register, admin, super-admin; все серверные, metadata
+       экспортируется легально; robots.txt + meta = два рубежа. C5:
+       not-found.tsx — display-sm «404», одна строка объяснения, пилюля
+       primary на главную, section-container, h1-семантика. C6:
+       generateMetadata кейс-страницы /u/[slug]/[projectSlug] — title
+       «{title} — {fullName}», description из projects.teaser, OG
+       наследуется. C7: под CTA-кнопками CtaSection строка «By reaching
+       out you agree to our Privacy Policy» (text-body-sm, ссылка
+       /privacy). C2 (Open Graph + metadataBase) ОТЛОЖЕН по ТЗ: ждём
+       public/og/og-cover.png (экспорт из Figma); у /u/[slug] per-profile
+       OG из БД уже существовал (ogFile/faviconFile) — при C2 добавим
+       metadataBase, siteName и twitter-карточку туда же.
