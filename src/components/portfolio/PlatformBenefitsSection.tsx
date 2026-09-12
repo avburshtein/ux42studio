@@ -11,8 +11,9 @@ import {
  * Platform Benefits Section — промо-блок преимуществ платформы для дизайнеров
  * на главной студии. Bento-грид 3×2: иконка в кружке + заголовок + описание.
  * Стили — токены проекта (Main_page_Spec): NavLabel-разделитель, градиентный
- * заголовок (как ApproachSection), карточки surface-container-low
- * rounded-[24px]. Размещение — между Studio и CTA.
+ * заголовок (как ApproachSection), карточки как у карточек портфолио
+ * (case/PortfolioCard): фон surface-container-lowest, тень shadow-card,
+ * зелёные заголовки. Иконки — зелёные, без фона-кружка. Размещение — между Studio и CTA.
  * Копирайт намеренно без упоминания Material Design / Google.
  */
 
@@ -92,12 +93,12 @@ export function PlatformBenefitsSection() {
                     {BENEFITS.map(({ icon: Icon, title, description }) => (
                         <div
                             key={title}
-                            className='flex flex-col gap-4 rounded-[24px] bg-surface-container-low p-8 shadow-card transition-shadow duration-200 ease-out hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08)]'
+                            className='flex flex-col gap-4 rounded-[24px] bg-surface-container-lowest p-8 shadow-card transition-shadow duration-200 ease-out hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08)]'
                         >
-                            <span className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(11,110,79,0.1)] text-primary'>
-                                <Icon size={24} aria-hidden='true' />
+                            <span className='shrink-0 text-primary'>
+                                <Icon size={28} aria-hidden='true' />
                             </span>
-                            <h3 className='font-display text-title-lg font-medium text-on-surface'>
+                            <h3 className='font-display text-title-lg font-medium text-primary'>
                                 {title}
                             </h3>
                             <p className='text-body-md text-on-surface-variant'>
