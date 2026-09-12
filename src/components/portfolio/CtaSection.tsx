@@ -15,6 +15,9 @@ interface CtaSectionProps {
   whatsappVariant?: ButtonVariant;
   /** Декоративные Floating Elements (bokeh) — отключаются из админки */
   floatingElements?: boolean;
+  /** Цвет/форма плавающих элементов (из админки) */
+  floatingColor?: string | null;
+  floatingShape?: 'default' | 'circle' | 'square' | 'triangle';
 }
 
 export function CtaSection({
@@ -22,10 +25,19 @@ export function CtaSection({
   emailHref, emailLabel, emailVariant = 'primary',
   whatsappHref, whatsappLabel, whatsappVariant = 'secondary',
   floatingElements = true,
+  floatingColor, floatingShape,
 }: CtaSectionProps) {
   return (
     <section id='contact' className="relative scroll-mt-20 overflow-hidden bg-surface-container-lowest py-12 md:py-24 lg:py-30">
-      {floatingElements && <FloatingElements count={20} minBlur={0} maxBlur={20} />}
+      {floatingElements && (
+        <FloatingElements
+          count={20}
+          minBlur={0}
+          maxBlur={20}
+          color={floatingColor}
+          shape={floatingShape}
+        />
+      )}
 
       <div className="section-container relative z-10 flex flex-col items-center gap-8 text-center">
         <h2 className="font-display text-[32px] font-medium leading-[40px] text-on-surface lg:text-display-sm lg:leading-tight">

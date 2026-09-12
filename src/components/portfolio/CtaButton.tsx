@@ -10,9 +10,10 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   // решение (27)) → hover: opacity-90 + тень 0/8/16/20%
   primary:
     'bg-primary text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity] duration-150 ease-out',
-  // outline-семейство (secondary): border-primary-container, hover заливка 5%
+  // outline-семейство (secondary): border-primary-container, hover заливка 5% —
+  // от токена primary (color-mix), чтобы работать с кастомным сидом
   secondary:
-    'border border-primary-container bg-surface-container-lowest text-on-background shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity,background-color] duration-150 ease-out',
+    'border border-primary-container bg-surface-container-lowest text-on-background shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity,background-color] duration-150 ease-out',
   // ghost-семейство: без заливки и бордера, hover opacity-70
   ghost:
     'text-on-background hover:opacity-70 transition-opacity duration-150 ease-out',

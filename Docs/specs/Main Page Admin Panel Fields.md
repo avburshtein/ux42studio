@@ -469,3 +469,26 @@ UI в админке:
    /cdn-cgi/image недоступен, loader возвращал src без width. Фикс:
    images.unoptimized = NODE_ENV==='development' в next.config (prod не
    затронут); в image-loader width = 0 по умолчанию.
+
+РЕШЕНИЕ 7 (2026-09-08) — Color Theme (пункт 4).
+ • Движок: @material/material-color-utilities (официальный M3 HCT).
+   src/lib/theme.ts: generateThemeCss(seed) → SchemeTonalSpot light/dark
+   (contrastLevel 0) → переопределения всех --md-sys-color-* включая
+   surface-container уровни; extended-акценты (--md-ext-*) — hue-ротация
+   от сид (lime +90°, lavender 270°/300°, green +120°).
+ • Хранение: mainPageContent.theme {useCustomTheme, seedColor} и
+   .floating {color: hex|null, shape: default|circle|square|triangle}
+   (null/false = дефолт «как есть»).
+ • Применение: /u/[slug] инжектит <style> c :root и [data-theme=dark]
+   блоками — ThemeToggle продолжает работать, тёмная схема генерируется
+   автоматически по M3 (контраст гарантируется алгоритмом HCT).
+ • Админка: раздел 06 · Color Theme — чекбокс Custom theme, color-picker
+   seed + hex-инпут, 5 пресетов, live-превью всей админки (инъекция
+   #admin-theme-preview только пока открыт раздел), блок Floating
+   elements: цвет (picker + Reset) и форма (Default mixed/Circles/
+   Squares/Triangles).
+ • FloatingElements: пропсы color/shape — единый цвет вместо палитры и
+   фиксированная форма вместо случайной.
+ • Хардкоды зелёного переведены на color-mix от --md-sys-color-primary:
+   PortfolioCard hover-градиент (90/50%), hover-заливки secondary-кнопок
+   (5%) и чипов фильтров (10%), NavLabel-разделитель (16%).

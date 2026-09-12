@@ -13,6 +13,7 @@ import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
+import { generateThemeCss } from '@/lib/theme';
 
 export const revalidate = 3600;
 
@@ -25,7 +26,7 @@ function NavLabel({ label, id }: { label: string; id?: string }) {
             <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant">
                 {label}
             </span>
-            <span aria-hidden className="h-px flex-1 bg-[rgba(140,213,179,0.16)]" />
+            <span aria-hidden className='h-px flex-1 bg-[color-mix(in_srgb,var(--md-sys-color-primary)_16%,transparent)]' />
         </div>
     );
 }
@@ -132,6 +133,12 @@ export default async function ProfilePage({ params }: PageProps) {
     // Контент главной страницы — из админки (/admin/profile → Main Page Content),
     // с fallback на дефолты (Main Page Admin Panel Fields.md)
     const mpc = normalizeMainPageContent(profile.mainPageContent, bioParagraphs);
+
+    // Кастомная цветовая тема: M3-схема из seed → CSS-переопределения токенов.
+    // Пустая строка = дефолтная тема globals.css (useCustomTheme = false).
+    const themeCss = mpc.theme.useCustomTheme
+        ? generateThemeCss(mpc.theme.seedColor)
+        : '';
     const aboutParagraphs = [
         mpc.about.paragraph1,
         mpc.about.paragraph2,
@@ -207,6 +214,10 @@ export default async function ProfilePage({ params }: PageProps) {
 
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
+            {/* Кастомная тема: переопределяем --md-sys-color-* ДО рендера контента */}
+            {themeCss && (
+                <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+            )}
             <SiteHeader
                 profileSlug={slug}
                 displayName={profile.fullName}
@@ -230,6 +241,8 @@ export default async function ProfilePage({ params }: PageProps) {
                     coverUrl={coverUrl}
                     displayName={profile.fullName}
                     floatingElements={mpc.hero.floatingElements}
+                    floatingColor={mpc.floating.color}
+                    floatingShape={mpc.floating.shape}
                 />
             )}
             <main>
@@ -314,6 +327,8 @@ export default async function ProfilePage({ params }: PageProps) {
                     whatsappLabel={mpc.cta.whatsappLabel || undefined}
                     whatsappVariant={mpc.cta.whatsappVariant}
                     floatingElements={mpc.cta.floatingElements}
+                    floatingColor={mpc.floating.color}
+                    floatingShape={mpc.floating.shape}
                 />
             )}
             <SiteFooter

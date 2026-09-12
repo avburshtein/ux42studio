@@ -44,9 +44,11 @@ export function PortfolioCard({
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
 
-        {/* Gradient Overlay on hover — as Make: from 0.9 / via 0.5 / to transparent */}
+        {/* Gradient Overlay on hover — поверх — цвет от токена primary
+            (color-mix, чтобы работал кастомный сид), opacity как в Make:
+            from 0.9 / via 0.5 / to transparent */}
         <div className="absolute inset-0 flex flex-col justify-end p-6
-          bg-gradient-to-t from-[rgba(11,110,79,0.9)] via-[rgba(11,110,79,0.5)] to-transparent
+          bg-gradient-to-t from-[color-mix(in_srgb,var(--md-sys-color-primary)_90%,transparent)] via-[color-mix(in_srgb,var(--md-sys-color-primary)_50%,transparent)] to-transparent
           opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"
         >
           {overlayTags && overlayTags.length > 0 && (

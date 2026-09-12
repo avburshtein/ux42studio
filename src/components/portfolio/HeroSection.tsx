@@ -20,6 +20,9 @@ interface HeroSectionProps {
   displayName?: string;
   /** Декоративные Floating Elements (bokeh) — отключаются из админки */
   floatingElements?: boolean;
+  /** Цвет/форма плавающих элементов (из админки) */
+  floatingColor?: string | null;
+  floatingShape?: 'default' | 'circle' | 'square' | 'triangle';
 }
 
 /**
@@ -42,6 +45,7 @@ export function HeroSection({
   secondaryCtaVariant = 'secondary',
   avatarUrl, coverUrl, displayName,
   floatingElements = true,
+  floatingColor, floatingShape,
 }: HeroSectionProps) {
   return (
     <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
@@ -53,7 +57,15 @@ export function HeroSection({
           <div className="absolute inset-0 bg-surface-container-lowest/70" />
         </div>
       )}
-      {floatingElements && <FloatingElements count={20} minBlur={0} maxBlur={20} />}
+      {floatingElements && (
+        <FloatingElements
+          count={20}
+          minBlur={0}
+          maxBlur={20}
+          color={floatingColor}
+          shape={floatingShape}
+        />
+      )}
 
       <div className="section-container relative z-10 flex flex-col gap-16">
         <div className="flex flex-col gap-8">
