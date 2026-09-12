@@ -213,38 +213,43 @@ export default async function HomePage({
                                         We pursue design that is simple and
                                         functional to the point of genius — and
                                         mathematically beautiful. Psychology
-                                        helps us understand people; math keeps
-                                        the layout honest.
+                                        helps us understand people; engineering
+                                        keeps the architecture honest.
+                                    </p>
+                                    <p className='text-body-lg font-normal text-on-surface-variant'>
+                                        Behind UX42.studio is a rare
+                                        combination: a UX designer with a
+                                        background in clinical psychology and
+                                        human behaviour research, and a senior
+                                        engineer with an MD/PhD in psychiatry
+                                        and 8+ years building MedTech systems.
+                                        We don&apos;t just make things look
+                                        good — we make them make sense.
                                     </p>
                                 </div>
 
-                                <div className='grid gap-6 sm:grid-cols-3'>
-                                    {[
-                                        {
-                                            value: 'Google',
-                                            label: 'UX Design Certificate',
-                                        },
-                                        {
-                                            value: 'MSc',
-                                            label: "Psychology, master's degree",
-                                        },
-                                        {
-                                            value: 'NGO',
-                                            label: 'Projects for social good',
-                                        },
-                                    ].map(({ value, label }) => (
-                                        <div
-                                            key={label}
-                                            className='flex flex-col gap-1'
-                                        >
-                                            <span className='font-display text-[32px] font-medium leading-[40px] text-primary'>
-                                                {value}
-                                            </span>
-                                            <span className='text-body-md text-on-surface-variant'>
-                                                {label}
-                                            </span>
-                                        </div>
-                                    ))}
+                                <div className='flex flex-col gap-3'>
+                                    <span className='text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
+                                        Our background
+                                    </span>
+                                    <ul className='flex flex-col gap-2'>
+                                        {[
+                                            'MSc in Psychology · UX Research · Google UX Design Certificate',
+                                            '8+ years MedTech Engineering · Next.js · TypeScript',
+                                            'NGO — Projects for social good',
+                                        ].map((line) => (
+                                            <li
+                                                key={line}
+                                                className='flex items-start gap-3 text-body-md text-on-surface-variant'
+                                            >
+                                                <span
+                                                    aria-hidden
+                                                    className='mt-[10px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary'
+                                                />
+                                                {line}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
                             </div>
                         </div>
