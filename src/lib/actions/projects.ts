@@ -1280,6 +1280,40 @@ async function collectProjectFileIds(projectId: string): Promise<string[]> {
     return [...fileIds];
 }
 
+// ---- Видимость секций кейса на публичной странице ----
+
+export async function getProjectSectionsVisibility(
+    projectId: string,
+): Promise<Partial<Record<string, boolean>>> {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ sectionsVisibility: projects.sectionsVisibility })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    return project?.sectionsVisibility ?? {};
+}
+
+export async function updateProjectSectionsVisibility(
+    projectId: string,
+    sectionsVisibility: Record<string, boolean>,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(projects)
+        .set({ sectionsVisibility })
+        .where(eq(projects.id, projectId));
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Delete ----
+
 export async function deleteProject(projectId: string) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);

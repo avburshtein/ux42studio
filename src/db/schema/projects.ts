@@ -62,6 +62,12 @@ export const projects = sqliteTable(
         // Section 08: Reflections
         keyTakeaway: text('key_takeaway'), //[cite: 1]
 
+        // Видимость секций на публичной странице кейса (JSON-карта sectionKey →
+        // boolean; отсутствующий ключ = секция видна при наличии данных)
+        sectionsVisibility: text('sections_visibility', {
+            mode: 'json',
+        }).$type<Partial<Record<string, boolean>>>(),
+
         // Statuses & Visibility
         status: text('status', { enum: ['draft', 'published', 'archived'] })
             .notNull()

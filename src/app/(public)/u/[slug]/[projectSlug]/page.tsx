@@ -34,6 +34,27 @@ function getImageUrl(r2Key: string): string {
     return `/r2/${r2Key}`;
 }
 
+// Ключи секций кейса (совпадают с SectionsVisibilityEditor) —
+// порядок массива = порядок секций на странице
+type CaseSectionKey =
+    | 'problem'
+    | 'research'
+    | 'designProcess'
+    | 'designSystem'
+    | 'testing'
+    | 'finalDesign'
+    | 'reflection';
+
+const CASE_SECTION_ORDER: CaseSectionKey[] = [
+    'problem',
+    'research',
+    'designProcess',
+    'designSystem',
+    'testing',
+    'finalDesign',
+    'reflection',
+];
+
 // ---- SEO (C6, решение (42)): title/description кейса; OG наследуется
 // (специфичная OG-картинка есть только у профиля — ogFile).
 export async function generateMetadata({
@@ -202,6 +223,38 @@ export default async function ProjectPage({ params }: PageProps) {
     );
     const showReflection = !!(project.keyTakeaway || nextStepItems.length > 0);
 
+    // Видимость секций: авто-скрытие пустых секций + чекбоксы визарда
+    // (projects.sectionsVisibility, ключ absent = показывать). Номера секций
+    // перенумеровываются подряд по фактически показанным.
+    const visibility = project.sectionsVisibility ?? {};
+    const sectionHasData: Record<CaseSectionKey, boolean> = {
+        problem: showProblem,
+        research: showResearch,
+        designProcess: showDesignProcess,
+        designSystem: showDesignSystem,
+        testing: showTesting,
+        finalDesign: showFinalDesign,
+        reflection: showReflection,
+    };
+    const caseNumbers: Record<CaseSectionKey, string | undefined> = {
+        problem: undefined,
+        research: undefined,
+        designProcess: undefined,
+        designSystem: undefined,
+        testing: undefined,
+        finalDesign: undefined,
+        reflection: undefined,
+    };
+    {
+        let n = 0;
+        for (const key of CASE_SECTION_ORDER) {
+            if (sectionHasData[key] && visibility[key] !== false) {
+                n += 1;
+                caseNumbers[key] = String(n).padStart(2, '0');
+            }
+        }
+    }
+
     const nextProjectCard = nextProject
         ? {
               slug: nextProject.slug,
@@ -252,9 +305,9 @@ export default async function ProjectPage({ params }: PageProps) {
                         десктоп 64; py 64 → lg 80 (pad=80/64). */}
                         <div className='section-container flex flex-col gap-8 py-16 md:gap-16 lg:py-20'>
                             {/* Section 01 — Problem & Audience [199:26] */}
-                            {showProblem && (
+                            {caseNumbers.problem && (
                                 <CaseSection
-                                    number='01'
+                                    number={caseNumbers.problem}
                                     label='Problem & Audience'
                                     title='What problem are we solving?'
                                     description={project.problemStatement}
@@ -277,9 +330,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 02 — User Research [195:1178] */}
-                            {showResearch && (
+                            {caseNumbers.research && (
                                 <CaseSection
-                                    number='02'
+                                    number={caseNumbers.research}
                                     label='User Research'
                                     title='What the data revealed.'
                                     description={project.researchMethodology}
@@ -317,9 +370,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 03 — Design Process [199:49] */}
-                            {showDesignProcess && (
+                            {caseNumbers.designProcess && (
                                 <CaseSection
-                                    number='03'
+                                    number={caseNumbers.designProcess}
                                     label='Design Process'
                                     title='From blank page to structure.'
                                     description={project.designApproach}
@@ -350,9 +403,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 04 — Design System [276:135] */}
-                            {showDesignSystem && (
+                            {caseNumbers.designSystem && (
                                 <CaseSection
-                                    number='04'
+                                    number={caseNumbers.designSystem}
                                     label='Design System'
                                     title='Visual language & token system.'
                                     description={project.visualDirection}
@@ -390,9 +443,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 05 — Testing & Iteration [199:76] */}
-                            {showTesting && (
+                            {caseNumbers.testing && (
                                 <CaseSection
-                                    number='05'
+                                    number={caseNumbers.testing}
                                     label='Testing & Iteration'
                                     title='What users taught me.'
                                     description={project.testingProcess}
@@ -429,9 +482,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 06 — Final Design [199:93] */}
-                            {showFinalDesign && (
+                            {caseNumbers.finalDesign && (
                                 <CaseSection
-                                    number='06'
+                                    number={caseNumbers.finalDesign}
                                     label='Final Design'
                                     title='The Finished Product'
                                     description={project.finalDescription}
@@ -494,9 +547,9 @@ export default async function ProjectPage({ params }: PageProps) {
                             )}
 
                             {/* Section 07 — Reflection [199:110] */}
-                            {showReflection && (
+                            {caseNumbers.reflection && (
                                 <CaseSection
-                                    number='07'
+                                    number={caseNumbers.reflection}
                                     label='Reflection'
                                     title='What I learned.'
                                     description={project.keyTakeaway}
