@@ -503,3 +503,280 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        /privacy, /terms, /cookies в проекте не существует — все legal-
        ссылки сейчас ведут на 404; создать страницы (или заглушки)
        отдельным решением.
+
+  (31) 2026-09-09 — Релиз-гейт B1/B6 (аудит по чек-листу GLM). Факты:
+       страница профиля УЖЕ передаёт в SiteHeader navItems с хэшами
+       (#work/#about/#contact) — дефолтная ветка с полными URL не
+       использовалась, но приведена к хэшам для единообразия. Реальный
+       баг был в #about: якоря не существовало → NavLabel получил
+       опциональный id, About → id='about' (работа/контакт уже имели
+       якоря: PortfolioGallerySection id='work', CtaSection id='contact',
+       потому «Hire me»/CTA hero/FAB работали). scroll-mt-24 НЕ добавлен:
+       offset даёт глобальный [id] { scroll-margin-top } 80/72px
+       (решение (18), у GLM расходится). B6: Escape закрывает оба меню
+       (SiteHeader, useEffect на keydown). Сервисы: generateMetadata
+       fallback описания → EN «Portfolio of {name}» (description + OG);
+       убран неиспользуемый импорт AuthBar. WhatsApp-кнопка на профиле
+       не рендерится (whatsappUrl очищен в админке) → CtaSection хранит
+       опциональную поддержку, Meta-процессор в PP не требуется.
+
+  (32) 2026-09-09 — Мобильная карточка галереи не растягивается от
+       длинного заголовка (фидбэк: «карточки растягиваются на ширину
+       заголовка»). Причина: в мобильной карусели обёртка карточки
+       (flex-элемент с видимым overflow) не сжималась ниже min-content
+       nowrap-заголовка (truncate не работал — не было min-w-0 в цепочке).
+       Фикс: min-w-0 на обёртке элемента карусели — truncate обрезает
+       заголовок с «…», карточка = 100%−16px ширины стрипа, высота
+       не меняется (перенос не нужен). Заголовок карточки на мобильных
+       уменьшен 22/30 → 18px/26 (tracking −0.18), с sm — снова 22/30
+       (−0.22), когда карточки становятся колонками сетки.
+
+  (33) 2026-09-09 — Карусель: верхний запас под hover/pressed scale
+       (фидбэк: «при нажатии карточка увеличивается и обрезается сверху»).
+       Скроллер (overflow-x:auto) обрезает и по вертикали; :hover на тачах
+       «залипает», scale(1.02) поднимает верхний край карточки на ~4px —
+       он срезался. По образцу нижнего решения (pb-7 + −mb-5): pt-3 внутри
+       скроллера + −mt-3 снаружи (вертикальный ритм прежний), сброс
+       sm:pt-0/sm:mt-0 в grid-режиме. Отдельный компонент карусели НЕ
+       выделялся: инлайн-карусель в PortfolioGallerySection — единственная
+       (на главной мобильная галерея — обычная сетка); вынос в компонент —
+       при втором использовании.
+
+  (34) 2026-09-09 — Карусель вынесена в компонент portfolio/Carousel.tsx
+       и подключена к ГЛАВНОЙ (Work): на мобильном вместо сетки — тот же
+       стрип, карточки главной и страницы дизайнера идентичны.
+       Геометрия стрипа (фидбэк: «по сетке карточки шире и консистентнее;
+       убрать правый паддинг, чтобы сосед был виден; левый паддинг —
+       стандартный»):
+       − карточка = ширине карточки сетки: 327 @375 (было 311 — % basis
+         считался от content box с pr-4 внутри);
+       − full-bleed до краёв экрана: −mx-6 + w calc(100% + 48px) (w-full
+         не расширяется отрицательными margin);
+       − px-6 внутри: первая карточка на стандартном паддинге 24 (жёлтый
+         на макете), правого паддинга нет;
+       − соседняя карточка видна до самого края экрана: peek 8px @375
+         (24 + 327 + 16 + 8 = 375);
+       − scroll-px-6: последняя карточка при снапе встаёт ровно на 24
+         (max scroll 343n−327 = snap-цели 343(n−1) при любом n);
+       − верх/низ: запасы из (33)/(15)/(16) — pt-3+−mt-3 и pb-7+−mb-5.
+       ≥sm — сетка 2/3; в grid-режиме gap унифицирован: sm:gap-6 (у
+       дизайнера было gap-4 на sm) — как на главной. Обёртки карточек
+       (flex min-w-0 [&>*]:w-full) убраны: карточка — прямой ребёнок
+       карусели, min-w-0 перенесён в [&>*] компонента (решение (32)).
+
+  (35) 2026-09-09 — Фикс стрипа карусели (фидбэк: «карточка на всю ширину
+       экрана, слева паддинга нет, сосед не виден»): в className стрипа
+       был потерян px-6 — комментарий его обещал, а класса не было.
+       Следствие: у full-bleed стрипа (−mx-6 + w calc(100% + 48px))
+       content box = весь экран → basis-full = ширина экрана, первая
+       карточка на x=0, сосед за краем. Старый код не ломался, т.к. стрип
+       не был full-bleed влево (паддинг давал section-container) — при
+       переходе на двусторонний full-bleed свой px-6 обязателен.
+       Урок: класс-список проверять по факту, не по комментарию.
+
+  (36) 2026-09-11 — Страница /privacy — Privacy Policy EN+ES (релиз-гейт D3:
+       футер уже линкует /privacy (29), роута не было → 404). Роут
+       src/app/(public)/privacy/page.tsx (статический, без БД — prerender),
+       контент src/lib/privacyContent.ts (типизированные секции EN/ES,
+       источник Docs/ui/PP.md), рендерер src/components/legal/
+       PrivacyPolicy.tsx. §6/§7 актуализированы и в PP.md, и на странице
+       (WhatsApp удалён из админки, (31) → Meta из процессоров выпала):
+       единственный процессор — Cloudflare, Inc. (хостинг, CDN, object
+       storage, анонимная аналитика, email routing privacy@ux42.studio);
+       §7 — EU–US Data Privacy Framework (Cloudflare сертифицирован) или
+       SCC. Email унифицирован на privacy@ux42.studio (§1 EN имел
+       «av.butshtein@…» — вероятная опечатка; §8/ES уже использовали
+       privacy@; EN/ES адреса ответственного в §1 остаются разными — так
+       в источнике). Лид-ины списка §8 полужирные (макет). Layout:
+       sticky-панель h-14 (bg-background + shadow-card, section-container):
+       Back (←, href=/) + breadcrumb Main / Privacy Policy + ThemeToggle;
+       SiteHeader не используется (якорная навигация главной). Статья:
+       колонка max-w-5xl (1024px) по центру section-container — уже
+       контента футера, как в макете; H1 headline-lg, секции headline-sm
+       (font-display), текст body-md on-surface-variant, «Last updated»
+       body-sm; таблицы: шапка title-sm на bg-surface-container, ячейки
+       body-sm, первая колонка font-medium on-surface, мобильный
+       overflow-x (min-w-[560px]); разделитель EN/ES — пунктир + пилюля с
+       точкой primary. SiteFooter: profileName/profileHeadline,
+       socialLinks=[] — иконки соцсетей из макета отложены (источник
+       ссылок студии не определён, не хардкодить). ОТКРЫТО: (а) адресат
+       форварда privacy@ux42.studio — если Gmail, добавить Google LLC в
+       §6 EN+ES; (б) Terms/Cookies в футере главной → 404 (30),
+       страница /terms не решена.
+
+  (37) 2026-09-11 — §6: добавлен процессор Google LLC (решение пользователя).
+       Почта privacy@ux42.studio = Cloudflare Email Routing (MX домена на
+       Cloudflare) с форвардом на обычный личный @gmail.com: Cloudflare —
+       только транзит и письма не хранит; хранение входящих и исходящих
+       ответов — Gmail. Письмо = ПДн посетителя → хранителя ящика называем
+       в §6 (GDPR, раскрытие обработчиков). §6 EN+ES обновлены в PP.md и
+       privacyContent.ts: «…**Cloudflare, Inc.** (…) and **Google LLC**
+       (Gmail — storage of the forwarded correspondence / almacenamiento de
+       la correspondencia reenviada), acting as Data Processors /
+       Encargados del Tratamiento» (мн. число). Если перейдём на Google
+       Workspace (MX сразу на Google) — Cloudflare из почты выпадет,
+       §6 править снова. Открытым остаётся: Terms/Cookies в футере главной
+       → 404 (спека (30)).
+
+  (38) 2026-09-11 — Страница /terms — «Legal Notice & Terms of Use» EN+ES
+       (источник Docs/ui/Terms of Use.md → контент src/lib/termsContent.ts).
+       Патчи из чата: T1 — реальная дата 2026-09-11 синхронно в PP.md,
+       Terms of Use.md и константах LAST_UPDATED обоих контентов (было
+       «July 28, 2026»); T2 — переименование документа (ES: «Aviso Legal
+       y Condiciones de Uso») и блок идентификации LSSI Art. 10 в §2 EN+ES
+       (Domain/Owner/Location/Contact). Контакт — hello@ux42.studio: это
+       уже видимый контакт сайта (page.tsx mailto +
+       mainPageContent.emailAddress), алиас в Cloudflare Email Routing
+       добавляет Денис — ЗАВИСИМОСТЬ ДЕПЛОЯ: без алиаса письма на hello@
+       не дойдут; T3 — §8 EN без «dynamically» (выровнен по ES); T4 —
+       «restricted administrative panels» оставлено как есть. Рендерер
+       вынесен из legal/PrivacyPolicy.tsx в generic legal/LegalArticle.tsx
+       (props: title/lastUpdated/sections/esSections/esLabel) + оболочка
+       legal/LegalPageShell.tsx (sticky-панель Back+breadcrumb+ThemeToggle
+       и футер — общие для /privacy и /terms); PrivacyPolicy.tsx удалён,
+       /privacy переключён на LegalArticle.
+
+  (39) 2026-09-11 — Legal-контур (решение из чата): Cookie Policy НЕ
+       публикуется — черновик описывает несуществующий сайт (GA-куки,
+       consent-менеджер, ссылка Cookie Settings); /cookies не строим,
+       документ вернётся в Backlog v2 при появлении реальных cookies.
+       Вместо неё — микрораздел «Cookies and local storage» в PP §3 EN+ES
+       (после таблицы; новое поле outro в PrivacySection): strictly
+       necessary storage — auth-token (сессия зарегистрированных),
+       localStorage для темы (проверено в коде: ThemeProvider пишет
+       localStorage 'theme'), security cookies Cloudflare; аналитика
+       cookieless. SiteHeader menuMode: «Terms of Service» → «Terms of
+       Use», строка «Cookie Settings» удалена (меню главной: Privacy
+       Policy + Terms of Use). SiteFooter: Terms of Use теперь на ВСЕХ
+       страницах (было только на главной), ссылка Cookies удалена.
+       Патч PP: «Contact Form» → «Email correspondence» в §3/§4/§5 EN+ES —
+       формы на сайте НЕТ (CtaSection: только mailto + опциональный
+       WhatsApp), обращения идут письмом на hello@.
+
+  (40) 2026-09-11 — Таблицы legal-страниц (<768) рендерятся стопкой:
+       dl-список (dt = первая колонка полужирным, dd = значения с
+       подписями-заголовками колонок), ≥md — таблица как в макете
+       (overflow-x, min-w 560). Мотивация чата — WCAG 1.4.10 (data tables
+       формально исключены из reflow, но горизонтальный скролл legal-
+       таблиц на телефоне — плохой UX). Оба представления в DOM: скрытый
+       display:none не попадает в a11y-дерево — дубля для скринридеров нет.
+
+  (41) 2026-09-11 — PP §5, P7-патч (текст предоставлен ревьюером дословно):
+       строка Web Analytics Metrics — вместо «14 months / автоочистка» →
+       «Aggregated, non-identifying data only; retention per provider
+       (Cloudflare) defaults»: мы не управляем retention на стороне
+       Cloudflare, обещать конкретные сроки нельзя. Вторая правка той же
+       таблицы (рекомендация ревьюера, «проверить у Дениса» из первого
+       ревью): Server logs — вместо «30 to 90 days» → «Transient technical
+       logs, kept only as long as needed for security and diagnostics; not
+       used for profiling» (Workers по умолчанию логи не хранит — честно
+       при любой конфигурации). Зеркально ES. В микрораздел cookies §3
+       добавлено «No consent banner is used because no tracking cookies are
+       set» (ES: «No se utiliza banner de consentimiento porque no se
+       establecen cookies de seguimiento») — по чек-листу ревьюера в языке
+       ожидается ровно 1 упоминание banner. Дата не сдвинулась: правки в
+       тот же день (правило «правка = новая дата» даёт ту же 11.09).
+       Мини-верификация пройдена: Google Analytics/_ga/consent_status — 0,
+       Contact Form — 0, Cloudflare Web Analytics — есть (§3/§4),
+       Data Privacy Framework — есть (§7). Пункт чек-листа «EMAIL
+       PROVIDER» уже закрыт (спека (37): Google LLC добавлен в §6).
+
+  (42) 2026-09-11 — Блок C (SEO). C1: favicon src/app/icon.svg (64×64,
+       rx 14, фон #0B6E4F, «42» Poppins→Arial 600 #FBFFFA; HEX в
+       статических ассетах разрешён — CSS-переменные в SVG не
+       пробрасываются; дублей favicon.ico в src/app нет). C3: robots.ts
+       (allow /, disallow /admin /super-admin /login /register /api,
+       sitemap-ссылка) + sitemap.ts: статика / /privacy /terms + динамика
+       — публичные профили (isPublic) и published-проекты публичных
+       профилей из D1 через getCloudflareContext/getDb; force-dynamic —
+       prerender на билде заморозил бы динамическую часть (биндингов нет);
+       try/catch — без БД отдаётся только статика; lastModified из
+       projects.updatedAt (unixepoch × 1000). C4: noindex/nofollow в
+       robots-metadata трёх layouts приватных зон — (auth) покрывает
+       /login и /register, admin, super-admin; все серверные, metadata
+       экспортируется легально; robots.txt + meta = два рубежа. C5:
+       not-found.tsx — display-sm «404», одна строка объяснения, пилюля
+       primary на главную, section-container, h1-семантика. C6:
+       generateMetadata кейс-страницы /u/[slug]/[projectSlug] — title
+       «{title} — {fullName}», description из projects.teaser, OG
+       наследуется. C7: под CTA-кнопками CtaSection строка «By reaching
+       out you agree to our Privacy Policy» (text-body-sm, ссылка
+       /privacy). C2 (Open Graph + metadataBase) ОТЛОЖЕН по ТЗ: ждём
+       public/og/og-cover.png (экспорт из Figma); у /u/[slug] per-profile
+       OG из БД уже существовал (ogFile/faviconFile) — при C2 добавим
+       metadataBase, siteName и twitter-карточку туда же.
+
+  (43) 2026-09-11 — C2 закрыт: OG-обложка сгенерирована агентом (референс
+       пользователя не дошёл — собран ДРАФТ по признакам из чата: домен
+       внизу слева, стык имени с «4», цветные точки палитры; исходник
+       public/og/og-cover.svg → PNG через sharp, 1200×630, 38KB).
+       Поправить по референсу = отредактировать SVG + перегнать
+       sharp-скрипт. Нюанс шрифта: next/font Poppins в SVG-рендер не
+       пробрасывается — сработал системный fallback (Arial); при
+       финализации по референсу перевести текст в кривые. Metadata:
+       корень — metadataBase https://ux42.studio; /u/[slug] OG —
+       per-profile ogFile приоритетен, иначе /og/og-cover.png (alt
+       «{name} — UX/UI Designer»), siteName 'UX42.studio', url /u/{slug};
+       twitter card summary_large_image. Бонус C1: из корневого layout
+       удалена битая ссылка <link rel=icon href=/favicon.svg> — файла
+       favicon.svg в public/ не было (404 в консоли у всех); иконку
+       отдаёт file-convention src/app/icon.svg.
+
+  (44) 2026-09-11 — Референс OG-обложки получен (public/OG-cover (1).png
+       попал в коммит 6862fe2 через git add -A — пользователь положил
+       его в public/ перед сообщением). og-cover.svg/png пересобраны по
+       референсу: белый фон, «42»-ватермарка #E4EAE6 (font-size 900,
+       «2» уходит за правый край, низ цифр срезан нижней границей), имя
+       одной строкой #0E6741 92px (хвост «…ein» на «4» — стык),
+       «UX/UI Designer» #0B6E4F 32px, ux42.studio #4E8A6B 26px внизу
+       слева, точки-боke через feGaussianBlur (лаванда/лайм/зелёный,
+       ромбы + круги). PNG 1200×630, 79KB (<300). Референс перенесён
+       из public/ в Docs/ui/og-cover-reference.png (public — только
+       прод-ассеты, имя с пробелами недопустимо для URL). Шрифт: Poppins
+       в системе не установлен — рендер пошёл Segoe UI (допустимый
+       fallback по правилу «Poppins → fallback»); для точного Poppins
+       положить TTF в репо и перевести текст обложки в кривые.
+
+  (45) 2026-09-11 — ФИНАЛ OG-обложки: пользователь прислал Figma-экспорт
+       «OG-cover final.svg» — весь текст переведён в кривые (path'ы),
+       шрифтовая зависимость снята полностью. Файл заменил драфт:
+       mv → public/og/og-cover.svg (имя без пробелов), из него sharp-скрипт
+       перегнал og-cover.png (1200×630, 72KB). Истина по обложке — теперь
+       этот SVG: любые правки = новый экспорт из Figma → mv в og-cover.svg
+       → sharp-скрипт (node -e sharp(...)). Драфт-версия утрачена (не
+       нужна), Docs/ui/og-cover-reference.png оставлен как растровая
+       справка одобренного дизайна. C2 закрыт полностью: обложка +
+       metadataBase + OG/twitter /u/[slug] + per-profile ogFile fallback.
+
+  (46) 2026-09-11 — a11y /u/[slug] (Lighthouse Accessibility 90 → цель ≥95;
+       отчёты пользователя dev desktop+mobile, axe 4.12; нумерация GLM-
+       промпта «(45)» сдвинута — (45) занят OG-обложкой). Три failing-
+       аудита → три фикса: (1) color-contrast ×3 — NavLabel
+       (text-outline-variant #c5c6cc на белом = 1.7:1 при 11px) →
+       text-on-surface-variant (9.7:1 светл. / 12.5:1 тёмн., обе темы
+       ок) — исправлен в ОБОИХ NavLabel (главная + страница дизайнера,
+       один паттерн); декоративная линия лейбла — не текст, не тронута.
+       (2) heading-order — заголовок карточки PortfolioCard h4 → h3
+       (порядок: h1 hero → h2 секции → h3 карточки; класс-список не
+       менялся, визуал тот же). (3) link-name ×2 — соц-иконки SiteFooter
+       (LinkedIn/GitHub): в DOM нет ни текста, ни title (в БД title,
+       судя по axe, пуст) → aria-label={link.title || link.platform}
+       (фолбэк platform notNull). FAB НЕ тронут: aria-label ('Help') уже
+       есть, axe не ругался. Вне скоупа (по ТЗ): perf/CSP/source maps/
+       сжатие картинок. Повторный Lighthouse — прогон пользователя
+       (incognito, Accessibility).
+
+   (47) 2026-09-11 — ВЕРИФИКАЦИЯ (46), a11y-блок закрыт: 4 отчёта
+       Lighthouse 13.4.1 (dev, axe 4.12) — desktop + mobile × light +
+       dark, /u/aleksandra-burshtein. Accessibility = 100/100 во всех
+       четырёх; Best Practices = 100, SEO = 100. Все три фикса (46)
+       подтверждены (color-contrast обе темы/оба вьюпорта,
+       heading-order, link-name) — failing-аудитов a11y не осталось.
+       Остатки вне скоупа (perf, не фиксировали): mobile perf
+       0.74–0.78 — TBT 790–1020 ms (score 0.26–0.37) + image-delivery
+       ~14,4 MB wasted (портфолио-исходники 2400×1687 и пр. рендерятся
+       в ~728px — кандидат №1 на next/image/размеры, если возьмём
+       perf); desktop 0.92–0.98 (SI 0.41 в dt — шум dev/расширений).
+       valid-source-maps (bp) — вес 0, артефакт dev-режима. runWarnings
+       «Chrome extensions» — для точных perf-цифр прогонять incognito
+       (на a11y/bp/seo не влияет).

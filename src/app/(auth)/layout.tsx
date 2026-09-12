@@ -1,3 +1,11 @@
+import type { Metadata } from 'next';
+
+// C4 (решение (42)): приватная зона auth (/login, /register) — noindex/
+// nofollow (robots.txt уже закрывает пути; meta — второй рубеж).
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
+
 export default function AuthLayout({
     children,
 }: {

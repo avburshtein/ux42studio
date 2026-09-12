@@ -3,6 +3,7 @@ import { getDb } from '@/db';
 import { projects } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
 import { CaseSection } from '@/components/case/CaseSection';
@@ -31,6 +32,33 @@ interface PageProps {
 
 function getImageUrl(r2Key: string): string {
     return `/r2/${r2Key}`;
+}
+
+// ---- SEO (C6, решение (42)): title/description кейса; OG наследуется
+// (специфичная OG-картинка есть только у профиля — ogFile).
+export async function generateMetadata({
+    params,
+}: PageProps): Promise<Metadata> {
+    const { slug, projectSlug } = await params;
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { slug },
+        columns: { id: true, fullName: true },
+    });
+    if (!profile) return { title: 'UX42 Studio' };
+
+    const project = await db.query.projects.findFirst({
+        where: { profileId: profile.id, slug: projectSlug, status: 'published' },
+        columns: { title: true, teaser: true },
+    });
+    if (!project) return { title: 'UX42 Studio' };
+
+    return {
+        title: `${project.title} — ${profile.fullName}`,
+        description: project.teaser ?? undefined,
+    };
 }
 
 export default async function ProjectPage({ params }: PageProps) {

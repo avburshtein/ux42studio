@@ -42,6 +42,7 @@ const SECTIONS = [
     { id: 'about', label: '03 · About' },
     { id: 'expertise', label: '04 · Expertise' },
     { id: 'cta', label: '05 · CTA (Get in Touch)' },
+    { id: 'theme', label: '06 · Color Theme' },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]['id'];

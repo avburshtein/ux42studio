@@ -469,3 +469,48 @@ UI в админке:
    /cdn-cgi/image недоступен, loader возвращал src без width. Фикс:
    images.unoptimized = NODE_ENV==='development' в next.config (prod не
    затронут); в image-loader width = 0 по умолчанию.
+
+РЕШЕНИЕ 7 (2026-09-08) — Color Theme (пункт 4).
+ • Движок: @material/material-color-utilities (официальный M3 HCT).
+   src/lib/theme.ts: generateThemeCss(seed) → SchemeTonalSpot light/dark
+   (contrastLevel 0) → переопределения всех --md-sys-color-* включая
+   surface-container уровни; extended-акценты (--md-ext-*) — hue-ротация
+   от сид (lime +90°, lavender 270°/300°, green +120°).
+ • Хранение: mainPageContent.theme {useCustomTheme, seedColor} и
+   .floating {color: hex|null, shape: default|circle|square|triangle}
+   (null/false = дефолт «как есть»).
+ • Применение: /u/[slug] инжектит <style> c :root и [data-theme=dark]
+   блоками — ThemeToggle продолжает работать, тёмная схема генерируется
+   автоматически по M3 (контраст гарантируется алгоритмом HCT).
+ • Админка: раздел 06 · Color Theme — чекбокс Custom theme, color-picker
+   seed + hex-инпут, 5 пресетов, live-превью всей админки (инъекция
+   #admin-theme-preview только пока открыт раздел), блок Floating
+   elements: цвет (picker + Reset) и форма (Default mixed/Circles/
+   Squares/Triangles).
+ • FloatingElements: пропсы color/shape — единый цвет вместо палитры и
+   фиксированная форма вместо случайной.
+ • Хардкоды зелёного переведены на color-mix от --md-sys-color-primary:
+   PortfolioCard hover-градиент (90/50%), hover-заливки secondary-кнопок
+   (5%) и чипов фильтров (10%), NavLabel-разделитель (16%).
+
+═══════════════════════════════════════════════════════════
+РЕШЕНИЕ 8 (2026-09-12) — Кастомный хедер и фон страницы
+═══════════════════════════════════════════════════════════
+ • theme.header {mode: default|transparent|solid, color} и
+   theme.background {mode: default|seed-tint|solid, color}
+   (JSON-колонка, normalizeMainPageContent валидирует; дефолты — «как есть»).
+ • Хедер: transparent — без заливки header-glass (blur остаётся);
+   solid — инлайн фон + ЛОКАЛЬНЫЕ --md-sys-color-{primary,on-surface,
+   on-surface-variant,outline,primary-container} на <header> = контрастный
+   текст по luminance (contrastOn(), src/lib/theme.ts) — все тексты/иконки
+   шапки перекрашиваются, ThemeToggle работает. SiteHeaderBreadcrumb
+   (страницы кейсов) в кастомной теме не участвует.
+ • Фон: seed-tint — color-mix(primary 8%, surface-container-low) на wrapper;
+   solid — конкретный цвет. Внутренний main остаётся surface-container-lowest
+   — контент читаем на любом фоне.
+ • Админка: раздел 06 — два блока Header/Background (Select + color picker
+   + Input + Reset при solid), disabled без useCustomTheme.
+ • Формы плавающих (уточнение): 'default' = случайный микс круг/квадрат/
+   треугольник на КАЖДЫЙ элемент (детерминировано случайными координатами
+   init — при каждой загрузке новый микс); circle/square/triangle — одна
+   форма для всех. Так и было с решения 7 — UI уже соответствовал.

@@ -98,12 +98,41 @@ export type CtaContent = {
   whatsappVariant: ButtonVariant;
 };
 
+/** Режим фона страницы (кастомная тема). */
+export type ThemeBackgroundMode = 'default' | 'seed-tint' | 'solid';
+/** Режим шапки (кастомная тема). */
+export type ThemeHeaderMode = 'default' | 'transparent' | 'solid';
+
+/** Настройки цветовой темы: seed-цвет → M3-схема (src/lib/theme.ts). */
+export type ThemeSettings = {
+  /** false = дефолтная тема globals.css («как есть») */
+  useCustomTheme: boolean;
+  /** Seed-цвет HEX (#RRGGBB) */
+  seedColor: string;
+  /** Фон страницы: default (surface) / seed-tint (акцент сида) / solid (цвет) */
+  background: { mode: ThemeBackgroundMode; color: string | null };
+  /** Шапка: default (стекло) / transparent / solid (цвет + контрастный текст) */
+  header: { mode: ThemeHeaderMode; color: string | null };
+};
+
+/** Стиль плавающих элементов. null/default = как есть. */
+export type FloatingStyle = {
+  /** HEX или null (палитра по умолчанию) */
+  color: string | null;
+  /** 'default' = круг/квадрат/треугольник случайно */
+  shape: 'default' | 'circle' | 'square' | 'triangle';
+};
+
 export type MainPageContent = {
   hero: HeroContent;
   portfolio: PortfolioContent;
   about: AboutContent;
   expertise: ExpertiseContent;
   cta: CtaContent;
+  /** Цветовая тема (пункт 4, решение 7) */
+  theme: ThemeSettings;
+  /** Цвет/форма плавающих элементов */
+  floating: FloatingStyle;
 };
 
 export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
@@ -208,6 +237,16 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     whatsappUrl: '',
     whatsappVariant: 'secondary',
   },
+  theme: {
+    useCustomTheme: false,
+    seedColor: '#0b6e4f',
+    background: { mode: 'default', color: null },
+    header: { mode: 'default', color: null },
+  },
+  floating: {
+    color: null,
+    shape: 'default',
+  },
 };
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
@@ -235,6 +274,26 @@ const steps = (v: unknown, fallback: ProcessStep[]): ProcessStep[] =>
         description: str((s as ProcessStep)?.description, ''),
       }))
     : fallback;
+
+const SHAPES = ['default', 'circle', 'square', 'triangle'] as const;
+const bgMode = (v: unknown): ThemeBackgroundMode =>
+  v === 'seed-tint' || v === 'solid' ? v : 'default';
+
+const headerMode = (v: unknown): ThemeHeaderMode =>
+  v === 'transparent' || v === 'solid' ? v : 'default';
+
+const shape = (v: unknown): FloatingStyle['shape'] =>
+  SHAPES.includes(v as FloatingStyle['shape'])
+    ? (v as FloatingStyle['shape'])
+    : 'default';
+
+const hexOrNull = (v: unknown): string | null =>
+  typeof v === 'string' && /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(v.trim())
+    ? v.trim()
+    : null;
+
+const hex = (v: unknown, fallback: string): string =>
+  hexOrNull(v) ?? fallback;
 
 /** Дополняет неполный/битый JSON из БД дефолтами (null-safe). */
 export function normalizeMainPageContent(
@@ -312,6 +371,22 @@ export function normalizeMainPageContent(
       whatsappLabel: str(src.cta?.whatsappLabel, d.cta.whatsappLabel),
       whatsappUrl: str(src.cta?.whatsappUrl, d.cta.whatsappUrl),
       whatsappVariant: variant(src.cta?.whatsappVariant, d.cta.whatsappVariant),
+    },
+    theme: {
+      useCustomTheme: bool(src.theme?.useCustomTheme, false),
+      seedColor: hex(src.theme?.seedColor, d.theme.seedColor),
+      background: {
+        mode: bgMode(src.theme?.background?.mode),
+        color: hexOrNull(src.theme?.background?.color),
+      },
+      header: {
+        mode: headerMode(src.theme?.header?.mode),
+        color: hexOrNull(src.theme?.header?.color),
+      },
+    },
+    floating: {
+      color: hexOrNull(src.floating?.color),
+      shape: shape(src.floating?.shape),
     },
   };
 }

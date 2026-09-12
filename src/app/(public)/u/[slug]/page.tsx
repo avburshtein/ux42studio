@@ -12,19 +12,21 @@ import { SkillsSection } from '@/components/portfolio/SkillsSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
-import AuthBar from '@/components/AuthBar';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
+import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
 
 export const revalidate = 3600;
 
-// Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE)
-function NavLabel({ label }: { label: string }) {
+// Navigation divider: label + green line (11px Inter Semi Bold UPPERCASE).
+// id — якорь для навигации шапки (#about); вертикальный offset при скролле
+// даёт глобальный [id] { scroll-margin-top } = 80/72px (решение (18))
+function NavLabel({ label, id }: { label: string; id?: string }) {
     return (
-        <div className="section-container flex w-full items-center gap-4 py-0">
-            <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant">
+        <div id={id} className="section-container flex w-full items-center gap-4 py-0">
+            <span className="shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant">
                 {label}
             </span>
-            <span aria-hidden className="h-px flex-1 bg-[rgba(140,213,179,0.16)]" />
+            <span aria-hidden className='h-px flex-1 bg-[color-mix(in_srgb,var(--md-sys-color-primary)_16%,transparent)]' />
         </div>
     );
 }
@@ -54,15 +56,36 @@ export async function generateMetadata({
     const ogImageUrl = p.ogFile ? `/r2/${p.ogFile.r2Key}` : undefined;
     const faviconUrl = p.faviconFile ? `/r2/${p.faviconFile.r2Key}` : undefined;
 
+    // C2 (решение (43)): OG — per-profile ogFile приоритетен, иначе
+    // статическая обложка /og/og-cover.png; twitter — summary_large_image.
+    const ogImages = ogImageUrl
+        ? [{ url: ogImageUrl }]
+        : [
+              {
+                  url: '/og/og-cover.png',
+                  width: 1200,
+                  height: 630,
+                  alt: `${p.fullName} — UX/UI Designer`,
+              },
+          ];
+
     return {
         title: `${p.fullName} — UX42 Studio`,
-        description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
+        description: p.headline ?? `Portfolio of ${p.fullName}`,
         icons: faviconUrl ? { icon: faviconUrl } : undefined,
         openGraph: {
             title: `${p.fullName} — UX42 Studio`,
-            description: p.headline ?? `Портфолио дизайнера ${p.fullName}`,
+            description: p.headline ?? `Portfolio of ${p.fullName}`,
             type: 'profile',
-            images: ogImageUrl ? [{ url: ogImageUrl }] : undefined,
+            url: `/u/${slug}`,
+            siteName: 'UX42.studio',
+            images: ogImages,
+        },
+        twitter: {
+            card: 'summary_large_image',
+            title: `${p.fullName} — UX42 Studio`,
+            description: p.headline ?? `Portfolio of ${p.fullName}`,
+            images: ogImages.map((image) => image.url),
         },
     };
 }
@@ -110,6 +133,67 @@ export default async function ProfilePage({ params }: PageProps) {
     // Контент главной страницы — из админки (/admin/profile → Main Page Content),
     // с fallback на дефолты (Main Page Admin Panel Fields.md)
     const mpc = normalizeMainPageContent(profile.mainPageContent, bioParagraphs);
+
+    // Кастомная цветовая тема: M3-схема из seed → CSS-переопределения токенов.
+    // Пустая строка = дефолтная тема globals.css (useCustomTheme = false).
+    const themeCss = mpc.theme.useCustomTheme
+        ? generateThemeCss(mpc.theme.seedColor)
+        : '';
+
+    // Кастомная шапка/фон (раздел 06). Цвета задаются CSS-переменными
+    // --mp-header-* / --mp-page-bg ОТДЕЛЬНО для light и dark (см. customVarsCss):
+    // инлайн fixed-hex перебивал [data-theme=dark] и ломал инверсию.
+    const headerMode = mpc.theme.useCustomTheme ? mpc.theme.header.mode : 'default';
+    const bgMode = mpc.theme.useCustomTheme ? mpc.theme.background.mode : 'default';
+
+    const customVars: string[] = [];
+    if (mpc.theme.useCustomTheme) {
+        if (headerMode === 'solid' && mpc.theme.header.color) {
+            const c = mpc.theme.header.color;
+            const dark = mixWithBlack(c, 0.45);
+            customVars.push(
+                `:root{--mp-header-bg:${c};--mp-header-fg:${contrastOn(c)}}`,
+                `[data-theme=dark]{--mp-header-bg:${dark};--mp-header-fg:${contrastOn(dark)}}`,
+            );
+        }
+        if (bgMode === 'seed-tint') {
+            const tint =
+                'color-mix(in srgb, var(--md-sys-color-primary) 8%, var(--md-sys-color-surface-container-low))';
+            customVars.push(`:root{--mp-page-bg:${tint}}`, `[data-theme=dark]{--mp-page-bg:${tint}}`);
+        } else if (bgMode === 'solid' && mpc.theme.background.color) {
+            const c = mpc.theme.background.color;
+            customVars.push(
+                `:root{--mp-page-bg:${c}}`,
+                `[data-theme=dark]{--mp-page-bg:${mixWithBlack(c, 0.45)}}`,
+            );
+        }
+    }
+    const customVarsCss = customVars.join('\n');
+
+    // Инлайн-стили ссылаются на переменные — в dark они уже другие.
+    const headerStyle: React.CSSProperties | undefined =
+        headerMode === 'solid' && mpc.theme.header.color
+            ? ({
+                  backgroundColor: 'var(--mp-header-bg)',
+                  '--md-sys-color-primary': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-primary': 'var(--mp-header-bg)',
+                  '--md-sys-color-primary-container': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-primary-container': 'var(--mp-header-bg)',
+                  '--md-sys-color-secondary': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-secondary': 'var(--mp-header-bg)',
+                  '--md-sys-color-secondary-container': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-secondary-container': 'var(--mp-header-bg)',
+                  '--md-sys-color-on-surface': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-surface-variant': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-background': 'var(--mp-header-fg)',
+                  '--md-sys-color-outline': 'var(--mp-header-fg)',
+              } as React.CSSProperties)
+            : undefined;
+
+    const pageBgStyle: React.CSSProperties | undefined =
+        bgMode !== 'default'
+            ? { backgroundColor: 'var(--mp-page-bg, var(--md-sys-color-surface-container-low))' }
+            : undefined;
     const aboutParagraphs = [
         mpc.about.paragraph1,
         mpc.about.paragraph2,
@@ -184,13 +268,25 @@ export default async function ProfilePage({ params }: PageProps) {
     });
 
     return (
-        <div className='min-h-screen w-full bg-surface-container-low'>
+        <div
+            className='min-h-screen w-full bg-surface-container-low'
+            style={pageBgStyle}
+        >
+            {/* Кастомная тема: переопределяем --md-sys-color-* ДО рендера контента */}
+            {themeCss && (
+                <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+            )}
+            {customVarsCss && (
+                <style dangerouslySetInnerHTML={{ __html: customVarsCss }} />
+            )}
             <SiteHeader
                 profileSlug={slug}
                 displayName={profile.fullName}
                 navItems={navItems}
                 ctaLabel="Hire me"
                 ctaHref="#contact"
+                variant={headerMode}
+                style={headerStyle}
             />
             {mpc.hero.visible && (
                 <HeroSection
@@ -208,6 +304,8 @@ export default async function ProfilePage({ params }: PageProps) {
                     coverUrl={coverUrl}
                     displayName={profile.fullName}
                     floatingElements={mpc.hero.floatingElements}
+                    floatingColor={mpc.floating.color}
+                    floatingShape={mpc.floating.shape}
                 />
             )}
             <main>
@@ -239,7 +337,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     )}
                     {mpc.about.visible && aboutParagraphs.length > 0 && (
                         <>
-                            <NavLabel label='About' />
+                            <NavLabel label='About' id='about' />
                             <AboutSection
                                 title={mpc.about.heading}
                                 paragraphs={aboutParagraphs}
@@ -292,6 +390,8 @@ export default async function ProfilePage({ params }: PageProps) {
                     whatsappLabel={mpc.cta.whatsappLabel || undefined}
                     whatsappVariant={mpc.cta.whatsappVariant}
                     floatingElements={mpc.cta.floatingElements}
+                    floatingColor={mpc.floating.color}
+                    floatingShape={mpc.floating.shape}
                 />
             )}
             <SiteFooter

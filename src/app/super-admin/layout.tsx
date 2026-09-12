@@ -3,6 +3,13 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { logout } from '@/lib/actions/auth';
 import { LogOut } from 'lucide-react';
+import type { Metadata } from 'next';
+
+// C4 (решение (42)): приватная зона — noindex/nofollow (robots.txt уже
+// закрывает /super-admin; meta — второй рубеж).
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
 
 export default async function SuperAdminLayout({
     children,

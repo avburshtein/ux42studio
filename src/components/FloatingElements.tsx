@@ -15,9 +15,19 @@ interface FloatingElementsProps {
   count?: number;
   minBlur?: number;
   maxBlur?: number;
+  /** Единый цвет элементов (HEX). null/undefined — дефолтная палитра. */
+  color?: string | null;
+  /** Форма всех элементов. 'default' — случайная из палитры форм. */
+  shape?: 'default' | 'circle' | 'square' | 'triangle';
 }
 
-export function FloatingElements({ count = 20, minBlur = 0, maxBlur = 20 }: FloatingElementsProps) {
+export function FloatingElements({
+  count = 20,
+  minBlur = 0,
+  maxBlur = 20,
+  color,
+  shape = 'default',
+}: FloatingElementsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementsRef = useRef<FloatingElement[]>([]);
   const animationFrameRef = useRef<number | undefined>(undefined);
@@ -31,14 +41,17 @@ export function FloatingElements({ count = 20, minBlur = 0, maxBlur = 20 }: Floa
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
 
-    // Палитра: зелёный (бренд), лаванда, фиолетовый, кислотно-жёлтый
-    const colors = [
+    // Палитра: зелёный (бренд), лаванда, фиолетовый, кислотно-жёлтый.
+    // color из админки переопределяет палитру (решение 7).
+    const defaultColors = [
       '#0b6e4f', '#0b6e4f', '#0b6e4f',
       '#a29ffe',
       '#c084fc',
       '#ccff00',
     ];
-    const shapes: Array<'circle' | 'square' | 'triangle'> = ['circle', 'square', 'triangle'];
+    const colors = color ? [color] : defaultColors;
+    const shapes: Array<'circle' | 'square' | 'triangle'> =
+      shape === 'default' ? ['circle', 'square', 'triangle'] : [shape];
 
     // Инициализация
     elementsRef.current = Array.from({ length: count }, () => ({
@@ -126,7 +139,7 @@ export function FloatingElements({ count = 20, minBlur = 0, maxBlur = 20 }: Floa
       window.removeEventListener('mousemove', handleMouseMove);
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [count, minBlur, maxBlur]);
+  }, [count, minBlur, maxBlur, color, shape]);
 
   return (
     <div

@@ -71,6 +71,10 @@ export function SiteFooter({
                                 href={link.url}
                                 target='_blank'
                                 rel='noopener noreferrer'
+                                // a11y (спека (46)): у иконок нет текста — имя
+                                // даёт aria-label; фолбэк на platform (notNull),
+                                // если title в админке пуст (axe link-name).
+                                aria-label={link.title || link.platform}
                                 className='inline-flex h-11 w-11 items-center justify-center rounded-full text-primary transition-opacity hover:opacity-70'
                                 title={link.title}
                             >
@@ -80,8 +84,9 @@ export function SiteFooter({
                     </div>
                 )}
 
-                {/* Footer links: на страницах дизайнера (profileSlug) — только
-                    Privacy Policy (решение (29)); на главной — полный набор. */}
+                {/* Footer links: Privacy Policy + Terms of Use — на всех страницах
+                    (решение (39)); /cookies не существует — cookies на сайте нет
+                    (хранение описано в PP §3), Cookie Policy вернётся в Backlog v2. */}
                 <div className='flex items-center gap-4'>
                     <Link
                         href='/privacy'
@@ -89,22 +94,12 @@ export function SiteFooter({
                     >
                         Privacy Policy
                     </Link>
-                    {!profileSlug && (
-                        <>
-                            <Link
-                                href='/terms'
-                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                            >
-                                Terms
-                            </Link>
-                            <Link
-                                href='/cookies'
-                                className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
-                            >
-                                Cookies
-                            </Link>
-                        </>
-                    )}
+                    <Link
+                        href='/terms'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                    >
+                        Terms of Use
+                    </Link>
                 </div>
 
                 {/* Back to Gallery — outline-семейство: hover как у secondary */}
@@ -113,7 +108,7 @@ export function SiteFooter({
                 {profileSlug && (
                     <Link
                         href={`/u/${profileSlug}`}
-                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] hover:opacity-90'
+                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90'
                     >
                         Back to Gallery
                     </Link>

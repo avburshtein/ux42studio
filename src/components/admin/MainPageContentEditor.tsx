@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -15,6 +15,11 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/Select';
+import {
+    generateThemeCss,
+    isValidSeed,
+    PRESET_SEEDS,
+} from '@/lib/theme';
 import type {
     ButtonVariant,
     MainPageContent,
@@ -256,6 +261,25 @@ export default function MainPageContentEditor({
     const wrap = (id: string, node: React.ReactNode) => (
         <div className={visibleSection === id ? '' : 'hidden'}>{node}</div>
     );
+
+    // Live-превью темы в админке: инжектим CSS пока открыт раздел 06
+    useEffect(() => {
+        if (visibleSection !== 'theme') return;
+        const css = content.theme.useCustomTheme
+            ? generateThemeCss(content.theme.seedColor)
+            : '';
+        let styleTag = document.getElementById('admin-theme-preview');
+        if (!css) {
+            styleTag?.remove();
+            return;
+        }
+        if (!styleTag) {
+            styleTag = document.createElement('style');
+            styleTag.id = 'admin-theme-preview';
+            document.head.appendChild(styleTag);
+        }
+        styleTag.textContent = css;
+    }, [visibleSection, content.theme.useCustomTheme, content.theme.seedColor]);
 
     const set = <S extends keyof MainPageContent>(
         section: S,
@@ -700,6 +724,302 @@ export default function MainPageContentEditor({
                                 value={content.cta.whatsappUrl}
                                 onChange={(e) => set('cta', { whatsappUrl: e.target.value })}
                             />
+                        </div>
+                    </div>
+                </Section>
+                ))}
+
+                {/* 06 · Color Theme: seed → M3-схема (light+dark), live-превью */}
+                {wrap('theme', (
+                <Section title='06 · Color Theme'>
+                    <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
+                        <input
+                            type='checkbox'
+                            checked={content.theme.useCustomTheme}
+                            onChange={(e) =>
+                                set('theme', { useCustomTheme: e.target.checked })
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        Custom color theme (seed → M3 light &amp; dark)
+                    </label>
+
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <div>
+                            <Label htmlFor='mp-seed'>Seed color</Label>
+                            <div className='flex items-center gap-2'>
+                                <input
+                                    id='mp-seed'
+                                    type='color'
+                                    value={
+                                        isValidSeed(content.theme.seedColor)
+                                            ? content.theme.seedColor
+                                            : '#0b6e4f'
+                                    }
+                                    onChange={(e) =>
+                                        set('theme', { seedColor: e.target.value })
+                                    }
+                                    className='h-10 w-14 cursor-pointer rounded-md border border-outline-variant bg-surface p-1'
+                                    disabled={!content.theme.useCustomTheme}
+                                />
+                                <Input
+                                    value={content.theme.seedColor}
+                                    onChange={(e) =>
+                                        set('theme', { seedColor: e.target.value })
+                                    }
+                                    placeholder='#0b6e4f'
+                                    disabled={!content.theme.useCustomTheme}
+                                />
+                            </div>
+                            {!isValidSeed(content.theme.seedColor) && (
+                                <p className='mt-1 text-body-sm text-error'>
+                                    Hex format: #RRGGBB
+                                </p>
+                            )}
+                        </div>
+                        <div>
+                            <Label>Presets</Label>
+                            <div className='flex flex-wrap gap-2'>
+                                {PRESET_SEEDS.map((preset) => (
+                                    <button
+                                        key={preset.value}
+                                        type='button'
+                                        onClick={() =>
+                                            set('theme', {
+                                                seedColor: preset.value,
+                                                useCustomTheme: true,
+                                            })
+                                        }
+                                        title={preset.label}
+                                        disabled={!content.theme.useCustomTheme}
+                                        className='h-10 w-10 cursor-pointer rounded-full border-2 border-outline-variant transition-transform hover:scale-110 disabled:cursor-not-allowed disabled:opacity-50'
+                                        style={{ background: preset.value }}
+                                        aria-label={preset.label}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    <p className='text-body-sm text-on-surface-variant'>
+                        Светлая и тёмная схемы генерируются автоматически по
+                        логике токенов Material 3 — контраст сохраняется.
+                        Выключенный чекбокс = дефолтная зелёная тема.
+                    </p>
+
+                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                        <div>
+                            <Label htmlFor='mp-header-mode'>Header</Label>
+                            <Select
+                                value={content.theme.header.mode}
+                                onValueChange={(v) =>
+                                    set('theme', {
+                                        header: {
+                                            ...content.theme.header,
+                                            mode: v as MainPageContent['theme']['header']['mode'],
+                                        },
+                                    })
+                                }
+                                disabled={!content.theme.useCustomTheme}
+                            >
+                                <SelectTrigger id='mp-header-mode'>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='default'>
+                                        Default (glass)
+                                    </SelectItem>
+                                    <SelectItem value='transparent'>
+                                        Transparent
+                                    </SelectItem>
+                                    <SelectItem value='solid'>
+                                        Solid color
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {content.theme.header.mode === 'solid' && (
+                                <div className='mt-2 flex items-center gap-2'>
+                                    <input
+                                        type='color'
+                                        aria-label='Header color'
+                                        value={content.theme.header.color ?? '#0b6e4f'}
+                                        onChange={(e) =>
+                                            set('theme', {
+                                                header: {
+                                                    ...content.theme.header,
+                                                    color: e.target.value,
+                                                },
+                                            })
+                                        }
+                                        className='h-10 w-14 cursor-pointer rounded-md border border-outline-variant bg-surface p-1'
+                                    />
+                                    <Input
+                                        value={content.theme.header.color ?? ''}
+                                        onChange={(e) =>
+                                            set('theme', {
+                                                header: {
+                                                    ...content.theme.header,
+                                                    color: e.target.value,
+                                                },
+                                            })
+                                        }
+                                        placeholder='#0b6e4f'
+                                    />
+                                    <Button
+                                        type='button'
+                                        variant='outline'
+                                        size='sm'
+                                        onClick={() =>
+                                            set('theme', {
+                                                header: {
+                                                    ...content.theme.header,
+                                                    color: null,
+                                                },
+                                            })
+                                        }
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                            )}
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Solid: текст шапки автоматически контрастный.
+                            </p>
+                        </div>
+                        <div>
+                            <Label htmlFor='mp-bg-mode'>Background</Label>
+                            <Select
+                                value={content.theme.background.mode}
+                                onValueChange={(v) =>
+                                    set('theme', {
+                                        background: {
+                                            ...content.theme.background,
+                                            mode: v as MainPageContent['theme']['background']['mode'],
+                                        },
+                                    })
+                                }
+                                disabled={!content.theme.useCustomTheme}
+                            >
+                                <SelectTrigger id='mp-bg-mode'>
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value='default'>
+                                        Default (surface)
+                                    </SelectItem>
+                                    <SelectItem value='seed-tint'>
+                                        Accent tint (seed)
+                                    </SelectItem>
+                                    <SelectItem value='solid'>
+                                        Solid color
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {content.theme.background.mode === 'solid' && (
+                                <div className='mt-2 flex items-center gap-2'>
+                                    <input
+                                        type='color'
+                                        aria-label='Background color'
+                                        value={content.theme.background.color ?? '#f7faf5'}
+                                        onChange={(e) =>
+                                            set('theme', {
+                                                background: {
+                                                    ...content.theme.background,
+                                                    color: e.target.value,
+                                                },
+                                            })
+                                        }
+                                        className='h-10 w-14 cursor-pointer rounded-md border border-outline-variant bg-surface p-1'
+                                    />
+                                    <Input
+                                        value={content.theme.background.color ?? ''}
+                                        onChange={(e) =>
+                                            set('theme', {
+                                                background: {
+                                                    ...content.theme.background,
+                                                    color: e.target.value,
+                                                },
+                                            })
+                                        }
+                                        placeholder='#f7faf5'
+                                    />
+                                    <Button
+                                        type='button'
+                                        variant='outline'
+                                        size='sm'
+                                        onClick={() =>
+                                            set('theme', {
+                                                background: {
+                                                    ...content.theme.background,
+                                                    color: null,
+                                                },
+                                            })
+                                        }
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                            )}
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Контент остаётся на светлой поверхности —
+                                читаемость сохраняется.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div className='rounded-xl border border-outline-variant p-4'>
+                        <h3 className='mb-3 text-title-sm font-semibold text-on-surface'>
+                            Floating elements
+                        </h3>
+                        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                            <div>
+                                <Label htmlFor='mp-float-color'>Color</Label>
+                                <div className='flex items-center gap-2'>
+                                    <input
+                                        id='mp-float-color'
+                                        type='color'
+                                        value={content.floating.color ?? '#0b6e4f'}
+                                        onChange={(e) =>
+                                            set('floating', { color: e.target.value })
+                                        }
+                                        className='h-10 w-14 cursor-pointer rounded-md border border-outline-variant bg-surface p-1'
+                                    />
+                                    <Button
+                                        type='button'
+                                        variant='outline'
+                                        size='sm'
+                                        onClick={() => set('floating', { color: null })}
+                                    >
+                                        Reset
+                                    </Button>
+                                </div>
+                                <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                    Пусто = дефолтная палитра.
+                                </p>
+                            </div>
+                            <div>
+                                <Label htmlFor='mp-float-shape'>Shape</Label>
+                                <Select
+                                    value={content.floating.shape}
+                                    onValueChange={(v) =>
+                                        set('floating', {
+                                            shape: v as MainPageContent['floating']['shape'],
+                                        })
+                                    }
+                                >
+                                    <SelectTrigger id='mp-float-shape'>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value='default'>
+                                            Default (mixed)
+                                        </SelectItem>
+                                        <SelectItem value='circle'>Circles</SelectItem>
+                                        <SelectItem value='square'>Squares</SelectItem>
+                                        <SelectItem value='triangle'>Triangles</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
                 </Section>

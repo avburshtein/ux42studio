@@ -5,6 +5,13 @@ import { getDb } from '@/db';
 import Link from 'next/link';
 import { logout } from '@/lib/actions/auth';
 import { LogOut } from 'lucide-react';
+import type { Metadata } from 'next';
+
+// C4 (решение (42)): приватная зона — noindex/nofollow (robots.txt уже
+// закрывает /admin; meta — второй рубеж).
+export const metadata: Metadata = {
+    robots: { index: false, follow: false },
+};
 
 export default async function AuthLayout({
     children,

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { PortfolioCard } from '@/components/PortfolioCard';
+import { Carousel } from '@/components/portfolio/Carousel';
 import { HeroSection } from '@/components/portfolio/HeroSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
@@ -15,7 +16,7 @@ export const revalidate = 300;
 function NavLabel({ label }: { label: string }) {
     return (
         <div className='flex w-full items-center gap-4'>
-            <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
+            <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant'>
                 {label}
             </span>
             <span aria-hidden className='h-px flex-1 bg-[rgba(140,213,179,0.16)]' />
@@ -152,7 +153,10 @@ export default async function HomePage({
                                 No published projects yet
                             </p>
                         ) : (
-                            <div className='grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3'>
+                            /* <sm — карусель (решение (34): карточки главной и страницы
+                                дизайнера идентичны: ширина 327 @375 = ширине сетки,
+                                сосед виден до края экрана), ≥sm — сетка 2/3 */
+                            <Carousel>
                                 {cards.map((project) => (
                                     <PortfolioCard
                                         key={project.id}
@@ -169,7 +173,7 @@ export default async function HomePage({
                                             .filter((n): n is string => Boolean(n))}
                                     />
                                 ))}
-                            </div>
+                            </Carousel>
                         )}
                     </div>
                 </section>

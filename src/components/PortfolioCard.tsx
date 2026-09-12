@@ -44,9 +44,11 @@ export function PortfolioCard({
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
 
-        {/* Gradient Overlay on hover — as Make: from 0.9 / via 0.5 / to transparent */}
+        {/* Gradient Overlay on hover — поверх — цвет от токена primary
+            (color-mix, чтобы работал кастомный сид), opacity как в Make:
+            from 0.9 / via 0.5 / to transparent */}
         <div className="absolute inset-0 flex flex-col justify-end p-6
-          bg-gradient-to-t from-[rgba(11,110,79,0.9)] via-[rgba(11,110,79,0.5)] to-transparent
+          bg-gradient-to-t from-[color-mix(in_srgb,var(--md-sys-color-primary)_90%,transparent)] via-[color-mix(in_srgb,var(--md-sys-color-primary)_50%,transparent)] to-transparent
           opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"
         >
           {overlayTags && overlayTags.length > 0 && (
@@ -60,11 +62,13 @@ export function PortfolioCard({
       {/* Text area — flex-1: высота ровно 368−256=112px у ВСЕХ карточек
           (фидбэк: разная высота текстовой зоны выглядела неконсистентно).
           truncate на строках — страховка от переполнения при длинных
-          заголовках (две строки в 112px не помещаются). */}
+          заголовках (две строки в 112px не помещаются).
+          h3, не h4 — heading-order (a11y, спека (46)): секции h2 →
+          карточки h3, без перескока уровня; классы не менялись. */}
       <div className="flex flex-1 flex-col gap-2 px-6 py-6">
-        <h4 className="font-display m-0 truncate text-[22px] font-medium leading-[30px] tracking-[-0.22px] text-on-surface-variant">
+        <h3 className="font-display m-0 truncate text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-on-surface-variant sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.22px]">
           {title}
-        </h4>
+        </h3>
         <span className="truncate text-[16px] leading-[24px] text-primary">
           {tag}
         </span>
