@@ -125,7 +125,7 @@ export function generateThemeCss(seed?: string): string {
   const block = (selector: string, tokens: ThemeTokens) =>
     selector + ' {\n' + Object.entries(tokens).map(([k, v]) => '  ' + k + ': ' + v + ';').join('\n') + '\n}';
 
-  return block(":root", make(false)) + "\\n" + block("[data-theme=dark]", make(true));
+  return block(":root", make(false)) + "\n" + block("[data-theme=dark]", make(true));
 }
 
 /** Ext-акценты ч/б темы: та же нейтральная палитра, без цвета. */
@@ -145,6 +145,22 @@ function extToTokensNeutral(dark: boolean): ThemeTokens {
     ...accent('lavender-purple'),
     ...accent('green-accent'),
   };
+}
+
+/**
+ * Смесь hex → чёрный (t = доля чёрного, 0..1). Для dark-вариантов
+ * solid-цветов (хедер/фон), чтобы они не слепили в тёмной теме.
+ */
+export function mixWithBlack(hex: string, t: number): string {
+  const m = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.exec(hex.trim());
+  if (!m) return hex;
+  const h = m[1].length === 3
+    ? m[1].split('').map((c) => c + c).join('')
+    : m[1];
+  const n = parseInt(h, 16);
+  const ch = (v: number) => Math.round(v * (1 - t));
+  const r = ch((n >> 16) & 255), g = ch((n >> 8) & 255), b = ch(n & 255);
+  return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
 }
 
 /** Валидация hex (3/6), для инпута. */

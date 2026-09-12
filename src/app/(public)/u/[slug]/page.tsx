@@ -13,7 +13,7 @@ import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
-import { generateThemeCss, contrastOn } from '@/lib/theme';
+import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
 
 export const revalidate = 3600;
 
@@ -140,45 +140,60 @@ export default async function ProfilePage({ params }: PageProps) {
         ? generateThemeCss(mpc.theme.seedColor)
         : '';
 
-    // Кастомная шапка (раздел 06): transparent — без заливки стекла;
-    // solid — фон + локальные токены текста (primary/on-surface/...) с
-    // контрастом по luminance фона — перекрашивает все тексты/иконки шапки.
+    // Кастомная шапка/фон (раздел 06). Цвета задаются CSS-переменными
+    // --mp-header-* / --mp-page-bg ОТДЕЛЬНО для light и dark (см. customVarsCss):
+    // инлайн fixed-hex перебивал [data-theme=dark] и ломал инверсию.
     const headerMode = mpc.theme.useCustomTheme ? mpc.theme.header.mode : 'default';
-    let headerStyle: React.CSSProperties | undefined;
-    if (headerMode === 'solid' && mpc.theme.header.color) {
-        const fg = contrastOn(mpc.theme.header.color);
-        // on-* — цвет фона хедера (парные токены), иначе, например,
-        // «Hire me» (bg-primary + text-on-primary) становится невидимым.
-        headerStyle = {
-            backgroundColor: mpc.theme.header.color,
-            '--md-sys-color-primary': fg,
-            '--md-sys-color-on-primary': mpc.theme.header.color,
-            '--md-sys-color-primary-container': fg,
-            '--md-sys-color-on-primary-container': mpc.theme.header.color,
-            '--md-sys-color-secondary': fg,
-            '--md-sys-color-on-secondary': mpc.theme.header.color,
-            '--md-sys-color-secondary-container': fg,
-            '--md-sys-color-on-secondary-container': mpc.theme.header.color,
-            '--md-sys-color-on-surface': fg,
-            '--md-sys-color-on-surface-variant': fg,
-            '--md-sys-color-on-background': fg,
-            '--md-sys-color-outline': fg,
-        } as React.CSSProperties;
-    }
-
-    // Кастомный фон страницы (раздел 06): seed-tint — лёгкий акцент сида
-    // поверх surface-container-low; solid — конкретный цвет. Внутренний
-    // контент (main) остаётся на surface-container-lowest — читаемо на любом фоне.
     const bgMode = mpc.theme.useCustomTheme ? mpc.theme.background.mode : 'default';
+
+    const customVars: string[] = [];
+    if (mpc.theme.useCustomTheme) {
+        if (headerMode === 'solid' && mpc.theme.header.color) {
+            const c = mpc.theme.header.color;
+            const dark = mixWithBlack(c, 0.45);
+            customVars.push(
+                `:root{--mp-header-bg:${c};--mp-header-fg:${contrastOn(c)}}`,
+                `[data-theme=dark]{--mp-header-bg:${dark};--mp-header-fg:${contrastOn(dark)}}`,
+            );
+        }
+        if (bgMode === 'seed-tint') {
+            const tint =
+                'color-mix(in srgb, var(--md-sys-color-primary) 8%, var(--md-sys-color-surface-container-low))';
+            customVars.push(`:root{--mp-page-bg:${tint}}`, `[data-theme=dark]{--mp-page-bg:${tint}}`);
+        } else if (bgMode === 'solid' && mpc.theme.background.color) {
+            const c = mpc.theme.background.color;
+            customVars.push(
+                `:root{--mp-page-bg:${c}}`,
+                `[data-theme=dark]{--mp-page-bg:${mixWithBlack(c, 0.45)}}`,
+            );
+        }
+    }
+    const customVarsCss = customVars.join('\n');
+
+    // Инлайн-стили ссылаются на переменные — в dark они уже другие.
+    const headerStyle: React.CSSProperties | undefined =
+        headerMode === 'solid' && mpc.theme.header.color
+            ? ({
+                  backgroundColor: 'var(--mp-header-bg)',
+                  '--md-sys-color-primary': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-primary': 'var(--mp-header-bg)',
+                  '--md-sys-color-primary-container': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-primary-container': 'var(--mp-header-bg)',
+                  '--md-sys-color-secondary': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-secondary': 'var(--mp-header-bg)',
+                  '--md-sys-color-secondary-container': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-secondary-container': 'var(--mp-header-bg)',
+                  '--md-sys-color-on-surface': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-surface-variant': 'var(--mp-header-fg)',
+                  '--md-sys-color-on-background': 'var(--mp-header-fg)',
+                  '--md-sys-color-outline': 'var(--mp-header-fg)',
+              } as React.CSSProperties)
+            : undefined;
+
     const pageBgStyle: React.CSSProperties | undefined =
-        bgMode === 'seed-tint'
-            ? {
-                  backgroundColor:
-                      'color-mix(in srgb, var(--md-sys-color-primary) 8%, var(--md-sys-color-surface-container-low))',
-              }
-            : bgMode === 'solid' && mpc.theme.background.color
-              ? { backgroundColor: mpc.theme.background.color }
-              : undefined;
+        bgMode !== 'default'
+            ? { backgroundColor: 'var(--mp-page-bg, var(--md-sys-color-surface-container-low))' }
+            : undefined;
     const aboutParagraphs = [
         mpc.about.paragraph1,
         mpc.about.paragraph2,
@@ -260,6 +275,9 @@ export default async function ProfilePage({ params }: PageProps) {
             {/* Кастомная тема: переопределяем --md-sys-color-* ДО рендера контента */}
             {themeCss && (
                 <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+            )}
+            {customVarsCss && (
+                <style dangerouslySetInnerHTML={{ __html: customVarsCss }} />
             )}
             <SiteHeader
                 profileSlug={slug}
