@@ -492,3 +492,25 @@ UI в админке:
  • Хардкоды зелёного переведены на color-mix от --md-sys-color-primary:
    PortfolioCard hover-градиент (90/50%), hover-заливки secondary-кнопок
    (5%) и чипов фильтров (10%), NavLabel-разделитель (16%).
+
+═══════════════════════════════════════════════════════════
+РЕШЕНИЕ 8 (2026-09-12) — Кастомный хедер и фон страницы
+═══════════════════════════════════════════════════════════
+ • theme.header {mode: default|transparent|solid, color} и
+   theme.background {mode: default|seed-tint|solid, color}
+   (JSON-колонка, normalizeMainPageContent валидирует; дефолты — «как есть»).
+ • Хедер: transparent — без заливки header-glass (blur остаётся);
+   solid — инлайн фон + ЛОКАЛЬНЫЕ --md-sys-color-{primary,on-surface,
+   on-surface-variant,outline,primary-container} на <header> = контрастный
+   текст по luminance (contrastOn(), src/lib/theme.ts) — все тексты/иконки
+   шапки перекрашиваются, ThemeToggle работает. SiteHeaderBreadcrumb
+   (страницы кейсов) в кастомной теме не участвует.
+ • Фон: seed-tint — color-mix(primary 8%, surface-container-low) на wrapper;
+   solid — конкретный цвет. Внутренний main остаётся surface-container-lowest
+   — контент читаем на любом фоне.
+ • Админка: раздел 06 — два блока Header/Background (Select + color picker
+   + Input + Reset при solid), disabled без useCustomTheme.
+ • Формы плавающих (уточнение): 'default' = случайный микс круг/квадрат/
+   треугольник на КАЖДЫЙ элемент (детерминировано случайными координатами
+   init — при каждой загрузке новый микс); circle/square/triangle — одна
+   форма для всех. Так и было с решения 7 — UI уже соответствовал.

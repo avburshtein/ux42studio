@@ -13,7 +13,7 @@ import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { FAB } from '@/components/FAB';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
-import { generateThemeCss } from '@/lib/theme';
+import { generateThemeCss, contrastOn } from '@/lib/theme';
 
 export const revalidate = 3600;
 
@@ -139,6 +139,37 @@ export default async function ProfilePage({ params }: PageProps) {
     const themeCss = mpc.theme.useCustomTheme
         ? generateThemeCss(mpc.theme.seedColor)
         : '';
+
+    // Кастомная шапка (раздел 06): transparent — без заливки стекла;
+    // solid — фон + локальные токены текста (primary/on-surface/...) с
+    // контрастом по luminance фона — перекрашивает все тексты/иконки шапки.
+    const headerMode = mpc.theme.useCustomTheme ? mpc.theme.header.mode : 'default';
+    let headerStyle: React.CSSProperties | undefined;
+    if (headerMode === 'solid' && mpc.theme.header.color) {
+        const fg = contrastOn(mpc.theme.header.color);
+        headerStyle = {
+            backgroundColor: mpc.theme.header.color,
+            '--md-sys-color-primary': fg,
+            '--md-sys-color-on-surface': fg,
+            '--md-sys-color-on-surface-variant': fg,
+            '--md-sys-color-outline': fg,
+            '--md-sys-color-primary-container': fg,
+        } as React.CSSProperties;
+    }
+
+    // Кастомный фон страницы (раздел 06): seed-tint — лёгкий акцент сида
+    // поверх surface-container-low; solid — конкретный цвет. Внутренний
+    // контент (main) остаётся на surface-container-lowest — читаемо на любом фоне.
+    const bgMode = mpc.theme.useCustomTheme ? mpc.theme.background.mode : 'default';
+    const pageBgStyle: React.CSSProperties | undefined =
+        bgMode === 'seed-tint'
+            ? {
+                  backgroundColor:
+                      'color-mix(in srgb, var(--md-sys-color-primary) 8%, var(--md-sys-color-surface-container-low))',
+              }
+            : bgMode === 'solid' && mpc.theme.background.color
+              ? { backgroundColor: mpc.theme.background.color }
+              : undefined;
     const aboutParagraphs = [
         mpc.about.paragraph1,
         mpc.about.paragraph2,
@@ -213,7 +244,10 @@ export default async function ProfilePage({ params }: PageProps) {
     });
 
     return (
-        <div className='min-h-screen w-full bg-surface-container-low'>
+        <div
+            className='min-h-screen w-full bg-surface-container-low'
+            style={pageBgStyle}
+        >
             {/* Кастомная тема: переопределяем --md-sys-color-* ДО рендера контента */}
             {themeCss && (
                 <style dangerouslySetInnerHTML={{ __html: themeCss }} />
@@ -224,6 +258,8 @@ export default async function ProfilePage({ params }: PageProps) {
                 navItems={navItems}
                 ctaLabel="Hire me"
                 ctaHref="#contact"
+                variant={headerMode}
+                style={headerStyle}
             />
             {mpc.hero.visible && (
                 <HeroSection

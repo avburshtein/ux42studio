@@ -98,12 +98,21 @@ export type CtaContent = {
   whatsappVariant: ButtonVariant;
 };
 
+/** Режим фона страницы (кастомная тема). */
+export type ThemeBackgroundMode = 'default' | 'seed-tint' | 'solid';
+/** Режим шапки (кастомная тема). */
+export type ThemeHeaderMode = 'default' | 'transparent' | 'solid';
+
 /** Настройки цветовой темы: seed-цвет → M3-схема (src/lib/theme.ts). */
 export type ThemeSettings = {
   /** false = дефолтная тема globals.css («как есть») */
   useCustomTheme: boolean;
   /** Seed-цвет HEX (#RRGGBB) */
   seedColor: string;
+  /** Фон страницы: default (surface) / seed-tint (акцент сида) / solid (цвет) */
+  background: { mode: ThemeBackgroundMode; color: string | null };
+  /** Шапка: default (стекло) / transparent / solid (цвет + контрастный текст) */
+  header: { mode: ThemeHeaderMode; color: string | null };
 };
 
 /** Стиль плавающих элементов. null/default = как есть. */
@@ -231,6 +240,8 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   theme: {
     useCustomTheme: false,
     seedColor: '#0b6e4f',
+    background: { mode: 'default', color: null },
+    header: { mode: 'default', color: null },
   },
   floating: {
     color: null,
@@ -265,6 +276,12 @@ const steps = (v: unknown, fallback: ProcessStep[]): ProcessStep[] =>
     : fallback;
 
 const SHAPES = ['default', 'circle', 'square', 'triangle'] as const;
+const bgMode = (v: unknown): ThemeBackgroundMode =>
+  v === 'seed-tint' || v === 'solid' ? v : 'default';
+
+const headerMode = (v: unknown): ThemeHeaderMode =>
+  v === 'transparent' || v === 'solid' ? v : 'default';
+
 const shape = (v: unknown): FloatingStyle['shape'] =>
   SHAPES.includes(v as FloatingStyle['shape'])
     ? (v as FloatingStyle['shape'])
@@ -358,6 +375,14 @@ export function normalizeMainPageContent(
     theme: {
       useCustomTheme: bool(src.theme?.useCustomTheme, false),
       seedColor: hex(src.theme?.seedColor, d.theme.seedColor),
+      background: {
+        mode: bgMode(src.theme?.background?.mode),
+        color: hexOrNull(src.theme?.background?.color),
+      },
+      header: {
+        mode: headerMode(src.theme?.header?.mode),
+        color: hexOrNull(src.theme?.header?.color),
+      },
     },
     floating: {
       color: hexOrNull(src.floating?.color),

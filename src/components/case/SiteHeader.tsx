@@ -32,6 +32,12 @@ interface SiteHeaderProps {
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
     ctaHref?: string;
+    /** Режим фона шапки (раздел 06 Color Theme): default — стекло как есть,
+     *  transparent — без заливки, solid — заливка через style (+контрастный
+     *  текст через локальные --md-sys-color-* токены). */
+    variant?: 'default' | 'transparent' | 'solid';
+    /** Инлайн-стили (фон solid + переопределение токенов текста) */
+    style?: React.CSSProperties;
     className?: string;
 }
 
@@ -58,6 +64,8 @@ export function SiteHeader({
     menuMode = false,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
+    variant = 'default',
+    style,
     className,
 }: SiteHeaderProps) {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -95,7 +103,14 @@ export function SiteHeader({
 
     return (
         <header
-            className={cn('header-glass sticky top-0 z-40 w-full py-2 backdrop-blur-md backdrop-saturate-[1.8] md:py-2', className)}
+            className={cn(
+                variant === 'transparent'
+                    ? 'bg-transparent backdrop-blur-md backdrop-saturate-[1.8]'
+                    : 'header-glass backdrop-blur-md backdrop-saturate-[1.8]',
+                'sticky top-0 z-40 w-full py-2 md:py-2',
+                className,
+            )}
+            style={style}
         >
             {/* Mobile menu (<768, НЕ menuMode): backdrop + панель под шапкой.
                 ВАЖНО: backdrop-filter на <header> создаёт containing block для
