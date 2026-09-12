@@ -8,6 +8,7 @@ import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
+import { PlatformBenefitsSection } from '@/components/portfolio/PlatformBenefitsSection';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -27,7 +28,8 @@ function NavLabel({ label }: { label: string }) {
 /**
  * Главная страница студии — визуальный язык страницы дизайнера
  * (Main_page_Spec), контент: Hero + Approach (решение 2026-09-04 (21)) +
- * каталог проектов (showOnHomepage) + Stats + Pro Bono Banner + CTA.
+ * каталог проектов (showOnHomepage) + Stats + Pro Bono Banner +
+ * Platform Benefits (промо платформы для дизайнеров) + CTA.
  * Решение 2026-09-02 (19), каталог возвращён 2026-09-04 (22).
  */
 export default async function HomePage({
@@ -219,6 +221,8 @@ export default async function HomePage({
                         </div>
                     </div>
                 </section>
+
+                <PlatformBenefitsSection />
 
                 <CtaSection
                     title='Get in touch'
