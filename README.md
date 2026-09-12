@@ -27,6 +27,15 @@
 - **`verstka`** — активная разработка UI (Alex), периодически вливается в `main` через PR.
 - **`token`**, **`cursor/case-page-surface-tokens`**, **`cursor/agent-docs-and-guidelines`** — исторические ветки Alex (дизайн-токены, токены страницы кейса, документация для агентов), полностью влиты в `main`.
 
+## Что нового в `verstka` (сентябрь 2026)
+
+- **Главная дизайнера и страница кейса** — полная перестройка по Figma-спекам (`Docs/ui/`), адаптивная мобильная версия, карусель галереи, хедер с меню-панелью и хэш-навигацией.
+- **Контент главной из БД** — редактор «Main Page Content» в `/admin/profile` (секции, галерея, соцсети, OG-обложка, favicon); `/u/[slug]` рендерит контент из D1.
+- **Кастомизация темы** — M3 seed-based цветовая тема, настраиваемые хедер (transparent/solid) и фон страницы, настраиваемые floating elements с live-превью.
+- **SEO-контур** — favicon, `robots.txt` + sitemap из D1, `generateMetadata` кейсов, Open Graph (og-cover 1200×630), noindex для админок/auth, 404-страница.
+- **Legal** — `/privacy` и `/terms` (EN + ES), микрораздел cookies.
+- **Доступность** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
+
 ## Разработка
 
 ```bash

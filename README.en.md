@@ -27,6 +27,15 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **`verstka`** — active UI development (Alex), periodically merged into `main` via PRs.
 - **`token`**, **`cursor/case-page-surface-tokens`**, **`cursor/agent-docs-and-guidelines`** — Alex's historical branches (design tokens, case page surface tokens, agent documentation), fully merged into `main`.
 
+## What's New in `verstka` (September 2026)
+
+- **Designer home page & case page** — fully rebuilt from Figma specs (`Docs/ui/`), responsive mobile layout, gallery carousel, header with menu panel and hash navigation.
+- **Main page content from DB** — "Main Page Content" editor in `/admin/profile` (sections, gallery, social links, OG cover, favicon); `/u/[slug]` renders content from D1.
+- **Theme customization** — M3 seed-based color theme, configurable header (transparent/solid) and page background, configurable floating elements with live preview.
+- **SEO** — favicon, `robots.txt` + sitemap generated from D1, `generateMetadata` for case pages, Open Graph (og-cover 1200×630), noindex for admin/auth routes, 404 page.
+- **Legal** — `/privacy` and `/terms` (EN + ES), cookies section.
+- **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
+
 ## Development
 
 ```bash
