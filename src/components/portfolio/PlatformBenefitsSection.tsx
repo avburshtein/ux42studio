@@ -78,7 +78,8 @@ export function PlatformBenefitsSection() {
 
                 <div className='flex flex-col items-start gap-8'>
                     <h2 className='max-w-[720px] bg-gradient-to-br from-primary to-[#2C5A07] bg-clip-text font-display text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-transparent lg:text-[52px] lg:leading-[1.2]'>
-                        Not just a portfolio — a platform.
+                        Not just a portfolio
+                        <br aria-hidden='true' />— a platform.
                     </h2>
                     <p className='max-w-[560px] text-body-lg text-on-surface-variant'>
                         UX42 runs on the same platform we offer to designers.
@@ -91,7 +92,7 @@ export function PlatformBenefitsSection() {
                     {BENEFITS.map(({ icon: Icon, title, description }) => (
                         <div
                             key={title}
-                            className='flex flex-col gap-4 rounded-[24px] bg-surface-container-low p-8 transition-shadow duration-200 ease-out hover:shadow-[4px_4px_12px_rgba(0,0,0,0.08)]'
+                            className='flex flex-col gap-4 rounded-[24px] bg-surface-container-low p-8 shadow-card transition-shadow duration-200 ease-out hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08)]'
                         >
                             <span className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[rgba(11,110,79,0.1)] text-primary'>
                                 <Icon size={24} aria-hidden='true' />
