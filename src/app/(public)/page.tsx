@@ -6,7 +6,6 @@ import { Carousel } from '@/components/portfolio/Carousel';
 import { HeroSection } from '@/components/portfolio/HeroSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
-import { FloatingElements } from '@/components/FloatingElements';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import { PlatformBenefitsSection } from '@/components/portfolio/PlatformBenefitsSection';
@@ -193,10 +192,18 @@ export default async function HomePage({
 
                         <div className='flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10'>
                             {/* Визуал — по образцу AboutSection (516×495):
-                                картинка опциональна, пока — панель с
-                                FloatingElements (как ApproachSection) */}
+                                одно фото (public/studio-2.webp, конверт из
+                                PNG 2,37 МБ → 102 КБ); градиент — подложка
+                                на время загрузки */}
                             <div className='relative aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-gradient-to-br from-[rgba(11,110,79,0.08)] to-[rgba(44,90,7,0.12)] lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
-                                <FloatingElements count={14} minBlur={0} maxBlur={16} />
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src='/studio-2.webp'
+                                    alt=''
+                                    loading='lazy'
+                                    decoding='async'
+                                    className='absolute inset-0 h-full w-full object-cover'
+                                />
                             </div>
 
                             <div className='flex w-full flex-col gap-8 lg:w-[516px]'>

@@ -780,3 +780,34 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        valid-source-maps (bp) — вес 0, артефакт dev-режима. runWarnings
        «Chrome extensions» — для точных perf-цифр прогонять incognito
        (на a11y/bp/seo не влияет).
+
+    (48) 2026-09-12 — Панели Approach/Studio получили фото, benefit-карточки
+        потемнели. (1) Ассеты появились в public/: approach-1..3.png +
+        studio-1..4.png (переименованы из «Approach N.png»/«Studio N.png» —
+        без пробелов в URL); FloatingElements-заглушки панелей заменены
+        фотоколлажами: Approach — 3 кадра (крупный слева row-span-2 + 2
+        справа), Studio — сетка 2×2; grid absolute inset-0 внутри
+        overflow-hidden rounded-панели, градиент остался подложкой на
+        загрузку, img loading=lazy. (2) Benefit-карточки: фон
+        surface-container-low (#f6f3f4) против белого канваса не читался
+        (фидбэк «не отличаются по цвету») → surface-container (#f0edee) +
+        hairline-контур 1px outline-variant 60% (outline, не box-shadow —
+        hover-тень .portfolio-card:hover контур не сбрасывает; в тёмной теме
+        фон/тень по-прежнему от [data-theme='dark'] .portfolio-card). Из
+
+    (49) 2026-09-12 — Панели Approach/Studio — по одному фото (WebP),
+        benefit-карточки без бордера. (1) Коллажи-сетки разобраны:
+        Approach — одно фото approach-1, Studio — studio-2 (выбор
+        пользователя); img absolute inset-0 object-cover внутри прежней
+        rounded-панели, градиент остался подложкой на загрузку.
+        (2) Ассеты конвертированы в WebP (sharp, scripts/
+        convert-to-webp.cjs): approach-1.webp 1280w 77 КБ (PNG был
+        1,46 МБ), studio-2.webp 1100w 102 КБ (PNG 2,37 МБ) — ~20×;
+        quality 80, withoutEnlargement; исходные PNG оставлены в public
+        (не используются — кандидаты на удаление). (3) Hairline-контур
+        (outline) benefit-карточек снят (фидбэк: после потемнения до
+        surface-container стал лишним) — остался только фон;
+        .platform-benefit-card:hover (transform:none) не тронут.
+
+        className карточки снят дублирующий bg-surface-container-lowest.
+

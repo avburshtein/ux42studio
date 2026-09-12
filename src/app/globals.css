@@ -455,6 +455,24 @@ body {
 }
 
 /*
+ * Platform Benefit cards используют тень .portfolio-card, но это не ссылки —
+ * hover-масштабирование (transform: scale) отключаем, оставляем только тень.
+ * Фон — surface-container (#f0edee), на ступень темнее канваса секции
+ * (lowest #ffffff). Первая попытка с surface-container-low (#f6f3f4) против
+ * белого не читалась (фидбэк: «не отличаются по цвету») — помогло потемнение
+ * до surface-container. Hairline-контур (outline) был добавлен вместе с ним,
+ * но после потемнения стал лишним — снят (фидбэк 2026-09-12). В тёмной теме
+ * фон/тень переопределяет [data-theme='dark'] .portfolio-card (специфичнее).
+ */
+.platform-benefit-card {
+  background: var(--md-sys-color-surface-container);
+}
+
+.platform-benefit-card:hover {
+  transform: none;
+}
+
+/*
  * Контейнер контента внутри полноширинных блоков (паттерн Figma: Section → container → Content Slot).
  * Блок-секция тянется на всю ширину экрана и несёт фон + вертикальный паддинг,
  * а контейнер ограничивает содержимое шириной 1280px по центру и держит

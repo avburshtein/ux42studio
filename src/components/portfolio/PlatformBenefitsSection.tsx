@@ -12,8 +12,9 @@ import {
  * на главной студии. Bento-грид 3×2: иконка в кружке + заголовок + описание.
  * Стили — токены проекта (Main_page_Spec): NavLabel-разделитель, градиентный
  * заголовок (как ApproachSection), карточки как у карточек портфолио
- * (case/PortfolioCard): фон surface-container-lowest, тень shadow-card,
- * зелёные заголовки. Иконки — зелёные, без фона-кружка. Размещение — между Studio и CTA.
+ * (case/PortfolioCard): тень через класс .portfolio-card, фон темнее канваса
+ * через .platform-benefit-card (globals.css). Иконки — зелёные,
+ * без фона-кружка. Размещение — между Studio и CTA.
  * Копирайт намеренно без упоминания Material Design / Google.
  */
 
@@ -36,9 +37,9 @@ const BENEFITS: Array<{
     },
     {
         icon: Palette,
-        title: 'Design-system quality',
+        title: 'Proven structure, your story',
         description:
-            'Every case follows a solid typographic grid. Your work looks curated, not templated.',
+            'A case study template built to industry standards. Publish the full case — or just the sections you need.',
     },
     {
         icon: Sparkles,
@@ -93,7 +94,7 @@ export function PlatformBenefitsSection() {
                     {BENEFITS.map(({ icon: Icon, title, description }) => (
                         <div
                             key={title}
-                            className='flex flex-col gap-4 rounded-[24px] bg-surface-container-lowest p-8 shadow-card transition-shadow duration-200 ease-out hover:shadow-[0px_4px_16px_0px_rgba(0,0,0,0.08)]'
+                            className='portfolio-card platform-benefit-card flex flex-col gap-4 rounded-[24px] p-8'
                         >
                             <span className='shrink-0 text-primary'>
                                 <Icon size={28} aria-hidden='true' />
