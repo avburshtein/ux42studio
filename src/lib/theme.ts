@@ -9,6 +9,7 @@ import {
   TonalPalette,
   Hct,
   SchemeTonalSpot,
+  SchemeMonochrome,
 } from '@material/material-color-utilities';
 
 export type ThemeTokens = Record<string, string>;
@@ -50,6 +51,38 @@ function schemeToTokens(s: SchemeTonalSpot): ThemeTokens {
   };
 }
 
+/**
+ * Ч/б режим (seed близок к нейтральному, chroma < 8): SchemeMonochrome
+ * даёт серые поверхности, но primary tone 40 — тёмно-серый, а не чёрный.
+ * Дожимаем primary-пару и поверхности до настоящего чёрно-белого.
+ */
+function bwOverrides(dark: boolean): ThemeTokens {
+  const tone = (t: number) => hexFromArgb(TonalPalette.fromHueAndChroma(0, 0).tone(t));
+  return dark
+    ? {
+        '--md-sys-color-primary': tone(90),
+        '--md-sys-color-on-primary': tone(10),
+        '--md-sys-color-primary-container': tone(30),
+        '--md-sys-color-on-primary-container': tone(90),
+        '--md-sys-color-background': tone(4),
+        '--md-sys-color-on-background': tone(90),
+        '--md-sys-color-surface': tone(4),
+        '--md-sys-color-on-surface': tone(90),
+        '--md-sys-color-surface-tint': tone(90),
+      }
+    : {
+        '--md-sys-color-primary': tone(10),
+        '--md-sys-color-on-primary': tone(100),
+        '--md-sys-color-primary-container': tone(90),
+        '--md-sys-color-on-primary-container': tone(10),
+        '--md-sys-color-background': tone(100),
+        '--md-sys-color-on-background': tone(10),
+        '--md-sys-color-surface': tone(100),
+        '--md-sys-color-on-surface': tone(10),
+        '--md-sys-color-surface-tint': tone(10),
+      };
+}
+
 /** Extended accents: hue-ротация от сид (как в extended-палитре дизайна). */
 function extToTokens(seedArgb: number, dark: boolean): ThemeTokens {
   const hue = new SchemeTonalSpot(Hct.fromInt(seedArgb), false, 0)
@@ -77,19 +110,41 @@ export function generateThemeCss(seed?: string): string {
   if (!/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(trimmed)) return "";
 
   const seedArgb = argbFromHex(trimmed);
-  const light = {
-    ...schemeToTokens(new SchemeTonalSpot(Hct.fromInt(seedArgb), false, 0)),
-    ...extToTokens(seedArgb, false),
-  };
-  const dark = {
-    ...schemeToTokens(new SchemeTonalSpot(Hct.fromInt(seedArgb), true, 0)),
-    ...extToTokens(seedArgb, true),
+  const seedHct = Hct.fromInt(seedArgb);
+  // Нейтральный seed (чёрный/белый/серый) → настоящая ч/б тема:
+  // SchemeMonochrome (хрома 0) + дожим primary/поверхностей до ч/б.
+  const bw = seedHct.chroma < 8;
+  const make = (dark: boolean): ThemeTokens => {
+    const scheme = bw
+      ? schemeToTokens(new SchemeMonochrome(seedHct, dark, 0))
+      : schemeToTokens(new SchemeTonalSpot(seedHct, dark, 0));
+    const ext = bw ? extToTokensNeutral(dark) : extToTokens(seedArgb, dark);
+    return bw ? { ...scheme, ...ext, ...bwOverrides(dark) } : { ...scheme, ...ext };
   };
 
   const block = (selector: string, tokens: ThemeTokens) =>
     selector + ' {\n' + Object.entries(tokens).map(([k, v]) => '  ' + k + ': ' + v + ';').join('\n') + '\n}';
 
-  return block(":root", light) + "\\n" + block("[data-theme=dark]", dark);
+  return block(":root", make(false)) + "\\n" + block("[data-theme=dark]", make(true));
+}
+
+/** Ext-акценты ч/б темы: та же нейтральная палитра, без цвета. */
+function extToTokensNeutral(dark: boolean): ThemeTokens {
+  const mainTone = dark ? 80 : 40;
+  const onTone = dark ? 20 : 100;
+  const accent = (name: string) => {
+    const p = TonalPalette.fromHueAndChroma(0, 0);
+    return {
+      ['--md-ext-' + name]: hexFromArgb(p.tone(mainTone)),
+      ['--md-ext-on-' + name]: hexFromArgb(p.tone(onTone)),
+    };
+  };
+  return {
+    ...accent('lime-accent'),
+    ...accent('lavender-light'),
+    ...accent('lavender-purple'),
+    ...accent('green-accent'),
+  };
 }
 
 /** Валидация hex (3/6), для инпута. */

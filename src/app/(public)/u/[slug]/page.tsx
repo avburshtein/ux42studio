@@ -147,13 +147,22 @@ export default async function ProfilePage({ params }: PageProps) {
     let headerStyle: React.CSSProperties | undefined;
     if (headerMode === 'solid' && mpc.theme.header.color) {
         const fg = contrastOn(mpc.theme.header.color);
+        // on-* — цвет фона хедера (парные токены), иначе, например,
+        // «Hire me» (bg-primary + text-on-primary) становится невидимым.
         headerStyle = {
             backgroundColor: mpc.theme.header.color,
             '--md-sys-color-primary': fg,
+            '--md-sys-color-on-primary': mpc.theme.header.color,
+            '--md-sys-color-primary-container': fg,
+            '--md-sys-color-on-primary-container': mpc.theme.header.color,
+            '--md-sys-color-secondary': fg,
+            '--md-sys-color-on-secondary': mpc.theme.header.color,
+            '--md-sys-color-secondary-container': fg,
+            '--md-sys-color-on-secondary-container': mpc.theme.header.color,
             '--md-sys-color-on-surface': fg,
             '--md-sys-color-on-surface-variant': fg,
+            '--md-sys-color-on-background': fg,
             '--md-sys-color-outline': fg,
-            '--md-sys-color-primary-container': fg,
         } as React.CSSProperties;
     }
 
