@@ -1,10 +1,9 @@
-'use client';
+use client';
 
 import { useState } from 'react';
 import { ChevronDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CtaButton } from './CtaButton';
-import { Carousel } from './Carousel';
 import type { ButtonVariant } from '@/lib/mainPageContent';
 
 export interface GalleryItem {
@@ -30,7 +29,7 @@ interface PortfolioGalleryProps {
 const chipClass = (selected: boolean) =>
   selected
     ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out cursor-pointer hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-    : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-colors duration-150 ease-out cursor-pointer hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_10%,transparent)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+    : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-colors duration-150 ease-out cursor-pointer hover:bg-[rgba(11,110,79,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
 
 /**
  * Portfolio Gallery Section — Main_page_Spec §6 (эталон: U5OjywCHbtzQgBsi7PU25r, узел 124:575)
@@ -105,11 +104,25 @@ export function PortfolioGallerySection({
           </>
         )}
 
-        {/* <sm — карусель-стрип (компонент Carousel, решения (15)–(16), (33), (34)),
+        {/* Mobile (<sm): карусель — flex-стрип со scroll-snap. Слева карточка
+            выровнена по контейнеру (паддинг 16 — фидбэк: «отличный»), справа
+            bleed до самого края экрана без правого поля: карточка =
+            100% − 16px (327px @ 375), за ней gap-4 и 16px соседа вплотную
+            к краю (решения (15), (16)). Тень карточки (вылет ~20px вниз) не
+            срезается скроллером: pb-7 внутри + компенсация −mb-5 снаружи
+            (вертикальный ритм прежний), sm:mb-0 — сброс в grid-режиме.
             ≥sm — сетка 2/3 (решение (13)) */}
-        <Carousel>
-          {visibleItems ? visibleItems.map((it) => it.node) : children}
-        </Carousel>
+        <div className="-mr-4 -mb-5 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mb-0 sm:mr-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
+          {visibleItems
+            ? visibleItems.map((it, i) => (
+              // flex: карточка растягивается по высоте grid-ячейки —
+              // все карточки строки выровнены по самой высокой
+              <div key={`${it.category}-${i}`} className='flex min-w-0 [&>*]:w-full'>
+                {it.node}
+              </div>
+            ))
+            : children}
+        </div>
 
         {viewAllHref && viewAllLabel && (
           <CtaButton href={viewAllHref} variant={viewAllVariant ?? 'primary'}>
