@@ -291,6 +291,7 @@ export default function ProfilePage() {
                                     setValue('ogImageFileId', fileId ?? '')
                                 }
                                 aspectRatio={1200 / 630}
+                                cropRatio={1200 / 630}
                             />
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
                                 Превью ссылки в соцсетях и мессенджерах.
@@ -304,6 +305,7 @@ export default function ProfilePage() {
                                     setValue('faviconFileId', fileId ?? '')
                                 }
                                 aspectRatio={1}
+                                cropRatio={1}
                             />
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
                                 Иконка во вкладке браузера (32×32+).

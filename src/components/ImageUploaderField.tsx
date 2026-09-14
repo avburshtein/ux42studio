@@ -12,6 +12,8 @@ type ImageUploaderFieldProps = {
     accept?: string;
     maxSize?: number;
     aspectRatio?: number;
+    /** Пропорция кадрирования перед загрузкой (обычно = aspectRatio). */
+    cropRatio?: number;
     compact?: boolean;
 };
 
@@ -21,6 +23,7 @@ export default function ImageUploaderField({
     accept,
     maxSize,
     aspectRatio,
+    cropRatio,
     compact,
 }: ImageUploaderFieldProps) {
     const [uploaded, setUploaded] = useState<UploadedFile | null>(null);
@@ -63,6 +66,7 @@ export default function ImageUploaderField({
             accept={accept}
             maxSize={maxSize}
             aspectRatio={aspectRatio}
+            cropRatio={cropRatio}
             compact={compact}
         />
     );

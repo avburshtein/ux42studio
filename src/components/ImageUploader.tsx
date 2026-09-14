@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { cn } from '@/lib/utils';
-import { Upload, X } from 'lucide-react';
+import { Crop, Upload, X } from 'lucide-react';
+import ImageCropperDialog from './ImageCropperDialog';
 
 type ImageUploaderProps = {
     value: { fileId: string; r2Key: string } | null;
@@ -10,6 +11,12 @@ type ImageUploaderProps = {
     accept?: string;
     maxSize?: number;
     aspectRatio?: number;
+    /**
+     * Пропорция кадрирования (width / height). Если задана — перед
+     * загрузкой открывается диалог кадрирования, в R2 уезжает уже
+     * кадрированное изображение (пропорция = пропорции слота на странице).
+     */
+    cropRatio?: number;
     compact?: boolean;
 };
 
@@ -19,6 +26,7 @@ export default function ImageUploader({
     accept = 'image/*',
     maxSize = 10 * 1024 * 1024,
     aspectRatio,
+    cropRatio,
     compact = false,
 }: ImageUploaderProps) {
     const [isDragging, setIsDragging] = useState(false);
@@ -26,6 +34,19 @@ export default function ImageUploader({
     const [isUploading, setIsUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+    // Оригинал (до кадрирования) — для повторного кадрирования превью
+    const originalFileRef = useRef<File | null>(null);
+    const objectUrlRef = useRef<string | null>(null);
+    const [cropping, setCropping] = useState<{ file: File; url: string } | null>(
+        null,
+    );
+
+    // Освобождаем object URL при размонтировании
+    useEffect(() => {
+        return () => {
+            if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+        };
+    }, []);
 
     const validateFile = (file: File): string | null => {
         if (!file.type.startsWith('image/')) {
@@ -122,18 +143,64 @@ export default function ImageUploader({
         setIsDragging(false);
         const file = e.dataTransfer.files[0];
         if (file) {
-            uploadFile(file);
+            startCropFlow(file);
         }
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            uploadFile(file);
+            startCropFlow(file);
         }
         if (inputRef.current) {
             inputRef.current.value = '';
         }
+    };
+
+    /**
+     * Выбор файла: с cropRatio — сначала диалог кадрирования (SVG кадрируем
+     * как есть), без — сразу загрузка. Оригинал держим в ref для re-crop.
+     */
+    const startCropFlow = (file: File) => {
+        if (!cropRatio || file.type === 'image/svg+xml') {
+            uploadFile(file);
+            return;
+        }
+        originalFileRef.current = file;
+        if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+        const url = URL.createObjectURL(file);
+        objectUrlRef.current = url;
+        setError(null);
+        setCropping({ file, url });
+    };
+
+    /** Повторное кадрирование: из оригинала в памяти или замена файла. */
+    const handleRecrop = () => {
+        const original = originalFileRef.current;
+        if (original) {
+            startCropFlow(original);
+        } else {
+            // После перезагрузки страницы оригинала нет — предлагаем
+            // выбрать файл заново (после выбора откроется кадрирование)
+            inputRef.current?.click();
+        }
+    };
+
+    /** Кадр из диалога → File → обычная загрузка (upload endpoint). */
+    const handleCropApply = (blob: Blob) => {
+        const source = cropping?.file;
+        const ext =
+            blob.type === 'image/png'
+                ? 'png'
+                : blob.type === 'image/webp'
+                  ? 'webp'
+                  : 'jpg';
+        const base = (source?.name ?? 'image').replace(/\.[^.]+$/, '');
+        const file = new File([blob], `${base}-cropped.${ext}`, {
+            type: blob.type,
+        });
+        setCropping(null);
+        uploadFile(file);
     };
 
     const handleRemove = () => {
@@ -169,6 +236,17 @@ export default function ImageUploader({
                     >
                         <X className='h-3.5 w-3.5' />
                     </button>
+                    {cropRatio && (
+                        <button
+                            type='button'
+                            onClick={handleRecrop}
+                            title='Кадрировать'
+                            aria-label='Crop image'
+                            className='absolute -left-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-[var(--md-sys-color-surface-container)] text-[var(--md-sys-color-on-surface)] shadow-md hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-[var(--md-sys-color-primary)] cursor-pointer'
+                        >
+                            <Crop className='h-3.5 w-3.5' />
+                        </button>
+                    )}
                 </div>
             ) : (
                 <div
@@ -188,7 +266,9 @@ export default function ImageUploader({
                     className={cn(
                         'flex items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors cursor-pointer',
                         'bg-[var(--md-sys-color-surface-input)]',
-                        compact ? 'p-2' : 'flex-col p-8',
+                        // min-h-10 = высота ui/Input (h-10): в строках
+                        // админки дропзона и поле caption на одной линии
+                        compact ? 'min-h-10 p-2' : 'flex-col p-8',
                         isDragging
                             ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)]/20'
                             : 'border-[var(--md-sys-color-outline-variant)] hover:border-[var(--md-sys-color-outline)]',
@@ -253,6 +333,16 @@ export default function ImageUploader({
                 >
                     {error}
                 </p>
+            )}
+
+            {cropping && cropRatio && (
+                <ImageCropperDialog
+                    src={cropping.url}
+                    aspectRatio={cropRatio}
+                    fileType={cropping.file.type}
+                    onApply={handleCropApply}
+                    onCancel={() => setCropping(null)}
+                />
             )}
         </div>
     );
