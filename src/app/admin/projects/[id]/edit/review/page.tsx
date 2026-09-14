@@ -19,6 +19,7 @@ import {
     getProjectReview,
 } from '@/lib/actions/projects';
 import Link from 'next/link';
+import SectionsVisibilityEditor from '@/components/admin/SectionsVisibilityEditor';
 
 const reviewItemSchema = z.object({
     id: z.string().optional(),
@@ -318,6 +319,9 @@ export default function ReviewPage({
                         </div>
                     ))}
                 </div>
+
+                {/* Section visibility on the public case page (автосейв) */}
+                {projectId && <SectionsVisibilityEditor projectId={projectId} />}
 
                 <div className='mt-12'></div>
 

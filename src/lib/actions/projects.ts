@@ -7,6 +7,7 @@ import {
     projectCategories,
     projectAssets,
 } from '@/db/schema/projects';
+import type { GalleryLayout } from '@/db/schema/projects';
 import { categories } from '@/db/schema/categories';
 import { files } from '@/db/schema/files';
 import { profiles } from '@/db/schema/profiles';
@@ -521,6 +522,7 @@ export async function updateProjectGallery(
             order: number;
         }>;
         moodboardPresetId?: string | null;
+        galleryLayout?: GalleryLayout | null;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -549,12 +551,20 @@ export async function updateProjectGallery(
                 order: a.order,
             }),
         ),
-        // Update moodboardPresetId if provided
+        // Update moodboardPresetId / galleryLayout if provided
         ...(data.moodboardPresetId !== undefined
             ? [
                   db
                       .update(projects)
                       .set({ moodboardPresetId: data.moodboardPresetId })
+                      .where(eq(projects.id, projectId)),
+              ]
+            : []),
+        ...(data.galleryLayout !== undefined
+            ? [
+                  db
+                      .update(projects)
+                      .set({ galleryLayout: data.galleryLayout })
                       .where(eq(projects.id, projectId)),
               ]
             : []),
@@ -577,7 +587,10 @@ export async function getProjectGallery(projectId: string) {
     const db = getDb(env.DB);
 
     const project = await db
-        .select({ moodboardPresetId: projects.moodboardPresetId })
+        .select({
+            moodboardPresetId: projects.moodboardPresetId,
+            galleryLayout: projects.galleryLayout,
+        })
         .from(projects)
         .where(eq(projects.id, projectId))
         .get();
@@ -595,7 +608,11 @@ export async function getProjectGallery(projectId: string) {
         .orderBy(asc(projectAssets.order))
         .all();
 
-    return { assets, moodboardPresetId: project?.moodboardPresetId ?? null };
+    return {
+        assets,
+        moodboardPresetId: project?.moodboardPresetId ?? null,
+        galleryLayout: project?.galleryLayout ?? null,
+    };
 }
 
 // ---- Section 07: Showcase (db.batch) ----
@@ -1279,6 +1296,40 @@ async function collectProjectFileIds(projectId: string): Promise<string[]> {
 
     return [...fileIds];
 }
+
+// ---- Видимость секций кейса на публичной странице ----
+
+export async function getProjectSectionsVisibility(
+    projectId: string,
+): Promise<Partial<Record<string, boolean>>> {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ sectionsVisibility: projects.sectionsVisibility })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+
+    return project?.sectionsVisibility ?? {};
+}
+
+export async function updateProjectSectionsVisibility(
+    projectId: string,
+    sectionsVisibility: Record<string, boolean>,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(projects)
+        .set({ sectionsVisibility })
+        .where(eq(projects.id, projectId));
+
+    revalidatePath(`/admin/projects/${projectId}`);
+}
+
+// ---- Delete ----
 
 export async function deleteProject(projectId: string) {
     const { env } = await getCloudflareContext();

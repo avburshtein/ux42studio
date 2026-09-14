@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { FloatingElements } from '../FloatingElements';
 
 /**
  * Approach Section — по паттерну Layout2 из исходника главного сайта
@@ -33,9 +32,18 @@ export function ApproachSection() {
         </div>
 
         <div className='flex flex-col gap-10 md:gap-16 lg:flex-row lg:items-center lg:gap-20'>
-          {/* Визуальная панель — на мобильных сверху */}
+          {/* Визуальная панель — на мобильных сверху. Одно фото
+              (public/approach-1.webp, конверт из PNG 1,46 МБ → 77 КБ);
+              градиент — подложка на время загрузки */}
           <div className='relative order-1 aspect-[4/3] w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-[rgba(11,110,79,0.08)] to-[rgba(44,90,7,0.12)] lg:order-2 lg:aspect-[600/640] lg:w-auto lg:flex-1'>
-            <FloatingElements count={14} minBlur={0} maxBlur={16} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src='/approach-1.webp'
+              alt=''
+              loading='lazy'
+              decoding='async'
+              className='absolute inset-0 h-full w-full object-cover'
+            />
           </div>
 
           {/* Текст — на мобильных снизу */}

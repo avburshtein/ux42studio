@@ -780,3 +780,133 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
        valid-source-maps (bp) — вес 0, артефакт dev-режима. runWarnings
        «Chrome extensions» — для точных perf-цифр прогонять incognito
        (на a11y/bp/seo не влияет).
+
+    (48) 2026-09-12 — Панели Approach/Studio получили фото, benefit-карточки
+        потемнели. (1) Ассеты появились в public/: approach-1..3.png +
+        studio-1..4.png (переименованы из «Approach N.png»/«Studio N.png» —
+        без пробелов в URL); FloatingElements-заглушки панелей заменены
+        фотоколлажами: Approach — 3 кадра (крупный слева row-span-2 + 2
+        справа), Studio — сетка 2×2; grid absolute inset-0 внутри
+        overflow-hidden rounded-панели, градиент остался подложкой на
+        загрузку, img loading=lazy. (2) Benefit-карточки: фон
+        surface-container-low (#f6f3f4) против белого канваса не читался
+        (фидбэк «не отличаются по цвету») → surface-container (#f0edee) +
+        hairline-контур 1px outline-variant 60% (outline, не box-shadow —
+        hover-тень .portfolio-card:hover контур не сбрасывает; в тёмной теме
+        фон/тень по-прежнему от [data-theme='dark'] .portfolio-card). Из
+
+    (49) 2026-09-12 — Панели Approach/Studio — по одному фото (WebP),
+        benefit-карточки без бордера. (1) Коллажи-сетки разобраны:
+        Approach — одно фото approach-1, Studio — studio-2 (выбор
+        пользователя); img absolute inset-0 object-cover внутри прежней
+        rounded-панели, градиент остался подложкой на загрузку.
+        (2) Ассеты конвертированы в WebP (sharp, scripts/
+        convert-to-webp.cjs): approach-1.webp 1280w 77 КБ (PNG был
+        1,46 МБ), studio-2.webp 1100w 102 КБ (PNG 2,37 МБ) — ~20×;
+        quality 80, withoutEnlargement; исходные PNG оставлены в public
+        (не используются — кандидаты на удаление). (3) Hairline-контур
+        (outline) benefit-карточек снят (фидбэк: после потемнения до
+        surface-container стал лишним) — остался только фон;
+        .platform-benefit-card:hover (transform:none) не тронут.
+
+    (50) 2026-09-14 — Кейс: фикс overflow Results-карточек + editorial-
+        галерея финала с лайтбоксом. (1) ResultsCard и NextStepsList:
+        текст в flex-строке не сжимался ниже самого длинного слова
+        (min-width:auto) — случайная строка без пробелов выталкивала
+        карточку за экран на mobile (desktop не проявлялось) →
+        min-w-0 break-words на текстовых span. Попутно починен
+        PortfolioGallerySection.tsx: в HEAD была обрезана директива
+        ('use client' → use client) — tsc красный, prod-сборка не
+        замечала из-за кэша. (2) Showcase-галерея Final Design
+        переписана в editorial-формат (концепция пользователя +
+        обсуждение с Claude): новый клиентский компонент ShowcaseGallery
+        (case/), первые 3 фото — «длинное 1072/420 + ряд квадрат 420 +
+        плоское 628» (mobile: 4/3 + пара 1/1), object-cover; >3 фото —
+        оверлей «+N photos» на третьем слоте; клик по слоту — лайтбокс
+        на этом фото (scrim rgba(20,22,20,.94), object-contain, caption,
+        ←/→ кнопки + клавиатура по кругу, Esc/cross, свайп, счётчик
+        «n / N», body scroll lock, z-[70] поверх шапки z-40; паттерн
+        dialog/aria-modal как в MoodboardGrid). Caption в сетке не
+        показываем — только в лайтбоксе. Showcase-ветка GalleryGrid
+        удалена (masonry осталась — вне скоупа). Админка/БД без
+        изменений, порядок фото = БД.
+
+    (51) 2026-09-14 — Варианты лейаута финальной галереи (для фотографов/
+        иллюстраторов): editorial-сетка с кропом в слоты не годится, когда
+        кадр и есть работа (вертикальное фото, кадрированное автором,
+        должно остаться вертикальным). Выбор лейаута — на уровне проекта
+        (прецедент: projects.moodboardPresetId): (а) миграция
+        drizzle/20260914000000_add_project_gallery_layout — ALTER TABLE
+        projects ADD gallery_layout text (nullable; отсутствие = editorial,
+        совместимо с существующими проектами; тип GalleryLayout в схеме);
+        (б) лайтбокс вынесен в общий case/Lightbox.tsx (из ShowcaseGallery);
+        (в) новые варианты: MasonryGallery — Pinterest-колонки (2 на
+        mobile, 3 на lg), ячейки натуральной высоты через next/image с
+        width/height из files (пропорции не трогаем, caption под фото),
+        и StackGallery — фото по одному в ряд, ландшафтные на всю ширину,
+        портретные max-h 70vh по центру; оба показывают ВСЕ фото (без
+        «+N» — длинная страница осознанный выбор автора), общий лайтбокс;
+        (г) админка, вкладка Gallery: пикер «Final gallery layout»
+        (3 радио-карточки с описаниями), поле идёт через
+        getProjectGallery/updateProjectGallery (по паттерну
+        moodboardPresetId); (д) публичная страница: switch по
+        project.galleryLayout ?? 'editorial', toAsset добавил
+        width/height из files. Показ всех фото в masonry/stack —
+        сознательно; капы/«+N» для них — при запросе. Публичный эффект
+        для UX/UI-кейсов не меняется (дефолт editorial).
+
+    (52) 2026-09-14 — Stack → Justified grid (правка (51) по референсу
+        ryangammaphotography.com — портфолио фотографа): «по одному в
+        ряду» заменено на justified-сетку — равновысокие ряды, края
+        заподлицо, оригинальные пропорции кадров (кропа нет). Чистый CSS,
+        без JS/замеров: flex-wrap + flex-basis = ar × --target-h (перенос
+        строк) + flex-grow = ar (остаток ряда распределяется пропорц.
+        аспектам → фото ряда одной высоты, бокс = кадр). target-h:
+        130px mobile / 200 sm / 240 lg. Кап ширины 2.2×target-h у кадров
+        ar < 1.15 — защита от «одинокого портрета» (растянулся бы в
+        ~1600px высотой); такой ряд может не дотянуться до правого края —
+        осознанный компромисс. Значение enum 'stack' → 'justified'
+        (фича в прод не уходила — переименование свободно); компонент
+        JustifiedGallery.tsx (StackGallery удалён), пикер админки —
+        «Justified grid». Masonry (колонки) остался — это другой ритм:
+        рваные горизонтали против рваных вертикалей.
+
+    (53) 2026-09-14 — Мелкий UX по фидбэку. (1) Лайтбокс: кадр примыкал
+        к нижнему краю экрана — читалось как «часть фото скрыта»;
+        рамка фото получила нижний отступ (bottom-8 / sm:bottom-12),
+        стрелки центрируются по рамке. Нюанс: fill-изображение
+        позиционируется от padding-box родителя — нужен внутренний
+        absolute-контейнер, паддинг не работает. (2) Админка, Gallery:
+        «+ Add Asset» вставляет новое поле в НАЧАЛО списка
+        (fa.insert(0) вместо append) — сразу под кнопкой; фотограф
+        загружает 20+ фото подряд, скролл к низу после каждого
+        добавления недопустим. Порядок сохранения не изменился: order
+        переназначается по итоговому индексу при сабмите.
+
+    (54) 2026-09-14 — Мелкий UX, продолжение (53). (1) Админка, Gallery:
+        дропзона (compact) и поле caption разной высоты и не на одной
+        линии → дропзоне min-h-10 (= высота ui/Input h-10), ряду
+        items-start (верхние края на одной линии; при загруженном превью
+        4/3 тоже корректно). (2) Caption финальной галереи теперь
+        отображается и в editorial-сетке: под каждым из слотов мелкой
+        строкой (figure/figcaption в Slot) — панели фикс. aspect, подписи
+        их высоту не меняют, «ровность» не ломается. В masonry/justified
+        подписи уже были. До этого editorial скрывал caption по решению
+        (50) — фидбэк: пользователь не видел свой текст нигде.
+
+        className карточки снят дублирующий bg-surface-container-lowest.
+
+
+    (55) 2026-09-14 — Caption под фото во всех галереях кейса (editorial /
+        masonry / justified + GalleryGrid wireframes). Проблемы: длинная
+        подпись переносилась на несколько строк (в editorial это съедало
+        высоту фикс. слотов, в masonry/justified делало ряды рваными), а
+        в justified центрировалась — figcaption лежит внутри <button>,
+        браузерный text-align:center наследовался (в masonry спасал
+        text-left на кнопке, в editorial подпись вне кнопки). Решение:
+        figcaption = min-w-0 truncate text-left — одна строка, «…» ровно
+        по ширине кадра (подпись и так растянута по ширине
+        фото-контейнера), выравнивание явно влево. Полный текст доступен
+        по hover (title) и в лайтбоксе — там caption сознательно остался
+        многострочным по центру (контекст чтения, не подпись-ярлык).
+

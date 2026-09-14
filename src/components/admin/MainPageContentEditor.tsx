@@ -325,6 +325,7 @@ export default function MainPageContentEditor({
                                 value={avatarFileId || null}
                                 onChange={(fileId) => setAvatarFileId(fileId ?? '')}
                                 aspectRatio={1}
+                                cropRatio={1}
                             />
                         </div>
                         <div>
@@ -333,6 +334,7 @@ export default function MainPageContentEditor({
                                 value={coverFileId || null}
                                 onChange={(fileId) => setCoverFileId(fileId ?? '')}
                                 aspectRatio={16 / 5}
+                                cropRatio={16 / 5}
                             />
                         </div>
                     </div>
@@ -535,6 +537,7 @@ export default function MainPageContentEditor({
                                 set('about', { processImageFileId: fileId ?? null })
                             }
                             aspectRatio={516 / 495}
+                            cropRatio={516 / 495}
                         />
                     </div>
                 </Section>

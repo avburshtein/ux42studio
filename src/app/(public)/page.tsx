@@ -8,6 +8,7 @@ import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
+import { PlatformBenefitsSection } from '@/components/portfolio/PlatformBenefitsSection';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -27,7 +28,8 @@ function NavLabel({ label }: { label: string }) {
 /**
  * Главная страница студии — визуальный язык страницы дизайнера
  * (Main_page_Spec), контент: Hero + Approach (решение 2026-09-04 (21)) +
- * каталог проектов (showOnHomepage) + Stats + Pro Bono Banner + CTA.
+ * каталог проектов (showOnHomepage) + Studio (About-стиль: визуал + статы) +
+ * Platform Benefits (промо платформы для дизайнеров) + CTA.
  * Решение 2026-09-02 (19), каталог возвращён 2026-09-04 (22).
  */
 export default async function HomePage({
@@ -180,45 +182,88 @@ export default async function HomePage({
 
                 <ApproachSection />
 
-                {/* Studio — stats (эталон: Stats-блок) + Pro Bono Banner */}
+                {/* Studio — по образцу About на странице дизайнера: слева
+                    визуал, справа текст + статы с расшифровкой.
+                    Статы — факты: Google UX Certificate, MSc Psychology,
+                    NGO-проекты (Design for good баннер убран 2026-09-12). */}
                 <section id='studio' className='bg-surface-container-lowest py-12 md:py-24'>
                     <div className='section-container flex flex-col gap-16'>
                         <NavLabel label='Studio' />
-                        <div className='grid gap-10 text-center sm:grid-cols-3'>
-                            {[['10+', 'Years of design experience'], ['MSc', 'Human-Centered Design'], ['NGO', 'Projects for social good']].map(
-                                ([value, label]) => (
-                                    <div key={label} className='flex flex-col gap-2'>
-                                        <span className='font-display text-[52px] font-medium leading-[65px] text-primary'>
-                                            {value}
-                                        </span>
-                                        <span className='text-body-md text-on-surface-variant'>
-                                            {label}
-                                        </span>
-                                    </div>
-                                ),
-                            )}
-                        </div>
 
-                        <div className='flex flex-col items-start gap-6 rounded-[24px] bg-primary p-8 md:flex-row md:items-center md:justify-between md:p-12'>
-                            <div className='flex flex-col gap-2'>
-                                <h3 className='font-display text-title-lg font-medium text-on-primary'>
-                                    Design for good
-                                </h3>
-                                <p className='max-w-[560px] text-body-md text-on-primary/90'>
-                                    We reserve part of our studio time for NGOs
-                                    and social initiatives. If your organization
-                                    needs design help — reach out.
-                                </p>
+                        <div className='flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10'>
+                            {/* Визуал — по образцу AboutSection (516×495):
+                                одно фото (public/studio-2.webp, конверт из
+                                PNG 2,37 МБ → 102 КБ); градиент — подложка
+                                на время загрузки */}
+                            <div className='relative aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-gradient-to-br from-[rgba(11,110,79,0.08)] to-[rgba(44,90,7,0.12)] lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                    src='/studio-2.webp'
+                                    alt=''
+                                    loading='lazy'
+                                    decoding='async'
+                                    className='absolute inset-0 h-full w-full object-cover'
+                                />
                             </div>
-                            <Link
-                                href='#contact'
-                                className='inline-flex h-14 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-surface-container-lowest px-8 text-button font-medium text-primary transition-opacity duration-150 ease-out hover:opacity-90'
-                            >
-                                Start a project
-                            </Link>
+
+                            <div className='flex w-full flex-col gap-8 lg:w-[516px]'>
+                                <h2 className='font-display text-[32px] font-medium leading-[40px] text-on-surface lg:text-display-sm lg:leading-tight'>
+                                    Simple by design
+                                </h2>
+
+                                <div className='flex flex-col gap-4'>
+                                    <p className='text-body-lg font-normal text-on-surface-variant'>
+                                        We come to design with a live, open
+                                        mind — always learning, always curious.
+                                    </p>
+                                    <p className='text-body-lg font-normal text-on-surface-variant'>
+                                        We pursue design that is simple and
+                                        functional to the point of genius — and
+                                        mathematically beautiful. Psychology
+                                        helps us understand people; engineering
+                                        keeps the architecture honest.
+                                    </p>
+                                    <p className='text-body-lg font-normal text-on-surface-variant'>
+                                        Behind UX42.studio is a rare
+                                        combination: a UX designer with a
+                                        background in clinical psychology and
+                                        human behaviour research, and a senior
+                                        engineer with an MD/PhD in psychiatry
+                                        and 8+ years building MedTech systems.
+                                        We don&apos;t just make things look
+                                        good — we make them make sense.
+                                    </p>
+                                </div>
+
+                                <div className='flex flex-col gap-3'>
+                                    <span className='text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
+                                        Our background
+                                    </span>
+                                    <ul className='flex flex-col gap-2'>
+                                        {[
+                                            'MSc in Psychology · UX Research · Google UX Design Certificate',
+                                            '8+ years MedTech Engineering · Next.js · TypeScript',
+                                            'NGO — Projects for social good',
+                                        ].map((line) => (
+                                            <li
+                                                key={line}
+                                                className='flex items-start gap-3 text-body-md text-on-surface-variant'
+                                            >
+                                                <span
+                                                    aria-hidden
+                                                    className='mt-[10px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary'
+                                                />
+                                                {line}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
+
+                <PlatformBenefitsSection />
 
                 <CtaSection
                     title='Get in touch'
