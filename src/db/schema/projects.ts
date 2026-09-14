@@ -11,6 +11,10 @@ import { profiles } from './profiles';
 import { files } from './files';
 import { categories } from './categories';
 
+// Вариант лейаута финальной галереи кейса — projects.galleryLayout
+// (решения (51)-(52) 2026-09-14 в Main_page_Spec.md)
+export type GalleryLayout = 'editorial' | 'masonry' | 'justified';
+
 export const projects = sqliteTable(
     'projects',
     {
@@ -58,6 +62,13 @@ export const projects = sqliteTable(
 
         // Section 07: Showcase
         finalDescription: text('final_description'), //[cite: 1]
+
+        // Вариант представления финальной галереи: editorial — сетка
+        // «длинное + квадрат + плоское» с кропом в слоты (ShowcaseGallery);
+        // masonry — Pinterest-колонки (оригинальные кадры); stack —
+        // по одному в ряд (оригинальные кадры). Nullable: отсутствие
+        // значения = editorial (совместимо с существующими проектами).
+        galleryLayout: text('gallery_layout').$type<GalleryLayout>(),
 
         // Section 08: Reflections
         keyTakeaway: text('key_takeaway'), //[cite: 1]

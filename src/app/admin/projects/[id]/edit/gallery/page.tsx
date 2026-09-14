@@ -16,6 +16,8 @@ import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import MoodboardGridSection from '@/components/admin/MoodboardGridSection';
 import type { GridImage } from '@/components/admin/GridSlot';
+import type { GalleryLayout } from '@/db/schema';
+import { cn } from '@/lib/utils';
 import {
     updateProjectGallery,
     getProjectGallery,
@@ -61,6 +63,34 @@ type DefaultValues = {
     final_gallery: AssetDraft[];
 };
 
+// Варианты лейаута финальной галереи (решение (51) 2026-09-14):
+// editorial — дефолт (кроп в слоты, для UX/UI-кейсов), masonry/stack —
+// оригинальные пропорции кадров (фотографы/иллюстраторы).
+const GALLERY_LAYOUTS: Array<{
+    value: GalleryLayout;
+    title: string;
+    description: string;
+}> = [
+    {
+        value: 'editorial',
+        title: 'Editorial grid',
+        description:
+            'Hero + square + flat slots. Photos are cropped to fit — best for UX/UI cases.',
+    },
+    {
+        value: 'masonry',
+        title: 'Masonry',
+        description:
+            'Pinterest-style columns. Original photo crops are preserved.',
+    },
+    {
+        value: 'justified',
+        title: 'Justified grid',
+        description:
+            'Equal-height rows, flush edges — original photo crops are preserved.',
+    },
+];
+
 type AssetDraft = z.infer<typeof assetSchema>;
 
 export default function GalleryPage({
@@ -74,6 +104,10 @@ export default function GalleryPage({
     const [error, setError] = useState<string | null>(null);
     const [moodboardPresetId, setMoodboardPresetId] = useState<string | null>(
         'hero-left',
+    );
+    // Лейаут финальной галереи (решение (51)); дефолт — editorial
+    const [galleryLayout, setGalleryLayout] = useState<GalleryLayout>(
+        'editorial',
     );
     const [moodboardGridImages, setMoodboardGridImages] = useState<GridImage[]>(
         [],
@@ -128,10 +162,11 @@ export default function GalleryPage({
                             order: index,
                         }));
 
-                // Загружаем moodboardPresetId
+                // Загружаем moodboardPresetId и лейаут финальной галереи
                 if (s?.moodboardPresetId) {
                     setMoodboardPresetId(s.moodboardPresetId);
                 }
+                setGalleryLayout(s?.galleryLayout ?? 'editorial');
 
                 // Преобразуем moodboard-ассеты в GridImage[]
                 const moodboardAssets = (s?.assets ?? []).filter(
@@ -193,6 +228,7 @@ export default function GalleryPage({
             await updateProjectGallery(projectId, {
                 assets,
                 moodboardPresetId,
+                galleryLayout,
             });
             router.push(`/admin/projects/${projectId}/edit/showcase`);
         } catch (e) {
@@ -217,11 +253,15 @@ export default function GalleryPage({
                         type='button'
                         variant='ghost'
                         onClick={() =>
-                            fa.append({
+                            // Новое поле — сразу под кнопкой (insert 0),
+                            // а не в конце списка: фотограф добавляет
+                            // фото 20+ раз подряд, скроллить к низу
+                            // после каждого добавления недопустимо (53)
+                            fa.insert(0, {
                                 fileId: '',
                                 assetType: section.key,
                                 caption: '',
-                                order: fa.fields.length,
+                                order: 0,
                             })
                         }
                     >
@@ -232,7 +272,7 @@ export default function GalleryPage({
                 {fa.fields.map((field, index) => (
                     <div
                         key={field.id}
-                        className='mb-3 flex items-center gap-3 rounded-md border border-outline-variant p-3'
+                        className='mb-3 flex items-start gap-3 rounded-md border border-outline-variant p-3'
                     >
                         <div className='min-w-0 flex-1'>
                             <ImageUploaderField
@@ -311,6 +351,43 @@ export default function GalleryPage({
 
                 {/* Wireframe */}
                 {renderSection(SECTIONS[1])}
+
+                {/* Final Gallery Layout — решение (51): editorial /
+                    masonry / stack; пикер рядом с загрузкой фото */}
+                <div className='flex flex-col gap-3'>
+                    <Title variant='headline-md'>
+                        Final gallery layout
+                    </Title>
+                    <div className='grid gap-3 sm:grid-cols-3'>
+                        {GALLERY_LAYOUTS.map((option) => (
+                            <label
+                                key={option.value}
+                                className={cn(
+                                    'flex cursor-pointer flex-col gap-1 rounded-lg border p-4 transition-colors',
+                                    galleryLayout === option.value
+                                        ? 'border-primary bg-[rgba(11,110,79,0.04)]'
+                                        : 'border-outline-variant',
+                                )}
+                            >
+                                <input
+                                    type='radio'
+                                    name='galleryLayout'
+                                    className='sr-only'
+                                    checked={galleryLayout === option.value}
+                                    onChange={() =>
+                                        setGalleryLayout(option.value)
+                                    }
+                                />
+                                <span className='text-label-lg font-medium text-on-surface'>
+                                    {option.title}
+                                </span>
+                                <span className='text-body-sm text-on-surface-variant'>
+                                    {option.description}
+                                </span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Final Gallery */}
                 {renderSection(SECTIONS[2])}

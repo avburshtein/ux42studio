@@ -31,7 +31,9 @@ export function ResultsCard({ content, className }: ResultsCardProps) {
                     strokeLinejoin='round'
                 />
             </svg>
-            <span className='text-body-md text-on-surface'>
+            {/* min-w-0: иначе flex не сжимает span ниже самого длинного слова
+                (длинная строка без пробелов уезжала за карточку, mobile) */}
+            <span className='min-w-0 break-words text-body-md text-on-surface'>
                 {content}
             </span>
         </div>

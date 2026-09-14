@@ -13,6 +13,9 @@ import { MetricCard } from '@/components/case/MetricCard';
 import { PersonaCard } from '@/components/case/PersonaCard';
 import { BeforeAfterComparison } from '@/components/case/BeforeAfterComparison';
 import { GalleryGrid } from '@/components/case/GalleryGrid';
+import { ShowcaseGallery } from '@/components/case/ShowcaseGallery';
+import { MasonryGallery } from '@/components/case/MasonryGallery';
+import { JustifiedGallery } from '@/components/case/JustifiedGallery';
 import { MoodboardGrid } from '@/components/case/MoodboardGrid';
 import { DesignSystemColors } from '@/components/case/DesignSystemColors';
 import { TypographyScale } from '@/components/case/TypographyScale';
@@ -177,6 +180,10 @@ export default async function ProjectPage({ params }: PageProps) {
         url: a.file?.r2Key ? getImageUrl(a.file.r2Key) : undefined,
         caption: a.caption,
         alt: a.caption ?? undefined,
+        // Натуральные размеры кадра — для masonry/stack (решение (51));
+        // editorial-слоты их не используют (кроп в фикс. слоты)
+        width: a.file?.width,
+        height: a.file?.height,
     });
 
     const moodboardAssets = assets
@@ -188,6 +195,10 @@ export default async function ProjectPage({ params }: PageProps) {
     const finalGalleryAssets = assets
         .filter((a) => a.assetType === 'final_gallery')
         .map(toAsset);
+
+    // Вариант лейаута финальной галереи (решение (51) 2026-09-14):
+    // editorial (дефолт) / masonry / stack — задаётся в админке
+    const galleryLayout = project.galleryLayout ?? 'editorial';
 
     const resultItems = items.filter((i) => i.type === 'result');
     const toolItems = items.filter((i) => i.type === 'tool');
@@ -490,13 +501,31 @@ export default async function ProjectPage({ params }: PageProps) {
                                     description={project.finalDescription}
                                 >
                                     <div className='flex flex-col gap-8'>
-                                        {/* Showcase Images */}
-                                        {finalGalleryAssets.length > 0 && (
-                                            <GalleryGrid
-                                                assets={finalGalleryAssets}
-                                                showcase
-                                            />
-                                        )}
+                                        {/* Showcase Images — лейаут по
+                                            projects.galleryLayout (решения
+                                            (51)-(52)): editorial / masonry /
+                                            justified, у всех общий лайтбокс */}
+                                        {finalGalleryAssets.length > 0 &&
+                                            (galleryLayout === 'masonry' ? (
+                                                <MasonryGallery
+                                                    assets={
+                                                        finalGalleryAssets
+                                                    }
+                                                />
+                                            ) : galleryLayout ===
+                                              'justified' ? (
+                                                <JustifiedGallery
+                                                    assets={
+                                                        finalGalleryAssets
+                                                    }
+                                                />
+                                            ) : (
+                                                <ShowcaseGallery
+                                                    assets={
+                                                        finalGalleryAssets
+                                                    }
+                                                />
+                                            ))}
 
                                         {/* Hi-Fi Prototype Link */}
                                         {project.figmaPrototypeUrl && (

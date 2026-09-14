@@ -9,18 +9,17 @@ interface GalleryGridProps {
         alt?: string;
     }>;
     columns?: 1 | 2 | 3;
-    showcase?: boolean;
     masonry?: boolean;
     className?: string;
 }
 
-// Сетка изображений: wireframes (2 колонки) или showcase (1 колонка, full-width)
+// Сетка изображений: wireframes (2 колонки) или moodboard-пресет (masonry)
 // Figma: Wireframes Grid [199:57] — 2×2, gap=24
-// Figma: Showcase Image (master 410:539) — 1072×420, radius=16
+// Showcase-галерея финала вынесена в ShowcaseGallery (решение (50)
+// 2026-09-14 в Main_page_Spec.md)
 export function GalleryGrid({
     assets,
     columns = 2,
-    showcase = false,
     masonry = false,
     className,
 }: GalleryGridProps) {
@@ -54,44 +53,6 @@ export function GalleryGrid({
                             />
                         )}
                     </div>
-                ))}
-            </div>
-        );
-    }
-
-    if (showcase) {
-        return (
-            // Карусель <sm (слайд = одна showcase-картинка 4/3), ≥sm —
-            // вертикальный стек full-width 1072/420 по спеке
-            <div
-                className={cn(
-                    '-mr-4 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pr-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mr-0 sm:flex-col sm:gap-6 sm:overflow-x-visible sm:pb-0 sm:pr-0 sm:snap-none sm:[&>*]:basis-auto',
-                    className,
-                )}
-            >
-                {assets.map((asset) => (
-                    <figure
-                        key={asset.id}
-                        className='flex flex-col gap-3'
-                    >
-                        {/* 4/3 на <sm: 1072/420 даёт плоскую ленту 343×134 */}
-                        <div className='relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-surface-variant sm:aspect-[1072/420]'>
-                            {asset.url && (
-                                <Image
-                                    src={asset.url}
-                                    alt={asset.alt ?? asset.caption ?? ''}
-                                    fill
-                                    sizes='(max-width: 640px) 100vw, 1072px'
-                                    className='object-cover'
-                                />
-                            )}
-                        </div>
-                        {asset.caption && (
-                            <figcaption className='text-body-sm text-on-surface-variant'>
-                                {asset.caption}
-                            </figcaption>
-                        )}
-                    </figure>
                 ))}
             </div>
         );
@@ -132,7 +93,10 @@ export function GalleryGrid({
                         )}
                     </div>
                     {asset.caption && (
-                        <figcaption className='text-body-sm text-on-surface-variant'>
+                        <figcaption
+                            title={asset.caption}
+                            className='min-w-0 truncate text-left text-body-sm text-on-surface-variant'
+                        >
                             {asset.caption}
                         </figcaption>
                     )}
