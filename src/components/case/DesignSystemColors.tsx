@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Switch } from '@/components/ui/Switch';
 
@@ -56,9 +56,11 @@ function ContrastBadge({
     textColor: string;
 }) {
     return (
+        // a11y (LH color-contrast): opacity 0.7 ронял контраст бейджа
+        // ниже AA — цвет теперь сплошной
         <span
             className='text-[10px] font-medium leading-4'
-            style={{ color: textColor, opacity: 0.7 }}
+            style={{ color: textColor }}
         >
             {ratio.toFixed(1)}:1 {level}
         </span>
@@ -161,6 +163,20 @@ export function DesignSystemColors({
 }: DesignSystemColorsProps) {
     const [darkMode, setDarkMode] = useState(false);
 
+    // Синхронизация с темой сайта: data-theme на <html> ставит и
+    // ThemeProvider, и inline-скрипт. По умолчанию схема раздела = тема
+    // сайта (тёмная тема → тёмные Color Tokens), ручной переключатель
+    // Dark/Light Scheme работает как override до следующей смены темы.
+    useEffect(() => {
+        const root = document.documentElement;
+        const sync = () =>
+            setDarkMode(root.getAttribute('data-theme') === 'dark');
+        sync();
+        const obs = new MutationObserver(sync);
+        obs.observe(root, { attributes: true, attributeFilter: ['data-theme'] });
+        return () => obs.disconnect();
+    }, []);
+
     if (roles.length === 0) return null;
 
     const isDark = darkMode;
@@ -185,7 +201,7 @@ export function DesignSystemColors({
     return (
         <div className={cn('flex w-full flex-col gap-6', className)}>
             {/* Заголовок «COLOR TOKENS» (раздел 3) */}
-            <p className='text-[11px] font-semibold uppercase leading-4 tracking-[0.5px] text-outline'>
+            <p className='text-[11px] font-semibold uppercase leading-4 tracking-[0.5px] text-on-surface-variant'>
                 Color Tokens
             </p>
 
@@ -205,11 +221,22 @@ export function DesignSystemColors({
                         className='text-base font-medium leading-6'
                         style={{ color: isDark ? '#E4E2E3' : '#1B1B1D' }}
                     >
-                        {isDark ? 'Light Scheme' : 'Dark Scheme'}
+                        {/* Подпись = ТЕКУЩАЯ схема раздела (следует теме
+                            сайта); свитч переключает на противоположную.
+                            Раньше показывали целевую схему — сбивало при
+                            синхронизации с темой */}
+                        {isDark ? 'Dark Scheme' : 'Light Scheme'}
                     </span>
+                    {/* a11y (LH button-name): у свитча нет текста — имя
+                        даёт aria-label */}
                     <Switch
                         checked={isDark}
                         onCheckedChange={setDarkMode}
+                        aria-label={
+                            isDark
+                                ? 'Switch to light scheme'
+                                : 'Switch to dark scheme'
+                        }
                     />
                 </div>
 

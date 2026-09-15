@@ -437,3 +437,21 @@ export async function removeSocialLink(linkId: string) {
  • Review (последний шаг): одна primary «Save» через WizardSaveBar(nextHidden)
    + индикатор «Saved ✓» (актуально при publish=true, когда страница
    остаётся открытой с превью-ссылкой).
+
+## Кадрирование изображений кейса (2026-09-15)
+
+**(59)** Кроппер ImageCropperDialog включён на всех загрузчиках кейса,
+        КРОМЕ мудборда (AdminGridEditor — отдельный механизм, не тронут):
+        • General → Cover Image: cropRatio 16/9 (= слот);
+        • Research → Persona Avatar: cropRatio 1 (круглый);
+        • Showcase → Before/After: cropRatio 4/3 (публичный слот
+          BeforeAfterComparison aspect-[4/3]; превью в админке было
+          16/10 — выровнено на 4/3);
+        • Gallery (case gallery): свободный режим crop (слоты editorial/
+          masonry/justified не имеют фиксированного aspect) — рамка =
+          пропорция исходника, зумом выбирается фрагмент;
+        • Review → Avatar: cropRatio 1 (круглый).
+        Механика: cropRatio фиксирует пропорцию рамки; crop без cropRatio
+        → aspectRatio undefined в диалоге → ratio = naturalWidth/Height.
+        Экспорт ≤1600px по большей стороне — будущие загрузки не будут
+        «огромными» (главная статья image-delivery в Lighthouse).

@@ -322,6 +322,7 @@ export default function GeneralPage({
                             setValue('coverFileId', fileId ?? '')
                         }
                         aspectRatio={16 / 9}
+                        cropRatio={16 / 9}
                     />
                 </div>
 

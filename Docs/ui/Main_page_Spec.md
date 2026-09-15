@@ -910,3 +910,31 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
         по hover (title) и в лайтбоксе — там caption сознательно остался
         многострочным по центру (контекст чтения, не подпись-ярлык).
 
+
+### Обновление 2026-09-15 (Lighthouse-зачистка + тема)
+
+**(56)** Карточка «Up next / next case» (NextProjectShowcase) — фон
+        bg-background (нежно-зелёный #f7faf5, как у футера) вместо
+        серого bg-surface-container-low; hover:bg-surface-container.
+        В тёмной теме карточка темнее секции — та же логика, что у футера.
+
+**(57)** Раздел Color Tokens (DesignSystemColors) следует теме сайта:
+        data-theme на <html> синхронизирует светлую/тёмную схему
+        раздела (MutationObserver на атрибут). Ручной переключатель
+        Dark/Light Scheme остаётся override до следующей смены темы.
+        Ранее раздел всегда стартовал в светлой схеме.
+
+**(58)** Lighthouse (mobile, a11y 90→) — кодовые фиксы:
+        • color-contrast: мелкие overline-подписи секций (BlockLabel
+          «text-outline-variant», SectionLabel «text-outline») и заголовок
+          «Color Tokens» → text-on-surface-variant (passes AA в обеих
+          темах; вызовы с text-primary не задеты — tailwind-merge);
+        • ContrastBadge: убрана opacity 0.7 (полупрозрачность роняла
+          контраст ниже AA);
+        • button-name: Switch схемы Color Tokens получил aria-label
+          (Radix-кнопка без текста).
+        Perf-статьи отчёта (server 2.7s, unminified, bf-cache: no-store
+        + WebSocket, source maps) — артефакты dev-сервера localhost,
+        не код; image-delivery (~7.4MB) лечится кадрированием (решение
+        (59) в 03-admin-wizard.md: загрузка ≤1600px, повторная загрузка
+        кейс-изображений через кроппер).

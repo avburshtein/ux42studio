@@ -17,6 +17,12 @@ type ImageUploaderProps = {
      * кадрированное изображение (пропорция = пропорции слота на странице).
      */
     cropRatio?: number;
+    /**
+     * Включить кадрирование без фикс. пропорции слота: рамка = пропорция
+     * выбранного изображения, зум/пан выбирают фрагмент. Для галерей
+     * кейса, где слоты не имеют фиксированного aspect.
+     */
+    crop?: boolean;
     compact?: boolean;
 };
 
@@ -27,6 +33,7 @@ export default function ImageUploader({
     maxSize = 10 * 1024 * 1024,
     aspectRatio,
     cropRatio,
+    crop = false,
     compact = false,
 }: ImageUploaderProps) {
     const [isDragging, setIsDragging] = useState(false);
@@ -158,11 +165,13 @@ export default function ImageUploader({
     };
 
     /**
-     * Выбор файла: с cropRatio — сначала диалог кадрирования (SVG кадрируем
-     * как есть), без — сразу загрузка. Оригинал держим в ref для re-crop.
+     * Выбор файла: с crop/cropRatio — сначала диалог кадрирования (SVG
+     * кадрируем как есть), без — сразу загрузка. Оригинал держим в ref
+     * для re-crop.
      */
     const startCropFlow = (file: File) => {
-        if (!cropRatio || file.type === 'image/svg+xml') {
+        const cropEnabled = cropRatio !== undefined || crop;
+        if (!cropEnabled || file.type === 'image/svg+xml') {
             uploadFile(file);
             return;
         }
@@ -236,7 +245,7 @@ export default function ImageUploader({
                     >
                         <X className='h-3.5 w-3.5' />
                     </button>
-                    {cropRatio && (
+                    {(cropRatio || crop) && (
                         <button
                             type='button'
                             onClick={handleRecrop}
@@ -335,7 +344,7 @@ export default function ImageUploader({
                 </p>
             )}
 
-            {cropping && cropRatio && (
+            {cropping && (cropRatio || crop) && (
                 <ImageCropperDialog
                     src={cropping.url}
                     aspectRatio={cropRatio}

@@ -244,6 +244,7 @@ export default function ResearchPage({
                                             )
                                         }
                                         aspectRatio={1}
+                                        cropRatio={1}
                                     />
                                 </div>
                                 <div>

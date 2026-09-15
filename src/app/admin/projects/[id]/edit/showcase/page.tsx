@@ -218,7 +218,8 @@ export default function ShowcasePage({
                                                     fileId ?? '',
                                                 )
                                             }
-                                            aspectRatio={16 / 10}
+                                            aspectRatio={4 / 3}
+                                            cropRatio={4 / 3}
                                         />
                                     </div>
                                     <div>
@@ -235,7 +236,8 @@ export default function ShowcasePage({
                                                     fileId ?? '',
                                                 )
                                             }
-                                            aspectRatio={16 / 10}
+                                            aspectRatio={4 / 3}
+                                            cropRatio={4 / 3}
                                         />
                                     </div>
                                 </div>

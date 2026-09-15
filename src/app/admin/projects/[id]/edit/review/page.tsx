@@ -264,6 +264,8 @@ export default function ReviewPage({
                                                 fileId ?? '',
                                             )
                                         }
+                                        aspectRatio={1}
+                                        cropRatio={1}
                                     />
                                 </div>
                                 <input

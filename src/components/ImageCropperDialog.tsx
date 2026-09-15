@@ -20,8 +20,13 @@ import { Button } from '@/components/ui/Button';
 type ImageCropperDialogProps = {
     /** Object URL исходного изображения (не SVG). Освобождает вызывающий. */
     src: string;
-    /** Целевая пропорция кадра (width / height) — равна пропорции слота. */
-    aspectRatio: number;
+    /**
+     * Целевая пропорция кадра (width / height). Задана — рамка держит
+     * пропорцию слота (аватар/обложка/OG). Не задана — «свободный»
+     * режим: рамка = пропорция самого изображения, зумом выбирается
+     * любой фрагмент той же пропорции (кейс-галереи без фикс. слотов).
+     */
+    aspectRatio?: number;
     /** Исходный MIME (png/webp сохраняют тип, остальное → jpeg). */
     fileType: string;
     onApply: (croppedBlob: Blob) => void;
@@ -128,12 +133,15 @@ export default function ImageCropperDialog({
     /** Рамка кадра + масштаб «вписать целиком» (k). */
     const frame = useMemo(() => {
         if (!imgSize) return null;
+        // Пропорция кадра: слотовая (aspectRatio) либо самого изображения
+        // (свободный режим — рамка равна пропорции исходника)
+        const ratio = aspectRatio ?? imgSize.w / imgSize.h;
         const k = Math.min(vp.w / imgSize.w, vp.h / imgSize.h);
         const dispW = imgSize.w * k;
         const dispH = imgSize.h * k;
-        // Крупнейший вписанный прямоугольник пропорции aspectRatio
-        const fh = Math.min(dispH, dispW / aspectRatio);
-        return { w: fh * aspectRatio, h: fh, k };
+        // Крупнейший вписанный прямоугольник пропорции ratio
+        const fh = Math.min(dispH, dispW / ratio);
+        return { w: fh * ratio, h: fh, k };
     }, [imgSize, vp, aspectRatio]);
 
     // Текущий масштаб: от «вписанного» (zoom 0) до ZOOM_MAX_FACTOR ×

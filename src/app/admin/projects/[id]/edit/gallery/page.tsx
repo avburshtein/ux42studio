@@ -294,6 +294,7 @@ export default function GalleryPage({
                         <div className='min-w-0 flex-1'>
                             <ImageUploaderField
                                 compact
+                                crop
                                 value={
                                     watch(`${section.key}.${index}.fileId`) ||
                                     null
