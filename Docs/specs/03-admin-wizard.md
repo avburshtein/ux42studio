@@ -419,3 +419,21 @@ export async function removeSocialLink(linkId: string) {
 | Создать    | `src/app/admin/profile/page.tsx`                     |
 | Создать    | `src/lib/actions/projects.ts`                        |
 | Создать    | `src/lib/actions/profile.ts`                         |
+
+## Обновление (2026-09-15) — раздельные кнопки Save / Save & Next
+
+Раньше в футере каждого шага визарда кейса была одна кнопка «Save & Next →»
+(submit: сохранение + router.push на следующий шаг) — чтобы просто сохранить,
+приходилось перескакивать на другой раздел.
+
+Теперь: новый общий компонент src/components/admin/WizardSaveBar.tsx.
+ • «Save» (outline, type=button, onClick=handleSubmit(onSaveOnly)) — сохранить
+   и ОСТАТЬСЯ на разделе; рядом на 2.5 с появляется индикатор «Saved ✓»
+   (хук useSavedFlag), после чего можно открыть «Просмотр страницы».
+ • «Save & Next →» (primary, type=submit) — прежнее поведение: сохранение +
+   переход к следующему разделу.
+ • В шагах: onSubmit разбит на submitData (общее сохранение, возвращает
+   успех) + onSubmit (сейв → push next) + onSaveOnly (сейв → markSaved).
+ • Review (последний шаг): одна primary «Save» через WizardSaveBar(nextHidden)
+   + индикатор «Saved ✓» (актуально при publish=true, когда страница
+   остаётся открытой с превью-ссылкой).

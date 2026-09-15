@@ -6,6 +6,9 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
+import WizardSaveBar, {
+    useSavedFlag,
+} from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
@@ -40,6 +43,7 @@ export default function ShowcasePage({
     const router = useRouter();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
+    const [saved, markSaved] = useSavedFlag();
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
@@ -86,8 +90,8 @@ export default function ShowcasePage({
             .catch(() => {});
     }, [projectId, reset]);
 
-    const onSubmit = async (data: FormData) => {
-        if (!projectId) return;
+    const submitData = async (data: FormData): Promise<boolean> => {
+        if (!projectId) return false;
         setSaving(true);
         setError(null);
         try {
@@ -101,11 +105,24 @@ export default function ShowcasePage({
                     afterText: c.afterText || undefined,
                 })),
             });
-            router.push(`/admin/projects/${projectId}/edit/results`);
+            return true;
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
+            return false;
         } finally {
             setSaving(false);
+        }
+    };
+
+    const onSubmit = async (data: FormData) => {
+        if (await submitData(data)) {
+            router.push(`/admin/projects/${projectId}/edit/results`);
+        }
+    };
+
+    const onSaveOnly = async (data: FormData) => {
+        if (await submitData(data)) {
+            markSaved();
         }
     };
 
@@ -270,9 +287,11 @@ export default function ShowcasePage({
                     >
                         ← Back
                     </Button>
-                    <Button type='submit' disabled={saving}>
-                        {saving ? 'Saving...' : 'Save & Next →'}
-                    </Button>{' '}
+                    <WizardSaveBar
+                        saving={saving}
+                        saved={saved}
+                        onSave={handleSubmit(onSaveOnly)}
+                    />
                 </div>
             </form>
         </div>

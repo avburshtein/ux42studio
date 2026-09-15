@@ -6,6 +6,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
+import WizardSaveBar, {
+    useSavedFlag,
+} from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
@@ -53,6 +56,7 @@ export default function GeneralPage({
     const router = useRouter();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
+    const [saved, markSaved] = useSavedFlag();
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [slugTouched, setSlugTouched] = useState(false);
@@ -155,8 +159,8 @@ export default function GeneralPage({
         }
     };
 
-    const onSubmit = async (data: FormData) => {
-        if (!projectId) return;
+    const submitData = async (data: FormData): Promise<boolean> => {
+        if (!projectId) return false;
         setSaving(true);
         setError(null);
         try {
@@ -175,11 +179,24 @@ export default function GeneralPage({
                 webPrototypeUrl: data.webPrototypeUrl || undefined,
                 categoryIds: data.categoryIds ?? [],
             });
-            router.push(`/admin/projects/${projectId}/edit/problem`);
+            return true;
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
+            return false;
         } finally {
             setSaving(false);
+        }
+    };
+
+    const onSubmit = async (data: FormData) => {
+        if (await submitData(data)) {
+            router.push(`/admin/projects/${projectId}/edit/problem`);
+        }
+    };
+
+    const onSaveOnly = async (data: FormData) => {
+        if (await submitData(data)) {
+            markSaved();
         }
     };
 
@@ -384,9 +401,11 @@ export default function GeneralPage({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
                 <div className='flex justify-end gap-3 pt-4'>
-                    <Button type='submit' disabled={saving}>
-                        {saving ? 'Saving...' : 'Save & Next →'}
-                    </Button>
+                    <WizardSaveBar
+                        saving={saving}
+                        saved={saved}
+                        onSave={handleSubmit(onSaveOnly)}
+                    />
                 </div>
             </form>
         </div>

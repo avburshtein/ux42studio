@@ -6,6 +6,9 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
+import WizardSaveBar, {
+    useSavedFlag,
+} from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Card } from '@/components/ui/Card';
@@ -53,6 +56,7 @@ export default function ReviewPage({
     const router = useRouter();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
+    const [saved, markSaved] = useSavedFlag();
     const [error, setError] = useState<string | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [projectStatus, setProjectStatus] = useState<string | null>(null);
@@ -139,6 +143,7 @@ export default function ReviewPage({
                 return;
             }
 
+            markSaved();
             if (data.publish) {
                 const info = await getProjectPreviewInfo(projectId);
                 if (info) {
@@ -369,9 +374,13 @@ export default function ReviewPage({
                         ← Back
                     </Button>
                     <div className='flex gap-3'>
-                        <Button type='submit' disabled={saving}>
-                            {saving ? 'Saving...' : 'Save'}
-                        </Button>
+                        <WizardSaveBar
+                            saving={saving}
+                            saved={saved}
+                            onSave={handleSubmit(onSubmit)}
+                            nextHidden
+                            saveVariant='default'
+                        />
                     </div>
                 </div>
             </form>
