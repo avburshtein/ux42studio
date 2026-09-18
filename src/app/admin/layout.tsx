@@ -5,6 +5,7 @@ import { getDb } from '@/db';
 import Link from 'next/link';
 import { logout } from '@/lib/actions/auth';
 import { LogOut } from 'lucide-react';
+import { ThemeToggle } from '@/components/case/ThemeToggle';
 import type { Metadata } from 'next';
 
 // C4 (решение (42)): приватная зона — noindex/nofollow (robots.txt уже
@@ -77,15 +78,20 @@ export default async function AuthLayout({
                                 )}
                             </nav>
                         </div>
-                        <form action={logout}>
-                            <button
-                                type='submit'
-                                className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                            >
-                                <LogOut className='h-4 w-4' />
-                                Выйти
-                            </button>
-                        </form>
+                        <div className='flex items-center gap-2'>
+                            {/* Переключатель темы доступен на всех шагах
+                                админки (ThemeProvider — в корневом layout) */}
+                            <ThemeToggle className='h-9 w-9' />
+                            <form action={logout}>
+                                <button
+                                    type='submit'
+                                    className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                >
+                                    <LogOut className='h-4 w-4' />
+                                    Выйти
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </header>

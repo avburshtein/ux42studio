@@ -3,6 +3,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { logout } from '@/lib/actions/auth';
 import { LogOut } from 'lucide-react';
+import { ThemeToggle } from '@/components/case/ThemeToggle';
 import type { Metadata } from 'next';
 
 // C4 (решение (42)): приватная зона — noindex/nofollow (robots.txt уже
@@ -50,15 +51,19 @@ export default async function SuperAdminLayout({
                             </Link>
                         ))}
                     </nav>
-                    <form action={logout}>
-                        <button
-                            type='submit'
-                            className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                        >
-                            <LogOut className='h-4 w-4' />
-                            Выйти
-                        </button>
-                    </form>
+                    <div className='ml-auto flex items-center gap-2'>
+                        {/* Переключатель темы на всех шагах суперадминки */}
+                        <ThemeToggle className='h-9 w-9' />
+                        <form action={logout}>
+                            <button
+                                type='submit'
+                                className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                            >
+                                <LogOut className='h-4 w-4' />
+                                Выйти
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </header>
             <div className='mx-auto max-w-7xl px-8 pt-4'>{children}</div>

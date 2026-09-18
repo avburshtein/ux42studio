@@ -996,3 +996,12 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
         (аудит скриптом WCAG-формулы: default 9.01/7.73, outline/ghost
         16.33/14.40, link 8.56/10.89, destructive 5.77/5.65,
         surface-badge 7.22/5.48).
+
+### Обновление 2026-09-18 — переключатель темы в приватной зоне
+
+**(62)** ThemeToggle (Sun/Moon) добавлен в хедеры всех приватных layout-ов:
+        admin (рядом с «Выйти»), super-admin (ml-auto, рядом с «Выйти»),
+        (auth) — fixed в правом верхнем углу (login/register).
+        ThemeProvider уже в корневом layout с anti-flash inline-скриптом —
+        тема работала, просто не было переключателя. Состояние хранится
+        в localStorage, синхронизируется с <html data-theme>.
