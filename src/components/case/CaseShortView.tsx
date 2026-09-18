@@ -87,7 +87,7 @@ export function CaseShortView({
                 поэтому title/теги «исчезали» под обложкой (фидбэк 2026-09-18). */}
             <header className='bg-background pb-8'>
                 <div className='section-container flex w-full flex-col gap-6'>
-                    <div className='relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
+                    <div className='cover-shell relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
                         {coverUrl ? (
                             <Image
                                 src={coverUrl}
@@ -174,7 +174,7 @@ export function CaseShortView({
                             {metrics.map((metric, i) => (
                                 <div
                                     key={i}
-                                    className='rounded-2xl border border-outline-variant bg-surface-container-lowest p-6'
+                                    className='print-avoid rounded-2xl border border-outline-variant bg-surface-container-lowest p-6'
                                 >
                                     <p className='font-display text-headline-sm text-primary'>
                                         {metric.value}
@@ -197,7 +197,7 @@ export function CaseShortView({
                             {keyScreens.map((asset) => (
                                 <div
                                     key={asset.id}
-                                    className='relative aspect-[4/3] overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest'
+                                    className='print-avoid relative aspect-[4/3] overflow-hidden rounded-2xl border border-outline-variant bg-surface-container-lowest'
                                 >
                                     {asset.url && (
                                         <Image
@@ -223,8 +223,8 @@ export function CaseShortView({
                     </section>
                 )}
 
-                {/* CTA → полный кейс */}
-                <section className='flex flex-col items-start gap-6 border-t border-outline-variant pt-8'>
+                {/* CTA → полный кейс (на печатной версии скрыт) */}
+                <section className='no-print flex flex-col items-start gap-6 border-t border-outline-variant pt-8'>
                     <Link
                         href={fullCaseHref}
                         className='inline-flex h-12 items-center gap-2 rounded-5xl bg-primary px-6 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'

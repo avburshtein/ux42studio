@@ -1,10 +1,12 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { CaseShortView } from '@/components/case/CaseShortView';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
+import { PrintTldrButton } from '@/components/case/PrintTldrButton';
 
 export const revalidate = 3600;
 
@@ -134,7 +136,8 @@ export default async function CaseShortPage({ params }: PageProps) {
         }));
 
     return (
-        <div className='min-h-screen bg-surface-container-low'>
+        // print-short — scope для @media print (globals.css): печать/PDF
+        <div className='print-short min-h-screen bg-surface-container-low'>
             {/* Шапка — breadcrumb-вариант, как на полном кейсе (фидбэк
                 2026-09-18: Work/About на глубокой странице не работают —
                 это якоря страницы профиля; здесь место занято крошками). */}
@@ -166,6 +169,12 @@ export default async function CaseShortPage({ params }: PageProps) {
                 profileHeadline={profile.headline}
                 socialLinks={socialLinks}
             />
+            {/* Плавающая «Скачать PDF» (window.print). useSearchParams
+                требует Suspense-границы на статическом роуте. ?print=1 —
+                автозапуск диалога (кнопка «Скачать PDF» на Review-шаге). */}
+            <Suspense fallback={null}>
+                <PrintTldrButton />
+            </Suspense>
         </div>
     );
 }

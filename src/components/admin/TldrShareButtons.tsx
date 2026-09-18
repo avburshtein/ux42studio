@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Check, Link2, FileText } from 'lucide-react';
+import { Check, Link2, FileText, Printer } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 
@@ -69,6 +69,18 @@ export function TldrShareButtons({ shortUrl, previewHref }: TldrShareButtonsProp
                     </>
                 )}
             </Button>
+            {/* PDF — print-CSS версия TL;DR: открываем /short?print=1,
+                там диалог печати открывается сам (PrintTldrButton) */}
+            <Link
+                href={`${previewHref}?print=1`}
+                target='_blank'
+                rel='noopener noreferrer'
+            >
+                <Button type='button' variant='outline'>
+                    <Printer className='h-4 w-4' aria-hidden='true' />
+                    Скачать PDF
+                </Button>
+            </Link>
         </div>
     );
 }
