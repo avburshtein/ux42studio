@@ -84,6 +84,13 @@ export const projects = sqliteTable(
             .notNull()
             .default('draft'), //[cite: 1]
         showOnHomepage: integer('show_on_homepage').notNull().default(1),
+
+        // Ручной порядок кейса в галерее дизайнера (Manual-режим сортировки,
+        // решения 2026-09-16). Меньше значение = выше в списке; авто-режимы
+        // (newest/oldest/A-Z) поле игнорируют. Backfill в миграции — по
+        // дате публикации (новейший = 0).
+        sortOrder: integer('sort_order').notNull().default(0),
+
         viewsCount: integer('views_count').notNull().default(0),
 
         publishedAt: integer('published_at'),

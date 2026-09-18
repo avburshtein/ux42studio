@@ -11,6 +11,7 @@ import type { GalleryLayout } from '@/db/schema/projects';
 import { categories } from '@/db/schema/categories';
 import { files } from '@/db/schema/files';
 import { profiles } from '@/db/schema/profiles';
+import type { CaseSortMode } from '@/db/schema/profiles';
 import { colorRoles } from '@/db/schema/color-roles';
 import {
     projectPersonas,
@@ -22,6 +23,7 @@ import {
 } from '@/db/schema/project-details';
 import { eq, and, inArray, asc, desc, sql } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
 import { slugify } from '@/lib/utils/slug';
 
 // ---- Section 00: Meta ----
@@ -1349,4 +1351,64 @@ export async function deleteProject(projectId: string) {
     }
 
     revalidatePath('/admin');
+}
+
+// ---- Case sorting (Manual / Auto) ----
+// Ручной порядок — projects.sort_order (asc), режим — profiles.case_sort_mode.
+// Решение 2026-09-16: панель сортировки кейсов (CaseSortManager в /admin).
+
+/** Профиль текущей сессии (x-user-id ставит middleware). */
+async function getAdminProfile(): Promise<{ id: string; slug: string }> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) throw new Error('Unauthorized');
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+    const profile = await db.query.profiles.findFirst({
+        where: { userId },
+        columns: { id: true, slug: true },
+    });
+    if (!profile) throw new Error('Profile not found');
+    return profile;
+}
+
+/** Сохраняет режим сортировки кейсов (Manual/Auto). */
+export async function setCaseSortMode(mode: CaseSortMode) {
+    const profile = await getAdminProfile();
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+    await db
+        .update(profiles)
+        .set({ caseSortMode: mode })
+        .where(eq(profiles.id, profile.id));
+    revalidatePath('/admin');
+    revalidatePath(`/u/${profile.slug}`);
+}
+
+/**
+ * Сохраняет ручной порядок кейсов: индекс в массиве = sort_order.
+ * Все id обязаны принадлежать профилю текущей сессии.
+ */
+export async function reorderProjects(orderedIds: string[]) {
+    const profile = await getAdminProfile();
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+    const owned = await db
+        .select({ id: projects.id })
+        .from(projects)
+        .where(eq(projects.profileId, profile.id));
+    const ownedIds = new Set(owned.map((row) => row.id));
+    if (!orderedIds.every((id) => ownedIds.has(id))) {
+        throw new Error('Project does not belong to the profile');
+    }
+    // Паттерн как в reorderColorRoles: последовательные апдейты
+    // (список кейсов небольшой; db.batch требует кортеж-тип)
+    for (let index = 0; index < orderedIds.length; index++) {
+        await db
+            .update(projects)
+            .set({ sortOrder: index })
+            .where(eq(projects.id, orderedIds[index]));
+    }
+    revalidatePath('/admin');
+    revalidatePath(`/u/${profile.slug}`);
 }
