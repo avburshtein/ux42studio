@@ -42,7 +42,7 @@ export function Hero({
                 одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги
                 section-container 16/32), ≥lg — карта 1072 в контейнере:
                 верхние углы прямые, нижние скруглены (24) === */}
-            <div className='relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
+            <div className='relative -mx-4 h-[400px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[480px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}

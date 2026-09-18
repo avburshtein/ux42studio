@@ -42,7 +42,9 @@ export function BeforeAfterComparison({
                             </div>
                         )}
                     </div>
-                    <div className='flex items-center gap-2'>
+                    {/* items-start: текст описания — по верхнему краю строки
+                        относительно label, а не по центру (фидбэк) */}
+                    <div className='flex items-start gap-2'>
                         <span className='text-label-md font-semibold uppercase text-outline'>
                             Before
                         </span>
@@ -71,7 +73,7 @@ export function BeforeAfterComparison({
                             </div>
                         )}
                     </div>
-                    <div className='flex items-center gap-2'>
+                    <div className='flex items-start gap-2'>
                         <span className='text-label-md font-semibold uppercase text-primary'>
                             After
                         </span>

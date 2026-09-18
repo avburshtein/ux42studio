@@ -582,6 +582,8 @@ export async function updateProjectGallery(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    // Публичная страница кейса кэшируется (revalidate = 3600) — сбрасываем
+    revalidatePath('/', 'layout');
 }
 
 export async function getProjectGallery(projectId: string) {

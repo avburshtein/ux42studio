@@ -518,6 +518,8 @@ body {
 @media (max-width: 767px) {
   [id] {
     scroll-margin-top: 72px; /* mobile: шапка 64px + 8px */
+  }
+}
 
 /* ============================================================
    ПЕЧАТЬ / PDF — TL;DR (страница /short). Решение (65).
@@ -610,7 +612,13 @@ body {
   .print-short section > :first-child {
     break-after: avoid;
   }
-}
 
+  /* Цельные блоки не разрывать между страницами: карточки, цитаты,
+     подписи, обложка, кнопки. Перенос — по гапам между контейнерами. */
+  .print-short figure,
+  .print-short figure *,
+  .print-short button,
+  .print-short blockquote {
+    break-inside: avoid;
   }
 }

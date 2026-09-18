@@ -3,6 +3,7 @@ import { getDb } from '@/db';
 import { projects } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import type { Metadata } from 'next';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
@@ -118,7 +119,7 @@ export default async function ProjectPage({ params }: PageProps) {
     if (!project) notFound();
 
     // 3. Параллельная загрузка всех данных кейса
-    const [assets, personas, keyMetrics, comparisons, items, colorRolesData] =
+    const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews] =
         await Promise.all([
             db.query.projectAssets.findMany({
                 where: { projectId: project.id },
@@ -144,6 +145,11 @@ export default async function ProjectPage({ params }: PageProps) {
             }),
             db.query.colorRoles.findMany({
                 where: { projectId: project.id },
+                orderBy: { order: 'asc' },
+            }),
+            db.query.projectReviews.findMany({
+                where: { projectId: project.id },
+                with: { avatarFile: true },
                 orderBy: { order: 'asc' },
             }),
         ]);
@@ -583,7 +589,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                     title='What I learned.'
                                     description={project.keyTakeaway}
                                 >
-                                    {nextStepItems.length > 0 && (
+                                        {nextStepItems.length > 0 && (
                                         <div className='flex flex-col gap-6'>
                                             <SectionLabel>
                                                 Next steps
@@ -591,6 +597,59 @@ export default async function ProjectPage({ params }: PageProps) {
                                             <NextStepsList
                                                 items={nextStepItems}
                                             />
+                                        </div>
+                                    )}
+
+                                    {/* Client reviews [Sec 08] — цитаты + аватар/имя/роль */}
+                                    {reviews.length > 0 && (
+                                        <div className='flex flex-col gap-6'>
+                                            <SectionLabel>
+                                                Client reviews
+                                            </SectionLabel>
+                                            <div className='flex flex-col gap-8'>
+                                                {reviews.map((r) => (
+                                                    <figure
+                                                        key={r.id}
+                                                        className='flex flex-col gap-4'
+                                                    >
+                                                        <blockquote className='text-body-lg text-on-surface'>
+                                                            «{r.text}»
+                                                        </blockquote>
+                                                        <figcaption className='flex items-center gap-3'>
+                                                            {r.avatarFile
+                                                                ?.r2Key ? (
+                                                                <Image
+                                                                    src={getImageUrl(
+                                                                        r
+                                                                            .avatarFile
+                                                                            .r2Key,
+                                                                    )}
+                                                                    alt={
+                                                                        r.authorName
+                                                                    }
+                                                                    width={40}
+                                                                    height={40}
+                                                                    className='h-10 w-10 rounded-full object-cover'
+                                                                />
+                                                            ) : null}
+                                                            <div className='flex flex-col'>
+                                                                <span className='text-label-md font-semibold text-on-surface'>
+                                                                    {
+                                                                        r.authorName
+                                                                    }
+                                                                </span>
+                                                                {r.authorRole && (
+                                                                    <span className='text-body-sm text-on-surface-variant'>
+                                                                        {
+                                                                            r.authorRole
+                                                                        }
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        </figcaption>
+                                                    </figure>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                 </CaseSection>
