@@ -80,8 +80,10 @@ export default async function AuthLayout({
                         </div>
                         <div className='flex items-center gap-2'>
                             {/* Переключатель темы доступен на всех шагах
-                                админки (ThemeProvider — в корневом layout) */}
-                            <ThemeToggle className='h-9 w-9' />
+                                админки (ThemeProvider — в корневом layout).
+                                Размер 48×48 — по спеке (§74) и WCAG 2.5.5
+                                Target Size (AAA, 44px min); Material 3 = 48 */}
+                            <ThemeToggle />
                             <form action={logout}>
                                 <button
                                     type='submit'

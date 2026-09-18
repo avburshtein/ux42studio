@@ -52,8 +52,9 @@ export default async function SuperAdminLayout({
                         ))}
                     </nav>
                     <div className='ml-auto flex items-center gap-2'>
-                        {/* Переключатель темы на всех шагах суперадминки */}
-                        <ThemeToggle className='h-9 w-9' />
+                        {/* Переключатель темы на всех шагах суперадминки.
+                            48×48 — спека §74, WCAG 2.5.5 (AAA) */}
+                        <ThemeToggle />
                         <form action={logout}>
                             <button
                                 type='submit'
