@@ -110,7 +110,7 @@ function Slot({
     onOpen,
 }: SlotProps) {
     return (
-        <figure className='flex flex-col gap-2'>
+        <figure className='flex min-w-0 flex-col gap-2'>
             <button
                 type='button'
                 onClick={() => asset?.url && onOpen(index)}

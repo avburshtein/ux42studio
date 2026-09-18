@@ -77,13 +77,13 @@ export default function ResearchPage({
 
     const {
         fields: personaFields,
-        append: appendPersona,
+        append: prependPersona,
         remove: removePersona,
     } = useFieldArray({ control, name: 'personas' });
 
     const {
         fields: metricFields,
-        append: appendMetric,
+        append: prependMetric,
         remove: removeMetric,
     } = useFieldArray({ control, name: 'keyMetrics' });
 
@@ -185,7 +185,7 @@ export default function ResearchPage({
                                 type='button'
                                 variant='ghost'
                                 onClick={() =>
-                                    appendPersona({
+                                    prependPersona({
                                         nameAndAge: '',
                                         avatarFileId: '',
                                         role: '',
@@ -291,7 +291,7 @@ export default function ResearchPage({
                                 type='button'
                                 variant='ghost'
                                 onClick={() =>
-                                    appendMetric({ value: '', description: '' })
+                                    prependMetric({ value: '', description: '' })
                                 }
                             >
                                 + Add Metric

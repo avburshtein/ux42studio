@@ -1090,3 +1090,23 @@ hover заливка rgba(11,110,79,0.1) (transition-colors, без opacity).
             контента (break-after: avoid у первого ребёнка);
           – @page margin 14mm.
 
+### Обновление 2026-09-18 — фиксы печати и админки по фидбэку
+
+**(66)** Три бага после просмотра:
+
+        • PDF без картинок: Next Image грузит всё ниже фолда лениво —
+          при автопечати обложка и key screens не успевали. Fix:
+          waitForImages() в PrintTldrButton — перед window.print()
+          все <img> переключаются в loading=eager (триггерит загрузку
+          отложенных) и ждём load/error (таймаут 6 с + rAF на layout).
+        • Горизонтальный скролл на странице кейса: в ShowcaseGallery
+          figure (grid-элемент ряда «квадрат + плоское») без min-w-0
+          — длинный caption раздувал min-content колонки, третья
+          карточка вылезала за вьюпорт. Fix: min-w-0 на figure
+          (truncate у caption уже был).
+        • Новые items внизу списка: useFieldArray append в визарде.
+          Fix: prepend во всех списках админки — research (personas,
+          keyMetrics), results (results, tools, baCards), showcase
+          (comparisons). Новый пункт появляется сразу под кнопкой
+          «+ Add».
+

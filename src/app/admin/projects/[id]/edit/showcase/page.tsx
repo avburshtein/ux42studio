@@ -68,7 +68,7 @@ export default function ShowcasePage({
 
     const {
         fields: comparisonFields,
-        append: appendComparison,
+        append: prependComparison,
         remove: removeComparison,
     } = useFieldArray({ control, name: 'comparisons' });
 
@@ -157,7 +157,7 @@ export default function ShowcasePage({
                             type='button'
                             variant='ghost'
                             onClick={() =>
-                                appendComparison({
+                                prependComparison({
                                     featureName: '',
                                     beforeFileId: '',
                                     afterFileId: '',
