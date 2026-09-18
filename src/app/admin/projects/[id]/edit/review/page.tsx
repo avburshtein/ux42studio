@@ -23,6 +23,7 @@ import {
 } from '@/lib/actions/projects';
 import Link from 'next/link';
 import SectionsVisibilityEditor from '@/components/admin/SectionsVisibilityEditor';
+import { TldrShareButtons } from '@/components/admin/TldrShareButtons';
 
 const reviewItemSchema = z.object({
     id: z.string().optional(),
@@ -360,6 +361,28 @@ export default function ReviewPage({
                                 </Link>
                             </p>
                         )}
+                    </div>
+                )}
+
+                {/* TL;DR — короткая версия кейса для hiring manager.
+                    Авто-генерируется из уже структурированных данных;
+                    дизайнер только копирует ссылку. Решение (63).
+                    Показываем только для опубликованных проектов (есть URL). */}
+                {previewUrl && (
+                    <div className='flex flex-col gap-2 rounded-lg border border-outline-variant bg-surface-container-low p-4'>
+                        <p className='text-label-md font-medium text-on-surface'>
+                            Короткая версия (TL;DR)
+                        </p>
+                        <p className='text-body-sm text-on-surface-variant'>
+                            Авто-сводка из метаданных кейса — для рекрутеров
+                            и отклика на вакансию.
+                        </p>
+                        <div className='mt-1'>
+                            <TldrShareButtons
+                                shortUrl={`${previewUrl}/short`}
+                                previewHref={`${previewUrl}/short`}
+                            />
+                        </div>
                     </div>
                 )}
 
