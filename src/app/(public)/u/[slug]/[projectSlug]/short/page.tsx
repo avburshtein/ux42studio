@@ -3,7 +3,7 @@ import { getDb } from '@/db';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { CaseShortView } from '@/components/case/CaseShortView';
-import { SiteHeader } from '@/components/case/SiteHeader';
+import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
 
 export const revalidate = 3600;
@@ -135,9 +135,13 @@ export default async function CaseShortPage({ params }: PageProps) {
 
     return (
         <div className='min-h-screen bg-surface-container-low'>
-            <SiteHeader
+            {/* Шапка — breadcrumb-вариант, как на полном кейсе (фидбэк
+                2026-09-18: Work/About на глубокой странице не работают —
+                это якоря страницы профиля; здесь место занято крошками). */}
+            <SiteHeaderBreadcrumb
                 profileSlug={slug}
                 displayName={profile.fullName}
+                currentTitle={project.title}
                 ctaLabel='Hire me'
                 ctaHref='#contact'
             />

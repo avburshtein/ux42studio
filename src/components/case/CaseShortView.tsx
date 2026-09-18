@@ -2,7 +2,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { SectionLabel } from './BlockLabel';
-import { TagBadge } from './TagBadge';
 
 // ------------------------------------------------------------------
 // Типы — совпадают со структурой, которую отдаёт page.tsx роута /short
@@ -80,47 +79,68 @@ export function CaseShortView({
 
     return (
         <article className='min-h-screen bg-surface-container-low pb-16'>
-            {/* Hero — обложка + заголовок + метаданные */}
-            <header className='relative'>
-                {coverUrl && (
-                    <div className='relative h-[320px] w-full overflow-hidden bg-surface sm:h-[420px] lg:h-[480px]'>
-                        <Image
-                            src={coverUrl}
-                            alt={title}
-                            fill
-                            sizes='100vw'
-                            className='object-cover'
-                            priority
-                        />
+            {/* Hero — тот же паттерн, что у полного кейса (Hero.tsx):
+                full-bleed <lg, карта в контейнере ≥lg (rounded-b-3xl).
+                Заголовок/теги/teaser — absolute-оверлей ВНУТРИ обложки.
+                Раньше текстовый блок шёл соседом с отрицательным margin:
+                absolute-картинка (Image fill) рисуется выше in-flow контента,
+                поэтому title/теги «исчезали» под обложкой (фидбэк 2026-09-18). */}
+            <header className='bg-background pb-8'>
+                <div className='section-container flex w-full flex-col gap-6'>
+                    <div className='relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
+                        {coverUrl ? (
+                            <Image
+                                src={coverUrl}
+                                alt={title}
+                                fill
+                                sizes='(max-width: 1023px) 100vw, (max-width: 1263px) calc(100vw - 128px), 1072px'
+                                className='object-cover'
+                                priority
+                            />
+                        ) : (
+                            <div className='hero-block-gradient h-full w-full' />
+                        )}
+
+                        {/* Scrim gradient — тот же класс, что в Hero */}
                         <div
-                            className='absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent'
+                            className='hero-image-scrim absolute inset-0'
                             aria-hidden='true'
                         />
+
+                        {/* Title overlay — absolute bottom (паттерн Hero).
+                            Пилюли тегов — как на полном кейсе: полупрозрачный
+                            белый + blur, читаются на любом фото. */}
+                        <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-4 pb-6 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
+                            {categories.length > 0 && (
+                                <div className='flex flex-wrap gap-2'>
+                                    {categories.map((cat) => (
+                                        <span
+                                            key={cat}
+                                            className='inline-flex items-center rounded-full bg-[rgba(255,255,255,0.16)] px-3 py-1 text-label-sm font-medium uppercase tracking-[0.0455em] text-white backdrop-blur-sm'
+                                        >
+                                            {cat}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                            <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
+                                {title}
+                            </h1>
+                            {teaser && (
+                                <p className='max-w-3xl text-body-md text-white/80 sm:text-body-lg'>
+                                    {teaser}
+                                </p>
+                            )}
+                        </div>
                     </div>
-                )}
-                <div className='section-container -mt-20 flex flex-col gap-4 sm:-mt-28 lg:-mt-32'>
-                    <div className='flex flex-col gap-3'>
-                        {categories.length > 0 && (
-                            <div className='flex flex-wrap gap-2'>
-                                {categories.map((cat) => (
-                                    <TagBadge key={cat} label={cat} />
-                                ))}
-                            </div>
-                        )}
-                        <h1 className='font-display text-headline-sm text-on-surface lg:text-headline-md'>
-                            {title}
-                        </h1>
-                        {teaser && (
-                            <p className='text-body-lg text-on-surface-variant'>
-                                {teaser}
-                            </p>
-                        )}
-                        {metadata && (
-                            <p className='text-body-sm text-on-surface-variant'>
-                                {metadata}
-                            </p>
-                        )}
-                    </div>
+
+                    {/* Metadata-строка (client · year · duration · role) —
+                        под обложкой, по оси section-container */}
+                    {metadata && (
+                        <p className='text-body-sm text-on-surface-variant'>
+                            {metadata}
+                        </p>
+                    )}
                 </div>
             </header>
 
