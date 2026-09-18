@@ -42,7 +42,7 @@ export function Hero({
                 одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги
                 section-container 16/32), ≥lg — карта 1072 в контейнере:
                 верхние углы прямые, нижние скруглены (24) === */}
-            <div className='relative -mx-4 h-[400px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[480px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
+            <div className='relative -mx-4 flex min-h-[400px] w-[calc(100%+32px)] flex-col justify-end overflow-hidden bg-background sm:min-h-[480px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:min-h-[555px] lg:w-auto lg:rounded-b-3xl'>
                 {coverUrl ? (
                     <Image
                         src={coverUrl}
@@ -53,7 +53,7 @@ export function Hero({
                         priority
                     />
                 ) : (
-                    <div className='hero-block-gradient h-full w-full' />
+                    <div className='hero-block-gradient absolute inset-0' />
                 )}
 
                 {/* Scrim gradient (bottom→top dark) */}
@@ -62,11 +62,14 @@ export function Hero({
                     aria-hidden='true'
                 />
 
-                {/* Title overlay — absolute bottom.
+                {/* Title overlay — in-flow, прижат к низу (justify-end).
+                    Раньше был absolute bottom-0 в фикс. по высоте контейнере:
+                    длинные заголовок/teaser росли вверх и срезались верхним
+                    краем (тег не помещался). Теперь контейнер растёт по
+                    контенту (min-height), картинка/scrim — absolute-подложка.
                     Горизонтальные паддинги = осям section-container
-                    (16/32/64): картинка edge-to-edge контейнера, поэтому
-                    заголовок встаёт на одну вертикаль с текстом секций. */}
-                <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-4 pb-6 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
+                    (16/32/64): заголовок на одной вертикали с текстом секций. */}
+                <div className='relative z-10 flex flex-col gap-4 px-4 pb-6 pt-10 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
                     {categories.length > 0 && (
                         <div className='flex flex-wrap gap-2'>
                             {categories.map((cat) => (

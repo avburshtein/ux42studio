@@ -87,7 +87,7 @@ export function CaseShortView({
                 поэтому title/теги «исчезали» под обложкой (фидбэк 2026-09-18). */}
             <header className='bg-background pb-8'>
                 <div className='section-container flex w-full flex-col gap-6'>
-                    <div className='cover-shell relative -mx-4 h-[320px] w-[calc(100%+32px)] overflow-hidden bg-background sm:h-[420px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:h-[555px] lg:w-auto lg:rounded-b-3xl'>
+                    <div className='cover-shell relative -mx-4 flex min-h-[400px] w-[calc(100%+32px)] flex-col justify-end overflow-hidden bg-background sm:min-h-[480px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:min-h-[555px] lg:w-auto lg:rounded-b-3xl'>
                         {coverUrl ? (
                             <Image
                                 src={coverUrl}
@@ -98,7 +98,7 @@ export function CaseShortView({
                                 priority
                             />
                         ) : (
-                            <div className='hero-block-gradient h-full w-full' />
+                            <div className='hero-block-gradient absolute inset-0' />
                         )}
 
                         {/* Scrim gradient — тот же класс, что в Hero */}
@@ -107,10 +107,11 @@ export function CaseShortView({
                             aria-hidden='true'
                         />
 
-                        {/* Title overlay — absolute bottom (паттерн Hero).
-                            Пилюли тегов — как на полном кейсе: полупрозрачный
-                            белый + blur, читаются на любом фото. */}
-                        <div className='absolute inset-x-0 bottom-0 flex flex-col gap-4 px-4 pb-6 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
+                        {/* Title overlay — in-flow, прижат к низу
+                            (паттерн Hero.tsx: контейнер растёт по контенту,
+                            длинный заголовок/теги не срезаются). Пилюли тегов —
+                            как на полном кейсе: полупрозрачный белый + blur. */}
+                        <div className='relative z-10 flex flex-col gap-4 px-4 pb-6 pt-10 sm:px-8 sm:pb-8 lg:px-16 lg:pb-16'>
                             {categories.length > 0 && (
                                 <div className='flex flex-wrap gap-2'>
                                     {categories.map((cat) => (

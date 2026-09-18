@@ -586,7 +586,10 @@ body {
 
   /* Обложка компактнее — целиком на первой странице */
   .print-short .cover-shell {
-    height: 250px !important;
+    /* height:auto + min-height: контейнер растёт по контенту — длинный
+       заголовок/теги/teaser больше не срезаются верхним краем (фидбэк) */
+    height: auto !important;
+    min-height: 250px !important;
     width: 100% !important;
     margin: 0 !important;
     border-radius: 1rem !important;

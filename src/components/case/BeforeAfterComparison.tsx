@@ -25,8 +25,13 @@ export function BeforeAfterComparison({
         <div className={cn('flex flex-col gap-6', className)}>
             <SectionLabel>{featureName}</SectionLabel>
             <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
-                {/* Before */}
+                {/* Before — label НАД изображением: текст описания ниже
+                    занимает всю ширину карточки, без отступа от inline-лейбла
+                    (фидбэк 2026-09-18) */}
                 <div className='flex flex-col gap-3'>
+                    <span className='text-label-md font-semibold uppercase text-outline'>
+                        Before
+                    </span>
                     <div className='relative aspect-[4/3] overflow-hidden rounded-base bg-surface-variant'>
                         {beforeUrl ? (
                             <Image
@@ -42,22 +47,18 @@ export function BeforeAfterComparison({
                             </div>
                         )}
                     </div>
-                    {/* items-start: текст описания — по верхнему краю строки
-                        относительно label, а не по центру (фидбэк) */}
-                    <div className='flex items-start gap-2'>
-                        <span className='text-label-md font-semibold uppercase text-outline'>
-                            Before
-                        </span>
-                        {beforeText && (
-                            <span className='text-body-sm text-on-surface-variant'>
-                                {beforeText}
-                            </span>
-                        )}
-                    </div>
+                    {beforeText && (
+                        <p className='text-body-sm text-on-surface-variant'>
+                            {beforeText}
+                        </p>
+                    )}
                 </div>
 
-                {/* After */}
+                {/* After — label НАД изображением, текст — на всю ширину */}
                 <div className='flex flex-col gap-3'>
+                    <span className='text-label-md font-semibold uppercase text-primary'>
+                        After
+                    </span>
                     <div className='relative aspect-[4/3] overflow-hidden rounded-base bg-surface-variant'>
                         {afterUrl ? (
                             <Image
@@ -73,16 +74,11 @@ export function BeforeAfterComparison({
                             </div>
                         )}
                     </div>
-                    <div className='flex items-start gap-2'>
-                        <span className='text-label-md font-semibold uppercase text-primary'>
-                            After
-                        </span>
-                        {afterText && (
-                            <span className='text-body-sm text-on-surface-variant'>
-                                {afterText}
-                            </span>
-                        )}
-                    </div>
+                    {afterText && (
+                        <p className='text-body-sm text-on-surface-variant'>
+                            {afterText}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
