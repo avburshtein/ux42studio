@@ -11,7 +11,11 @@ import { AboutSection } from '@/components/portfolio/AboutSection';
 import { SkillsSection } from '@/components/portfolio/SkillsSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
-import { FAB } from '@/components/FAB';
+// FAB (плавающая круглая кнопка) отключён 26.09.2026 — решение владельца
+// до появления реального виртуального помощника. Компонент сохранён:
+// src/components/FAB.tsx, план реализации — Docs/roadmap/ai-assistant-fab.md.
+// Вернуть: раскомментировать импорт и строку ниже.
+//   {mpc.cta.visible && <FAB href='#contact' />}
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
 import { sql } from 'drizzle-orm';
@@ -394,7 +398,6 @@ export default async function ProfilePage({ params }: PageProps) {
                     )}
                     {mpc.cta.visible && <NavLabel label='Reach' />}
                 </div>
-                {mpc.cta.visible && <FAB href='#contact' />}
             </main>
 
             {mpc.cta.visible && (
