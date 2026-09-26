@@ -11,14 +11,11 @@ import WizardSaveBar, {
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     updateProjectReview,
     getProjectPreviewInfo,
-    archiveProject,
-    getProjectStatus,
     getProjectReview,
 } from '@/lib/actions/projects';
 import Link from 'next/link';
@@ -60,17 +57,14 @@ export default function ReviewPage({
     const [saved, markSaved] = useSavedFlag();
     const [error, setError] = useState<string | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-    const [projectStatus, setProjectStatus] = useState<string | null>(null);
-    const [archiving, setArchiving] = useState(false);
 
     useEffect(() => {
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    useEffect(() => {
-        if (!projectId) return;
-        getProjectStatus(projectId).then((status) => setProjectStatus(status));
-    }, [projectId]);
+    // Раньше здесь был эффект getProjectStatus(projectId) -> setProjectStatus:
+    // статус загружался, но нигде не рендерился. Удалено вместе с состоянием
+    // и импортом archiveProject/getProjectStatus (мёртвый код).
 
     const {
         register,

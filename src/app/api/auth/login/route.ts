@@ -70,7 +70,7 @@ export async function POST(req: Request) {
             maxAge,
         });
         return res;
-    } catch (err) {
+    } catch {
         return NextResponse.json({ message: 'Server error' }, { status: 500 });
     }
 }

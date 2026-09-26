@@ -44,6 +44,10 @@ export default function ProfileHeader({ profile }: ProfileHeaderProps) {
             {/* Cover */}
             <div className='relative h-48 sm:h-64 w-full overflow-hidden rounded-b-xl'>
                 {profile.coverFile ? (
+                    // Обложка из R2 по ключу (/r2/<key>): размеры неизвестны
+                    // на этапе рендера, next/image неприменим. Изображение
+                    // декоративное (пустой alt + aria-hidden), LCP не несёт.
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                         src={getImageUrl(profile.coverFile.r2Key)}
                         alt=''

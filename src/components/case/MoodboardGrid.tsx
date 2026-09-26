@@ -44,6 +44,7 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                 {assets.map((asset) => (
                     <div key={asset.id} className='overflow-hidden rounded-lg'>
                         {asset.url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img
                                 src={asset.url}
                                 alt={asset.alt ?? asset.caption ?? ''}
@@ -79,6 +80,7 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                             className={`${className} overflow-hidden rounded-lg bg-[var(--md-sys-color-surface-variant)]`}
                         >
                             {asset?.url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
                                 <img
                                     src={asset.url}
                                     alt={asset.alt ?? asset.caption ?? ''}
@@ -138,6 +140,7 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                                         className={`${className} overflow-hidden rounded-md bg-[var(--md-sys-color-surface-variant)]`}
                                     >
                                         {asset?.url ? (
+                                            // eslint-disable-next-line @next/next/no-img-element
                                             <img
                                                 src={asset.url}
                                                 alt={

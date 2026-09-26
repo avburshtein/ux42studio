@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
@@ -32,7 +33,9 @@ export default function LoginForm() {
                 message?: string;
             };
             setError(data?.message || 'Ошибка входа');
-        } catch (err) {
+        } catch {
+            // Сетевая ошибка: детали не логируем (иначе в консоль утекут
+            // чувствительные данные ответа), показываем нейтральный текст.
             setError('Сетевая ошибка');
         } finally {
             setLoading(false);
@@ -45,6 +48,9 @@ export default function LoginForm() {
                 <Label htmlFor='email'>Email</Label>
                 <Input
                     id='email'
+                    type='email'
+                    required
+                    autoComplete='email'
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                 />
@@ -54,16 +60,36 @@ export default function LoginForm() {
                 <Input
                     id='password'
                     type='password'
+                    required
+                    autoComplete='current-password'
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </div>
-            {error && <p className='text-sm text-red-600'>{error}</p>}
+            {error && (
+                <p role='alert' className='text-sm text-red-600'>
+                    {error}
+                </p>
+            )}
             <div className='flex justify-end'>
                 <Button type='submit' disabled={loading}>
                     {loading ? 'Загрузка...' : 'Войти'}
                 </Button>
             </div>
+
+            {/* RGPD Art. 13: вход тоже обрабатывает email (аутентификация).
+                Уведомление + ссылка на политику. */}
+            <p className='text-xs leading-relaxed text-on-surface-variant'>
+                Вход использует email для аутентификации. Подробности об
+                обработке данных — в{' '}
+                <Link
+                    href='/privacy'
+                    className='text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80'
+                >
+                    Политике конфиденциальности
+                </Link>
+                .
+            </p>
         </form>
     );
 }

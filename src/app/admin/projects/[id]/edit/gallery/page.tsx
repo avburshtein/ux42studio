@@ -14,7 +14,6 @@ import WizardSaveBar, {
     useSavedFlag,
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import MoodboardGridSection from '@/components/admin/MoodboardGridSection';

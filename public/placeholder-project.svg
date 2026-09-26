@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="800" height="600" role="img" aria-label="Project cover placeholder">
+  <!-- Плейсхолдер обложки проекта для карточек без coverFile.
+       Статический ассет: HEX разрешён (CSS-переменные в SVG не пробрасываются),
+       те же значения, что у src/app/icon.svg: primary-container #0B6E4F,
+       tertiary-container #FBFFFA. Aspect 4:3 — как типичные обложки кейсов. -->
+  <rect width="800" height="600" fill="#0B6E4F" />
+  <rect
+    x="24" y="24" width="752" height="552" rx="20" fill="none"
+    stroke="#FBFFFA" stroke-opacity="0.28" stroke-width="2" stroke-dasharray="12 12"
+  />
+  <text
+    x="400" y="292" text-anchor="middle" font-family="Poppins, Arial, sans-serif"
+    font-weight="500" font-size="40" fill="#FBFFFA" fill-opacity="0.92"
+  >42</text>
+  <text
+    x="400" y="338" text-anchor="middle" font-family="Inter, Arial, sans-serif"
+    font-weight="400" font-size="18" letter-spacing="0.5" fill="#FBFFFA" fill-opacity="0.72"
+  >Cover coming soon</text>
+</svg>

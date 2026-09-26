@@ -164,6 +164,9 @@ export default function GridSlot({
                     {...attributes}
                     className='w-full h-full cursor-grab active:cursor-grabbing group touch-none rounded-lg overflow-hidden'
                 >
+                    {/* Фото в слоте: R2/blob-URL, размеры неизвестны,
+                        пропорции задаёт контейнер слота. */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                         src={image.url}
                         alt={`Фото в слоте ${slotIndex}`}

@@ -55,16 +55,22 @@ export default function ImageUploader({
         };
     }, []);
 
-    const validateFile = (file: File): string | null => {
-        if (!file.type.startsWith('image/')) {
-            return 'Please select an image file.';
-        }
-        if (file.size > maxSize) {
-            const maxMB = Math.round(maxSize / (1024 * 1024));
-            return `File size must be less than ${maxMB}MB.`;
-        }
-        return null;
-    };
+    // validateFile вынесена в useCallback: uploadFile зависит от неё,
+    // без стабилизации exhaustive-deps ругается на отсутствующий
+    // зависимости элемент и эффект пересоздаётся на каждом рендере.
+    const validateFile = useCallback(
+        (file: File): string | null => {
+            if (!file.type.startsWith('image/')) {
+                return 'Please select an image file.';
+            }
+            if (file.size > maxSize) {
+                const maxMB = Math.round(maxSize / (1024 * 1024));
+                return `File size must be less than ${maxMB}MB.`;
+            }
+            return null;
+        },
+        [maxSize],
+    );
 
     const uploadFile = useCallback(
         async (file: File) => {
@@ -132,7 +138,9 @@ export default function ImageUploader({
                 setUploadProgress(0);
             }
         },
-        [onChange, maxSize],
+        // maxSize уже учтён внутри validateFile (useCallback) — прямой
+        // зависимостью он больше не нужен.
+        [onChange, validateFile],
     );
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -231,6 +239,9 @@ export default function ImageUploader({
                                 : 'aspect-video',
                         )}
                     >
+                        {/* Ассет из R2 по ключу; размеры неизвестны на
+                            этапе рендера, пропорции задаёт aspect-square. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={getImageUrl(value.r2Key)}
                             alt='Uploaded image'

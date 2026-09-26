@@ -13,7 +13,13 @@ export default function AuthLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className='min-h-screen flex items-center justify-center bg-[var(--md-sys-color-surface)]'>
+        // lang='ru': формы /login и /register — единственный русскоязычный
+        // контент на сайте (остальное — EN/ES). Помечаем язык фрагмента, иначе
+        // скринридер читает русский текст английским голосом (WCAG 3.1.1).
+        <div
+            lang='ru'
+            className='min-h-screen flex items-center justify-center bg-[var(--md-sys-color-surface)]'
+        >
             {/* Переключатель темы — и на экране входа/регистрации.
                 48×48 — спека §74, WCAG 2.5.5 Target Size (AAA) */}
             <div className='fixed right-4 top-4'>
