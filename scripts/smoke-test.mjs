@@ -95,6 +95,47 @@ await check('Главная страница открывается', async () =
 await check('Страница входа открывается', () => expectOk('/login'));
 await check('Страница регистрации открывается', () => expectOk('/register'));
 
+// ── 1a. Разделение аудиторий (решение (69)) ──
+group('1a. Главная студии и промо платформы');
+
+await check('Главная ведёт на студию, а не на платформу', async () => {
+    const html = await (await expectOk('/')).text();
+    assert(html.includes('Selected work'), 'нет блока Work — главная потеряла кейсы студии');
+    return 'Work на месте';
+});
+
+await check('Главная не рекламирует платформу (закрытый бета)', async () => {
+    const html = await (await expectOk('/')).text();
+    assert(!html.includes('Not just a portfolio'), 'на главной остался блок «Not just a portfolio» — он должен жить на /platform');
+    assert(
+        !html.includes('Build it here'),
+        'на главной остался баннер «Build it here» — платформа в закрытом тесте, призыв обещает лишнее',
+    );
+    return 'только футерная ссылка';
+});
+
+await check('В футере главной есть ссылка для дизайнеров', async () => {
+    const html = await (await expectOk('/')).text();
+    assert(html.includes('For designers'), 'в футере нет ссылки «For designers» — вход на /platform потерян');
+    return '/platform доступен из футера';
+});
+
+await check('Страница платформы /platform открывается', () => expectOk('/platform'));
+await check('На /platform есть блок преимуществ платформы', () =>
+    expectText('/platform', 'Code-free case editor', 'карточка преимущества'),
+);
+await check('На /platform есть инструкция «как начать»', () =>
+    expectText('/platform', 'Three steps to published', 'заголовок шагов'),
+);
+await check('На /platform есть ссылка на живой пример страницы', async () => {
+    const html = await (await expectOk('/platform')).text();
+    assert(
+        html.includes('/u/aleksandra-burshtein'),
+        'нет ссылки на реальную страницу дизайнера — обещание без доказательства',
+    );
+    return '/u/aleksandra-burshtein';
+});
+
 await check('Язык страницы объявлен как английский', async () => {
     const html = await (await expectOk('/')).text();
     assert(/<html[^>]*\slang=["']en["']/.test(html), 'в теге <html> нет lang="en" (WCAG 3.1.1)');
@@ -164,6 +205,12 @@ await check('sitemap.xml содержит главную и юридически
         assert(body.includes(p), `в карте сайта нет ${p}`);
     }
     return 'структура корректна';
+});
+
+await check('sitemap.xml содержит страницу платформы', async () => {
+    const body = await (await expectOk('/sitemap.xml')).text();
+    assert(body.includes('/platform'), 'в карте сайта нет /platform');
+    return '/platform в карте';
 });
 
 await check('PWA-манифест содержит имя и цвет темы', async () => {

@@ -6,16 +6,24 @@ import {
     TrendingUp,
     Rocket,
 } from 'lucide-react';
+import { SectionLabel } from './SectionLabel';
 
 /**
- * Platform Benefits Section — промо-блок преимуществ платформы для дизайнеров
- * на главной студии. Bento-грид 3×2: иконка в кружке + заголовок + описание.
- * Стили — токены проекта (Main_page_Spec): NavLabel-разделитель, градиентный
- * заголовок (как ApproachSection), карточки как у карточек портфолио
- * (case/PortfolioCard): тень через класс .portfolio-card, фон темнее канваса
- * через .platform-benefit-card (globals.css). Иконки — зелёные,
- * без фона-кружка. Размещение — между Studio и CTA.
- * Копирайт намеренно без упоминания Material Design / Google.
+ * Platform Benefits Section — промо-блок преимуществ платформы для
+ * дизайнеров. Живёт на /platform (решение (69), 2026-09-26): раньше блок
+ * стоял на главной студии и смешивал две аудитории — клиентов студии и
+ * других дизайнеров.
+ *
+ * Bento-грид 3×2: иконка + заголовок + описание.
+ * Стили — токены проекта (Main_page_Spec): SectionLabel-разделитель,
+ * градиентный заголовок (как ApproachSection), карточки как у карточек
+ * портфолио (case/PortfolioCard): тень через класс .portfolio-card, фон
+ * темнее канваса через .platform-benefit-card (globals.css). Иконки —
+ * зелёные, без фона-кружка. Копирайт намеренно без упоминания
+ * Material Design / Google.
+ *
+ * Компонент параметризован текстами, чтобы /platform могла переиспользовать
+ * его со своим заголовком, не дублируя вёрстку.
  */
 
 const BENEFITS: Array<{
@@ -60,32 +68,37 @@ const BENEFITS: Array<{
     },
 ];
 
-export function PlatformBenefitsSection() {
+interface PlatformBenefitsSectionProps {
+    /** Подпись разделителя секции */
+    label?: string;
+    /** Заголовок. \n — принудительный перенос (рендерится <br aria-hidden>) */
+    heading?: string;
+    /** Подзаголовок под заголовком */
+    description?: string;
+    /** id секции (для якорей) */
+    id?: string;
+}
+
+export function PlatformBenefitsSection({
+    label = 'Platform',
+    heading = 'Not just a portfolio\n— a platform.',
+    description = 'UX42 runs on the same platform we offer to designers. No feeds, no noise — your work, curated.',
+    id = 'platform',
+}: PlatformBenefitsSectionProps = {}) {
     return (
         <section
-            id='platform'
+            id={id}
             className='bg-surface-container-lowest py-12 md:py-24'
         >
             <div className='section-container flex flex-col gap-16'>
-                {/* Разделитель — как в блоках Work/Approach */}
-                <div className='flex w-full items-center gap-4'>
-                    <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant'>
-                        Platform
-                    </span>
-                    <span
-                        aria-hidden
-                        className='h-px flex-1 bg-[rgba(140,213,179,0.16)]'
-                    />
-                </div>
+                <SectionLabel label={label} />
 
                 <div className='flex flex-col items-start gap-8'>
-                    <h2 className='max-w-[720px] bg-gradient-to-br from-primary to-[#2C5A07] bg-clip-text font-display text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-transparent lg:text-[52px] lg:leading-[1.2]'>
-                        Not just a portfolio
-                        <br aria-hidden='true' />— a platform.
+                    <h2 className='max-w-[720px] whitespace-pre-line bg-gradient-to-br from-primary to-[#2C5A07] bg-clip-text font-display text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-transparent lg:text-[52px] lg:leading-[1.2]'>
+                        {heading}
                     </h2>
                     <p className='max-w-[560px] text-body-lg text-on-surface-variant'>
-                        UX42 runs on the same platform we offer to designers.
-                        No feeds, no noise — your work, curated.
+                        {description}
                     </p>
                 </div>
 

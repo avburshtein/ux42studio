@@ -19,6 +19,18 @@ interface FloatingElementsProps {
   color?: string | null;
   /** Форма всех элементов. 'default' — случайная из палитры форм. */
   shape?: 'default' | 'circle' | 'square' | 'triangle';
+  /**
+   * Держать элементы строго внутри контейнера. По умолчанию false —
+   * прежний свободный режим: координаты гуляют от −10% до 110%, а на
+   * границе элемент переносится на противоположную сторону (Hero/CTA так и
+   * работают — там слой = вся секция, выходить за неё некуда).
+   *
+   * true — нужно там, где слой привязан к узкой полосе и выход за неё виден
+   * (боке между NavLabel «Approach» и «Studio»): стартовая позиция и каждый
+   * шаг зажимаются так, чтобы ВНУТРИ оставался весь элемент, а не только его
+   * центр, и у стенки скорость отражается, а не телепортируется.
+   */
+  bounded?: boolean;
 }
 
 export function FloatingElements({
@@ -27,6 +39,7 @@ export function FloatingElements({
   maxBlur = 20,
   color,
   shape = 'default',
+  bounded = false,
 }: FloatingElementsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementsRef = useRef<FloatingElement[]>([]);
@@ -53,20 +66,48 @@ export function FloatingElements({
     const shapes: Array<'circle' | 'square' | 'triangle'> =
       shape === 'default' ? ['circle', 'square', 'triangle'] : [shape];
 
+    // Габарариты слоя в пикселях — нужны bounded-режиму, чтобы зажимать
+    // элемент по его собственному размеру, а не по центру.
+    const boxSize = () => ({
+      w: container.clientWidth || 1,
+      h: container.clientHeight || 1,
+    });
+
+    // Предельные координаты ЦЕНТРА элемента в %: половина его размера должна
+    // оставаться внутри слоя, иначе квадрат/круг/треугольник торчит за
+    // границу. Если элемент сам больше слоя — держим его по центру.
+    const limits = (size: number) => {
+      const { w, h } = boxSize();
+      const mx = w > size * 1.05 ? (size / 2 / w) * 100 : 50;
+      const my = h > size * 1.05 ? (size / 2 / h) * 100 : 50;
+      return { minX: mx, maxX: 100 - mx, minY: my, maxY: 100 - my };
+    };
+
+    const clamp = (v: number, min: number, max: number) =>
+      v < min ? min : v > max ? max : v;
+
     // Инициализация
-    elementsRef.current = Array.from({ length: count }, () => ({
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 20 + Math.random() * 80,
-      speedX: (Math.random() - 0.5) * 0.3,
-      speedY: (Math.random() - 0.5) * 0.3,
-      rotation: Math.random() * 360,
-      rotationSpeed: (Math.random() - 0.5) * 0.5,
-      opacity: 0.1 + Math.random() * 0.3,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      shape: shapes[Math.floor(Math.random() * shapes.length)],
-      blur: Math.random() * (maxBlur - minBlur) + minBlur,
-    }));
+    elementsRef.current = Array.from({ length: count }, () => {
+      const el: FloatingElement = {
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: 20 + Math.random() * 80,
+        speedX: (Math.random() - 0.5) * 0.3,
+        speedY: (Math.random() - 0.5) * 0.3,
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 0.5,
+        opacity: 0.1 + Math.random() * 0.3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        shape: shapes[Math.floor(Math.random() * shapes.length)],
+        blur: Math.random() * (maxBlur - minBlur) + minBlur,
+      };
+      if (bounded) {
+        const b = limits(el.size);
+        el.x = clamp(el.x, b.minX, b.maxX);
+        el.y = clamp(el.y, b.minY, b.maxY);
+      }
+      return el;
+    });
 
     // Mouse parallax
     const handleMouseMove = (e: MouseEvent) => {
@@ -84,6 +125,31 @@ export function FloatingElements({
         el.x += el.speedX;
         el.y += el.speedY;
         el.rotation += el.rotationSpeed;
+
+        if (bounded) {
+          // Зажимаем по габаритам самого элемента: половина размера должна
+          // оставаться внутри слоя. У стенки скорость ОТРАЖАЕТСЯ (знак меняется)
+          // — иначе элемент прилипал бы к краю или телепортировался, и полоса
+          // выглядела бы прорезанной. Сдвиг от параллакса ниже делаем до
+          // зажима, чтобы он тоже не выносил элемент за границу.
+          const b = limits(el.size);
+
+          // Parallax-отталкивание от курсора — сначала, до проверки границ.
+          const dx = mouseRef.current.x - el.x;
+          const dy = mouseRef.current.y - el.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 30 && dist > 0.001) {
+            const force = (30 - dist) / 30;
+            el.x -= (dx / dist) * force * 0.5;
+            el.y -= (dy / dist) * force * 0.5;
+          }
+
+          if (el.x < b.minX) { el.x = b.minX; el.speedX = Math.abs(el.speedX); }
+          if (el.x > b.maxX) { el.x = b.maxX; el.speedX = -Math.abs(el.speedX); }
+          if (el.y < b.minY) { el.y = b.minY; el.speedY = Math.abs(el.speedY); }
+          if (el.y > b.maxY) { el.y = b.maxY; el.speedY = -Math.abs(el.speedY); }
+          return;
+        }
 
         if (el.x < -10) el.x = 110;
         if (el.x > 110) el.x = -10;
@@ -139,7 +205,7 @@ export function FloatingElements({
       window.removeEventListener('mousemove', handleMouseMove);
       if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
     };
-  }, [count, minBlur, maxBlur, color, shape]);
+  }, [count, minBlur, maxBlur, color, shape, bounded]);
 
   return (
     <div

@@ -10,6 +10,11 @@
 # Сгенерировать: node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 JWT_SECRET=replace-me-with-a-long-random-string
 
+# Slug профиля студии — чьи кейсы показываются на главной / и чья страница
+# служит живым примером на /platform (решение (69) в Docs/ui/Main_page_Spec.md).
+# По умолчанию (если не задана) берётся самый ранний профиль.
+STUDIO_PROFILE_SLUG=aleksandra-burshtein
+
 # Одноразовая инициализация первого суперадмина — только для локальной
 # разработки. В проде эти переменные НЕ нужны: заводится через
 # POST /api/auth/init, и сразу после этого секреты удаляются

@@ -33,6 +33,7 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **Main page content from DB** — "Main Page Content" editor in `/admin/profile` (sections, gallery, social links, OG cover, favicon); `/u/[slug]` renders content from D1.
 - **Theme customization** — M3 seed-based color theme, configurable header (transparent/solid) and page background, configurable floating elements with live preview.
 - **SEO** — favicon, `robots.txt` + sitemap generated from D1, `generateMetadata` for case pages, Open Graph (og-cover 1200×630), noindex for admin/auth routes, 404 page.
+- **Audience split** — `/` belongs to the studio (Hero → founder's cases → Approach → Studio → CTA), the designer-facing platform promo lives on `/platform` (benefits → 3 steps → live example), the personal page stays on `/u/[slug]`. The studio profile is set via the `STUDIO_PROFILE_SLUG` variable.
 - **Legal** — `/privacy` and `/terms` (EN + ES), cookies section.
 - **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
 
@@ -52,8 +53,9 @@ npm run lint        # eslint
 npm run check       # both
 ```
 
-**Site smoke test** — 33 checks against a running server (pages, legal
-documents, robots/sitemap/manifest, security headers, admin protection,
+**Site smoke test** — 41 checks against a running server (pages, the split
+between the studio homepage and /platform, legal documents,
+robots/sitemap/manifest, security headers, admin protection,
 database availability). Start the server first:
 
 ```bash

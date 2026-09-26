@@ -13,6 +13,9 @@ const BASE_URL = 'https://ux42.studio';
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const staticEntries: MetadataRoute.Sitemap = [
         { url: `${BASE_URL}/`, changeFrequency: 'monthly', priority: 1 },
+        // Промо платформы для дизайнеров (решение (69)): аудитория другая,
+        // поэтому отдельная страница в карте сайта, а не секция главной.
+        { url: `${BASE_URL}/platform`, changeFrequency: 'monthly', priority: 0.9 },
         { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.5 },
         { url: `${BASE_URL}/terms`, changeFrequency: 'yearly', priority: 0.5 },
     ];
