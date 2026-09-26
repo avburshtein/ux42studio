@@ -189,7 +189,7 @@ export default function ProfilePage() {
                                     <button
                                         type='button'
                                         onClick={() => setSection(s.id)}
-                                        className={`block w-full whitespace-nowrap rounded-md px-3 py-2 text-body-sm transition-colors cursor-pointer ${
+                                        className={`block w-full whitespace-nowrap rounded-md px-3 py-2 text-left text-body-sm transition-colors cursor-pointer ${
                                             section === s.id
                                                 ? 'bg-primary-container text-on-primary-container font-medium'
                                                 : 'text-on-surface-variant hover:bg-surface-variant/50'

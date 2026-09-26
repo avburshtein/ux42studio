@@ -130,6 +130,9 @@ export default function AssetGallery({
                         role='listitem'
                     >
                         <div className='aspect-square relative overflow-hidden'>
+                            {/* Ассет из R2 по ключу; размеры неизвестны на
+                                этапе рендера, пропорции задаёт aspect-square. */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src={getImageUrl(asset.file.r2Key)}
                                 alt={asset.caption ?? 'Asset'}

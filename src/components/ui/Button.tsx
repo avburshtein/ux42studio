@@ -10,7 +10,11 @@ const buttonVariants = cva(
                 default:
                     'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] hover:opacity-90',
                 destructive:
-                    'bg-[var(--md-sys-color-error-container)] text-[var(--md-sys-color-on-error-container)] hover:opacity-90',
+                    // error/on-error, а не error-container/on-error-container:
+                    // пара контейнеров в светлой теме давала 2.4:1 (LH
+                    // color-contrast); error/on-error ≈ 5.8:1 (светлая) и
+                    // ≈ 5.7:1 (тёмная)
+                    'bg-[var(--md-sys-color-error)] text-[var(--md-sys-color-on-error)] hover:opacity-90',
                 outline:
                     'border border-[var(--md-sys-color-outline)] bg-transparent text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-variant)]',
                 secondary:

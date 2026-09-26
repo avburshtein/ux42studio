@@ -12,6 +12,8 @@ const badgeVariants = cva(
                 secondary:
                     'bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]',
                 destructive:
+                    // error/on-error — контрастная пара в обеих темах
+                    // (см. комментарий в Button.tsx destructive)
                     'bg-[var(--md-sys-color-error)] text-[var(--md-sys-color-on-error)]',
                 outline:
                     'border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-on-surface)]',

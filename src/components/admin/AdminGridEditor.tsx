@@ -92,24 +92,32 @@ export default function AdminGridEditor({
     );
 
     // Обработчик завершения перетаскивания (Swap)
-    const handleDragEnd = useCallback((event: DragEndEvent) => {
-        const { active, over } = event;
+    const handleDragEnd = useCallback(
+        (event: DragEndEvent) => {
+            const { active, over } = event;
 
-        if (!over || active.id === over.id) return;
+            if (!over || active.id === over.id) return;
 
-        const activeSlotIndex = active.data.current?.slotIndex as
-            | number
-            | undefined;
-        const overSlotIndex = over.data.current?.slotIndex as
-            | number
-            | undefined;
+            const activeSlotIndex = active.data.current?.slotIndex as
+                | number
+                | undefined;
+            const overSlotIndex = over.data.current?.slotIndex as
+                | number
+                | undefined;
 
-        if (activeSlotIndex === undefined || overSlotIndex === undefined) {
-            return;
-        }
+            if (
+                activeSlotIndex === undefined ||
+                overSlotIndex === undefined
+            ) {
+                return;
+            }
 
-        setImages((prev) => {
-            const next = prev.map((img) => ({ ...img }));
+            setActiveDragImage(null);
+
+            // Чистая функция (без побочных эффектов внутри setState-
+            // апдейтера — иначе StrictMode вызывает её дважды):
+            // считаем новый порядок снаружи, затем one-sync вверх.
+            const next = images.map((img) => ({ ...img }));
             const activeItem = next.find(
                 (img) => img.slotIndex === activeSlotIndex,
             );
@@ -120,13 +128,18 @@ export default function AdminGridEditor({
             if (activeItem) activeItem.slotIndex = overSlotIndex;
             if (overItem) overItem.slotIndex = activeSlotIndex;
 
-            return next;
-        });
+            setImages(next);
+            // Сообщаем родителю новый порядок. Без этого вызова перестановка
+            // слотов жила только в локальном состоянии редактора и терялась
+            // при сохранении кейса (и откатывалась при следующей загрузке
+            // файла — initialImages перетирал локальный порядок).
+            onImagesChange?.(next);
+        },
+        [images, onImagesChange],
+    );
 
-        setActiveDragImage(null);
-    }, []);
-
-    // Обработчик загрузки файла в конкретный слот
+    // Обработчик загрузки файла в конкретный слот (fallback, когда родитель
+    // не передал onFileUpload)
     const handleFileUpload = useCallback(
         (file: File, targetSlotIndex: number) => {
             const objectUrl = URL.createObjectURL(file);
@@ -136,16 +149,15 @@ export default function AdminGridEditor({
                 slotIndex: targetSlotIndex,
             };
 
-            setImages((prev) => {
-                // Убираем старое изображение из этого слота, если есть
-                const filtered = prev.filter(
-                    (img) => img.slotIndex !== targetSlotIndex,
-                );
-                const next = [...filtered, newImage];
-                return next;
-            });
+            // Убираем старое изображение из этого слота, если есть
+            const next = [
+                ...images.filter((img) => img.slotIndex !== targetSlotIndex),
+                newImage,
+            ];
+            setImages(next);
+            onImagesChange?.(next);
         },
-        [],
+        [images, onImagesChange],
     );
 
     // Смена пресета
@@ -218,11 +230,14 @@ export default function AdminGridEditor({
                 <DragOverlay dropAnimation={null}>
                     {activeDragImage ? (
                         <div className='w-40 h-40 rounded-lg overflow-hidden opacity-90 shadow-lg ring-2 ring-[var(--md-sys-color-primary)]'>
-                            <img
-                                src={activeDragImage.url}
-                                alt=''
-                                className='w-full h-full object-cover'
-                            />
+                        {/* DragOverlay-превью: blob:/R2-URL, размеры
+                            неизвестны, контейнер фиксирован w-40 h-40. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={activeDragImage.url}
+                            alt=''
+                            className='w-full h-full object-cover'
+                        />
                         </div>
                     ) : null}
                 </DragOverlay>

@@ -2,17 +2,14 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { projects, profiles, users } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import PageTitle from '@/components/ui/PageTitle';
-import {
-    deleteProject,
-    archiveProject,
-    unarchiveProject,
-} from '@/lib/actions/projects';
+import CaseSortManager, {
+    type CaseProjectRow,
+} from '@/components/admin/CaseSortManager';
+import type { CaseSortMode } from '@/db/schema/profiles';
 
 const STATUS_TABS = [
     { value: 'all', label: 'Все' },
@@ -37,7 +34,7 @@ export default async function AdminDashboardPage({
 
     const profile = await db.query.profiles.findFirst({
         where: { userId },
-        columns: { id: true, slug: true },
+        columns: { id: true, slug: true, caseSortMode: true },
     });
 
     if (!profile) {
@@ -56,8 +53,48 @@ export default async function AdminDashboardPage({
             statusFilter === 'all'
                 ? { profileId: profile.id }
                 : { profileId: profile.id, status: statusFilter },
-        orderBy: (projects, { desc }) => [desc(projects.updatedAt)],
+        orderBy: (p, { desc }) => [desc(p.updatedAt)],
     });
+
+    // ---- Порядок строк (решение 2026-09-16, панель CaseSortManager) ----
+    // Режим сортировки хранится в профиле; null = 'newest' (как раньше).
+    const sortMode: CaseSortMode = profile.caseSortMode ?? 'newest';
+
+    const toRow = (project: (typeof projectList)[number]): CaseProjectRow => ({
+        id: project.id,
+        title: project.title,
+        slug: project.slug,
+        status: project.status,
+        viewsCount: project.viewsCount,
+        updatedLabel: new Date(
+            project.updatedAt * 1000,
+        ).toLocaleDateString('ru-RU'),
+    });
+
+    const sortKey = (p: (typeof projectList)[number]) =>
+        p.publishedAt ?? p.createdAt;
+    const byTitleAsc = (
+        a: (typeof projectList)[number],
+        b: (typeof projectList)[number],
+    ) => a.title.localeCompare(b.title, undefined, { sensitivity: 'base' });
+
+    const autoRows: CaseProjectRow[] = (() => {
+        const sorted = [...projectList];
+        if (sortMode === 'oldest')
+            sorted.sort((a, b) => sortKey(a) - sortKey(b));
+        else if (sortMode === 'alpha_asc') sorted.sort(byTitleAsc);
+        else if (sortMode === 'alpha_desc')
+            sorted.sort((a, b) => byTitleAsc(b, a));
+        else sorted.sort((a, b) => sortKey(b) - sortKey(a));
+        return sorted.map(toRow);
+    })();
+
+    // Manual: sort_order (asc); tie-breaker — свежие выше
+    const manualRows: CaseProjectRow[] = [...projectList]
+        .sort(
+            (a, b) => a.sortOrder - b.sortOrder || b.updatedAt - a.updatedAt,
+        )
+        .map(toRow);
 
     return (
         <main className=''>
@@ -106,135 +143,12 @@ export default async function AdminDashboardPage({
                     </Link>
                 </Card>
             ) : (
-                <div className='overflow-x-auto rounded-lg border border-outline-variant'>
-                    <table className='w-full'>
-                        <thead>
-                            <tr className='border-b border-outline-variant bg-surface-variant/50'>
-                                <th className='px-4 py-3 text-left text-label-md text-on-surface-variant'>
-                                    Название
-                                </th>
-                                <th className='px-4 py-3 text-left text-label-md text-on-surface-variant'>
-                                    Статус
-                                </th>
-                                <th className='px-4 py-3 text-left text-label-md text-on-surface-variant'>
-                                    Просмотры
-                                </th>
-                                <th className='px-4 py-3 text-left text-label-md text-on-surface-variant'>
-                                    Обновлён
-                                </th>
-                                <th className='px-4 py-3 text-right text-label-md text-on-surface-variant'>
-                                    Действия
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {projectList.map((project) => (
-                                <tr
-                                    key={project.id}
-                                    className='border-b border-outline-variant last:border-0 hover:bg-surface-variant/30'
-                                >
-                                    <td className='table-cell-truncate px-4 py-3 text-on-surface'>
-                                        <Link
-                                            href={`/admin/projects/${project.id}/edit/general`}
-                                        >
-                                            <div className='overflow-hidden text-ellipsis whitespace-nowrap font-medium'>
-                                                {project.title}
-                                            </div>
-                                        </Link>
-                                    </td>
-                                    <td className='px-4 py-3'>
-                                        <span
-                                            className={`inline-block rounded-full px-2 py-0.5 text-label-sm ${
-                                                project.status === 'published'
-                                                    ? 'bg-primary-container text-on-primary-container'
-                                                    : project.status ===
-                                                        'archived'
-                                                      ? 'bg-surface-variant text-on-surface-variant'
-                                                      : 'bg-surface-variant text-on-surface-variant'
-                                            }`}
-                                        >
-                                            {project.status === 'published'
-                                                ? 'Опубликован'
-                                                : project.status === 'archived'
-                                                  ? 'Архив'
-                                                  : 'Черновик'}
-                                        </span>
-                                    </td>
-                                    <td className='px-4 py-3 text-body-sm text-on-surface-variant'>
-                                        {project.viewsCount}
-                                    </td>
-                                    <td className='px-4 py-3 text-body-sm text-on-surface-variant'>
-                                        {new Date(
-                                            project.updatedAt * 1000,
-                                        ).toLocaleDateString('ru-RU')}
-                                    </td>
-                                    <td className='px-4 py-3 text-right'>
-                                        <div className='flex items-center justify-end gap-2'>
-                                            <form
-                                                action={async () => {
-                                                    'use server';
-                                                    await deleteProject(
-                                                        project.id,
-                                                    );
-                                                }}
-                                            >
-                                                <Button
-                                                    variant='ghost'
-                                                    type='submit'
-                                                    className='text-error'
-                                                >
-                                                    Удалить
-                                                </Button>
-                                            </form>
-                                            {project.status === 'published' && (
-                                                <form
-                                                    action={async () => {
-                                                        'use server';
-                                                        await archiveProject(
-                                                            project.id,
-                                                        );
-                                                    }}
-                                                >
-                                                    <Button
-                                                        variant='ghost'
-                                                        type='submit'
-                                                    >
-                                                        В&nbsp;архив
-                                                    </Button>
-                                                </form>
-                                            )}
-                                            {project.status === 'archived' && (
-                                                <form
-                                                    action={async () => {
-                                                        'use server';
-                                                        await unarchiveProject(
-                                                            project.id,
-                                                        );
-                                                    }}
-                                                >
-                                                    <Button
-                                                        variant='ghost'
-                                                        type='submit'
-                                                        className='text-primary'
-                                                    >
-                                                        Восстановить
-                                                    </Button>
-                                                </form>
-                                            )}
-                                            <Link
-                                                href={`/u/${profile.slug}/${project.slug}`}
-                                            >
-                                                <Button variant='ghost'>
-                                                    На&nbsp;сайт
-                                                </Button>
-                                            </Link>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                <CaseSortManager
+                    profileSlug={profile.slug}
+                    mode={sortMode}
+                    autoRows={autoRows}
+                    manualRows={manualRows}
+                />
             )}
         </main>
     );

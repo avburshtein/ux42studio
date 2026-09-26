@@ -17,8 +17,40 @@ const inter = Inter({
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://ux42.studio'),
-    title: 'UX42 Studio',
-    description: 'Portfolio management platform',
+    // Шаблон заголовка: страницы задают title целиком («Legal Notice & Terms
+    // of Use — UX42 Studio»), дефолт собирает «<page> — UX42 Studio».
+    title: {
+        default: 'UX42 Studio',
+        template: '%s — UX42 Studio',
+    },
+    applicationName: 'UX42 Studio',
+    authors: [{ name: 'Aleksandra Burshtein' }],
+    creator: 'UX42 Studio',
+    description: 'Product design studio — we help teams ship clear, human interfaces.',
+    alternates: { canonical: '/' },
+    openGraph: {
+        type: 'website',
+        siteName: 'UX42 Studio',
+        locale: 'en_US',
+        url: '/',
+        title: 'UX42 Studio',
+        description: 'Product design studio — we help teams ship clear, human interfaces.',
+        images: [
+            {
+                url: '/og/og-cover.png',
+                width: 1200,
+                height: 630,
+                alt: 'UX42 Studio',
+            },
+        ],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        title: 'UX42 Studio',
+        description: 'Product design studio — we help teams ship clear, human interfaces.',
+        images: ['/og/og-cover.png'],
+    },
+    robots: { index: true, follow: true },
 };
 
 export default function RootLayout({
@@ -27,8 +59,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
+        // lang='en': публичный контент сайта английский (EN — основной язык
+        // /u/[slug], /privacy, /terms). Было 'ru' — конфликт с lang скринридера
+        // и с поисковыми системами (WCAG 3.1.1 Language of Page).
+        // Русские фрагменты (формы /login, /register) помечены lang="ru" ниже.
         <html
-            lang='ru'
+            lang='en'
             suppressHydrationWarning
             className={`${poppins.variable} ${inter.variable}`}
         >

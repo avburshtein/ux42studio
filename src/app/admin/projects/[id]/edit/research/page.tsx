@@ -11,7 +11,6 @@ import WizardSaveBar, {
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
@@ -77,13 +76,13 @@ export default function ResearchPage({
 
     const {
         fields: personaFields,
-        append: appendPersona,
+        append: prependPersona,
         remove: removePersona,
     } = useFieldArray({ control, name: 'personas' });
 
     const {
         fields: metricFields,
-        append: appendMetric,
+        append: prependMetric,
         remove: removeMetric,
     } = useFieldArray({ control, name: 'keyMetrics' });
 
@@ -185,7 +184,7 @@ export default function ResearchPage({
                                 type='button'
                                 variant='ghost'
                                 onClick={() =>
-                                    appendPersona({
+                                    prependPersona({
                                         nameAndAge: '',
                                         avatarFileId: '',
                                         role: '',
@@ -244,6 +243,7 @@ export default function ResearchPage({
                                             )
                                         }
                                         aspectRatio={1}
+                                        cropRatio={1}
                                     />
                                 </div>
                                 <div>
@@ -290,7 +290,7 @@ export default function ResearchPage({
                                 type='button'
                                 variant='ghost'
                                 onClick={() =>
-                                    appendMetric({ value: '', description: '' })
+                                    prependMetric({ value: '', description: '' })
                                 }
                             >
                                 + Add Metric

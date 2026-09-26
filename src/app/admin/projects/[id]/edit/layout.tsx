@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { projects, profiles } from '@/db/schema';
 import { notFound, redirect } from 'next/navigation';
 import { WizardSidebar } from '@/components/admin/WizardSidebar';
 

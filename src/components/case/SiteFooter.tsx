@@ -16,6 +16,8 @@ interface SiteFooterProps {
     profileName?: string;
     profileHeadline?: string | null;
     socialLinks: SocialLink[];
+    /** Ссылка «For designers» → /platform (главная студии и /platform) */
+    showPlatformLink?: boolean;
     className?: string;
 }
 
@@ -28,6 +30,7 @@ export function SiteFooter({
     profileName,
     profileHeadline,
     socialLinks,
+    showPlatformLink = false,
     className,
 }: SiteFooterProps) {
     return (
@@ -86,8 +89,19 @@ export function SiteFooter({
 
                 {/* Footer links: Privacy Policy + Terms of Use — на всех страницах
                     (решение (39)); /cookies не существует — cookies на сайте нет
-                    (хранение описано в PP §3), Cookie Policy вернётся в Backlog v2. */}
-                <div className='flex items-center gap-4'>
+                    (хранение описано в PP §3), Cookie Policy вернётся в Backlog v2.
+                    Ссылка «For designers» → /platform — вход для второй аудитории
+                    (дизайнеров); на страницах дизайнера и legal не нужна, поэтому
+                    выключается флагом showPlatformLink (решение (69)). */}
+                <div className='flex flex-wrap items-center gap-4'>
+                    {showPlatformLink && (
+                        <Link
+                            href='/platform'
+                            className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                        >
+                            For designers
+                        </Link>
+                    )}
                     <Link
                         href='/privacy'
                         className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import PageTitle from '@/components/ui/PageTitle';
 import { Plus, Trash2 } from 'lucide-react';
 import { saveMainPageContent, updateProfile } from '@/lib/actions/profile';
 import ImageUploaderField from '@/components/ImageUploaderField';

@@ -68,7 +68,7 @@ export default function ShowcasePage({
 
     const {
         fields: comparisonFields,
-        append: appendComparison,
+        append: prependComparison,
         remove: removeComparison,
     } = useFieldArray({ control, name: 'comparisons' });
 
@@ -157,7 +157,7 @@ export default function ShowcasePage({
                             type='button'
                             variant='ghost'
                             onClick={() =>
-                                appendComparison({
+                                prependComparison({
                                     featureName: '',
                                     beforeFileId: '',
                                     afterFileId: '',
@@ -218,7 +218,8 @@ export default function ShowcasePage({
                                                     fileId ?? '',
                                                 )
                                             }
-                                            aspectRatio={16 / 10}
+                                            aspectRatio={4 / 3}
+                                            cropRatio={4 / 3}
                                         />
                                     </div>
                                     <div>
@@ -235,7 +236,8 @@ export default function ShowcasePage({
                                                     fileId ?? '',
                                                 )
                                             }
-                                            aspectRatio={16 / 10}
+                                            aspectRatio={4 / 3}
+                                            cropRatio={4 / 3}
                                         />
                                     </div>
                                 </div>

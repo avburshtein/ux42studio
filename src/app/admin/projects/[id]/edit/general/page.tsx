@@ -11,7 +11,6 @@ import WizardSaveBar, {
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
@@ -322,6 +321,7 @@ export default function GeneralPage({
                             setValue('coverFileId', fileId ?? '')
                         }
                         aspectRatio={16 / 9}
+                        cropRatio={16 / 9}
                     />
                 </div>
 

@@ -17,6 +17,12 @@ type ImageUploaderProps = {
      * кадрированное изображение (пропорция = пропорции слота на странице).
      */
     cropRatio?: number;
+    /**
+     * Включить кадрирование без фикс. пропорции слота: рамка = пропорция
+     * выбранного изображения, зум/пан выбирают фрагмент. Для галерей
+     * кейса, где слоты не имеют фиксированного aspect.
+     */
+    crop?: boolean;
     compact?: boolean;
 };
 
@@ -27,6 +33,7 @@ export default function ImageUploader({
     maxSize = 10 * 1024 * 1024,
     aspectRatio,
     cropRatio,
+    crop = false,
     compact = false,
 }: ImageUploaderProps) {
     const [isDragging, setIsDragging] = useState(false);
@@ -48,16 +55,22 @@ export default function ImageUploader({
         };
     }, []);
 
-    const validateFile = (file: File): string | null => {
-        if (!file.type.startsWith('image/')) {
-            return 'Please select an image file.';
-        }
-        if (file.size > maxSize) {
-            const maxMB = Math.round(maxSize / (1024 * 1024));
-            return `File size must be less than ${maxMB}MB.`;
-        }
-        return null;
-    };
+    // validateFile вынесена в useCallback: uploadFile зависит от неё,
+    // без стабилизации exhaustive-deps ругается на отсутствующий
+    // зависимости элемент и эффект пересоздаётся на каждом рендере.
+    const validateFile = useCallback(
+        (file: File): string | null => {
+            if (!file.type.startsWith('image/')) {
+                return 'Please select an image file.';
+            }
+            if (file.size > maxSize) {
+                const maxMB = Math.round(maxSize / (1024 * 1024));
+                return `File size must be less than ${maxMB}MB.`;
+            }
+            return null;
+        },
+        [maxSize],
+    );
 
     const uploadFile = useCallback(
         async (file: File) => {
@@ -125,7 +138,9 @@ export default function ImageUploader({
                 setUploadProgress(0);
             }
         },
-        [onChange, maxSize],
+        // maxSize уже учтён внутри validateFile (useCallback) — прямой
+        // зависимостью он больше не нужен.
+        [onChange, validateFile],
     );
 
     const handleDragOver = (e: React.DragEvent) => {
@@ -158,11 +173,13 @@ export default function ImageUploader({
     };
 
     /**
-     * Выбор файла: с cropRatio — сначала диалог кадрирования (SVG кадрируем
-     * как есть), без — сразу загрузка. Оригинал держим в ref для re-crop.
+     * Выбор файла: с crop/cropRatio — сначала диалог кадрирования (SVG
+     * кадрируем как есть), без — сразу загрузка. Оригинал держим в ref
+     * для re-crop.
      */
     const startCropFlow = (file: File) => {
-        if (!cropRatio || file.type === 'image/svg+xml') {
+        const cropEnabled = cropRatio !== undefined || crop;
+        if (!cropEnabled || file.type === 'image/svg+xml') {
             uploadFile(file);
             return;
         }
@@ -222,6 +239,9 @@ export default function ImageUploader({
                                 : 'aspect-video',
                         )}
                     >
+                        {/* Ассет из R2 по ключу; размеры неизвестны на
+                            этапе рендера, пропорции задаёт aspect-square. */}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src={getImageUrl(value.r2Key)}
                             alt='Uploaded image'
@@ -236,7 +256,7 @@ export default function ImageUploader({
                     >
                         <X className='h-3.5 w-3.5' />
                     </button>
-                    {cropRatio && (
+                    {(cropRatio || crop) && (
                         <button
                             type='button'
                             onClick={handleRecrop}
@@ -335,7 +355,7 @@ export default function ImageUploader({
                 </p>
             )}
 
-            {cropping && cropRatio && (
+            {cropping && (cropRatio || crop) && (
                 <ImageCropperDialog
                     src={cropping.url}
                     aspectRatio={cropRatio}

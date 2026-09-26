@@ -10,7 +10,6 @@ import WizardSaveBar, {
     useSavedFlag,
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
 import {
     updateProjectResults,
@@ -71,19 +70,19 @@ export default function ResultsPage({
 
     const {
         fields: resultFields,
-        append: appendResult,
+        append: prependResult,
         remove: removeResult,
     } = useFieldArray({ control, name: 'results' });
 
     const {
         fields: toolFields,
-        append: appendTool,
+        append: prependTool,
         remove: removeTool,
     } = useFieldArray({ control, name: 'tools' });
 
     const {
         fields: baCardFields,
-        append: appendBaCard,
+        append: prependBaCard,
         remove: removeBaCard,
     } = useFieldArray({ control, name: 'baCards' });
 
@@ -157,7 +156,7 @@ export default function ResultsPage({
                             type='button'
                             variant='ghost'
                             onClick={() =>
-                                appendResult({
+                                prependResult({
                                     content: '',
                                     order: resultFields.length,
                                 })
@@ -206,7 +205,7 @@ export default function ResultsPage({
                             type='button'
                             variant='ghost'
                             onClick={() =>
-                                appendTool({
+                                prependTool({
                                     content: '',
                                     order: toolFields.length,
                                 })
@@ -257,7 +256,7 @@ export default function ResultsPage({
                             type='button'
                             variant='ghost'
                             onClick={() =>
-                                appendBaCard({
+                                prependBaCard({
                                     featureName: '',
                                     beforeText: '',
                                     afterText: '',

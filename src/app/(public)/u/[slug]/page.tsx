@@ -11,9 +11,15 @@ import { AboutSection } from '@/components/portfolio/AboutSection';
 import { SkillsSection } from '@/components/portfolio/SkillsSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
-import { FAB } from '@/components/FAB';
+// FAB (плавающая круглая кнопка) отключён 26.09.2026 — решение владельца
+// до появления реального виртуального помощника. Компонент сохранён:
+// src/components/FAB.tsx, план реализации — Docs/roadmap/ai-assistant-fab.md.
+// Вернуть: раскомментировать импорт и строку ниже.
+//   {mpc.cta.visible && <FAB href='#contact' />}
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
+import { sql } from 'drizzle-orm';
+import type { CaseSortMode } from '@/db/schema/profiles';
 
 export const revalidate = 3600;
 
@@ -106,6 +112,7 @@ export default async function ProfilePage({ params }: PageProps) {
             bio: true,
             isPublic: true,
             mainPageContent: true,
+            caseSortMode: true,
         },
         with: {
             socialLinks: { orderBy: { order: 'asc' } },
@@ -116,6 +123,10 @@ export default async function ProfilePage({ params }: PageProps) {
     if (!profile) notFound();
     if (!profile.isPublic) notFound();
 
+    // Порядок кейсов — выбранный дизайнером режим сортировки (панель
+    // CaseSortManager в /admin; null = 'newest' — историческое поведение).
+    // Manual — по projects.sort_order (asc), tie-breaker — свежие выше.
+    const caseSortMode: CaseSortMode = profile.caseSortMode ?? 'newest';
     const projects = await db.query.projects.findMany({
         where: { profileId: profile.id, status: 'published' },
         with: {
@@ -123,7 +134,20 @@ export default async function ProfilePage({ params }: PageProps) {
             projectCategories: { with: { category: true } },
             coverFile: true,
         },
-        orderBy: { publishedAt: 'desc' },
+        orderBy: (p, { asc, desc }) => {
+            switch (caseSortMode) {
+                case 'manual':
+                    return [asc(p.sortOrder), desc(p.createdAt)];
+                case 'oldest':
+                    return [asc(p.publishedAt)];
+                case 'alpha_asc':
+                    return [sql`${p.title} COLLATE NOCASE`];
+                case 'alpha_desc':
+                    return [sql`${p.title} COLLATE NOCASE DESC`];
+                default:
+                    return [desc(p.publishedAt)];
+            }
+        },
     });
 
     const bioParagraphs = profile.bio
@@ -374,7 +398,6 @@ export default async function ProfilePage({ params }: PageProps) {
                     )}
                     {mpc.cta.visible && <NavLabel label='Reach' />}
                 </div>
-                {mpc.cta.visible && <FAB href='#contact' />}
             </main>
 
             {mpc.cta.visible && (

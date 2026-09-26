@@ -10,7 +10,6 @@ import WizardSaveBar, {
     useSavedFlag,
 } from '@/components/admin/WizardSaveBar';
 import { Label } from '@/components/ui/Label';
-import { Card } from '@/components/ui/Card';
 import Title from '@/components/ui/Title';
 import {
     updateProjectProblem,

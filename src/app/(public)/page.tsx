@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { PortfolioCard } from '@/components/PortfolioCard';
@@ -6,31 +7,31 @@ import { Carousel } from '@/components/portfolio/Carousel';
 import { HeroSection } from '@/components/portfolio/HeroSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
+import { SectionLabel } from '@/components/portfolio/SectionLabel';
+import { FloatingElements } from '@/components/FloatingElements';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
-import { PlatformBenefitsSection } from '@/components/portfolio/PlatformBenefitsSection';
+import { readStudioProfileSlug } from '@/lib/studioProfile';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
 
-// Navigation divider — как на странице дизайнера (Main_page_Spec §4)
-function NavLabel({ label }: { label: string }) {
-    return (
-        <div className='flex w-full items-center gap-4'>
-            <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant'>
-                {label}
-            </span>
-            <span aria-hidden className='h-px flex-1 bg-[rgba(140,213,179,0.16)]' />
-        </div>
-    );
-}
+// Navigation divider — общий компонент SectionLabel (вынесен 2026-09-26,
+// решение (69): разметка была продублирована в трёх местах).
+const NavLabel = SectionLabel;
 
 /**
  * Главная страница студии — визуальный язык страницы дизайнера
- * (Main_page_Spec), контент: Hero + Approach (решение 2026-09-04 (21)) +
- * каталог проектов (showOnHomepage) + Studio (About-стиль: визуал + статы) +
- * Platform Benefits (промо платформы для дизайнеров) + CTA.
- * Решение 2026-09-02 (19), каталог возвращён 2026-09-04 (22).
+ * (Main_page_Spec), контент: Hero + Work (только кейсы профиля студии,
+ * решение (69)) + Approach + Studio (About-стиль: визуал + статы) + CTA.
+ *
+ * Решение (69), 2026-09-26 — приоритет «студия» над «платформа»:
+ * − блок Platform Benefits убран с главной и переехал на /platform;
+ * − Work показывает кейсы профиля студии (slug из STUDIO_PROFILE_SLUG),
+ *   а не общий каталог платформы;
+ * − чипы категорий строятся по фактическим работам студии.
+ *
+ * Решения (19) и (22), 2026-09-02/04: каталог проектов на главной.
  */
 export default async function HomePage({
     searchParams,
@@ -41,42 +42,69 @@ export default async function HomePage({
     const { env } = await getCloudflareContext({ async: true });
     const db = getDb(env.DB);
 
-    const allCategories = await db.query.categories.findMany({
+    // Профиль студии (решение (69)): главная показывает только его кейсы.
+    // Сначала пробуем slug из STUDIO_PROFILE_SLUG, иначе — самый ранний
+    // профиль (createdAt asc). Если профилей нет вообще, workProjects пуст
+    // и блок Work покажет пустое состояние, а не чужие работы.
+    const studioProfile =
+        (await db.query.profiles.findFirst({
+            where: { slug: readStudioProfileSlug(env) ?? '' },
+            columns: { id: true, slug: true },
+        })) ??
+        (await db.query.profiles.findFirst({
+            orderBy: { createdAt: 'asc' },
+            columns: { id: true, slug: true },
+        }));
+
+    const workProjects = studioProfile
+        ? await db.query.projects.findMany({
+              where: {
+                  profileId: studioProfile.id,
+                  status: 'published',
+                  showOnHomepage: 1,
+              },
+              with: {
+                  profile: {
+                      columns: { slug: true, fullName: true, avatarFileId: true },
+                  },
+                  projectCategories: {
+                      with: { category: true },
+                  },
+                  coverFile: true,
+              },
+              orderBy: { publishedAt: 'desc' },
+              limit: 100,
+          })
+        : [];
+
+    // Чипы категорий — только по тем, что реально встречаются в работах
+    // студии (решение (69)). Раньше выводились все категории платформы,
+    // и клик по «System Architecture» давал пустую сетку с надписью
+    // «No published projects yet».
+    const usedCategoryIds = new Set(
+        workProjects.flatMap((p) =>
+            p.projectCategories.map((pc) => pc.categoryId),
+        ),
+    );
+
+    const allCategories = (await db.query.categories.findMany({
         orderBy: { order: 'asc' },
-    });
+    })).filter((c) => usedCategoryIds.has(c.id));
 
     const selectedCategory = category
         ? allCategories.find((c) => c.slug === category)
         : undefined;
 
-    let publishedProjects = await db.query.projects.findMany({
-        where: {
-            status: 'published',
-            showOnHomepage: 1,
-        },
-        with: {
-            profile: {
-                columns: { slug: true, fullName: true, avatarFileId: true },
-            },
-            projectCategories: {
-                with: { category: true },
-            },
-            coverFile: true,
-        },
-        orderBy: { publishedAt: 'desc' },
-        limit: 100,
-    });
-
-    if (selectedCategory) {
-        publishedProjects = publishedProjects.filter((p) =>
-            p.projectCategories.some(
-                (pc) => pc.category?.slug === selectedCategory.slug,
-            ),
-        );
-    }
+    const filteredProjects = selectedCategory
+        ? workProjects.filter((p) =>
+              p.projectCategories.some(
+                  (pc) => pc.category?.slug === selectedCategory.slug,
+              ),
+          )
+        : workProjects;
 
     // Карточка нового стиля требует обложку — проекты без неё не рендерим
-    const cards = publishedProjects.filter((p) => p.coverFile);
+    const cards = filteredProjects.filter((p) => p.coverFile);
 
     const chipClass = (selected: boolean) =>
         selected
@@ -120,6 +148,21 @@ export default async function HomePage({
                                 Projects we are proud of — each one a full case
                                 study with process, results and lessons.
                             </p>
+                            {studioProfile && (
+                                /* Ссылка на личную страницу основателя:
+                                    главная студии и страница дизайнера —
+                                    разные аудитории (решение (69)). */
+                                <Link
+                                    href={`/u/${studioProfile.slug}`}
+                                    className='inline-flex items-center gap-2 text-body-md font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary'
+                                >
+                                    See the full case library
+                                    <ArrowRight
+                                        size={18}
+                                        aria-hidden='true'
+                                    />
+                                </Link>
+                            )}
                         </div>
 
                         {allCategories.length > 0 && (
@@ -138,7 +181,7 @@ export default async function HomePage({
                                     return (
                                         <Link
                                             key={cat.id}
-                                            href={`/?category=${encodeURIComponent(cat.slug)}#portfolio`}
+                                            href={`/?category=${encodeURIComponent(cat.slug)}#work`}
                                             scroll={false}
                                             className={chipClass(active)}
                                             aria-current={active || undefined}
@@ -180,38 +223,136 @@ export default async function HomePage({
                     </div>
                 </section>
 
-                <ApproachSection />
+                {/* Обёртка Approach + Studio (решение (72)). Боке ставится
+                    здесь, а не внутри ApproachSection, потому что оно должно
+                    идти ОТ NavLabel Approach ДО NavLabel Studio — то есть
+                    пересекать границу между двумя секциями. Внутри одной
+                    секции его обрезал бы overflow-hidden.
 
-                {/* Studio — по образцу About на странице дизайнера: слева
-                    визуал, справа текст + статы с расшифровкой.
-                    Статы — факты: Google UX Certificate, MSc Psychology,
-                    NGO-проекты (Design for good баннер убран 2026-09-12). */}
-                <section id='studio' className='bg-surface-container-lowest py-12 md:py-24'>
+                    Границы слоя задаёт класс .bokeh-band в globals.css
+                    (решение (73)): отрицательные inset-утилиты Tailwind
+                    (`bottom-[-112px]`) в этом проекте НЕ генерируются — слой
+                    терял нижнюю границу, схлопывался по высоте, и пятна
+                    разбрасывались по всей странице вместо полосы между
+                    секциями. Обычный CSS от JIT-сканирования не зависит.
+
+                    Границы: top = верхний padding Approach (48/96/120),
+                    чтобы надпись «Approach» и воздух над ней остались чистыми.
+                    bottom = −(верхний padding Studio + высота NavLabel 16px) —
+                    боке заходит в отступ между секциями и доходит ровно до
+                    подписи «Studio», не задевая её саму.
+
+                    overflow-hidden на обёртке: обрезает боке по краям экрана.
+                    Секции прозрачные, фон перенесён на обёртку, иначе они
+                    перекрыли бы слой. */}
+                <div className='relative overflow-hidden bg-surface-container-lowest'>
+                    <div aria-hidden className='bokeh-band'>
+                        {/* bounded: полоса узкая, и без зажима элементы
+                            выходили бы за её края (свободный режим гуляет
+                            от −10% до 110% и переносится на другую сторону). */}
+                        <FloatingElements
+                            count={14}
+                            minBlur={12}
+                            maxBlur={32}
+                            bounded
+                        />
+                    </div>
+
+                    <ApproachSection />
+
+                    {/* Распорка: бывший верхний padding Studio (py-12 / md:py-24),
+                        вынесенный из секции. Обёртка заканчивается здесь, поэтому
+                        `bottom: 0` у .bokeh-band приходится ровно на верх
+                        подписи «Studio» — полоса не заходит на неё (решение (74)).
+                        Высота равна md:py-24, поэтому вертикальный ритм между
+                        блоками не изменился. */}
+                    <div aria-hidden className='h-12 md:h-24' />
+                </div>
+
+                {/* Studio — команда и подход студии. Решение (70):
+                    фото /studio-2.webp удалено. На его месте — карточки двух
+                    основателей: текст о «редком сочетании» из соседнего
+                    абзаца превращён в конкретные факты с именами, а буллеты
+                    «Our background» разложены по тем же карточкам. Так блок
+                    отвечает на вопрос посетителя «кто вы такие» без
+                    сгенерированной сток-фотографии, на которой нечитаемый
+                    текст выдавал бы ИИ. Статы — факты: Google UX Certificate,
+                    MSc Psychology, NGO-проекты (Design for good баннер убран
+                    2026-09-12). */}
+                {/* Верхний padding перенесён в распорку внутри обёртки (решение
+                    (74)) — на фоне боке он больше не нужен. Нижний остаётся:
+                    он отделяет Studio от CTA. Фон свой, т.к. секция вынесена
+                    из-под обёртки. */}
+                <section
+                    id='studio'
+                    className='relative scroll-mt-20 bg-surface-container-lowest pb-12 md:pb-24'
+                >
                     <div className='section-container flex flex-col gap-16'>
                         <NavLabel label='Studio' />
 
-                        <div className='flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10'>
-                            {/* Визуал — по образцу AboutSection (516×495):
-                                одно фото (public/studio-2.webp, конверт из
-                                PNG 2,37 МБ → 102 КБ); градиент — подложка
-                                на время загрузки */}
-                            <div className='relative aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-gradient-to-br from-[rgba(11,110,79,0.08)] to-[rgba(44,90,7,0.12)] lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src='/studio-2.webp'
-                                    alt=''
-                                    loading='lazy'
-                                    decoding='async'
-                                    className='absolute inset-0 h-full w-full object-cover'
-                                />
-                            </div>
+                        {/* Шахматный ритм (решение (71)): у Approach заголовок
+                            слева — здесь он справа, карточки напротив. Ритм
+                            «текст ↔ факты» связывает блоки в одну историю и не
+                            даёт странице превратиться в повтор. На мобильных
+                            порядок прежний — заголовок, потом карточки. */}
+                        <div className='flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-16'>
+                            {/* Два основателя — на месте фотографии студии */}
+                            <ul className='order-2 flex flex-1 flex-col gap-6 lg:order-1 lg:max-w-[460px]'>
+                                {[
+                                    {
+                                        role: 'Design & psychology',
+                                        name: 'Aleksandra',
+                                        lines: [
+                                            'MSc in Psychology',
+                                            'UX Research',
+                                            'Google UX Design Certificate',
+                                        ],
+                                    },
+                                    {
+                                        role: 'Engineering & systems',
+                                        name: 'Denis',
+                                        lines: [
+                                            'MD/PhD in Psychiatry',
+                                            '8+ years MedTech engineering',
+                                            'Next.js · TypeScript',
+                                        ],
+                                    },
+                                ].map((member) => (
+                                    <li
+                                        key={member.name}
+                                        className='team-card flex flex-col gap-3 rounded-[24px] p-7'
+                                    >
+                                        <span className='text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-primary'>
+                                            {member.role}
+                                        </span>
+                                        <h3 className='font-display text-title-lg font-medium text-on-surface'>
+                                            {member.name}
+                                        </h3>
+                                        <ul className='flex flex-col gap-1.5'>
+                                            {member.lines.map((line) => (
+                                                <li
+                                                    key={line}
+                                                    className='flex items-start gap-3 text-body-md text-on-surface-variant'
+                                                >
+                                                    <span
+                                                        aria-hidden
+                                                        className='mt-[10px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary'
+                                                    />
+                                                    {line}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </li>
+                                ))}
+                            </ul>
 
-                            <div className='flex w-full flex-col gap-8 lg:w-[516px]'>
-                                <h2 className='font-display text-[32px] font-medium leading-[40px] text-on-surface lg:text-display-sm lg:leading-tight'>
+                            {/* Текст и заголовок — напротив карточек (справа на lg) */}
+                            <div className='order-1 flex flex-1 flex-col gap-8 lg:order-2'>
+                                <h2 className='max-w-[560px] bg-gradient-to-br from-primary to-[#2C5A07] bg-clip-text font-display text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-transparent lg:text-[52px] lg:leading-[1.2]'>
                                     Simple by design
                                 </h2>
 
-                                <div className='flex flex-col gap-4'>
+                                <div className='flex max-w-[560px] flex-col gap-4'>
                                     <p className='text-body-lg font-normal text-on-surface-variant'>
                                         We come to design with a live, open
                                         mind — always learning, always curious.
@@ -223,48 +364,26 @@ export default async function HomePage({
                                         helps us understand people; engineering
                                         keeps the architecture honest.
                                     </p>
-                                    <p className='text-body-lg font-normal text-on-surface-variant'>
-                                        Behind UX42.studio is a rare
-                                        combination: a UX designer with a
-                                        background in clinical psychology and
-                                        human behaviour research, and a senior
-                                        engineer with an MD/PhD in psychiatry
-                                        and 8+ years building MedTech systems.
-                                        We don&apos;t just make things look
-                                        good — we make them make sense.
-                                    </p>
                                 </div>
 
-                                <div className='flex flex-col gap-3'>
-                                    <span className='text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
-                                        Our background
-                                    </span>
-                                    <ul className='flex flex-col gap-2'>
-                                        {[
-                                            'MSc in Psychology · UX Research · Google UX Design Certificate',
-                                            '8+ years MedTech Engineering · Next.js · TypeScript',
-                                            'NGO — Projects for social good',
-                                        ].map((line) => (
-                                            <li
-                                                key={line}
-                                                className='flex items-start gap-3 text-body-md text-on-surface-variant'
-                                            >
-                                                <span
-                                                    aria-hidden
-                                                    className='mt-[10px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary'
-                                                />
-                                                {line}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                <p className='max-w-[560px] text-body-lg font-normal text-on-surface'>
+                                    Behind UX42.studio is a rare combination of
+                                    two disciplines. We don&apos;t just make
+                                    things look good — we make them make sense.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                <PlatformBenefitsSection />
-
+                {/* Блок Platform Benefits убран с главной и живёт на /platform
+                    (решение (69)). Отдельно убран и баннер «For designers»
+                    перед CTA: платформа пока в закрытом бета-тесте, и
+                    публичный призыв «Build it here» обещает то, чего
+                    пока нет — отбор тестеров идёт вручную. Вход остался
+                    только в футере (SiteFooter showPlatformLink) —
+                    ненавязчивый и не мешает витрине кейсов. Вернуть
+                    промо на главную, когда платформа откроется. */}
                 <CtaSection
                     title='Get in touch'
                     bodyLines={[
@@ -275,7 +394,11 @@ export default async function HomePage({
                     emailLabel='Send an email'
                 />
             </main>
-            <SiteFooter profileHeadline='Product design studio' socialLinks={[]} />
+            <SiteFooter
+                profileHeadline='Product design studio'
+                socialLinks={[]}
+                showPlatformLink
+            />
         </>
     );
 }

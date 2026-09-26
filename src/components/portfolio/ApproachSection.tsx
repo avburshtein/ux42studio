@@ -1,53 +1,57 @@
 import Link from 'next/link';
+import { SectionLabel } from './SectionLabel';
 
 /**
- * Approach Section — по паттерну Layout2 из исходника главного сайта
- * (HomeDesktop → Layout2 «Human insight meets intelligent tools»):
- * слева тэглайн + градиентный заголовок + текст, справа визуальная панель.
- * Адаптив — как на странице дизайнера: на мобильных визуал сверху (order-1),
- * текст снизу (order-2); на lg — две колонки, текст слева.
- * Стили — токены проекта (Main_page_Spec), кнопка — пилюля primary
- * (h-14 px-8 rounded-full, как HeroSection).
+ * Approach Section — «Human insight meets intelligent tools».
+ *
+ * Решение (70), 2026-09-26 — блок переведён на типографику, фото
+ * `/approach-1.webp` удалено. Причина: сгенерированное изображение читалось
+ * как ИИ-сток (светящийся wireframe-мозг, голографические панели) и спорило
+ * с собственным текстом секции — подпись говорит про человеческую
+ * проницательность, а картинка показывала машинную эстетику без человека.
+ *
+ * Чем заменено: тот же визуальный ритм (слева заголовок + текст + кнопка,
+ * справа колонка), но правая колонка — не фото, а три принципа работы.
+ * Смысл «инструментов» несут тонкие линии-разделители; технологичность
+ * возникает из фонового боке, которое ставит родитель (page.tsx).
+ *
+ * Решение (72): фон и `overflow-hidden` перенесены на обёртку в page.tsx,
+ * где секция живёт вместе с Studio. Боке должно идти от NavLabel Approach
+ * до NavLabel Studio — то есть через две секции, и внутри одной оно
+ * обрезалось бы. Здесь секция прозрачная, `relative z-10` — контент всегда
+ * над слоем боке.
+ *
+ * Токены и сетка — прежние (Main_page_Spec §4/§7), чтобы блок остался
+ * частью главной, а не выглядел отдельной страницей.
  */
-/**
- * Approach Section — по паттерну Layout2 из исходника главного сайта
- * (HomeDesktop → Layout2 «Human insight meets intelligent tools»):
- * слева тэглайн + градиентный заголовок + текст, справа визуальная панель.
- * Фон и разделитель (NavLabel) — как у блока Work (Main_page_Spec §4/§6).
- * Адаптив — как на странице дизайнера: на мобильных визуал сверху (order-1),
- * текст снизу (order-2); на lg — две колонки, текст слева.
- * Стили — токены проекта (Main_page_Spec), кнопка — пилюля primary
- * (h-14 px-8 rounded-full, как HeroSection).
- */
+
+const PRINCIPLES = [
+    {
+        title: 'Listen first',
+        body: 'Your business, your customers, what keeps you awake at night — we understand all of it before opening a single design file.',
+    },
+    {
+        title: 'Build with precision',
+        body: 'We use AI to accelerate the parts that should be fast, and never let it flatten the thinking behind them.',
+    },
+    {
+        title: 'Keep it human',
+        body: 'Work stays meaningful when a person can still feel the person who made it. That never goes through an API.',
+    },
+];
+
 export function ApproachSection() {
   return (
-    <section id='approach' className='bg-surface-container-lowest py-12 md:py-24 lg:py-30'>
+    <section
+      id='approach'
+      className='relative z-10 scroll-mt-20 py-12 md:py-24 lg:py-30'
+    >
       <div className='section-container flex flex-col gap-16'>
-        {/* Разделитель — как в блоке Work (NavLabel, Main_page_Spec §4) */}
-        <div className='flex w-full items-center gap-4'>
-          <span className='shrink-0 text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-outline-variant'>
-            Approach
-          </span>
-          <span aria-hidden className='h-px flex-1 bg-[rgba(140,213,179,0.16)]' />
-        </div>
+        <SectionLabel label='Approach' />
 
-        <div className='flex flex-col gap-10 md:gap-16 lg:flex-row lg:items-center lg:gap-20'>
-          {/* Визуальная панель — на мобильных сверху. Одно фото
-              (public/approach-1.webp, конверт из PNG 1,46 МБ → 77 КБ);
-              градиент — подложка на время загрузки */}
-          <div className='relative order-1 aspect-[4/3] w-full overflow-hidden rounded-[24px] bg-gradient-to-br from-[rgba(11,110,79,0.08)] to-[rgba(44,90,7,0.12)] lg:order-2 lg:aspect-[600/640] lg:w-auto lg:flex-1'>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src='/approach-1.webp'
-              alt=''
-              loading='lazy'
-              decoding='async'
-              className='absolute inset-0 h-full w-full object-cover'
-            />
-          </div>
-
-          {/* Текст — на мобильных снизу */}
-          <div className='order-2 flex flex-1 flex-col items-start gap-8 lg:order-1'>
+        <div className='flex flex-col gap-12 md:gap-16 lg:flex-row lg:items-start lg:gap-20'>
+          {/* Заголовок, текст и кнопка — как раньше в левой колонке */}
+          <div className='flex flex-1 flex-col items-start gap-8'>
             <h2 className='bg-gradient-to-br from-primary to-[#2C5A07] bg-clip-text font-display text-[32px] font-medium leading-[1.2] tracking-[-0.5px] text-transparent lg:text-[52px] lg:leading-[1.2]'>
               Human insight meets intelligent tools
             </h2>
@@ -61,11 +65,31 @@ export function ApproachSection() {
 
             <Link
               href='#contact'
-              className='inline-flex h-14 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)]'
+              className='inline-flex h-14 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
             >
               Start a project
             </Link>
           </div>
+
+          {/* Три принципа — тонкие разделители занимают место фотографии */}
+          <ul className='flex flex-1 flex-col gap-8 lg:max-w-[400px]'>
+            {PRINCIPLES.map((principle, i) => (
+              <li key={principle.title} className='flex flex-col gap-2'>
+                <div className='flex items-center gap-4'>
+                  <span className='font-display text-title-md font-medium tabular-nums text-primary'>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span aria-hidden className='h-px flex-1 bg-outline-variant' />
+                </div>
+                <h3 className='font-display text-title-lg font-medium text-on-surface'>
+                  {principle.title}
+                </h3>
+                <p className='text-body-md text-on-surface-variant'>
+                  {principle.body}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </section>

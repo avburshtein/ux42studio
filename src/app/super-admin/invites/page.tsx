@@ -5,7 +5,6 @@ import { getDb } from '@/db';
 import { invites, users } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import PageTitle from '@/components/ui/PageTitle';
 import Title from '@/components/ui/Title';

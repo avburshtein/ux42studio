@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { SiteFooter } from '@/components/case/SiteFooter';
-import { ThemeToggle } from '@/components/case/ThemeToggle';
 import {
     EN_PRIVACY_SECTIONS,
     ES_PRIVACY_SECTIONS,

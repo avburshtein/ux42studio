@@ -14,7 +14,6 @@ import WizardSaveBar, {
     useSavedFlag,
 } from '@/components/admin/WizardSaveBar';
 import { Input } from '@/components/ui/Input';
-import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import MoodboardGridSection from '@/components/admin/MoodboardGridSection';
@@ -203,9 +202,13 @@ export default function GalleryPage({
         setSaving(true);
         setError(null);
         try {
-            // Собираем moodboard-ассеты из GridImage (fileId уже есть после загрузки)
+            // Собираем moodboard-ассеты из GridImage (fileId уже есть после загрузки).
+            // ВАЖНО: сортируем по slotIndex — drag-n-drop свапает slotIndex у
+            // элементов, но не порядок массива; order должен совпадать с тем,
+            // что видит дизайнер в слотах (фидбэк 2026-09-18: порядок «плыл»).
             const moodboardAssetsFromGrid = moodboardGridImages
                 .filter((img) => img.fileId)
+                .sort((a, b) => a.slotIndex - b.slotIndex)
                 .map((img, index) => ({
                     fileId: img.fileId!,
                     assetType: 'moodboard' as const,
@@ -294,6 +297,7 @@ export default function GalleryPage({
                         <div className='min-w-0 flex-1'>
                             <ImageUploaderField
                                 compact
+                                crop
                                 value={
                                     watch(`${section.key}.${index}.fileId`) ||
                                     null

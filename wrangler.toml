@@ -21,6 +21,12 @@ custom_domain = true
 binding = "ASSETS"
 directory = ".open-next/assets"
 
+# Несекретные переменные (решение (69)): slug профиля студии — чьи кейсы
+# показываются на главной / и чья страница служит примером на /platform.
+# Если значение не задано, код берёт самый ранний профиль (createdAt asc).
+[vars]
+STUDIO_PROFILE_SLUG = "aleksandra-burshtein"
+
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "ux42next"
