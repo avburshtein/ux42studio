@@ -9,14 +9,14 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **Frontend:** Next.js (App Router, Server Actions)
 - **Database:** Cloudflare D1 + Drizzle ORM
 - **Storage:** Cloudflare R2
-- **Styling:** Tailwind CSS v4 + Material Design 3 (seed: `#0B6E4F`)
+- **Styling:** Tailwind CSS v4 + design tokens on CSS variables (seed: `#0B6E4F`)
 - **Deployment:** Cloudflare Pages / Workers via `@opennextjs/cloudflare`
 
 ## Team & Areas of Responsibility
 
 | Who | Area of responsibility |
 | --- | --- |
-| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Markup and design system: public pages (designer home page, case study page), components in `src/components/portfolio/*` and `src/components/case/*`, design tokens and styles (`src/app/globals.css`, `src/tokens.md`), component UI specs (`Docs/ui/`), content editor UI in `/admin/profile`. Branches: `verstka`, `token`, `cursor/*` |
+| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Markup and design system: public pages (`/`, `/platform`, the designer's page `/u/[slug]`, case study and its TL;DR/PDF), components in `src/components/portfolio/*` and `src/components/case/*`, design tokens and styles (`src/app/globals.css`, `src/tokens.md`), component UI specs (`Docs/ui/`), admin UI (profile editor, case wizard, section visibility, TL;DR/PDF). Branches: `verstka`, `token`, `cursor/*` |
 | **Denis Zakharchenko** (<den.zakh@gmail.com>) | Backend and platform: authentication (`src/middleware.ts`, `src/lib/jwt.ts`, `/api/auth`), Server Actions (`src/lib/actions/`), database schema and migrations (D1 + Drizzle), admin panel and super admin core (`/admin`, `/super-admin`), file uploads to R2, Cloudflare/Next.js configuration |
 
 > Active development ran from August to September 2026. The admin UI layer (main page content editor) on top of the backend — Alex; the server side and admin core — Denis.
@@ -31,11 +31,27 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 
 - **Designer home page & case page** — fully rebuilt from Figma specs (`Docs/ui/`), responsive mobile layout, gallery carousel, header with menu panel and hash navigation.
 - **Main page content from DB** — "Main Page Content" editor in `/admin/profile` (sections, gallery, social links, OG cover, favicon); `/u/[slug]` renders content from D1.
-- **Theme customization** — M3 seed-based color theme, configurable header (transparent/solid) and page background, configurable floating elements with live preview.
+- **Theme customization** — seed-based color theme (the palette is derived from a single source color), configurable header (transparent/solid) and page background, configurable floating elements with live preview.
 - **SEO** — favicon, `robots.txt` + sitemap generated from D1, `generateMetadata` for case pages, Open Graph (og-cover 1200×630), noindex for admin/auth routes, 404 page.
 - **Audience split** — `/` belongs to the studio (Hero → founder's cases → Approach → Studio → CTA), the designer-facing platform promo lives on `/platform` (benefits → 3 steps → live example), the personal page stays on `/u/[slug]`. The studio profile is set via the `STUDIO_PROFILE_SLUG` variable.
+- **Case TL;DR & PDF** — a short case version for hiring managers (`/u/[slug]/[projectSlug]/short`) with share buttons and a "Download PDF" button (print CSS, `?print=1`, light theme when printing).
+- **Case gallery** — selectable layout (editorial / masonry / justified) and a lightbox.
+- **Case section visibility** — checkboxes in the wizard (Review step) on top of auto-hiding empty sections; section numbers are renumbered on the public page.
+- **Admin** — image cropping before upload (avatar, cover, About, OG, favicon), separate Save and Save & Next buttons in the wizard, manual/auto case sorting (`profiles.case_sort_mode`), light/dark theme toggle in the private area.
 - **Legal** — `/privacy` and `/terms` (EN + ES), cookies section.
 - **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
+
+## Pages
+
+| Path | What it is |
+| --- | --- |
+| `/` | Studio homepage: Hero → cases → Approach → Studio → CTA |
+| `/platform` | Designer-facing platform promo: benefits → 3 steps → live example |
+| `/u/[slug]` | Designer's personal page (content from D1) |
+| `/u/[slug]/[projectSlug]` | Case study: sections + visibility, gallery layouts, lightbox |
+| `/u/[slug]/[projectSlug]/short` | TL;DR case version for hiring managers (+ PDF) |
+| `/privacy`, `/terms` | Legal documents (EN + ES) |
+| `/admin`, `/super-admin` | Private area (auth, case wizard, profile editor) |
 
 ## Development
 
@@ -51,6 +67,7 @@ npm run deploy     # Deploy to Cloudflare
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint
 npm run check       # both
+npm run verify      # check + smoke test
 ```
 
 **Site smoke test** — 41 checks against a running server (pages, the split

@@ -9,14 +9,14 @@
 - **Фронтенд:** Next.js (App Router, Server Actions)
 - **БД:** Cloudflare D1 + Drizzle ORM
 - **Хранилище:** Cloudflare R2
-- **Стили:** Tailwind CSS v4 + Material Design 3 (seed: `#0B6E4F`)
+- **Стили:** Tailwind CSS v4 + дизайн-токены на CSS-переменных (seed: `#0B6E4F`)
 - **Деплой:** Cloudflare Pages / Workers via `@opennextjs/cloudflare`
 
 ## Команда и зоны ответственности
 
 | Кто | Зона ответственности |
 | --- | --- |
-| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Верстка и дизайн-система: публичные страницы (главная дизайнера, страница кейса), компоненты `src/components/portfolio/*` и `src/components/case/*`, дизайн-токены и стили (`src/app/globals.css`, `src/tokens.md`), UI-спеки компонентов (`Docs/ui/`), UI редактора контента в `/admin/profile`. Ветки: `verstka`, `token`, `cursor/*` |
+| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Верстка и дизайн-система: публичные страницы (`/`, `/platform`, личная страница дизайнера `/u/[slug]`, кейс и его TL;DR/PDF), компоненты `src/components/portfolio/*` и `src/components/case/*`, дизайн-токены и стили (`src/app/globals.css`, `src/tokens.md`), UI-спеки компонентов (`Docs/ui/`), UI админки (редактор профиля, визард кейса, видимость секций, TL;DR/PDF). Ветки: `verstka`, `token`, `cursor/*` |
 | **Denis Zakharchenko** (<den.zakh@gmail.com>) | Бэкенд и платформа: аутентификация (`src/middleware.ts`, `src/lib/jwt.ts`, `/api/auth`), Server Actions (`src/lib/actions/`), схема БД и миграции (D1 + Drizzle), ядро админ-панели и суперадмина (`/admin`, `/super-admin`), загрузка файлов в R2, конфигурация Cloudflare/Next.js |
 
 > Активная разработка велась с августа по сентябрь 2026. UI-слой админки (редактор главной страницы) поверх бэкенда — Alex; серверная часть и ядро админки — Denis.
@@ -31,11 +31,27 @@
 
 - **Главная дизайнера и страница кейса** — полная перестройка по Figma-спекам (`Docs/ui/`), адаптивная мобильная версия, карусель галереи, хедер с меню-панелью и хэш-навигацией.
 - **Контент главной из БД** — редактор «Main Page Content» в `/admin/profile` (секции, галерея, соцсети, OG-обложка, favicon); `/u/[slug]` рендерит контент из D1.
-- **Кастомизация темы** — M3 seed-based цветовая тема, настраиваемые хедер (transparent/solid) и фон страницы, настраиваемые floating elements с live-превью.
+- **Кастомизация темы** — seed-based цветовая тема (палитра строится из одного цвета-источника), настраиваемые хедер (transparent/solid) и фон страницы, настраиваемые floating elements с live-превью.
 - **SEO-контур** — favicon, `robots.txt` + sitemap из D1, `generateMetadata` кейсов, Open Graph (og-cover 1200×630), noindex для админок/auth, 404-страница.
 - **Разделение аудиторий** — главная `/` принадлежит студии (Hero → кейсы основателя → Approach → Studio → CTA), промо платформы для дизайнеров живёт на `/platform` (бенефиты → 3 шага → живой пример), личная страница — на `/u/[slug]`. Профиль студии задаётся переменной `STUDIO_PROFILE_SLUG`.
+- **Кейс: TL;DR и PDF** — короткая версия кейса для hiring manager (`/u/[slug]/[projectSlug]/short`) с share-кнопками и кнопкой «Скачать PDF» (print-CSS, `?print=1`, светлая тема при печати).
+- **Галерея кейса** — выбор раскладки (editorial / masonry / justified) и лайтбокс.
+- **Видимость секций кейса** — чекбоксы в визарде (шаг Review) поверх авто-скрытия пустых секций, номера секций перенумеровываются на публичной странице.
+- **Админка** — кадрирование изображений перед загрузкой (аватар, обложка, About, OG, favicon), раздельные кнопки Save и Save & Next на шагах визарда, ручная/авто сортировка кейсов (`profiles.case_sort_mode`), переключатель светлой и тёмной темы в приватной зоне.
 - **Legal** — `/privacy` и `/terms` (EN + ES), микрораздел cookies.
 - **Доступность** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
+
+## Страницы
+
+| Путь | Что это |
+| --- | --- |
+| `/` | Главная студии: Hero → кейсы → Approach → Studio → CTA |
+| `/platform` | Промо платформы для дизайнеров: бенефиты → 3 шага → живой пример |
+| `/u/[slug]` | Личная страница дизайнера (контент из D1) |
+| `/u/[slug]/[projectSlug]` | Кейс: секции + видимость, галерея с раскладками, лайтбокс |
+| `/u/[slug]/[projectSlug]/short` | TL;DR-версия кейса для hiring manager (+ PDF) |
+| `/privacy`, `/terms` | Legal-документы (EN + ES) |
+| `/admin`, `/super-admin` | Приватная зона (аутентификация, визард кейсов, редактор профиля) |
 
 ## Проверка
 
@@ -43,6 +59,7 @@
 npm run typecheck   # tsc --noEmit
 npm run lint        # eslint
 npm run check       # оба сразу
+npm run verify      # check + smoke-тест
 ```
 
 **Smoke-тест сайта** — 41 проверка работающего сайта (страницы, разделение
