@@ -36,6 +36,31 @@
 - **Legal** — `/privacy` и `/terms` (EN + ES), микрораздел cookies.
 - **Доступность** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
 
+## Проверка
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run check       # оба сразу
+```
+
+**Smoke-тест сайта** — 33 проверки работающего сайта (страницы, юридические
+документы, robots/sitemap/манифест, защитные заголовки, закрытость админок,
+доступность базы). Сервер должен быть уже запущен:
+
+```bash
+npm run dev            # в одном окне
+npm run smoke          # в другом
+
+# со страницами дизайнера и кейса:
+PROFILE_SLUG=aleksandra-burshtein PROJECT_SLUG=clinical-workflow-automation npm run smoke
+
+# проверка прода после деплоя:
+npm run smoke:prod
+```
+
+Код возврата `0` — всё в порядке, `1` — есть поломки. Подробности: `Docs/DEPLOY.md`.
+
 ## Разработка
 
 ```bash

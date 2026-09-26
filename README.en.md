@@ -44,6 +44,31 @@ npm run preview    # Local Cloudflare runtime
 npm run deploy     # Deploy to Cloudflare
 ```
 
+## Checks
+
+```bash
+npm run typecheck   # tsc --noEmit
+npm run lint        # eslint
+npm run check       # both
+```
+
+**Site smoke test** — 33 checks against a running server (pages, legal
+documents, robots/sitemap/manifest, security headers, admin protection,
+database availability). Start the server first:
+
+```bash
+npm run dev            # in one window
+npm run smoke          # in another
+
+# including designer and case pages:
+PROFILE_SLUG=aleksandra-burshtein PROJECT_SLUG=clinical-workflow-automation npm run smoke
+
+# check production after deploying:
+npm run smoke:prod
+```
+
+Exit code `0` — all good, `1` — problems found. Details: `Docs/DEPLOY.md`.
+
 ## Creating the First Superadmin
 
 ### Locally
