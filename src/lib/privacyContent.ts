@@ -27,7 +27,7 @@ export const PRIVACY_LAST_UPDATED = 'September 26, 2026';
  * ⚠️ ПЛЕЙСХОЛДЕР — обязательно заменить перед деплоем.
  * Если адрес совпадает с адресом Алекс, продублируйте CO_CONTROLLER_ADDRESS_ALESANDRA.
  */
-export const CO_CONTROLLER_ADDRESS_DENIS = 'TODO: replace with Denis Zakharchenko home address';
+export const CO_CONTROLLER_ADDRESS_DENIS = 'Villajoyosa, Alicante, Spain';
 
 /** Единый контактный ящик площадки: обращения по ПДн и по контенту. */
 export const PRIVACY_CONTACT_EMAIL = 'privacy@ux42.studio';
@@ -194,11 +194,11 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
                 [
                     'Platform accounts',
-                    'For as long as the account remains active. After closure or at the user\'s request, data is erased within 30 days, unless a legal retention obligation requires a longer period.',
+                    'For as long as the account remains active. You can delete your account at any time from Profile → Account in the editor, or by writing to privacy@ux42.studio. Deletion is immediate and irreversible: it removes the account, its profile, all case studies and all uploaded images.',
                 ],
                 [
                     'Registration invitations',
-                    'Until 12 months after creation, or until used — whichever comes first. Once an invitation is used, the associated email address is retained only as part of the account created from it.',
+                    'Until 12 months after creation, or until used — whichever comes first. Once an invitation is used, the associated email address is retained only as part of the account created from it. An unused invitation can be revoked at any time, which deletes the stored address immediately.',
                 ],
                 [
                     'Content published on a portfolio',
@@ -440,11 +440,11 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
                 ],
                 [
                     'Cuentas de la plataforma',
-                    'Mientras la cuenta esté activa. Tras su cierre o a petición del titular, los datos se suprimen en un máximo de 30 días, salvo que una obligación legal de conservación exija un plazo superior.',
+                    'Mientras la cuenta esté activa. Puede eliminar su cuenta en cualquier momento desde Perfil → Cuenta en el editor, o escribiendo a privacy@ux42.studio. La eliminación es inmediata e irreversible: borra la cuenta, su perfil, todos los casos de estudio y todas las imágenes subidas.',
                 ],
                 [
                     'Invitaciones a registrarse',
-                    'Hasta 12 meses desde su creación o hasta que se utilicen, lo que ocurra primero. Una vez utilizada la invitación, la dirección de email asociada se conserva únicamente como parte de la cuenta creada.',
+                    'Hasta 12 meses desde su creación o hasta que se utilicen, lo que ocurra primero. Una vez utilizada la invitación, la dirección de email asociada se conserva únicamente como parte de la cuenta creada. Una invitación no utilizada puede revocarse en cualquier momento, lo que elimina de inmediato la dirección almacenada.',
                 ],
                 [
                     'Contenido publicado en el portafolio',

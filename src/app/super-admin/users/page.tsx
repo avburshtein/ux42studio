@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import PageTitle from '@/components/ui/PageTitle';
 import { toggleUserActive, setUserRole } from '@/lib/actions/admin';
+import { deleteUserByAdmin } from '@/lib/actions/account';
 
 export default async function SuperAdminUsersPage({
     searchParams,
@@ -159,6 +160,25 @@ export default async function SuperAdminUsersPage({
                                                 </Button>
                                             </form>
                                         )}
+                                        {/* Полное удаление (GDPR Art. 17).
+                                            Блокировки (Deactivate) для
+                                            обращений субъекта недостаточно:
+                                            данные должны быть стираемы. */}
+                                        <form
+                                            action={async () => {
+                                                'use server';
+                                                await deleteUserByAdmin(u.id);
+                                            }}
+                                        >
+                                            <Button
+                                                variant='ghost'
+                                                type='submit'
+                                                className='text-error'
+                                                title={`Удалить ${u.email} вместе с профилем, кейсами и файлами`}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </form>
                                     </div>
                                 </td>
                             </tr>

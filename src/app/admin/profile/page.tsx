@@ -13,6 +13,7 @@ import {
     updateProfile,
     getOrCreateProfileId,
     getMyProfile,
+    getMyAccountEmail,
 } from '@/lib/actions/profile';
 import Link from 'next/link';
 import { Eye, KeyRound } from 'lucide-react';
@@ -20,6 +21,7 @@ import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
+import DeleteAccountSection from '@/components/admin/DeleteAccountSection';
 import { getMyMainPageContent } from '@/lib/actions/profile';
 import { DEFAULT_MAIN_PAGE_CONTENT, type MainPageContent } from '@/lib/mainPageContent';
 
@@ -43,6 +45,7 @@ const SECTIONS = [
     { id: 'expertise', label: '04 · Expertise' },
     { id: 'cta', label: '05 · CTA (Get in Touch)' },
     { id: 'theme', label: '06 · Color Theme' },
+    { id: 'account', label: '07 · Account' },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]['id'];
@@ -67,6 +70,8 @@ export default function ProfilePage() {
     // фиксирует пустой initialLinks и игнорирует данные из БД (решение (26))
     const [profileLoaded, setProfileLoaded] = useState(false);
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
+    // Email аккаунта — нужен для подтверждения удаления (GDPR Art. 17)
+    const [accountEmail, setAccountEmail] = useState('');
     const [mainContent, setMainContent] = useState<MainPageContent | null>(null);
     // Активный раздел сайдбара
     const [section, setSection] = useState<SectionId>('profile');
@@ -104,6 +109,12 @@ export default function ProfilePage() {
             try {
                 const id = await getOrCreateProfileId();
                 setProfileId(id);
+                // Email аккаунта для подтверждения удаления — берём сразу,
+                // не дожидаясь профиля: раздел Account должен работать и
+                // тогда, когда профиль ещё не создан.
+                getMyAccountEmail()
+                    .then((mail) => setAccountEmail(mail ?? ''))
+                    .catch(() => setAccountEmail(''));
                 if (!id) return;
 
                 const profile = await getMyProfile();
@@ -389,7 +400,7 @@ export default function ProfilePage() {
                     спека: Docs/specs/Main Page Admin Panel Fields.md.
                     Рендерится всегда (состояние форм сохраняется при
                     переключении разделов), видим только активный раздел. */}
-                {profileId && mainContent && (
+                {profileId && mainContent && section !== 'account' && (
                     <div className={section === 'profile' ? 'hidden' : ''}>
                         <MainPageContentEditor
                             profileId={profileId}
@@ -399,6 +410,12 @@ export default function ProfilePage() {
                             visibleSection={section}
                         />
                     </div>
+                )}
+
+                {/* Удаление аккаунта (GDPR Art. 17). Отдельный раздел
+                    сайдбара, а не часть редактора контента. */}
+                {section === 'account' && (
+                    <DeleteAccountSection accountEmail={accountEmail} />
                 )}
                 </div>
             </div>

@@ -25,6 +25,27 @@ export async function getMyProfileId(): Promise<string | null> {
     return profile?.id ?? null;
 }
 
+/**
+ * Email текущего пользователя. Нужен разделу удаления аккаунта для
+ * подтверждения (GDPR Art. 17) и админке. Возвращает только адрес
+ * владельца сессии — чужие адреса таким способом не получить.
+ */
+export async function getMyAccountEmail(): Promise<string | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const me = await db.query.users.findFirst({
+        where: { id: userId },
+        columns: { email: true },
+    });
+
+    return me?.email ?? null;
+}
+
 export type ProfileData = {
     id: string;
     fullName: string;
