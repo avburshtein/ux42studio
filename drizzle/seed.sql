@@ -17,7 +17,10 @@ INSERT INTO profiles (id, user_id, slug, full_name, headline, bio, location, web
 VALUES (
   'prf_denis_01',
   '{{ADMIN_ID}}',
-  'denis-zakharchenko',
+  -- Слаг обязан совпадать со STUDIO_PROFILE_SLUG (wrangler.toml [vars]):
+  -- главная ищет профиль студии именно по нему. Меняя здесь slug, правь
+  -- и .dev.vars, и wrangler.toml — иначе главная покажет чужой/пустой профиль.
+  'aleksandra-burshtein',
   'Denis Zakharchenko',
   'Frontend Architect & MedTech Lead',
   'Senior Software Engineer specializing in complex MedTech & B2B Web Applications.',

@@ -35,6 +35,27 @@ npx wrangler secret put JWT_SECRET
 > Секреты **никогда** не кладутся в `.env.local`, который может попасть
 > в репозиторий, и тем более в клиентский бандл.
 
+### Почему это не пожелание, а необходимость
+
+`@opennextjs/cloudflare` при сборке вызывает `extractProjectEnvVars()`
+(`dist/cli/utils/extract-project-env-vars.js`): он читает `.env`, `.env.{mode}`,
+`.env.local` и `.env.{mode}.local` и записывает их значения в
+`.open-next/cloudflare/next-env.mjs`, откуда они уезжают в **задеплоенный
+воркер**. Проверено на практике: `CLOUDFLARE_D1_TOKEN` и `JWT_SECRET` из
+`.env.local` оказывались в бандле.
+
+Поэтому `npm run deploy` (и `build:cf` / `upload` / `preview`) идут через
+`scripts/build-cloudflare.mjs`, который на время сборки убирает env-файлы, а
+после сборки возвращает их на место. Проверка после сборки:
+
+```bash
+cat .open-next/cloudflare/next-env.mjs   # должно быть три экспорта: {} {} {}
+grep -c "cfut_" .open-next/worker.js     # должно быть 0
+```
+
+Флаг `--with-env` (только для локальной отладки) оставляет env-файлы на месте —
+для прода его использовать нельзя.
+
 ## 2. Локальная разработка
 
 ```bash
@@ -82,15 +103,55 @@ npm run smoke
 
 ```bash
 npm run check                      # tsc --noEmit + eslint (обязательно)
-npm run deploy                     # opennextjs-cloudflare build && deploy
+npm run deploy                     # сборка + публикация
 ```
 
-Или по шагам:
+`npm run deploy` = `npm run build:cf && node scripts/build-cloudflare.mjs deploy`,
+то есть ровно то же, что раньше делали `opennextjs-cloudflare build && deploy`,
+но через обёртку (см. раздел 1 и раздел 4.1).
+
+Разбить на шаги:
 
 ```bash
-npx opennextjs-cloudflare build    # сборка в .open-next/
-npx wrangler deploy                # публикация в Cloudflare
+npm run build:cf                          # только сборка в .open-next/
+npx wrangler deploy --dry-run             # проверка бандла без публикации
+npx wrangler deploy                       # публикация
 ```
+
+> Публиковать нужно тем же аккаунтом, в котором лежат D1, R2 и домен.
+> `wrangler` берёт `account_id` из `CLOUDFLARE_ACCOUNT_ID` (`.env.local`) —
+> если в браузере выполнен `wrangler login` под другим аккаунтом, деплой
+> упадёт с `Authentication error [code: 10000]`. Проверка:
+> `npx wrangler deployments list` — команда должна показать деплои, а не ошибку.
+
+### 4.1. Сборка на Windows и в путях с кириллицей
+
+На Windows `fs.cpSync()` и `fs.rmSync()` **молча не делают ничего**, если путь
+содержит не-ASCII символы (кириллицу в имени папки — `D:\Хранилище\Projects\...`).
+Проверено на Node v22.23.3 и v24.13.0: операция завершается без ошибки, но не
+копирует и не удаляет ни одного файла. Остальные операции (`mkdir`, `writeFile`,
+`read`, `readdir`, `stat`, `copyFile`, `rename`, `unlink`) работают корректно —
+ломаются только рекурсивные.
+
+Как это выглядело без обхода:
+
+- `initOutputDir()` копирует скомпилированный `open-next.config.edge.mjs` в
+  `.open-next/.build` через `cpSync` → сборка падала с `ENOENT`;
+- `createAssets()` так же потерял бы `.next/static` и `public` — то есть в
+  воркер уехал бы воркер без CSS/JS;
+- `rmSync` не чистил `.open-next`, а `compileEnvFiles()` дописывает блоки в
+  `next-env.mjs` через `appendFileSync` — накапливались дубли
+  `export const production`, и бандл переставал собираться.
+
+`scripts/cp-sync-polyfill.cjs` подменяет `cpSync` и `rmSync` рекурсивными
+реализациями на `copyFileSync` / `unlinkSync` + `rmdirSync` (ASCII-пути при
+этом уходят в нативный код). Он подключается из `scripts/build-cloudflare.mjs`
+до импорта OpenNext. Отдельный `npm run` для ручного вызова не нужен, но при
+желании: `node -r ./scripts/cp-sync-polyfill.cjs <opennext-cli> build`.
+
+Скрипт работает и на Linux/macOS (там нативный код не сломан, патч просто
+не вмешивается), так что `npm run deploy` одинаково пригоден на всех
+платформах.
 
 ### Миграции D1
 
@@ -101,6 +162,29 @@ npm run db:seed:remote             # сид (категории, цветовы�
 
 > Миграции применяются **до** деплоя нового кода: если код ждёт новую
 > колонку, а её нет — публичные страницы упадут на 500.
+
+> ⚠️ `scripts/apply-migrations.mjs` применяет **все** миграции подряд, каждый
+> раз. Он не идемпотентен: `CREATE TABLE` без `IF NOT EXISTS` упадёт на уже
+> применённой миграции, а `ALTER TABLE ... ADD COLUMN` — на уже добавленной
+> колонке. Запускать его на базе, которая частично мигрирована, нельзя.
+>
+> Сверить состояние базы с кодом:
+>
+> ```bash
+> export CLOUDFLARE_API_TOKEN=<токен из .env.local: CLOUDFLARE_D1_TOKEN>
+> npx wrangler d1 execute ux42-portfolio-db --remote \
+>   --command "SELECT name FROM pragma_table_info('projects')"
+> ```
+>
+> и применять только недостающие миграции по одной:
+>
+> ```bash
+> npx wrangler d1 execute ux42-portfolio-db --remote \
+>   --file="drizzle/20260916120000_add_case_sorting/migration.sql"
+> ```
+>
+> Бэкап перед миграциями: `npx wrangler d1 export ux42-portfolio-db --remote \
+> --output backup.sql`.
 
 ## 5. Создание первого суперадмина (один раз)
 
