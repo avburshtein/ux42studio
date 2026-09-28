@@ -88,7 +88,15 @@ function restoreEnvFiles() {
     }
 }
 
-if (!withEnv) {
+const isBuild = cliArgs[0] === 'build';
+
+// Прячем env-файлы ТОЛЬКО на фазе build. На фазе deploy прятать нельзя:
+// из `.env.local` wrangler берёт CLOUDFLARE_ACCOUNT_ID, и без него
+// публикация уходит в личный аккаунт вместо аккаунта с воркером
+// ("Could not route to /client/v4/accounts/<личный>/workers/services/ux42next,
+// code 7003"). Секреты на deploy не попадают в бандл — бандл уже собран
+// фазой build, где env-файлы спрятаны.
+if (!withEnv && isBuild) {
     for (const name of ENV_FILES) {
         const original = path.join(projectRoot, name);
         if (fs.existsSync(original)) {
@@ -112,7 +120,7 @@ require('./cp-sync-polyfill.cjs');
 // 2. Чистка next-env.mjs: OpenNext дописывает в него блоки при каждой сборке.
 //    Только для `build` — фазе `deploy` этот файл нужен готовым (его импортирует
 //    .open-next/cloudflare/init.js), и генерируется он именно при сборке.
-if (cliArgs[0] === 'build') {
+if (isBuild) {
     fs.rmSync(NEXT_ENV_OUTPUT, { force: true });
 }
 
