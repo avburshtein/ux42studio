@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Input } from '../ui/Input';
+import { PasswordInput } from '../ui/PasswordInput';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
 
@@ -57,9 +58,8 @@ export default function LoginForm() {
             </div>
             <div>
                 <Label htmlFor='password'>Пароль</Label>
-                <Input
+                <PasswordInput
                     id='password'
-                    type='password'
                     required
                     autoComplete='current-password'
                     value={password}

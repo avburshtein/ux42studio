@@ -21,3 +21,15 @@ STUDIO_PROFILE_SLUG=aleksandra-burshtein
 # (см. README, раздел «Создание первого суперадмина»).
 ADMIN_EMAIL=admin@ux42.studio
 ADMIN_PASSWORD=replace-me
+
+# ─── Письма с приглашениями (см. Docs/EMAIL.md) ────────────────────────────
+# Провайдер №1 — Resend (работает на любом тарифе Cloudflare, бесплатно
+# 3 000 писем/мес). Ключ: https://resend.com/api-keys
+# RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+#
+# Провайдер №2 — Cloudflare Email Service: ключ не нужен, только биндинг
+# `send_email` в wrangler.toml (раскомментировать) + тариф Workers Paid.
+#
+# Адрес отправителя и публичный адрес сайта (для ссылок в письмах).
+EMAIL_FROM_NAME=UX42 Studio
+APP_URL=https://ux42.studio

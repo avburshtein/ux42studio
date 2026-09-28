@@ -11,6 +11,10 @@ declare namespace Cloudflare {
         JWT_SECRET: string;
         ADMIN_EMAIL: string;
         ADMIN_PASSWORD: string;
+        STUDIO_PROFILE_SLUG: string;
+        EMAIL_FROM: string;
+        EMAIL_FROM_NAME: string;
+        APP_URL: string;
     }
 }
 interface CloudflareEnv extends Cloudflare.Env {}

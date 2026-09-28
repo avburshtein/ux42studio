@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/Button';
+import { Button, buttonVariants } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import PageTitle from '@/components/ui/PageTitle';
@@ -15,7 +15,7 @@ import {
     getMyProfile,
 } from '@/lib/actions/profile';
 import Link from 'next/link';
-import { Eye } from 'lucide-react';
+import { Eye, KeyRound } from 'lucide-react';
 import FormBox from '@/components/ui/FormBox';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
@@ -200,6 +200,17 @@ export default function ProfilePage() {
                                 </li>
                             ))}
                         </ul>
+                        {/* Постоянный вход в смену пароля — виден в любом
+                            разделе сайдбара, а не только в блоке Profile. */}
+                        <div className='mt-4 border-t border-outline-variant pt-2'>
+                            <Link
+                                href='/admin/profile/password'
+                                className='flex items-center gap-2 rounded-md px-3 py-2 text-body-sm text-on-surface-variant transition-colors hover:bg-surface-variant hover:text-on-surface'
+                            >
+                                <KeyRound className='h-4 w-4' />
+                                Изменить пароль
+                            </Link>
+                        </div>
                         {slug && (
                             <div className='mt-8 hidden border-t border-outline-variant pt-4 md:block'>
                                 <Link
@@ -232,14 +243,35 @@ export default function ProfilePage() {
                         )}
                     </div>
 
-                    {/* Change Password */}
-                    <div className=''>
-                        <Link
-                            href='/admin/profile/password'
-                            className='text-body-sm text-primary hover:underline'
-                        >
-                            Перейти к смене пароля →
-                        </Link>
+                    {/* Смена пароля ведёт на отдельную страницу
+                        /admin/profile/password. Раньше здесь была бледная
+                        текстовая ссылка, которую легко было не заметить, —
+                        теперь это заметный блок с кнопкой. */}
+                    <div className='rounded-lg border border-outline-variant bg-surface-container-low p-4'>
+                        <div className='flex flex-wrap items-center justify-between gap-3'>
+                            <div className='flex items-start gap-3'>
+                                <KeyRound className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
+                                <div>
+                                    <p className='text-title-sm text-on-surface'>
+                                        Пароль и доступ
+                                    </p>
+                                    <p className='text-body-sm text-on-surface-variant'>
+                                        При регистрации выдан сгенерированный
+                                        пароль — замените его своим.
+                                    </p>
+                                </div>
+                            </div>
+                            <Link
+                                href='/admin/profile/password'
+                                className={buttonVariants({
+                                    variant: 'outline',
+                                    className: 'gap-2',
+                                })}
+                            >
+                                <KeyRound className='h-4 w-4' />
+                                Изменить пароль
+                            </Link>
+                        </div>
                     </div>
 
                     <div>

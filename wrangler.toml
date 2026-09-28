@@ -27,6 +27,25 @@ directory = ".open-next/assets"
 [vars]
 STUDIO_PROFILE_SLUG = "aleksandra-burshtein"
 
+# Адрес отправителя писем (приглашения + «аккаунт создан»). Домен должен
+# быть подтверждён у провайдера почты. Формат поддерживает имя:
+# "UX42 Studio <no-reply@ux42.studio>".
+EMAIL_FROM = "UX42 Studio <no-reply@ux42.studio>"
+EMAIL_FROM_NAME = "UX42 Studio"
+
+# Публичный адрес сайта — используется в ссылках внутри писем.
+APP_URL = "https://ux42.studio"
+
+# Отправка писем через Cloudflare Email Service. Раскомментировать, если
+# тариф Workers Paid, а домен включён командой
+# `npx wrangler email sending enable ux42.studio`. На Workers Free Email
+# Sending недоступен (Pricing: Email Sending = only Paid), поэтому по
+# умолчанию используется HTTP-провайдер (RESEND_API_KEY как secret).
+# Таблица должна быть на верхнем уровне файла, не внутри [vars].
+#
+# [[send_email]]
+# name = "EMAIL"
+
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "ux42next"

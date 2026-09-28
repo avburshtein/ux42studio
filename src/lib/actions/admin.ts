@@ -1,11 +1,17 @@
 'use server';
 
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { headers } from 'next/headers';
 import { getDb } from '@/db';
 import { users, invites } from '@/db/schema/users';
 import { projects } from '@/db/schema/projects';
 import { eq } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
+import {
+    sendInviteEmail,
+    resolveAppUrl,
+    type EmailSendStatus,
+} from '@/lib/email/send';
 
 export async function toggleUserActive(userId: string) {
     const { env } = await getCloudflareContext();
@@ -61,7 +67,25 @@ export async function createInvite(data: {
     });
 
     revalidatePath('/super-admin');
-    return { id, code };
+    revalidatePath('/super-admin/invites');
+
+    // Письмо с кодом и пошаговой инструкцией по регистрации.
+    // Отправка не бросает исключений: если почта не настроена или ошибка —
+    // инвайт всё равно создан, статус уходит в интерфейс (форму показывает
+    // код, который можно переслать вручную).
+    const to = data.email?.trim();
+    let mail: EmailSendStatus | null = null;
+    if (to) {
+        const appUrl = resolveAppUrl(env, (await headers()).get('host'));
+        mail = await sendInviteEmail({
+            toEmail: to,
+            code,
+            registerUrl: `${appUrl}/register?invite=${encodeURIComponent(code)}`,
+            expiresAt: data.expiresAt,
+        });
+    }
+
+    return { id, code, email: to ?? null, mail };
 }
 
 export async function revokeInvite(inviteId: string) {

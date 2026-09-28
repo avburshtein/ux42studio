@@ -5,6 +5,7 @@ import { users, invites } from '@/db/schema/users';
 import { eq } from 'drizzle-orm';
 import { signJwt } from '@/lib/jwt';
 import { hashPassword } from '@/lib/crypto';
+import { sendRegisteredEmail, resolveAppUrl } from '@/lib/email/send';
 
 export async function POST(req: Request) {
     try {
@@ -80,6 +81,17 @@ export async function POST(req: Request) {
         const payload = { userId: id, email, role: 'user' };
         const token = await signJwt(payload, jwtSecret);
         const maxAge = 60 * 60 * 24 * 7;
+
+        // Письмо «аккаунт создан» с планом первых шагов (сменить пароль →
+        // заполнить профиль → собрать первый кейс). Пароль в письмо не
+        // попадает намеренно. Функция не бросает исключений, поэтому
+        // не настроенная почта не ломает регистрацию.
+        const appUrl = resolveAppUrl(env, req.headers.get('host'));
+        await sendRegisteredEmail({
+            toEmail: email,
+            profileUrl: `${appUrl}/admin`,
+            passwordUrl: `${appUrl}/admin/profile/password`,
+        });
 
         const res = NextResponse.json({ ok: true, password });
         res.cookies.set('auth-token', token, {

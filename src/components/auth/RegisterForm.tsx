@@ -6,10 +6,16 @@ import { Input } from '../ui/Input';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
 
-export default function RegisterForm() {
+export default function RegisterForm({
+    defaultInviteCode = '',
+}: {
+    /** Код из ссылки /register?invite=CODE — подставляется в поле. */
+    defaultInviteCode?: string;
+}) {
     const router = useRouter();
     const [email, setEmail] = useState('');
-    const [invite, setInvite] = useState('');
+    // Код мог прийти в ссылке из письма-приглашения: /register?invite=CODE
+    const [invite, setInvite] = useState(defaultInviteCode);
     const [error, setError] = useState<string | null>(null);
     const [createdPassword, setCreatedPassword] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -76,6 +82,36 @@ export default function RegisterForm() {
                     >
                         {copied ? 'Скопировано!' : 'Скопировать'}
                     </Button>
+                </div>
+
+                <div className='space-y-2 border-t border-emerald-200 pt-4'>
+                    <p className='text-sm font-semibold text-emerald-900'>
+                        Что делать дальше
+                    </p>
+                    <ol className='space-y-1 text-sm text-emerald-800'>
+                        <li>
+                            Мы отправили письмо на {email} с этим же
+                            планом — загляните в «Спам», если не нашли.
+                        </li>
+                        <li>
+                            Смените пароль на удобный:{' '}
+                            <Link
+                                href='/admin/profile/password'
+                                className='font-semibold text-emerald-900 underline decoration-1 underline-offset-2'
+                            >
+                                Настройки профиля → Изменить пароль
+                            </Link>
+                            .
+                        </li>
+                        <li>
+                            Заполните «Настройки профиля» — это то, что
+                            видят посетители вашей страницы.
+                        </li>
+                        <li>
+                            Соберите первый кейс: «Ред. проекты» → «Новый
+                            проект».
+                        </li>
+                    </ol>
                 </div>
 
                 <div className='pt-2 flex justify-end'>

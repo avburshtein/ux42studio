@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Input } from '../ui/Input';
+import { PasswordInput } from '../ui/PasswordInput';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
 import { changePassword } from '@/lib/actions/auth';
@@ -69,9 +69,9 @@ export default function ChangePasswordForm() {
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div>
                 <Label htmlFor='currentPassword'>Текущий пароль</Label>
-                <Input
+                <PasswordInput
                     id='currentPassword'
-                    type='password'
+                    autoComplete='current-password'
                     {...register('currentPassword')}
                 />
                 {errors.currentPassword && (
@@ -83,9 +83,9 @@ export default function ChangePasswordForm() {
 
             <div>
                 <Label htmlFor='newPassword'>Новый пароль</Label>
-                <Input
+                <PasswordInput
                     id='newPassword'
-                    type='password'
+                    autoComplete='new-password'
                     {...register('newPassword')}
                 />
                 {errors.newPassword && (
@@ -97,9 +97,9 @@ export default function ChangePasswordForm() {
 
             <div>
                 <Label htmlFor='confirmPassword'>Подтверждение пароля</Label>
-                <Input
+                <PasswordInput
                     id='confirmPassword'
-                    type='password'
+                    autoComplete='new-password'
                     {...register('confirmPassword')}
                 />
                 {errors.confirmPassword && (

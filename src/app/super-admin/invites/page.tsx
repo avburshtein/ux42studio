@@ -5,10 +5,11 @@ import { getDb } from '@/db';
 import { invites, users } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import PageTitle from '@/components/ui/PageTitle';
 import Title from '@/components/ui/Title';
-import { createInvite, revokeInvite } from '@/lib/actions/admin';
+import CodeChip from '@/components/CodeChip';
+import InviteCreateForm from '@/components/InviteCreateForm';
+import { revokeInvite } from '@/lib/actions/admin';
 
 export default async function SuperAdminInvitesPage() {
     const headersList = await headers();
@@ -43,43 +44,7 @@ export default async function SuperAdminInvitesPage() {
                 <Title className='mb-4' variant='headline-sm'>
                     Создать инвайт
                 </Title>
-                <form
-                    action={async (formData: FormData) => {
-                        'use server';
-                        const email = formData.get('email') as string;
-                        const expiresAtStr = formData.get(
-                            'expiresAt',
-                        ) as string;
-                        await createInvite({
-                            email: email || undefined,
-                            createdByUserId: userId,
-                            expiresAt: expiresAtStr
-                                ? Math.floor(
-                                      new Date(expiresAtStr).getTime() / 1000,
-                                  )
-                                : undefined,
-                        });
-                    }}
-                    className='flex flex-wrap items-end gap-4'
-                >
-                    <div className='flex flex-col gap-1'>
-                        <label className='text-label-sm text-on-surface-variant'>
-                            Email (опционально)
-                        </label>
-                        <Input
-                            name='email'
-                            type='email'
-                            placeholder='user@example.com'
-                        />
-                    </div>
-                    <div className='flex flex-col gap-1'>
-                        <label className='text-label-sm text-on-surface-variant'>
-                            Expires At (опционально)
-                        </label>
-                        <Input name='expiresAt' type='date' />
-                    </div>
-                    <Button type='submit'>Generate</Button>
-                </form>
+                <InviteCreateForm createdByUserId={userId} />
             </div>
 
             <div className='overflow-x-auto rounded-lg border border-outline-variant'>
@@ -125,8 +90,10 @@ export default async function SuperAdminInvitesPage() {
                                     key={inv.id}
                                     className='border-b border-outline-variant last:border-0 hover:bg-surface-variant/30'
                                 >
-                                    <td className='px-4 py-3 text-body-sm font-mono text-on-surface'>
-                                        {inv.code}
+                                    <td className='px-4 py-3'>
+                                        {/* Клик по коду копирует его — как
+                                            блоки кода в чатах (Qwen и т.п.) */}
+                                        <CodeChip value={inv.code} />
                                     </td>
                                     <td className='px-4 py-3 text-body-sm text-on-surface-variant'>
                                         {inv.email || '—'}
