@@ -175,6 +175,41 @@ await check('Legal Notice / Terms открывается', () => expectOk('/term
 await check('Есть блок идентификации LSSI Art. 10', () => expectText('/terms', 'LSSI Art. 10'));
 await check('В условиях указан домен ux42.studio', () => expectText('/terms', 'ux42.studio'));
 
+// Проверки, добавленные 26.09.2026 после юридического аудита: они защищают
+// от возврата пробелов, найденных при проверке политик после деплоя.
+await check('Оба со-ответственных указаны (EN)', () => expectText('/privacy', 'Article 26 GDPR'));
+await check('Оба со-ответственных указаны (ES)', () => expectText('/privacy', 'artículo 26 del RGPD'));
+await check('Платформа указана как процессор (Resend, EN)', () => expectText('/privacy', 'Resend, Inc.'));
+await check('Данные учётных записей описаны', () => expectText('/privacy', 'Platform account'));
+await check('Данные учётных записей описаны (ES)', () => expectText('/privacy', 'Cuenta de la plataforma'));
+await check('Инвайты описаны как обработка ПДн', () => expectText('/privacy', 'Invitations to register'));
+await check('Ответственность дизайнеров раскрыта (EN)', () => expectText('/privacy', 'Responsibilities of portfolio owners'));
+await check('Ответственность дизайнеров раскрыта (ES)', () => expectText('/privacy', 'Responsabilidad de los titulares'));
+await check('Есть канал жалоб на контент', () => expectText('/privacy', 'privacy@ux42.studio'));
+await check('Оговорка об ответственности издателя в условиях (EN)', () => expectText('/terms', 'publisher responsibility'));
+await check('Оговорка об ответственности издателя в условиях (ES)', () => expectText('/terms', 'responsabilidad del editor'));
+
+// Симметрия EN/ES: испанская версия политики однажды обрывалась на §6 —
+// не было ни прав субъекта, ни права на жалобу в AEPD. Проверяем, что
+// испанская часть не короче английской по числу разделов.
+await check('ES-версия политики не короче EN (нет обрыва)', async () => {
+    const html = await (await expectOk('/privacy')).text();
+    // Разбиваем страницу по разделителю «Español» (LegalArticle рендерит
+    // EsDivider между EN- и ES-частями). Внутри h2 содержит только номер
+    // раздела, поэтому считаем сами h2, а не текст заголовка.
+    const splitAt = html.indexOf('Política de Privacidad');
+    assert(splitAt > 0, 'не найден разделитель между EN и ES частями');
+    const countH2 = (chunk) => (chunk.match(/<h2/g) || []).length;
+    const en = countH2(html.slice(0, splitAt));
+    const es = countH2(html.slice(splitAt));
+    assert(
+        es >= en,
+        `EN: ${en} разделов, ES: ${es} — испанская версия обрезана`,
+    );
+    assert(en > 0, 'EN-часть пуста — счётчик не работает');
+    return `EN: ${en}, ES: ${es}`;
+});
+
 // ── 3. Файлы, SEO и PWA ──
 group('3. Файлы, SEO и PWA');
 

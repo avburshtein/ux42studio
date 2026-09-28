@@ -7,7 +7,7 @@
 // (EN выровнен по ES). Мини-разметка строк: **жирный**; email/URL в
 // intro/bullets/contact подсвечиваются автолинками в LegalArticle.tsx.
 
-export const TERMS_LAST_UPDATED = 'September 11, 2026';
+export const TERMS_LAST_UPDATED = 'September 26, 2026';
 
 /** Подпись разделителя EN → ES */
 export const TERMS_ES_LABEL = 'Español — Aviso Legal y Condiciones de Uso';
@@ -21,6 +21,10 @@ export interface TermsSection {
     intro?: string[];
     /** Маркированный список */
     bullets?: string[];
+    /** Абзацы после списка (используется в §10 — «наша роль») */
+    outro?: string[];
+    /** Простые строки без автолинков */
+    lines?: string[];
     /** Подблок: полужирный заголовок + строки (email/URL подсвечиваются) */
     contact?: { title: string; lines: string[] };
 }
@@ -44,8 +48,10 @@ export const EN_TERMS_SECTIONS: TermsSection[] = [
             lines: [
                 'Domain: ux42.studio',
                 'Owner: Aleksandra Burshtein',
+                'Co-owner / technical operator: Denis Zakharchenko',
                 'Location: Villajoyosa, Alicante, Spain',
                 'Contact: hello@ux42.studio',
+                'Privacy and content complaints: privacy@ux42.studio',
             ],
         },
     },
@@ -101,7 +107,7 @@ export const EN_TERMS_SECTIONS: TermsSection[] = [
         number: 8,
         title: 'Modifications to Terms',
         intro: [
-            'Aleksandra Burshtein may revise these Terms of Use. Continued use of the Website after changes constitutes acceptance of the revised version.',
+            'Aleksandra Burshtein and Denis Zakharchenko, as the joint operators of this Website, may revise these Terms of Use. Continued use of the Website after changes constitutes acceptance of the revised version.',
         ],
     },
     {
@@ -109,6 +115,35 @@ export const EN_TERMS_SECTIONS: TermsSection[] = [
         title: 'Applicable law and jurisdiction',
         intro: [
             'These conditions are governed by Spanish law. Any dispute arising from access to or use of this website shall be submitted to the courts of Villajoyosa, Alicante, Spain.',
+        ],
+    },
+    {
+        number: 10,
+        title: 'Portfolio platform — publisher responsibility',
+        intro: [
+            'ux42.studio also operates a platform on which independent designers publish their own portfolios and case studies. Each designer is an independent publisher in respect of the content they upload and publish, and is solely responsible for that content.',
+            '**Each designer undertakes, as the party deciding what to publish, to:**',
+        ],
+        bullets: [
+            'Hold a lawful basis for any personal data of third parties published on their page (client names, testimonials, team photographs, metrics), including the corresponding consent where it is required.',
+            'Not publish special-category data (health, political or religious beliefs, sexual orientation, trade-union affiliation, etc.) without an appropriate legal basis.',
+            'Not publish content that is unlawful, infringes intellectual property, defames third parties, or violates the rights of image or privacy of any person.',
+            'Keep their published information accurate and up to date, and remove it when it is no longer accurate or when the person concerned objects.',
+            'Respond directly and promptly to requests from the person concerned, or to a competent authority, regarding the published content.',
+        ],
+        outro: [
+            '**Scope of our involvement.** UX42 Studio provides the technical platform and performs hosting, storage, access control, security and content moderation functions. Our responsibility for the content published by a designer is limited to those functions. The decision to publish, the selection of content, and the accuracy of what is published belong to the designer. This clause does not limit any obligation that Spanish law imposes on us as host or as joint data controller, nor our duty to act on complaints or removal orders addressed to privacy@ux42.studio.',
+        ],
+    },
+    {
+        number: 11,
+        title: 'Reporting content and complaints',
+        intro: [
+            'If you believe that content published on a portfolio page infringes your rights — including personal data, image rights, intellectual property, or defamatory content — report it to us. See section 14 of our Privacy Policy for the procedure.',
+        ],
+        bullets: [
+            '**Email:** privacy@ux42.studio, stating the URL of the page in question and the reason for the complaint.',
+            '**Our commitment:** we review every complaint, contact the designer concerned, and remove or restrict the content ourselves where the law requires it, where the content is manifestly unlawful, or where the designer does not respond within a reasonable period.',
         ],
     },
 
@@ -133,8 +168,10 @@ export const ES_TERMS_SECTIONS: TermsSection[] = [
             lines: [
                 'Dominio: ux42.studio',
                 'Titular: Aleksandra Burshtein',
+                'Cotitular y operador técnico: Denis Zakharchenko',
                 'Domicilio: Villajoyosa, Alicante, España',
                 'Contacto: hello@ux42.studio',
+                'Protección de datos y reclamaciones sobre contenido: privacy@ux42.studio',
             ],
         },
     },
@@ -190,7 +227,7 @@ export const ES_TERMS_SECTIONS: TermsSection[] = [
         number: 8,
         title: 'Modificaciones de las condiciones',
         intro: [
-            'Aleksandra Burshtein se reserva el derecho de revisar o ajustar estas Condiciones de Uso. El uso continuado del sitio tras los cambios implica su aceptación.',
+            'Aleksandra Burshtein y Denis Zakharchenko, como operadores conjuntos de este Sitio Web, se reservan el derecho de revisar o ajustar estas Condiciones de Uso. El uso continuado del sitio tras los cambios implica su aceptación.',
         ],
     },
     {
@@ -198,6 +235,35 @@ export const ES_TERMS_SECTIONS: TermsSection[] = [
         title: 'Legislación aplicable y jurisdicción',
         intro: [
             'Estas condiciones se rigen por la legislación española. Cualquier controversia derivada del acceso o uso de este sitio web será sometida a los juzgados de Villajoyosa, Alicante, España.',
+        ],
+    },
+    {
+        number: 10,
+        title: 'Plataforma de portafolios — responsabilidad del editor',
+        intro: [
+            'ux42.studio también opera una plataforma en la que diseñadores independientes publican sus propios portafolios y casos de estudio. Cada diseñador es un editor independiente respecto del contenido que carga y publica, y es el único responsable de dicho contenido.',
+            '**Cada diseñador se compromete, como parte que decide qué publicar, a:**',
+        ],
+        bullets: [
+            'Tener una base jurídica para cualquier dato personal de terceros que publique en su página (nombres de clientes, testimonios, fotografías de equipo, métricas), incluido el consentimiento correspondiente cuando sea necesario.',
+            'No publicar datos de categorías especiales (salud, creencias políticas o religiosas, orientación sexual, afiliación sindical, etc.) sin una base jurídica adecuada.',
+            'No publicar contenido que sea ilegal, vulnere derechos de propiedad intelectual, difame a terceros o наруve los derechos de imagen o privacidad de alguna persona.',
+            'Mantener su información publicada veraz y actualizada, y retirarla cuando deje de ser exacta o cuando el interesado se oponga.',
+            'Atender de forma directa y rápida las solicitudes del interesado o de una autoridad competente sobre el contenido publicado.',
+        ],
+        outro: [
+            '**Alcance de nuestra intervención.** UX42 Studio aporta la plataforma técnica y realiza funciones de alojamiento, almacenamiento, control de acceso, seguridad y moderación de contenidos. Nuestra responsabilidad sobre el contenido publicado por un diseñador se limita a esas funciones. La decisión de publicar, la selección del contenido y la exactitud de lo publicado corresponden al diseñador. Esta cláusula no limita ninguna obligación que la legislación española nos imponga como anfitrión o como responsables conjuntos del tratamiento, ni nuestro deber de actuar ante reclamaciones u órdenes de retirada dirigidas a privacy@ux42.studio.',
+        ],
+    },
+    {
+        number: 11,
+        title: 'Denuncia de contenido y reclamaciones',
+        intro: [
+            'Si considera que el contenido publicado en una página de portafolio vulnera sus derechos —incluidos datos personales, derechos de imagen, propiedad intelectual o contenido difamatorio— denomínelo. Véase el apartado 14 de nuestra Política de Privacidad para el procedimiento.',
+        ],
+        bullets: [
+            '**Correo electrónico:** privacy@ux42.studio, indicando la URL de la página en cuestión y el motivo de la reclamación.',
+            '**Nuestro compromiso:** revisamos cada reclamación, contactamos con el diseñador afectado y retiramos o restringimos el contenido nosotros mismos cuando la ley lo exija, cuando el contenido sea manifiestamente ilícito o cuando el diseñador no responda en un plazo razonable.',
         ],
     },
 
