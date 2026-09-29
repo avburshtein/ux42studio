@@ -194,9 +194,19 @@ export default async function HomePage({
                         )}
 
                         {cards.length === 0 ? (
-                            <p className='py-16 text-body-lg text-on-surface-variant'>
-                                No published projects yet
-                            </p>
+                            <div className='py-16 text-body-lg text-on-surface-variant'>
+                                {/* Публичных кейсов пока нет — вместо сухого
+                                    «No published projects yet» объясняем, что
+                                    происходит: сайт в разработке, галерея
+                                    наполняется, скоро будут проекты (тон §6.2:
+                                    первое лицо во множественном числе, без
+                                    канцелярита). */}
+                                <p>
+                                    Still in development — we’re filling
+                                    the gallery with projects worth seeing.
+                                    They’ll be here very soon.
+                                </p>
+                            </div>
                         ) : (
                             /* <sm — карусель (решение (34): карточки главной и страницы
                                 дизайнера идентичны: ширина 327 @375 = ширине сетки,
