@@ -25,9 +25,10 @@
 
 1. **Дизайн-система, токены и правила UI:** Читай `../Docs/design-system.md` — это **канонический** документ по реализованному UI (токены, компоненты, лейауты, a11y, анти-паттерны). `design-system-ux42.md` и `UX42 Design System — Full Reference.pdf` — **спека для Figma**, а не описание кода.
 2. **Правила Layout, Сетка и Компоненты:** Читай `Docs/design-system.md` §2 (токены), §3 (компоненты), §4 (лейауты, брейкпоинты), §5 (доступность), §7 (анти-паттерны). Старый `ui-rules.md` упразднён и содержит только указатель.
-3. **Конструктор кейсов и Спецификация формы:** Читай `case-template-spec.md` (на базе `case-template — Flow Description.pdf`).
-4. **Юридический комплаенс (Испания/ЕС 2026):** Читай `legal-and-compliance.md` (LSSI, RGPD, EAA 2025, VeriFactu).
-5. **Стратегия, Роли и Команда:** Читай `positioning-and-offers.md` и `УСТАВ КОМАНДЫ «DIGITAL CRAFTSMANSHIP»`.
+3. **Перенос токенов в Figma:** Читай `Docs/figma-tokens.md` — карта «код ↔ Figma»: какая роль M3 какому токену соответствует, что переименовать и что завести. Актуально при синхронизации Figma с `src/app/globals.css`.
+4. **Конструктор кейсов и Спецификация формы:** Читай `case-template-spec.md` (на базе `case-template — Flow Description.pdf`).
+5. **Юридический комплаенс (Испания/ЕС 2026):** Читай `legal-and-compliance.md` (LSSI, RGPD, EAA 2025, VeriFactu).
+6. **Стратегия, Роли и Команда:** Читай `positioning-and-offers.md` и `УСТАВ КОМАНДЫ «DIGITAL CRAFTSMANSHIP»`.
 
 ---
 

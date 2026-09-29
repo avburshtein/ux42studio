@@ -228,7 +228,9 @@ export default function ProfilePage() {
                                     href={`/u/${slug}`}
                                     target='_blank'
                                     rel='noopener noreferrer'
-                                    className='flex items-center gap-1 text-body-sm text-primary transition-colors hover:text-primary-variant'
+                                    // C2: см. WizardSidebar — hover:text-primary-variant
+                                    // заменён на state layer (opacity), токена в M3 нет.
+                                    className='flex items-center gap-1 text-body-sm text-primary transition-opacity duration-150 ease-out hover:opacity-80'
                                 >
                                     <Eye />{' '}
                                     <span className='font-medium'>

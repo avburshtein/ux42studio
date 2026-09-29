@@ -102,12 +102,10 @@ export default async function AuthBar({
                     {isOwner && projectId && (
                         <Link
                             href={`/admin/projects/${projectId}/edit/general`}
-                            // C2: класс hover:text-primary-variant ссылался на
-                            // несуществующий токен → hover просто не срабатывал.
-                            // Временно приглушение вместо цвета; как только
-                            // придёт реальный primary-variant из Figma —
-                            // вернуть hover:text-primary-variant.
-                            className='text-label-sm text-primary hover:opacity-80 transition-opacity font-medium'
+                            // C2: hover:text-primary-variant — несуществующий
+                            // токен (роли Primary Variant в M3 нет). Здесь
+                            // state layer: приглушение в hover.
+                            className='text-label-sm text-primary transition-opacity duration-150 ease-out hover:opacity-80 font-medium'
                         >
                             Редактировать проект
                         </Link>

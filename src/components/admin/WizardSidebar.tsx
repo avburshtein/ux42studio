@@ -62,7 +62,14 @@ export function WizardSidebar({
                             href={`/u/${profileSlug}/${projectSlug}`}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='text-body-sm text-primary hover:text-primary-variant transition-colors flex gap-1 items-center'
+                            // C2: hover:text-primary-variant ссылался на
+                            // несуществующий токен. В M3 роли Primary Variant
+                            // нет (это имя из Material 2), и Figma-агент
+                            // подтвердил: токена нет и в макете. Элемент уже
+                            // text-primary, поэтому цвет в hover не
+                            // переключаем — используем state layer (opacity),
+                            // как и в остальных ссылках проекта.
+                            className='flex items-center gap-1 text-body-sm text-primary transition-opacity duration-150 ease-out hover:opacity-80'
                         >
                             <Eye />{' '}
                             <span className='font-medium'>
