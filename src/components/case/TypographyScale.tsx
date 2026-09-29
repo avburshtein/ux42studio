@@ -17,15 +17,20 @@ export function TypographyScale({
     if (!displayFont && !bodyFont) return null;
 
     // Figma: Typography Scale [280:217] — 1072×351
-    // Единый контейнер с border, radius=20, 4 строки (Display Large, Display Small, Body Large, Body Small)
+    // Единый контейнер с контуром border-outline-faint и radius 12px
+    // (rounded-base), 4 строки: Display Large, Display Small, Body Large, Body Small
     return (
         <div className={cn('flex flex-col gap-6', className)}>
             <SectionLabel>Type scale</SectionLabel>
-            <div className='flex flex-col overflow-hidden rounded-[12px] border border-outline-variant bg-surface-container-lowest'>
+            {/* Контейнер — границы 1:1 с секцией Color Tokens:
+                border-outline-faint (Figma border.light/.dark) вместо
+                outline-variant, который был заметно темнее и выбивался
+                из пары. Радиус rounded-base = 12px (без rounded-[12px]). */}
+            <div className='flex flex-col overflow-hidden rounded-base border border-outline-faint bg-surface-container-lowest'>
                 {displayFont && (
                     <>
                         {/* Row 1: Display Large */}
-                        <div className='flex flex-col gap-3 border-b border-outline-variant px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
+                        <div className='flex flex-col gap-3 border-b border-outline-faint px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
                             <span className='shrink-0 text-label-md text-on-surface-variant'>
                                 Display Large
                             </span>
@@ -34,7 +39,7 @@ export function TypographyScale({
                             </span>
                         </div>
                         {/* Row 2: Display Small */}
-                        <div className='flex flex-col gap-3 border-b border-outline-variant px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
+                        <div className='flex flex-col gap-3 border-b border-outline-faint px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
                             <span className='shrink-0 text-label-md text-on-surface-variant'>
                                 Display Small
                             </span>
@@ -47,7 +52,7 @@ export function TypographyScale({
                 {bodyFont && (
                     <>
                         {/* Row 3: Body Large */}
-                        <div className='flex flex-col gap-3 border-b border-outline-variant px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
+                        <div className='flex flex-col gap-3 border-b border-outline-faint px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
                             <span className='shrink-0 text-label-md text-on-surface-variant'>
                                 Body Large
                             </span>

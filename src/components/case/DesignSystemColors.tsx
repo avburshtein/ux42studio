@@ -205,11 +205,14 @@ export function DesignSystemColors({
                 Color Tokens
             </p>
 
-            {/* Карточка (раздел 4) */}
+            {/* Карточка (раздел 4) — контур border-outline-faint (Figma
+                border.light/.dark), тот же токен, что у Type scale:
+                раньше был хардкод rgba(113,118,114,.1), который в тёмной
+                теме на фоне #0E0E0F был почти не виден. Радиус
+                rounded-base = 12px. */}
             <div
-                className='flex w-full flex-col gap-3 rounded-[12px] border px-5'
+                className='flex w-full flex-col gap-3 rounded-base border border-outline-faint px-5'
                 style={{
-                    borderColor: 'rgba(113,118,114,0.1)',
                     backgroundColor: isDark ? '#0E0E0F' : '#FFFFFF',
                     paddingTop: '20px',
                     paddingBottom: '24px',

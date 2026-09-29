@@ -77,6 +77,7 @@
 | `--md-sys-color-on-surface-variant` | `text-on-surface-variant` | `#44474b` | `#c5c6cc` |
 | `--md-sys-color-outline` | `border-outline` | `#75777c` | `#8f9196` |
 | `--md-sys-color-outline-variant` | `border-outline-variant` | `#c5c6cc` | `#44474b` |
+| `--md-sys-color-outline-faint` | `border-outline-faint` | `rgba(0,0,0,.1)` | `rgba(255,255,255,.15)` |
 | `--md-sys-color-scrim` | — (только в градиентах) | `#000000` | `#000000` |
 | `--md-sys-color-surface-container-lowest` | `bg-surface-container-lowest` | `#ffffff` | `#0e0e0f` |
 | `--md-sys-color-surface-container-low` | `bg-surface-container-low` | `#f6f3f4` | `#1b1b1d` |
@@ -90,6 +91,14 @@
 **Как читать роли поверхностей снизу вверх** (M3-шкала): `lowest` (канвас страницы, `body`) → `low` (шапка-стекло, карточки-плашки) → `container` (секции, benefit-карточки) → `high` → `highest` (оверлеи, hover-подложки). Поверх ставится текст: `on-surface` (основной) или `on-surface-variant` (вторичный).
 
 **Правило «поверх-подложки»:** подбирайте пару «поверхность + on-цвет» по соседней ступени, а не «по вкусу». Проверенные пары: `lowest`+`on-surface`, `low`+`on-surface`, `container`+`on-surface`, `primary`+`on-primary`, `primary-container`+`on-primary-container`, `error`+`on-error`, `error-container`+`on-error-container`.
+
+**Три уровня контура — не путать:**
+
+| Токен | Где | Правило |
+|---|---|---|
+| `border-outline-variant` | границы отдельных элементов (свотчи цветов, поля, карточки) | видимый, сплошной |
+| `border-outline-faint` | контур **карточки-контейнера** (Color Tokens, Type scale) | едва заметный, полупрозрачный; значения взяты из Figma-токенов `border.light` / `border.dark` |
+| хардкод цвета в `style` | запрещён | если нужен «свой» оттенок границы — это новый токен в `globals.css`, а не литерал в компоненте |
 
 > **Важно про тёмную тему.** Тёмная палитра объявлена дважды: `[data-theme="dark"]` (явный выбор) и `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` (системный фолбэк). Значения совпадают намеренно — так тема применяется до первого клика пользователя. Токен `Background` в тёмной теме **не** используется как канвас страницы: `body` красится `surface-container-lowest`, а `background` остаётся под футером и фолбэком обложки (решение (12)).
 
@@ -759,7 +768,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | # | Расхождение | Исправление | Файлы |
 |---|---|---|---|
 | **M1** | Нет глобального `prefers-reduced-motion` (учитывается только `FloatingElements`) | Добавить в `globals.css`: `@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }` | `src/app/globals.css` |
-| **M2** | Произвольные радиусы в разметке: `rounded-[12px]`, `rounded-[24px]`, `rounded-[48px]` | Заменить на `rounded-base`, `rounded-3xl`, `rounded-5xl` | `case/DesignSystemColors.tsx:210`, `app/(public)/page.tsx:323`, `case/SiteHeader.tsx:430` |
+| **M2** | Произвольные радиусы в разметке: `rounded-[12px]`, `rounded-[24px]`, `rounded-[48px]` | `rounded-[12px]` → `rounded-base` — **сделано** в `DesignSystemColors`/`TypographyScale`. Остались: `rounded-[24px]`, `rounded-[48px]` | `case/DesignSystemColors.tsx`, `app/(public)/page.tsx:323`, `case/SiteHeader.tsx:430` |
 | **M3** | `Lightbox` и `ImageCropperDialog` на `z-[70]` — значение не было закреплено | **Закрыто:** `z-[70]` и `z-[100]` разрешены явно (§2.5), код менять не нужно |
 | **M4** | `Hero` компенсирует паддинги контейнера через `-mx-4`/`-mx-8` + `w-[calc(100%+…)]` | **Закрыто:** full-bleed зафиксирован как норма в §2.6 |
 | **M5** | ~~В UI есть ссылки на M3 fixed-роли (`*-fixed`), которых нет в палитре~~ | **Закрыто:** семейство `secondary-fixed-dim` / `on-secondary-fixed` заведено в палитру (§2.1.2) и используется `FAB` | `globals.css`, `FAB.tsx` |
