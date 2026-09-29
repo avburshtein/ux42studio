@@ -65,10 +65,10 @@
 | `--md-sys-color-on-tertiary` | `text-on-tertiary` | `#ffffff` | `#2d312e` |
 | `--md-sys-color-tertiary-container` | `bg-tertiary-container` | `#fbfffa` | `#dfe4df` |
 | `--md-sys-color-on-tertiary-container` | `text-on-tertiary-container` | `#717672` | `#616562` |
-| `--md-sys-color-error` | `bg-error` / `text-error` | `#d4183d` | `#ff6a74` |
-| `--md-sys-color-on-error` | `text-on-error` | `#ffffff` | `#680016` |
-| `--md-sys-color-error-container` | `bg-error-container` | `#ffdad9` | `#7e2a30` |
-| `--md-sys-color-on-error-container` | `text-on-error-container` | `#40000a` | `#ffdad9` |
+| `--md-sys-color-error` | `bg-error` / `text-error` | `#8a5100` | `#ffb86e` |
+| `--md-sys-color-on-error` | `text-on-error` | `#ffffff` | `#492900` |
+| `--md-sys-color-error-container` | `bg-error-container` | `#d17d00` | `#d17d00` |
+| `--md-sys-color-on-error-container` | `text-on-error-container` | `#402300` | `#402300` |
 | `--md-sys-color-background` | `bg-background` | `#f7faf5` | `#101412` |
 | `--md-sys-color-on-background` | `text-on-background` | `#181d1a` | `#e0e3df` |
 | `--md-sys-color-surface` | `bg-surface` | `#fcf8fa` | `#131314` |
@@ -122,12 +122,18 @@
 |---|---|---|---|
 | `secondary-fixed-dim` / `on-secondary-fixed` | `#f2f0f4` / `#333338` | `#3a3a3c` / `#e5e2e6` | 11.10:1 / 8.84:1 |
 | `surface-tint` / `on-surface-tint` | `#056c4d` / `#ffffff` | `#83d7b1` / `#003826` | 6.44:1 / 7.73:1 |
-| `error` / `on-error` | `#d4183d` / `#ffffff` | `#ff6a74` / `#680016` | 4.99:1 / 6.69:1 |
-| `error-container` / `on-error-container` | `#ffdad9` / `#40000a` | `#7e2a30` / `#ffdad9` | 13.32:1 / 7.20:1 |
+| `error` / `on-error` | `#8a5100` / `#ffffff` | `#ffb86e` / `#492900` | 6.12:1 / 10.91:1 |
+| `error-container` / `on-error-container` | `#d17d00` / `#402300` | `#d17d00` / `#402300` | 4.56:1 |
 
-**Семейство Error и Figma.** `error` в светлой теме = **`#d4183d` из Figma-токенов** (`semantic.destructive`) — значение взято как есть. Тёмная тема — **производная от того же тона** (hue 17), потому что само значение `#d4183d` на тёмном фоне даёт 3.53:1, то есть ниже AA. Взят тон 64 (`#ff6a74`), а не м3-овский тон 80: тот даёт бледный `#ffb3b4`, почти неотличимый от `secondary` `#ffb3b1`. Контейнер в тёмной теме переведён с янтарного `#d17d00` (4.56:1, впритык с AA) на тон 30 того же тона — `#7e2a30`, что даёт 7.20:1.
+**Семейство Error — источник истины: экспорт M3 из Figma**, `material-theme/Light.tokens.json` и `Dark.tokens.json` (раздел `Schemes`). Значения взяты как есть, все 16 токенов сверены автоматически.
 
-> **Роль `secondary` в этом проекте — красный** (`#b12a33` / `#ffb3b1`), то есть по тону он почти совпадает с `error`. Столкновения в UI нет: `bg-secondary` не используется ни в одном компоненте (0 вхождений), а `bg-error`/`text-error` — 49. Но при работе с токенами это стоит помнить.
+> **Error намеренно не красный, а янтарный/коричневый** — так он уведён от `secondary`, который в этом проекте красный. Отличие по цвету большое: dE=75 в светлой теме и dE=67 в тёмной. Это осознанное решение владельца дизайна, а не побочный эффект палитры: ошибочно «приводить» Error к красному нельзя.
+>
+> Отдельно: `error-container` **одинаков в обеих темах** (`#d17d00`) — так M3 посчитал для этого сида. Это нормально, а не недосмотр.
+
+> **Устаревший источник:** `design-tokens (1).json` (папка «Projects light / Studio», вне репозитория) содержит другой, более старый набор, где `semantic.destructive` = `#d4183d` (красный) и `border.light/dark` со значениями 10%/15%. **Он не соответствует экспорту M3** — не берите Error оттуда. Актуальные значения только в `material-theme/*.tokens.json`.
+>
+> **Что совпадает** со старым набором: `border.light` `rgba(0,0,0,.1)` / `border.dark` `rgba(255,255,255,.15)` — именно они легли в токен `outline-faint`. Остальное (радиусы, типографика, spacing) — нет.
 
 #### 2.1.3 Seed-тема (генерация палитры)
 
@@ -757,6 +763,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `Docs/ui-rules.md` | Исторический набор UI-правил (уже не действует) | **Замён указателем на этот документ** (§9, **M6**); правила, которые из него перешли, — §2.3, §3.3, §2.6, §5.1 |
 | `Docs/roadmap/*.md` | Планы (в т.ч. `ai-assistant-fab.md` — план настоящего ассистента) | Вне дизайн-системы |
 | `Docs/figma-tokens.md` | **Карта «код ↔ Figma»**: роль M3 ↔ токен, что переименовать и что завести в Figma | Нужен при переносе токенов **из кода в Figma** (текущее направление). Дополняет §2 |
+| `material-theme/*.tokens.json` | **Экспорт M3 из Figma** — 6 режимов: Light, Light Medium/High Contrast, Dark, Dark Medium/High Contrast. **Источник истины для семейства Error** | Канонический источник значений палитры. Код синхронизируется с `Light`/`Dark`; контрастные режимы пока не заведены — см. §9 **L6** |
 
 **Правило работы с документом:** любое новое правило сначала появляется в коде, потом — здесь, с пометкой источника. Изменение палитры, типографики, радиусов или слоёв — только через `globals.css` + этот документ синхронно.
 
@@ -798,6 +805,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | **L3** | Высоты интерактивных элементов заданы утилитами (`h-10`…`h-16`) без токенов | Ввести `--control-height-*`, если значения начнут расходиться |
 | **L4** | `h-10` (40px) в админских формах меньше рекомендуемых 44px | Либо принять плотность админки как явное исключение (уже отражено в §2.6), либо поднять до `h-11` |
 | **L5** | Печать использует `!important` (`height: auto !important`, `min-height: 250px !important`) | Допустимо для print-слоя; при рефакторинге — убрать за счёт более специфичного селектора |
+| **L6** | В `material-theme/` лежат 4 контрастных режима (Light/Dark Medium и High Contrast), которых нет в коде | Добавить по `@media (prefers-contrast: more)` и/или переключателю. Ценность для a11y высокая, объём — четыре дополнительных блока токенов. Значения уже готовы, синхронизировать нечего |
 
 ### 9.4 Проверка после синхронизации
 
