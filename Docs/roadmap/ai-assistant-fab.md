@@ -104,7 +104,8 @@ FAB (u/[slug]) -> AssistantPanel (client)
 В `Docs/ui/Main_page_Spec.md` §11 (FAB) сейчас зафиксировано назначение
 «якорь на #contact». При переходе на ассистента спеку нужно обновить:
 иконка, `aria-label`, поведение, и добавить `AssistantPanel` в реестр
-(`Docs/ui-rules.md` §5).
+компонентов (`Docs/design-system.md` §3 — сейчас там реестр `ui/*` и прикладных
+компонентов, §9 — список открытых расхождений).
 
 ## 3. Проверка готовности (Definition of Done)
 
