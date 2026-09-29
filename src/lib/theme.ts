@@ -15,10 +15,19 @@ import {
 export type ThemeTokens = Record<string, string>;
 
 /** Маппинг Scheme → имена наших токенов. */
-function schemeToTokens(s: SchemeTonalSpot): ThemeTokens {
+function schemeToTokens(s: SchemeTonalSpot, dark: boolean): ThemeTokens {
   return {
     '--md-sys-color-primary': hexFromArgb(s.primary),
     '--md-sys-color-surface-tint': hexFromArgb(s.surfaceTint),
+    // Парный токен к surface-tint. БЕЗ него страница дизайнера с
+    // кастомным seed ломалась: surface-tint перекрашивался в цвет сида,
+    // а on-surface-tint оставался белым из globals.css — на светлых сидах
+    // (Acid #ccff00 и подобные) белый текст на тинте давал ~1.2:1, то есть
+    // теги TagBadge становились нечитаемыми. Тон берём от хрома сида:
+    // 100 в светлой схеме (белым по тёмному тинту), 20 в тёмной.
+    '--md-sys-color-on-surface-tint': hexFromArgb(
+      TonalPalette.fromHueAndChroma(s.primaryPalette.hue, 48).tone(dark ? 20 : 100),
+    ),
     '--md-sys-color-on-primary': hexFromArgb(s.onPrimary),
     '--md-sys-color-primary-container': hexFromArgb(s.primaryContainer),
     '--md-sys-color-on-primary-container': hexFromArgb(s.onPrimaryContainer),
@@ -69,6 +78,9 @@ function bwOverrides(dark: boolean): ThemeTokens {
         '--md-sys-color-surface': tone(4),
         '--md-sys-color-on-surface': tone(90),
         '--md-sys-color-surface-tint': tone(90),
+        // surface-tint здесь = tone 90 (почти белый), значит текст на нём
+        // обязан быть тёмным — иначе нечитаемо. Парность обязательна.
+        '--md-sys-color-on-surface-tint': tone(10),
       }
     : {
         '--md-sys-color-primary': tone(10),
@@ -80,6 +92,8 @@ function bwOverrides(dark: boolean): ThemeTokens {
         '--md-sys-color-surface': tone(100),
         '--md-sys-color-on-surface': tone(10),
         '--md-sys-color-surface-tint': tone(10),
+        // surface-tint = tone 10 (почти чёрный) → текст белый.
+        '--md-sys-color-on-surface-tint': tone(100),
       };
 }
 
@@ -115,11 +129,14 @@ export function generateThemeCss(seed?: string): string {
   // SchemeMonochrome (хрома 0) + дожим primary/поверхностей до ч/б.
   const bw = seedHct.chroma < 8;
   const make = (dark: boolean): ThemeTokens => {
-    const scheme = bw
-      ? schemeToTokens(new SchemeMonochrome(seedHct, dark, 0))
-      : schemeToTokens(new SchemeTonalSpot(seedHct, dark, 0));
+    // SchemeMonochrome — потомок SchemeTonalSpot, поэтому набор токенов
+    // у них одинаковый; приводим к общему типу ради одного маппинга.
+    const scheme = (
+      bw ? new SchemeMonochrome(seedHct, dark, 0) : new SchemeTonalSpot(seedHct, dark, 0)
+    ) as SchemeTonalSpot;
+    const tokens = schemeToTokens(scheme, dark);
     const ext = bw ? extToTokensNeutral(dark) : extToTokens(seedArgb, dark);
-    return bw ? { ...scheme, ...ext, ...bwOverrides(dark) } : { ...scheme, ...ext };
+    return bw ? { ...tokens, ...ext, ...bwOverrides(dark) } : { ...tokens, ...ext };
   };
 
   const block = (selector: string, tokens: ThemeTokens) =>
