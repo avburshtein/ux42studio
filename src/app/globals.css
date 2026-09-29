@@ -209,16 +209,17 @@
 
   --md-sys-color-tertiary-container: #fbfffa;
   --md-sys-color-on-tertiary-container: #717672;
-  /* error-container #ba5f22 — средний тон, НА НЁМ НЕТ текста с AA (макс
-     4.42 с белым). M3-стандарт: светлый контейнер + тёмный текст
-     (#410002 on #ffdad6 ≈ 13.3:1). Тёмная пара без изменений. */
-  --md-sys-color-error-container: #ffdad6;
-  --md-sys-color-on-error-container: #410002;
+  /* error = #d4183d — значение из Figma-токенов (semantic.destructive).
+     Семейство переведено на тон Figma (hue 17): error берём как есть,
+     error-container = тон 90 того же тона. Пары: 4.99:1 (error на фоне
+     страницы), 5.25:1 (белый на error), 13.32:1 (контейнер). */
+  --md-sys-color-error-container: #ffdad9;
+  --md-sys-color-on-error-container: #40000a;
 
   --md-sys-color-tertiary: #5b5f5c;
   --md-sys-color-on-tertiary: #ffffff;
 
-  --md-sys-color-error: #c81e00;
+  --md-sys-color-error: #d4183d;
   --md-sys-color-on-error: #ffffff;
 
   --md-sys-color-background: #f7faf5;
@@ -272,14 +273,20 @@
 
   --md-sys-color-tertiary-container: #dfe4df;
   --md-sys-color-on-tertiary-container: #616562;
-  --md-sys-color-error-container: #d17d00;
-  --md-sys-color-on-error-container: #402300;
+  /* Тёмная пара — производная от тона Figma #d4183d (hue 17), НЕ само
+     значение: #d4183d на тёмном фоне даёт 3.53:1 — ниже AA. Берём тон 64
+     (#ff6a74, 6.69:1 на фоне страницы) вместо м3-овского тона 80: тот даёт
+     #ffb3b4 — бледный и практически неотличимый от secondary #ffb3b1.
+     Контейнер переведён с янтарного #d17d00 (4.56:1, впритык) на тон 30
+     того же тона: #7e2a30 с #ffdad9 = 7.20:1. */
+  --md-sys-color-error-container: #7e2a30;
+  --md-sys-color-on-error-container: #ffdad9;
 
   --md-sys-color-tertiary: #ffffff;
   --md-sys-color-on-tertiary: #2d312e;
 
-  --md-sys-color-error: #fd7654;
-  --md-sys-color-on-error: #491600;
+  --md-sys-color-error: #ff6a74;
+  --md-sys-color-on-error: #680016;
 
   --md-sys-color-background: #101412;
   --md-sys-color-on-background: #e0e3df;
@@ -333,14 +340,18 @@
 
     --md-sys-color-tertiary-container: #dfe4df;
     --md-sys-color-on-tertiary-container: #616562;
-    --md-sys-color-error-container: #d17d00;
-    --md-sys-color-on-error-container: #402300;
+    /* Системный тёмный фолбэк — те же значения, что в [data-theme='dark'].
+       Раньше здесь стоял ДРУГОЙ error (#ffb86e, янтарный), из-за чего до
+       первого клика по переключателю темы тёмная палитра расходилась с
+       явной. Теперь оба блока идентичны. */
+    --md-sys-color-error-container: #7e2a30;
+    --md-sys-color-on-error-container: #ffdad9;
 
     --md-sys-color-tertiary: #ffffff;
     --md-sys-color-on-tertiary: #2d312e;
 
-    --md-sys-color-error: #ffb86e;
-    --md-sys-color-on-error: #492900;
+    --md-sys-color-error: #ff6a74;
+    --md-sys-color-on-error: #680016;
 
     --md-sys-color-background: #101412;
     --md-sys-color-on-background: #e0e3df;
@@ -647,6 +658,50 @@ body {
 }
 
 /* ============================================================
+   REDUCED MOTION — глобально (WCAG 2.3.3 Animation from
+   Interactions). Пользователь просит систему уменьшить
+   движение — уважаем это глобально, а не точечно.
+
+   Почему именно .01ms, а не 0s: событие animationend должно
+   продолжить срабатывать, иначе Radix-оверлеи (Dialog,
+   DropdownMenu) зависнут в состоянии «открывается, но не
+   завершилось». Практика — канонический снимок, который
+   используют в т.ч. GitHub.
+
+   !important здесь обязателен и не является нарушением
+   правила «без !important» (§7 анти-паттернов): сбой должен
+   перебить ЛЮБУю анимацию в проекте, включая инлайновые
+   style и сторонние компоненты. Иначе правило можно было бы
+   перебить обычным utility-классом.
+
+   Что отключается: scale-ховер карточек (.portfolio-card
+   1.02), транзишн all 500ms на них, декоративный слой
+   bokeh, появление модалок (animate-in/out), анимации
+   спиннеров (animate-spin) и пульсации скелетонов
+   (animate-pulse) — они замирают, но остаются видимыми:
+   состояние «идёт загрузка» не теряется.
+
+   Побочный эффект, о котором стоит знать: hover смены цвета
+   (transition-colors) тоже становятся мгновенными. Это
+   нормально — при reduced motion состояние всё равно видно,
+   просто без перехода.
+
+   Скриптовое отключение декора (FloatingElements) остаётся
+   как второй слой: он не создаёт элементы вообще, а CSS
+   просто не анимирует уже созданные.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
    ПЕЧАТЬ / PDF — TL;DR (страница /short). Решение (65).
    Hiring manager сохраняет короткую версию как PDF через
    диалог печати. Обёртка .print-short стоит на корневом div
@@ -675,11 +730,11 @@ body {
     --md-sys-color-on-secondary-fixed: #333338;
     --md-sys-color-tertiary-container: #fbfffa;
     --md-sys-color-on-tertiary-container: #717672;
-    --md-sys-color-error-container: #ffdad6;
-    --md-sys-color-on-error-container: #410002;
+    --md-sys-color-error-container: #ffdad9;
+    --md-sys-color-on-error-container: #40000a;
     --md-sys-color-tertiary: #5b5f5c;
     --md-sys-color-on-tertiary: #ffffff;
-    --md-sys-color-error: #c81e00;
+    --md-sys-color-error: #d4183d;
     --md-sys-color-on-error: #ffffff;
     --md-sys-color-background: #ffffff;
     --md-sys-color-on-background: #181d1a;

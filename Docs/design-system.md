@@ -65,10 +65,10 @@
 | `--md-sys-color-on-tertiary` | `text-on-tertiary` | `#ffffff` | `#2d312e` |
 | `--md-sys-color-tertiary-container` | `bg-tertiary-container` | `#fbfffa` | `#dfe4df` |
 | `--md-sys-color-on-tertiary-container` | `text-on-tertiary-container` | `#717672` | `#616562` |
-| `--md-sys-color-error` | `bg-error` / `text-error` | `#c81e00` | `#fd7654` |
-| `--md-sys-color-on-error` | `text-on-error` | `#ffffff` | `#491600` |
-| `--md-sys-color-error-container` | `bg-error-container` | `#ffdad6` | `#d17d00` |
-| `--md-sys-color-on-error-container` | `text-on-error-container` | `#410002` | `#402300` |
+| `--md-sys-color-error` | `bg-error` / `text-error` | `#d4183d` | `#ff6a74` |
+| `--md-sys-color-on-error` | `text-on-error` | `#ffffff` | `#680016` |
+| `--md-sys-color-error-container` | `bg-error-container` | `#ffdad9` | `#7e2a30` |
+| `--md-sys-color-on-error-container` | `text-on-error-container` | `#40000a` | `#ffdad9` |
 | `--md-sys-color-background` | `bg-background` | `#f7faf5` | `#101412` |
 | `--md-sys-color-on-background` | `text-on-background` | `#181d1a` | `#e0e3df` |
 | `--md-sys-color-surface` | `bg-surface` | `#fcf8fa` | `#131314` |
@@ -122,6 +122,12 @@
 |---|---|---|---|
 | `secondary-fixed-dim` / `on-secondary-fixed` | `#f2f0f4` / `#333338` | `#3a3a3c` / `#e5e2e6` | 11.10:1 / 8.84:1 |
 | `surface-tint` / `on-surface-tint` | `#056c4d` / `#ffffff` | `#83d7b1` / `#003826` | 6.44:1 / 7.73:1 |
+| `error` / `on-error` | `#d4183d` / `#ffffff` | `#ff6a74` / `#680016` | 4.99:1 / 6.69:1 |
+| `error-container` / `on-error-container` | `#ffdad9` / `#40000a` | `#7e2a30` / `#ffdad9` | 13.32:1 / 7.20:1 |
+
+**Семейство Error и Figma.** `error` в светлой теме = **`#d4183d` из Figma-токенов** (`semantic.destructive`) — значение взято как есть. Тёмная тема — **производная от того же тона** (hue 17), потому что само значение `#d4183d` на тёмном фоне даёт 3.53:1, то есть ниже AA. Взят тон 64 (`#ff6a74`), а не м3-овский тон 80: тот даёт бледный `#ffb3b4`, почти неотличимый от `secondary` `#ffb3b1`. Контейнер в тёмной теме переведён с янтарного `#d17d00` (4.56:1, впритык с AA) на тон 30 того же тона — `#7e2a30`, что даёт 7.20:1.
+
+> **Роль `secondary` в этом проекте — красный** (`#b12a33` / `#ffb3b1`), то есть по тону он почти совпадает с `error`. Столкновения в UI нет: `bg-secondary` не используется ни в одном компоненте (0 вхождений), а `bg-error`/`text-error` — 49. Но при работе с токенами это стоит помнить.
 
 #### 2.1.3 Seed-тема (генерация палитры)
 
@@ -252,7 +258,14 @@
 
 **Что анимируется:** цвет, прозрачность, тень, `transform`. Ширину/высоту/inset не анимируем (layout-thrash). Масштабирование карточек — только через классы `.portfolio-card`/`.team-card` (там уже зашиты `transform: scale(1.02)` и hover-тень).
 
-**`prefers-reduced-motion`:** сейчас учитывается **только** в `src/components/FloatingElements.tsx` (`window.matchMedia('(prefers-reduced-motion: reduce)')` — декоративный слой полностью отключается). Глобального правила в `globals.css` нет. **Правило системы:** декоративная анимация (bokeh, scale-ховер крупных карточек) обязана отключаться при `prefers-reduced-motion: reduce`. Добавить глобальный блок — задача из §9 (желательно).
+**`prefers-reduced-motion: reduce`** обрабатывается в двух слоях:
+
+1. **Глобально, в `globals.css`** — канонический сброс: `animation-duration: 0.01ms`, `animation-iteration-count: 1`, `transition-duration: 0.01ms`, `scroll-behavior: auto` для `*`, `::before`, `::after`. Отключаются scale-ховер карточек (`transform: scale(1.02)` в `.portfolio-card`), их `transition: all 500ms`, появление Radix-оверлеев (`animate-in/out`), анимации спиннеров и пульсация скелетонов.
+2. **Скриптом** в `FloatingElements` — `window.matchMedia('(prefers-reduced-motion: reduce)')` не создаёт декоративные элементы вообще.
+
+Почему `0.01ms`, а не `0s`: событие `animationend` должно продолжать срабатывать, иначе Radix (`Dialog`, `DropdownMenu`) зависнет в состоянии «начал открываться, но не завершился». Почему `!important`: правило обязано перебивать **любую** анимацию проекта, включая инлайновые `style` и сторонние компоненты, — иначе его можно было бы перебить обычным utility-классом. Это единственное оправданное исключение из правила «без `!important`» (§7).
+
+**Побочные эффекты, которые нужно знать:** спиннеры загрузки (`animate-spin`) и скелетоны (`animate-pulse`) замирают, но остаются видимыми — состояние «идёт загрузка» не теряется. Hover-смены цвета (`transition-colors`) становятся мгновенными: состояние видно, просто без перехода. Если понадобится, чтобы индикаторы загрузки продолжали двигаться, добавьте исключение для `.animate-spin` после этого блока.
 
 ### 2.5 Z-index
 
@@ -768,7 +781,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 
 | # | Расхождение | Исправление | Файлы |
 |---|---|---|---|
-| **M1** | Нет глобального `prefers-reduced-motion` (учитывается только `FloatingElements`) | Добавить в `globals.css`: `@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }` | `src/app/globals.css` |
+| **M1** | ~~Нет глобального `prefers-reduced-motion` (учитывался только `FloatingElements`)~~ | **Закрыто:** глобальный сброс в `globals.css` (§2.4) + скриптовый слой в `FloatingElements` | `src/app/globals.css` |
 | **M2** | Произвольные радиусы в разметке: `rounded-[12px]`, `rounded-[24px]`, `rounded-[48px]` | `rounded-[12px]` → `rounded-base` — **сделано** в `DesignSystemColors`/`TypographyScale`. Остались: `rounded-[24px]`, `rounded-[48px]` | `case/DesignSystemColors.tsx`, `app/(public)/page.tsx:323`, `case/SiteHeader.tsx:430` |
 | **M3** | `Lightbox` и `ImageCropperDialog` на `z-[70]` — значение не было закреплено | **Закрыто:** `z-[70]` и `z-[100]` разрешены явно (§2.5), код менять не нужно |
 | **M4** | `Hero` компенсирует паддинги контейнера через `-mx-4`/`-mx-8` + `w-[calc(100%+…)]` | **Закрыто:** full-bleed зафиксирован как норма в §2.6 |

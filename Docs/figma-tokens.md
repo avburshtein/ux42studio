@@ -17,7 +17,7 @@
 | `color.primary.green-secondary` | `#2c5a07` | — | В коде не используется (только для градиента) |
 | `color.primary.green-light` | `rgba(11,110,79,.2)` | — | В коде не используется |
 | `color.primary.green-accent` | `rgba(177,211,196,.3)` | `--shadow-card-accent` | ✅ Совпадает (тени карточек) |
-| `color.semantic.destructive` | `#d4183d` | `--md-sys-color-error` = `#c81e00` | ⚠️ Расхождение: в коде `#c81e00` (светлая) / `#fd7654` (тёмная) |
+| `color.semantic.destructive` | `#d4183d` | `--md-sys-color-error` | ✅ **Сведено Sept 2026.** Светлая тема = значение из Figma как есть. Тёмная тема — производная от того же тона (см. ниже) |
 | `color.semantic.success` | `#0b6e4f` | `primary-container` | То же значение, другая роль |
 | `color.semantic.warning` | `#f59e0b` | — | Отдельной роли в M3 нет. Ближайшее — `error-container` в тёмной теме (`#d17d00`) |
 | `color.border.light` | `rgba(0,0,0,.1)` | `--md-sys-color-outline-faint` | ✅ Сведено Sept 2026 |
@@ -89,13 +89,16 @@
 |---|---|
 | `primary-variant` (C2) | **Роли в M3 не существует** — это имя из Material 2. В Figma токена нет, и появляться ему не должен. Hover для текста, который уже `primary`, делается **state layer** (`opacity 80%`), а не сменой цвета. Если всё же нужен отдельный цвет — называть `--color-primary-hover`, не `primary-variant` |
 | `text-white` на `surface-tint` | Заменён на токен `on-surface-tint`. **Нельзя** использовать белый: в тёмной теме тинт светлеет до `#83d7b1` |
+| `semantic.destructive` | Светлая тема = значение из Figma. **Для тёмной темы в Figma значения нет** — оно физически не может быть тем же: `#d4183d` на тёмном фоне даёт 3.53:1. Заведена производная от того же тона: `error` `#ff6a74` (тон 64), `on-error` `#680016`, `error-container` `#7e2a30`, `on-error-container` `#ffdad9`. Правило для агента: **не дублировать одно значение на light и dark** — тёмная пара всегда светлее |
+| `secondary` в проекте — красный | Роль `secondary` = `#b12a33` (светлая) / `#ffb3b1` (тёмная). Она почти совпадает по тону с `error`, но в UI не используется (`bg-secondary` — 0 вхождений). Если захотите ввести `secondary` в интерфейс, сначала разведите тона: `error` держим hue 17 (тёмная пара — тон 64), `secondary` нужно увести в другую область тона |
 
 ## 7. Чек-лист перед применением в Figma
 
 1. `color.primary.green` → переименовать в `primary-container`; **завести** `primary` = `#00543b`.
 2. `borderRadius.button` → `button.pill`; `borderRadius.input` исправить на 10px или удалить.
 3. Добавить `on-surface-tint` и семейство `fixed-dim` — иначе FAB и чипы в тёмной теме нечитаемы.
-4. `semantic.destructive` привести к `#c81e00` (светлая) / `#fd7654` (тёмная).
+4. `semantic.destructive` — **светлая** тема берёт `#d4183d`; добавить тёмную пару `error` `#ff6a74` / `on-error` `#680016` (одно значение на обе темы не годится: 3.53:1 в тёмной).
 5. Не вводить отрицательный `letterSpacing` и брейкпоинт 375.
 6. Шкалу поверхностей заменить одним «main» на 5 ступеней + `background` отдельно.
 7. `background.*.main` привести к фону страницы (`#f7faf5` / `#101412`), а белый/black оставить для канваса контента.
+8. `semantic.warning` `#f59e0b` пока не заведён в код — если он нужен, скажите: это отдельная роль (предупреждение), а не `error-container`.
