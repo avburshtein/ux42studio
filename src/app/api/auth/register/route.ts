@@ -90,7 +90,8 @@ export async function POST(req: Request) {
         await sendRegisteredEmail({
             toEmail: email,
             profileUrl: `${appUrl}/admin`,
-            passwordUrl: `${appUrl}/admin/profile/password`,
+            // Настройки → Безопасность: раздел смены пароля
+            passwordUrl: `${appUrl}/admin/settings`,
         });
 
         const res = NextResponse.json({ ok: true, password });

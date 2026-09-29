@@ -217,7 +217,7 @@ for (const [path, label] of [
     ['/robots.txt', 'robots.txt'],
     ['/sitemap.xml', 'sitemap.xml'],
     ['/manifest.webmanifest', 'PWA-манифест'],
-    ['/icon.svg', 'иконка сайта'],
+    ['/icon.png', 'иконка сайта'],
     ['/og/og-cover.png', 'обложка для соцсетей'],
     ['/placeholder-project.svg', 'заглушка обложки проекта'],
 ]) {

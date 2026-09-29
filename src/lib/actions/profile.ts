@@ -182,6 +182,7 @@ export async function saveMainPageContent(
         .where(eq(profiles.id, profileId));
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
     if (current?.slug) revalidatePath(`/u/${current.slug}`);
 }
 
@@ -267,6 +268,10 @@ export async function updateProfile(
     }
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
+    // Личные данные теперь редактируются в /admin/settings — страница
+    // должна увидеть изменения сразу после сохранения.
+    revalidatePath('/admin/settings');
 }
 
 export async function addSocialLink(
@@ -292,6 +297,7 @@ export async function addSocialLink(
     });
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
     return id;
 }
 
@@ -309,6 +315,7 @@ export async function updateSocialLink(
     await db.update(socialLinks).set(data).where(eq(socialLinks.id, linkId));
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
 }
 
 export async function removeSocialLink(linkId: string) {
@@ -317,6 +324,7 @@ export async function removeSocialLink(linkId: string) {
 
     await db.delete(socialLinks).where(eq(socialLinks.id, linkId));
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
 }
 
 export async function updateSocialLinkOrder(
@@ -334,4 +342,5 @@ export async function updateSocialLinkOrder(
     }
 
     revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
 }

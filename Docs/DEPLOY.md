@@ -91,7 +91,7 @@ npm run smoke
 | --- | --- |
 | 1. Основные страницы | `/`, `/login`, `/register`, страница дизайнера, кейс, PDF-версия; язык страницы (`lang="en"` / `lang="ru"`) |
 | 2. Юридические | `/privacy`, `/terms`, блок AEPD, email контролёра, LSSI Art. 10, домен |
-| 3. Файлы, SEO, PWA | `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, `icon.svg`, `og-cover.png`, заглушка обложки; `Disallow: /admin`; структура карты сайта; ссылка на политику в футере |
+| 3. Файлы, SEO, PWA | `robots.txt`, `sitemap.xml`, `manifest.webmanifest`, `icon.png`, `og-cover.png`, заглушка обложки; `Disallow: /admin`; структура карты сайта; ссылка на политику в футере |
 | 4. Защита | HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `X-Frame-Options`, отсутствие `X-Powered-By` |
 | 5. Доступ | `/admin` и `/super-admin` закрыты без входа, `noindex` на приватных страницах, уведомление RGPD в форме, доступность D1 и R2 |
 
@@ -251,7 +251,12 @@ npx wrangler rollback <deployment-id>
 
 ### PWA-иконки
 
-Манифест ссылается на `icon.svg` (64×64) и `og-cover.png` (1200×630).
+Фавикон — файл `src/app/icon.png` (634×634, RGBA; Next сам отдаёт его как
+`/icon.png` и вставляет `<link rel="icon">`). До 29.09.2026 это был
+нарисованный `icon.svg` 64×64. Исходник нового PNG лежит в `public/`
+(`favicon UX42.png`).
+
+Манифест ссылается на `icon.png` (634×634) и `og-cover.png` (1200×630).
 Отдельных PNG 192×192 и 512×512 нет — браузеры без них просто не показывают
 install-промпт, страница при этом работает нормально.
 

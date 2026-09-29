@@ -64,9 +64,15 @@ export default async function AuthLayout({
                                 </Link>
                                 <Link
                                     href='/admin/profile'
-                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
                                 >
-                                    Ред. профиль
+                                    Редактировать страницу сайта
+                                </Link>
+                                <Link
+                                    href='/admin/settings'
+                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                >
+                                    Настройки профиля
                                 </Link>
                                 {profile?.slug && (
                                     <Link

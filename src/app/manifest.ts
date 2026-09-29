@@ -9,10 +9,10 @@ import type { MetadataRoute } from 'next';
  * цвета статус-бара. Статические ассеты, поэтому HEX разрешён (те же
  * значения, что в globals.css: primary-container #0B6E4F, background #F7FAF5).
  *
- * Цвета иконок: `src/app/icon.svg` (favicon 64×64) и `public/og/og-cover.png`
- * (1200×630). Отдельные 192/512 PNG не заведены — браузеры при отсутствии
- * PNG-иконок просто не показывают install-промпт, что не ломает страницу.
- * См. Docs/DEPLOY.md, раздел «PWA».
+ * Цвета иконок: `src/app/icon.png` (фавикон 634×634, PNG) и
+ * `public/og/og-cover.png` (1200×630). Отдельные 192/512 PNG не заведены —
+ * браузеры при отсутствии PNG-иконок просто не показывают install-промпт,
+ * что не ломает страницу. См. Docs/DEPLOY.md, раздел «PWA».
  */
 export default function manifest(): MetadataRoute.Manifest {
     return {
@@ -31,9 +31,9 @@ export default function manifest(): MetadataRoute.Manifest {
         categories: ['design', 'portfolio', 'business'],
         icons: [
             {
-                src: '/icon.svg',
-                sizes: 'any',
-                type: 'image/svg+xml',
+                src: '/icon.png',
+                sizes: '634x634',
+                type: 'image/png',
                 purpose: 'any',
             },
             {

@@ -587,7 +587,9 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `MainPageContentEditor` | Редактор контента главной, включая seed-цвет и режимы фона/шапки (§2.1.3–2.1.5) |
 | `MoodboardGridSection` | Секция moodboard-галереи |
 | `TldrShareButtons` | Шаринг TL;DR (копирование/ссылка) |
-| `DeleteAccountSection` | Опасная зона: `Button variant='destructive'` + подтверждение |
+| `DeleteAccountSection` | «Удаление профиля» (настройки): контейнер страницы оборачивает в `Card class='border-error'`, компонент рисует только содержимое. Триггер — `outline` с `border-error text-error hover:bg-error/10` (как Danger Zone в GitHub), финальное действие — сплошной `variant='destructive'`. Отбивка действий — `border-t border-outline-variant` + `pt-6` |
+| `AccountNameForm` | Имя и фамилия владельца (`admin/`), раздел «Аккаунт» настроек. Одно поле + панель сохранения по образцу `WizardSaveBar`; подсказка отсылает к «Брендинг и SEO» на `/admin/profile` |
+| `Field` (`ui/`) | Поле формы: `Label` + контрол + `min-h-[1.5rem]` под подсказку/ошибку (No-CLS, §3.3). Приоритет у ошибки, иначе показывается `hint` |
 
 **a11y админки:** каждая форма — `Label` + `Input` в паре, ошибки текстом рядом с полем; подтверждение деструктивных действий обязательно; загрузка файлов — с прогрессом и текстовым состоянием, не только спиннером.
 
@@ -635,6 +637,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | Auth | `/login`, `/register`, смена пароля | `(auth)/layout.tsx`: только `FormBox` + минимум chrome, **RU**, тёмная тема доступна |
 | Legal | `/privacy`, `/terms` | `LegalPageShell` + `LegalArticle`; EN/ES, узкая колонка |
 | Админка | `/admin/*` | `WizardSidebar` + контент + `WizardSaveBar`; плотная сетка, `Card`-ы, таблицы |
+| Настройки | `/admin/settings` | Личное и безопасность: сайдбар `Аккаунт` (email только для чтения + `AccountNameForm`) / `Безопасность` (`ChangePasswordForm`) / `Удаление профиля` (`DeleteAccountSection` в `Card` с `border-error`). `/admin/profile/password` — редирект сюда (на старую ссылку приходят письма) |
 | Super-admin | `/super-admin/*` | Своя навигация (`Overview`/`Users`) в `layout.tsx`, требует `role === 'admin'` |
 
 **Правила:**

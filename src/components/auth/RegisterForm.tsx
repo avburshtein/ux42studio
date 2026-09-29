@@ -96,12 +96,16 @@ export default function RegisterForm({
                         <li>
                             Смените пароль на удобный:{' '}
                             <Link
-                                href='/admin/profile/password'
+                                href='/admin/settings'
                                 className='font-semibold text-emerald-900 underline decoration-1 underline-offset-2'
                             >
-                                Настройки профиля → Изменить пароль
+                                Настройки профиля → Безопасность
                             </Link>
                             .
+                        </li>
+                        <li>
+                            Остальные поля профиля — «Редактировать
+                            страницу сайта» → «Брендинг и SEO».
                         </li>
                         <li>
                             Заполните «Настройки профиля» — это то, что

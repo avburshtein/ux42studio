@@ -5,50 +5,48 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button, buttonVariants } from '@/components/ui/Button';
+import { Button } from '@/components/ui/Button';
+import { Card } from '@/components/ui/Card';
+import Field from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
+import { Textarea } from '@/components/ui/Textarea';
 import PageTitle from '@/components/ui/PageTitle';
 import {
     updateProfile,
     getOrCreateProfileId,
     getMyProfile,
-    getMyAccountEmail,
+    getMyMainPageContent,
 } from '@/lib/actions/profile';
 import Link from 'next/link';
-import { Eye, KeyRound } from 'lucide-react';
-import FormBox from '@/components/ui/FormBox';
+import { Eye } from 'lucide-react';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
-import DeleteAccountSection from '@/components/admin/DeleteAccountSection';
-import { getMyMainPageContent } from '@/lib/actions/profile';
 import { DEFAULT_MAIN_PAGE_CONTENT, type MainPageContent } from '@/lib/mainPageContent';
 
+// В разделе «Брендинг и SEO» живёт всё, что описывает публичную страницу:
+// адрес, заголовок, био, город, сайт, ссылки и превью. Имя владельца и
+// email — в /admin/settings (раздел «Настройки профиля»).
 const formSchema = z.object({
-    fullName: z.string().min(1, 'Full name is required'),
+    slug: z
+        .string()
+        .min(1, 'Slug обязателен')
+        .regex(
+            /^[a-z0-9-]+$/i,
+            'Только латиница, цифры и дефис — например ivan-petrov',
+        ),
     headline: z.string().optional().or(z.literal('')),
     bio: z.string().optional().or(z.literal('')),
     location: z.string().optional().or(z.literal('')),
-    website: z.string().url().optional().or(z.literal('')),
-    slug: z.string().min(1, 'Slug is required'),
+    website: z
+        .string()
+        .url('Полный адрес, например https://ux42.studio')
+        .optional()
+        .or(z.literal('')),
     ogImageFileId: z.string().optional().or(z.literal('')),
     faviconFileId: z.string().optional().or(z.literal('')),
 });
-
-// Разделы левого сайдбара (как в редакторе кейса портфолио)
-const SECTIONS = [
-    { id: 'profile', label: 'Profile' },
-    { id: 'hero', label: '01 · Hero' },
-    { id: 'portfolio', label: '02 · Portfolio Gallery' },
-    { id: 'about', label: '03 · About' },
-    { id: 'expertise', label: '04 · Expertise' },
-    { id: 'cta', label: '05 · CTA (Get in Touch)' },
-    { id: 'theme', label: '06 · Color Theme' },
-    { id: 'account', label: '07 · Account' },
-] as const;
-
-type SectionId = (typeof SECTIONS)[number]['id'];
 
 type FormData = z.infer<typeof formSchema>;
 
@@ -60,21 +58,37 @@ type SocialLink = {
     order: number;
 };
 
+// Разделы левого сайдбара (как в редакторе кейса портфолио)
+const SECTIONS = [
+    { id: 'seo', label: 'Брендинг и SEO' },
+    { id: 'hero', label: '01 · Hero' },
+    { id: 'portfolio', label: '02 · Portfolio Gallery' },
+    { id: 'about', label: '03 · About' },
+    { id: 'expertise', label: '04 · Expertise' },
+    { id: 'cta', label: '05 · CTA (Get in Touch)' },
+    { id: 'theme', label: '06 · Color Theme' },
+] as const;
+
+type SectionId = (typeof SECTIONS)[number]['id'];
+
 export default function ProfilePage() {
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
-    // Редактор соцсетей монтируем только после загрузки профиля: иначе он
-    // фиксирует пустой initialLinks и игнорирует данные из БД (решение (26))
+    // Slug живёт в настройках (/admin/settings), но нужен здесь для ссылки
+    // «Просмотр страницы» в сайдбаре.
+    const [profileSlug, setProfileSlug] = useState('');
+    // Пока профиль не загружен, форму показываем, но сохранять нельзя:
+    // значения по умолчанию пустые, и сохранение затёрло бы OG-обложку.
     const [profileLoaded, setProfileLoaded] = useState(false);
+    // Редактор ссылок монтируем только после загрузки профиля: иначе он
+    // фиксирует пустой initialLinks и игнорирует данные из БД (решение (26))
     const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
-    // Email аккаунта — нужен для подтверждения удаления (GDPR Art. 17)
-    const [accountEmail, setAccountEmail] = useState('');
     const [mainContent, setMainContent] = useState<MainPageContent | null>(null);
     // Активный раздел сайдбара
-    const [section, setSection] = useState<SectionId>('profile');
+    const [section, setSection] = useState<SectionId>('seo');
     // Аватар/обложка редактируются в разделе Hero (MainPageContentEditor)
     const [initialFiles, setInitialFiles] = useState({
         avatar: '',
@@ -93,12 +107,11 @@ export default function ProfilePage() {
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            fullName: '',
+            slug: '',
             headline: '',
             bio: '',
             location: '',
             website: '',
-            slug: '',
             ogImageFileId: '',
             faviconFileId: '',
         },
@@ -109,23 +122,18 @@ export default function ProfilePage() {
             try {
                 const id = await getOrCreateProfileId();
                 setProfileId(id);
-                // Email аккаунта для подтверждения удаления — берём сразу,
-                // не дожидаясь профиля: раздел Account должен работать и
-                // тогда, когда профиль ещё не создан.
-                getMyAccountEmail()
-                    .then((mail) => setAccountEmail(mail ?? ''))
-                    .catch(() => setAccountEmail(''));
                 if (!id) return;
 
                 const profile = await getMyProfile();
                 if (profile) {
                     reset({
-                        fullName: profile.fullName,
+                        slug: profile.slug,
                         headline: profile.headline ?? '',
                         bio: profile.bio ?? '',
                         location: profile.location ?? '',
                         website: profile.website ?? '',
-                        slug: profile.slug,
+                        ogImageFileId: profile.ogImageFileId ?? '',
+                        faviconFileId: profile.faviconFileId ?? '',
                     });
                     setInitialFiles({
                         avatar: profile.avatarFileId ?? '',
@@ -133,6 +141,7 @@ export default function ProfilePage() {
                         og: profile.ogImageFileId ?? '',
                         favicon: profile.faviconFileId ?? '',
                     });
+                    setProfileSlug(profile.slug);
                     setSocialLinks(
                         (profile.socialLinks ?? []).map((link) => ({
                             id: link.id,
@@ -161,11 +170,11 @@ export default function ProfilePage() {
         try {
             const id = profileId ?? (await getOrCreateProfileId());
             if (!id) {
-                setError('Profile not found');
+                setError('Профиль не найден');
                 return;
             }
             await updateProfile(id, {
-                ...data,
+                slug: data.slug,
                 headline: data.headline || undefined,
                 bio: data.bio || undefined,
                 location: data.location || undefined,
@@ -182,13 +191,18 @@ export default function ProfilePage() {
         }
     };
 
-    const slug = watch('slug');
-
     return (
         <main className=''>
-            <div className='flex items-center justify-between gap-4'>
-                <PageTitle className='mb-8'>Настройки профиля</PageTitle>
-            </div>
+            {/* Тот же зазор между шапкой и содержимым, что в настройках
+                профиля (mb-10) — раньше шапка стояла встык с формой. */}
+            <header className='mb-10'>
+                <PageTitle className='mb-2'>
+                    Редактировать страницу сайта
+                </PageTitle>
+                <p className='text-body-sm text-on-surface-variant'>
+                    Контент публичной страницы: обложка, блоки и оформление
+                </p>
+            </header>
 
             <div className='flex flex-col gap-8 md:flex-row'>
                 {/* Сайдбар разделов — как в редакторе кейса (WizardSidebar) */}
@@ -211,21 +225,10 @@ export default function ProfilePage() {
                                 </li>
                             ))}
                         </ul>
-                        {/* Постоянный вход в смену пароля — виден в любом
-                            разделе сайдбара, а не только в блоке Profile. */}
-                        <div className='mt-4 border-t border-outline-variant pt-2'>
-                            <Link
-                                href='/admin/profile/password'
-                                className='flex items-center gap-2 rounded-md px-3 py-2 text-body-sm text-on-surface-variant transition-colors hover:bg-surface-variant hover:text-on-surface'
-                            >
-                                <KeyRound className='h-4 w-4' />
-                                Изменить пароль
-                            </Link>
-                        </div>
-                        {slug && (
-                            <div className='mt-8 hidden border-t border-outline-variant pt-4 md:block'>
+                        {profileSlug && (
+                            <div className='mt-4 border-t border-outline-variant pt-4'>
                                 <Link
-                                    href={`/u/${slug}`}
+                                    href={`/u/${profileSlug}`}
                                     target='_blank'
                                     rel='noopener noreferrer'
                                     // C2: см. WizardSidebar — hover:text-primary-variant
@@ -243,167 +246,199 @@ export default function ProfilePage() {
                 </aside>
 
                 <div className='min-w-0 flex-1'>
-                <div className={section === 'profile' ? '' : 'hidden'}>
-            <FormBox className=''>
-                <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-                    <div>
-                        <Label htmlFor='fullName'>Full Name *</Label>
-                        <Input id='fullName' {...register('fullName')} />
-                        {errors.fullName && (
-                            <p className='mt-1 text-body-sm text-error'>
-                                {errors.fullName.message}
+                <div className={section === 'seo' ? '' : 'hidden'}>
+                    <form onSubmit={handleSubmit(onSubmit)}>
+                        <Card className='p-6'>
+                            <h2 className='text-title-md text-on-surface'>
+                                Брендинг и SEO
+                            </h2>
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Всё, что описывает вашу публичную страницу:
+                                адрес, тексты, ссылки и превью. Имя владельца
+                                и email — в «Настройках профиля».
                             </p>
-                        )}
-                    </div>
 
-                    {/* Смена пароля ведёт на отдельную страницу
-                        /admin/profile/password. Раньше здесь была бледная
-                        текстовая ссылка, которую легко было не заметить, —
-                        теперь это заметный блок с кнопкой. */}
-                    <div className='rounded-lg border border-outline-variant bg-surface-container-low p-4'>
-                        <div className='flex flex-wrap items-center justify-between gap-3'>
-                            <div className='flex items-start gap-3'>
-                                <KeyRound className='mt-0.5 h-5 w-5 shrink-0 text-primary' />
-                                <div>
-                                    <p className='text-title-sm text-on-surface'>
-                                        Пароль и доступ
+                            <div className='mt-6 grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2'>
+                                <Field
+                                    id='slug'
+                                    label='Адрес страницы *'
+                                    error={errors.slug?.message}
+                                    hint='Это часть ссылки /u/ваш-slug'
+                                >
+                                    <div className='flex items-center gap-2'>
+                                        <span className='shrink-0 text-body-sm text-on-surface-variant'>
+                                            /u/
+                                        </span>
+                                        <Input
+                                            id='slug'
+                                            className='font-mono'
+                                            disabled={!profileLoaded}
+                                            {...register('slug')}
+                                        />
+                                    </div>
+                                </Field>
+
+                                <Field
+                                    id='headline'
+                                    label='Заголовок'
+                                    error={errors.headline?.message}
+                                    hint='Например: Product Designer'
+                                >
+                                    <Input
+                                        id='headline'
+                                        disabled={!profileLoaded}
+                                        {...register('headline')}
+                                    />
+                                </Field>
+
+                                <Field
+                                    id='location'
+                                    label='Город'
+                                    error={errors.location?.message}
+                                    hint='Можно указать страну или «удалённо»'
+                                >
+                                    <Input
+                                        id='location'
+                                        disabled={!profileLoaded}
+                                        {...register('location')}
+                                    />
+                                </Field>
+
+                                <Field
+                                    id='website'
+                                    label='Личный сайт'
+                                    error={errors.website?.message}
+                                >
+                                    <Input
+                                        id='website'
+                                        type='url'
+                                        placeholder='https://'
+                                        disabled={!profileLoaded}
+                                        {...register('website')}
+                                    />
+                                </Field>
+
+                                <Field
+                                    id='bio'
+                                    label='О себе'
+                                    error={errors.bio?.message}
+                                    hint='Пустая строка между абзацами = новый абзац'
+                                    className='md:col-span-2'
+                                >
+                                    <Textarea
+                                        id='bio'
+                                        rows={5}
+                                        disabled={!profileLoaded}
+                                        {...register('bio')}
+                                    />
+                                </Field>
+                            </div>
+
+                            {/* Ссылка профиля монтируется после загрузки
+                                (решение (26)) и сохраняется сама. */}
+                            <div className='mt-2 border-t border-outline-variant pt-6'>
+                                <Label>Ссылки</Label>
+                                {profileId && profileLoaded ? (
+                                    <div className='mt-3'>
+                                        <SocialLinksEditor
+                                            profileId={profileId}
+                                            initialLinks={socialLinks}
+                                        />
+                                    </div>
+                                ) : (
+                                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                        Загрузка…
                                     </p>
-                                    <p className='text-body-sm text-on-surface-variant'>
-                                        При регистрации выдан сгенерированный
-                                        пароль — замените его своим.
+                                )}
+                            </div>
+
+                            <h3 className='mt-8 text-title-sm text-on-surface'>
+                                Превью и иконка
+                            </h3>
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                Как ссылка выглядит в соцсетях и мессенджерах
+                                и как открывается в браузере.
+                            </p>
+
+                            <div className='mt-6 grid grid-cols-1 gap-6 md:grid-cols-2'>
+                                <div>
+                                    <Label>OG-обложка (1200×630)</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            watch('ogImageFileId') || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                'ogImageFileId',
+                                                fileId ?? '',
+                                            )
+                                        }
+                                        aspectRatio={1200 / 630}
+                                        cropRatio={1200 / 630}
+                                    />
+                                    <p className='mt-1 min-h-[1.5rem] text-body-sm text-on-surface-variant'>
+                                        Превью ссылки в соцсетях.
+                                    </p>
+                                </div>
+                                <div>
+                                    <Label>Фавикон (квадрат)</Label>
+                                    <ImageUploaderField
+                                        value={
+                                            watch('faviconFileId') || null
+                                        }
+                                        onChange={(fileId) =>
+                                            setValue(
+                                                'faviconFileId',
+                                                fileId ?? '',
+                                            )
+                                        }
+                                        aspectRatio={1}
+                                        cropRatio={1}
+                                    />
+                                    <p className='mt-1 min-h-[1.5rem] text-body-sm text-on-surface-variant'>
+                                        Иконка во вкладке браузера.
                                     </p>
                                 </div>
                             </div>
-                            <Link
-                                href='/admin/profile/password'
-                                className={buttonVariants({
-                                    variant: 'outline',
-                                    className: 'gap-2',
-                                })}
-                            >
-                                <KeyRound className='h-4 w-4' />
-                                Изменить пароль
-                            </Link>
-                        </div>
-                    </div>
 
-                    <div>
-                        <Label htmlFor='slug'>Slug *</Label>
-                        <Input id='slug' {...register('slug')} />
-                        {errors.slug && (
-                            <p className='mt-1 text-body-sm text-error'>
-                                {errors.slug.message}
-                            </p>
-                        )}
-                    </div>
+                            {error && (
+                                <p
+                                    role='alert'
+                                    className='mt-4 text-body-sm text-error'
+                                >
+                                    {error}
+                                </p>
+                            )}
 
-                    <div>
-                        <Label htmlFor='headline'>Headline</Label>
-                        <Input id='headline' {...register('headline')} />
-                    </div>
-
-                    <div>
-                        <Label htmlFor='bio'>Bio</Label>
-                        <textarea
-                            id='bio'
-                            {...register('bio')}
-                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
-                            rows={4}
-                        />
-                    </div>
-
-                    <div>
-                        <Label htmlFor='location'>Location</Label>
-                        <Input id='location' {...register('location')} />
-                    </div>
-
-                    <div>
-                        <Label htmlFor='website'>Website</Label>
-                        <Input
-                            id='website'
-                            type='url'
-                            {...register('website')}
-                        />
-                    </div>
-
-                    {/* SEO: OG-обложка и фавикон страницы дизайнера */}
-                    <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                        <div>
-                            <Label>OG Cover (1200×630)</Label>
-                            <ImageUploaderField
-                                value={watch('ogImageFileId') || null}
-                                onChange={(fileId) =>
-                                    setValue('ogImageFileId', fileId ?? '')
-                                }
-                                aspectRatio={1200 / 630}
-                                cropRatio={1200 / 630}
-                            />
-                            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Превью ссылки в соцсетях и мессенджерах.
-                            </p>
-                        </div>
-                        <div>
-                            <Label>Favicon (square)</Label>
-                            <ImageUploaderField
-                                value={watch('faviconFileId') || null}
-                                onChange={(fileId) =>
-                                    setValue('faviconFileId', fileId ?? '')
-                                }
-                                aspectRatio={1}
-                                cropRatio={1}
-                            />
-                            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Иконка во вкладке браузера (32×32+).
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* Social Links */}
-                    <div>
-                        <Label>Social Links</Label>
-                        {profileId && profileLoaded ? (
-                            <SocialLinksEditor
-                                profileId={profileId}
-                                initialLinks={socialLinks}
-                            />
-                        ) : (
-                            <p className='text-body-sm text-on-surface-variant'>
-                                Loading...
-                            </p>
-                        )}
-                    </div>
-
-                    {error && (
-                        <p className='text-body-sm text-error'>{error}</p>
-                    )}
-                    {success && (
-                        <p className='text-body-sm text-primary'>
-                            Profile saved successfully!
-                        </p>
-                    )}
-
-                    <div className='flex justify-end gap-3 pt-4'>
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            onClick={() => router.push('/admin')}
-                        >
-                            ← Back to Dashboard
-                        </Button>
-                        <Button type='submit' disabled={saving}>
-                            {saving ? 'Saving...' : 'Save Profile'}
-                        </Button>
-                    </div>
-                </form>
-            </FormBox>
+                            {/* Панель сохранения по образцу WizardSaveBar
+                                (§3.6): статус слева, действие справа.
+                                До загрузки профиля кнопка отключена —
+                                иначе сохранение пустых значений стёрло бы
+                                OG-обложку. */}
+                            <div className='mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant pt-4'>
+                                <p
+                                    role='status'
+                                    className='text-body-sm text-primary'
+                                >
+                                    {success ? 'Сохранено' : ''}
+                                </p>
+                                <Button
+                                    type='submit'
+                                    disabled={saving || !profileLoaded}
+                                >
+                                    {saving ? 'Сохраняем…' : 'Сохранить'}
+                                </Button>
+                            </div>
+                        </Card>
+                    </form>
                 </div>
 
                 {/* Редактор контента главной страницы дизайнера (/u/[slug]) —
                     спека: Docs/specs/Main Page Admin Panel Fields.md.
                     Рендерится всегда (состояние форм сохраняется при
                     переключении разделов), видим только активный раздел. */}
-                {profileId && mainContent && section !== 'account' && (
-                    <div className={section === 'profile' ? 'hidden' : ''}>
+                {profileId && mainContent && (
+                    <div className={section === 'seo' ? 'hidden' : ''}>
                         <MainPageContentEditor
                             profileId={profileId}
                             initialContent={mainContent}
@@ -412,12 +447,6 @@ export default function ProfilePage() {
                             visibleSection={section}
                         />
                     </div>
-                )}
-
-                {/* Удаление аккаунта (GDPR Art. 17). Отдельный раздел
-                    сайдбара, а не часть редактора контента. */}
-                {section === 'account' && (
-                    <DeleteAccountSection accountEmail={accountEmail} />
                 )}
                 </div>
             </div>
