@@ -24,12 +24,14 @@ export function TagBadge({
             className={cn(
                 'inline-flex items-center justify-center whitespace-nowrap font-medium',
                 size === 'lg' ? 'text-[16px] leading-[24px]' : 'text-label-md',
-                // Filled: bg surface-tint, white text, shadow, pad 8×14, radius 12
+                // Filled: bg surface-tint, pad 8×14, radius 12.
+                // Текст — on-surface-tint, а не text-white: в тёмной теме
+                // surface-tint светлеет до #83d7b1 и белый падает до ~1.8:1.
                 variant === 'filled' &&
-                    'rounded-base bg-surface-tint px-3.5 py-2 text-white shadow-[1px_1px_4px_rgba(0,0,0,0.1)]',
+                    'rounded-base bg-surface-tint px-3.5 py-2 text-on-surface-tint shadow-[1px_1px_4px_rgba(0,0,0,0.1)]',
                 // Outlined: bg container-lowest, border primary/16, pad 6×12, radius 10
                 variant === 'outlined' &&
-                    'rounded-[10px] border border-primary/16 bg-surface-container-lowest px-3 py-1.5 text-on-surface-variant',
+                    'rounded-md border border-primary/16 bg-surface-container-lowest px-3 py-1.5 text-on-surface-variant',
                 // Ghost: frosted glass bg on-secondary/16 + blur, pad 4×12, radius 12
                 variant === 'ghost' &&
                     'rounded-base bg-on-secondary/16 px-3 py-1 text-on-primary backdrop-blur-sm',

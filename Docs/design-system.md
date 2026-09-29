@@ -56,6 +56,7 @@
 | `--md-sys-color-primary-container` | `bg-primary-container` | `#0b6e4f` | `#0b6e4f` |
 | `--md-sys-color-on-primary-container` | `text-on-primary-container` | `#d9f9e7` | `#d9f9e7` |
 | `--md-sys-color-surface-tint` | `bg-surface-tint` | `#056c4d` | `#83d7b1` |
+| `--md-sys-color-on-surface-tint` | `text-on-surface-tint` | `#ffffff` | `#003826` |
 | `--md-sys-color-secondary` | `bg-secondary` | `#b12a33` | `#ffb3b1` |
 | `--md-sys-color-on-secondary` | `text-on-secondary` | `#ffffff` | `#680011` |
 | `--md-sys-color-secondary-container` | `bg-secondary-container` | `#ff6467` | `#ff6467` |
@@ -83,6 +84,8 @@
 | `--md-sys-color-surface-container-high` | `bg-surface-container-high` | `#f6f1f2` | `#2a2a2b` |
 | `--md-sys-color-surface-container-highest` | `bg-surface-container-highest` | `#e4e2e3` | `#353536` |
 | `--md-sys-color-surface-input` | `bg-surface-input` | = `lowest` | = `lowest` |
+| `--md-sys-color-secondary-fixed-dim` | `bg-secondary-fixed-dim` | `#f2f0f4` | `#3a3a3c` |
+| `--md-sys-color-on-secondary-fixed` | `text-on-secondary-fixed` | `#333338` | `#e5e2e6` |
 
 **Как читать роли поверхностей снизу вверх** (M3-шкала): `lowest` (канвас страницы, `body`) → `low` (шапка-стекло, карточки-плашки) → `container` (секции, benefit-карточки) → `high` → `highest` (оверлеи, hover-подложки). Поверх ставится текст: `on-surface` (основной) или `on-surface-variant` (вторичный).
 
@@ -103,6 +106,13 @@
 | `--md-ext-green-accent` | `bg-green-accent` | `#336210` | `#98d46f` | мягкие заливки, hover |
 
 Новый акцент добавляется **парой** `accent` + `on-accent` в обе темы; одиночный акцент без `on-` запрещён.
+
+**Fixed-роли (`secondary-fixed-dim`).** Это отдельное семейство «стеклянных» поверхностей: светлое приглушённое стекло в светлой теме и тёмное — в тёмной, всегда с тёмным/светлым текстом соответственно. Применяется к плавающей кнопке-ссылке на контакт (`FAB`) и будет переиспользована модальными окнами виртуального помощника. Пара `surface-tint`/`on-surface-tint` — отдельная: тинт в тёмной теме светлеет, поэтому текст на нём должен быть тёмным.
+
+| Пара | Светлая | Тёмная | Контраст |
+|---|---|---|---|
+| `secondary-fixed-dim` / `on-secondary-fixed` | `#f2f0f4` / `#333338` | `#3a3a3c` / `#e5e2e6` | 11.10:1 / 8.84:1 |
+| `surface-tint` / `on-surface-tint` | `#056c4d` / `#ffffff` | `#83d7b1` / `#003826` | 6.44:1 / 7.73:1 |
 
 #### 2.1.3 Seed-тема (генерация палитры)
 
@@ -500,6 +510,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `PortfolioCard` | Универсальная карточка кейса: заголовок `headline/small` + текст; используется в списках работ/связанных проектов |
 | `ResultsCard` | Результат (мастер 200:1125, 524×66, padding 20px, radius 14px → `p-5 rounded-lg`): check-иконка + текст. Компактная горизонтальная карточка результата |
 | `PersonaCard` | Персона (176:372), вертикальная: label «USER PERSONA» → `Avatar` + имя/роль → цитата |
+| `TestimonialCard` | Отзыв клиента (**Figma 176:378**): белая карточка `rounded-lg` (14px) + `shadow-card` + `p-8`; кавычка «“» — `font-display text-[100px] leading-[76px] text-primary`, `aria-hidden` (декоратив); цитата `text-body-lg text-on-surface`; имя `text-label-lg text-primary` (16/24 600); роль/компания `text-body-md text-on-surface-variant`; аватар 40×40 `rounded-full`, опционален | Секция «Client reviews» кейса (`project_reviews`). Ровно эти токены дают значения макета: `#ffffff`, r=14, тень `0 2px 12px rgba(0,0,0,.06)`, `#00543b`, `#44474b` |
 | `NextStepsList` | Список «Next steps»: маркер-точка 6×6 + текст, горизонтальный зазор 14px (`gap-3.5`) |
 | `BeforeAfterComparison` | Блок «Before/After» (195:1299): label + 2 изображения рядом, зазор 24px (`gap-6`) |
 | `GalleryGrid` | Сетка wireframes 2×2, зазор 24px (`gap-6`, Figma 199:57) или moodboard-пресет: CSS Grid `auto-fill min 240px gap-16`, первая ячейка крупная (`span 2` строк) |
@@ -529,7 +540,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `PlatformBenefitsSection` | Выгоды платформы `platform-benefit-card` |
 | `ProBonoBanner` | Баннер pro bono (контрастная плашка) |
 | `CtaSection` | Секция контакта (`id='contact'`) — цель `FAB` и якорей `#contact` |
-| `Carousel` | Слайдер с `z-20`; на мобильных — вертикальный стек |
+| `Carousel` | **Единственная** мобильная карусель карточек работ: `<sm` — full-bleed стрип со scroll-snap, `≥sm` — сетка 2/3. Классы: `-mx-6 -mb-5 -mt-3 w-[calc(100%+48px)] px-6 pb-7 pt-3 gap-4` + `scroll-px-6` (snap-цель = паддинг 24px, стрип всегда «доезжает» ровно); карточка `basis-full` = 327px @375 — ровно ширина сетки, сосед виден до края экрана (peek 8px). Требования к детям: корень с `w-full` (`PortfolioCard` ✓) и `[&>*]:min-w-0` против truncate | **Используется и главной, и страницей дизайнера** — геометрия живёт только здесь. Правка одной страницы «под себя» запрещена |
 | `FloatingElements` | Декоративный слой (bokeh и т.п.), **учитывает `prefers-reduced-motion`** |
 | `CtaButton`, `SectionLabel` | См. §3.2, §3.4 |
 
@@ -734,23 +745,26 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 
 ### 9.1 Критично (ломает тему или a11y)
 
-| # | Расхождение | Факт в коде | Исправление | Файлы |
+| # | Расхождение | Факт в коде | Исправление | Статус |
 |---|---|---|---|---|
-| **C1** | `FAB` использует несуществующие токены `bg-secondary-fixed-dim` / `text-on-secondary-fixed`; в палитре есть только `on-secondary` (`#ffffff` / `#680011`) | Классы молча не применяются: фон и иконка FAB остаются дефолтными | Заменить на `bg-primary text-on-primary` либо `bg-secondary-container text-on-secondary-container`; поправить JSDoc, где токены названы «правильными» | `src/components/FAB.tsx:22,23,31,33` |
-| **C2** | `hover:text-primary-variant` — токена `primary-variant` в палитре нет | Ссылки «Админка»/«Редактировать проект» и переход шага визарда не меняют цвет в hover | Заменить на `hover:text-primary` (или `hover:opacity-80`) | `src/components/AuthBar.tsx:96`, `src/components/admin/WizardSidebar.tsx:65`, `src/app/admin/profile/page.tsx:231` |
-| **C3** | `AuthBar` для гостя: `w-8 h-8 opacity-10` | Зона клика 32px и почти нулевой контраст — недоступно | `h-11 w-11`, `opacity-60 hover:opacity-100` (или `text-on-surface-variant`), добавить `aria-label` | `src/components/AuthBar.tsx:24-33, 41-51` |
-| **C4** | `TagBadge variant='filled'`: `text-white` на `bg-surface-tint`, а в тёмной теме `surface-tint = #83d7b1` | Контраст ≈ 1.8:1 — ниже AA; в печати белый может исчезнуть | `text-on-surface` (либо добавить пару `surface-tint`/`on-surface-tint` в палитру) | `src/components/case/TagBadge.tsx:29` |
+| **C1** | `FAB` использовал несуществующие токены `bg-secondary-fixed-dim` / `text-on-secondary-fixed` — фон и иконка оставались дефолтными | Классы молча не применялись | **Не баг, а недостающая реализация:** семейство «стеклянных» поверхностей заведено в палитру (§2.1.2). `FAB` получил `bg-secondary-fixed-dim` + `backdrop-blur-md` + `text-on-secondary-fixed` | ✅ Закрыто |
+| **C2** | `hover:text-primary-variant` — токена `primary-variant` в палитре нет | Ссылка «Редактировать проект» не меняла цвет в hover | Временно `hover:opacity-80` + комментарий в коде. **Ждём реальный токен из Figma** | ⏳ Ожидает токен |
+| **C3** | `AuthBar` для гостя: `w-8 h-8 opacity-10` | Зона клика 32px, контраст ~0.1 | `h-11 w-11` + `text-on-surface-variant` (8.87:1 / 10.90:1), `aria-label`; «спрятанность» сохранена размером, а не прозрачностью | ✅ Закрыто |
+| **C4** | `TagBadge variant='filled'`: `text-white` на `bg-surface-tint`; в тёмной теме tint = `#83d7b1`, белый ≈ 1.8:1 | Ниже AA | Заведена пара `on-surface-tint` (6.44:1 / 7.73:1), литерал `text-white` убран; заодно `rounded-[10px]` → `rounded-md` | ✅ Закрыто |
+
+> **Про C1:** владелец подтвердил, что «белая стекляшка с тёмно-серым текстом» — это осознанный вид (текущий вид FAB в Figma), а не ошибка. Поэтому решение — **дописать токены**, а не менять стиль. То же семейство `secondary-fixed-dim` предназначено для модалок виртуального помощника (`Docs/roadmap/ai-assistant-fab.md`).
 
 ### 9.2 Желательно (соответствие системе, не блокеры)
 
 | # | Расхождение | Исправление | Файлы |
 |---|---|---|---|
 | **M1** | Нет глобального `prefers-reduced-motion` (учитывается только `FloatingElements`) | Добавить в `globals.css`: `@media (prefers-reduced-motion: reduce) { *, ::before, ::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }` | `src/app/globals.css` |
-| **M2** | Произвольные радиусы в разметке: `rounded-[10px]`, `rounded-[12px]`, `rounded-[24px]`, `rounded-[48px]` | Заменить на `rounded-md`, `rounded-base`, `rounded-3xl`, `rounded-5xl` | `case/TagBadge.tsx:32`, `case/DesignSystemColors.tsx:210`, `app/(public)/page.tsx:323`, `case/SiteHeader.tsx:430` |
+| **M2** | Произвольные радиусы в разметке: `rounded-[12px]`, `rounded-[24px]`, `rounded-[48px]` | Заменить на `rounded-base`, `rounded-3xl`, `rounded-5xl` | `case/DesignSystemColors.tsx:210`, `app/(public)/page.tsx:323`, `case/SiteHeader.tsx:430` |
 | **M3** | `Lightbox` и `ImageCropperDialog` на `z-[70]` — значение не было закреплено | **Закрыто:** `z-[70]` и `z-[100]` разрешены явно (§2.5), код менять не нужно |
 | **M4** | `Hero` компенсирует паддинги контейнера через `-mx-4`/`-mx-8` + `w-[calc(100%+…)]` | **Закрыто:** full-bleed зафиксирован как норма в §2.6 |
-| **M5** | В UI есть ссылки на M3 fixed-роли (`*-fixed`), которых нет в палитре | Либо добавить fixed-роли в `globals.css`, либо удалить упоминания (следствие C1) | `globals.css`, `FAB.tsx` |
+| **M5** | ~~В UI есть ссылки на M3 fixed-роли (`*-fixed`), которых нет в палитре~~ | **Закрыто:** семейство `secondary-fixed-dim` / `on-secondary-fixed` заведено в палитру (§2.1.2) и используется `FAB` | `globals.css`, `FAB.tsx` |
 | **M6** | `Docs/ui-rules.md` дублирует правила отступов/сеток и частично с ними расходится | Заменён указателем на этот документ | `Docs/ui-rules.md` |
+| **M7** | Страница дизайнера имела **собственный** стрип карусели (`basis-[calc(100%-16px)]`, правый отступ ~20px), хотя по решению (34) карточки обеих страниц должны быть идентичны на мобильном | **Закрыто:** `PortfolioGallerySection` теперь рендерит общий `portfolio/Carousel` — эталон главной страницы (full-bleed, сосед до края экрана) | `src/components/portfolio/PortfolioGallerySection.tsx` |
 
 ### 9.3 Позже (на будущее, не блокирует)
 

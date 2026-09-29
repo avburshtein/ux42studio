@@ -8,7 +8,7 @@ interface FABProps {
 }
 
 /**
- * FAB — Floating Action Button главной страницы дизайнера (`/u/[slug]`).
+ * FAB — Floating Action Button (`/u/[slug]`).
  *
  * Ведёт к секции контакта (`#contact` → CtaSection), т.е. это быстрый доступ
  * к email/WhatsApp, а НЕ виртуальный помощник.
@@ -19,8 +19,11 @@ interface FABProps {
  * План по настоящему ассистенту: `Docs/roadmap/ai-assistant-fab.md`.
  *
  * Внешний вид: 64×64 (Main_page_Spec §11), фиксирован в правом нижнем углу,
- * z-50 (выше шапки z-40). Цвета — только токены (bg-secondary-fixed-dim,
- * text-on-secondary-fixed), HEX не хардкодим.
+ * z-50 (выше шапки z-40). Светлое «стекло»: --md-sys-color-secondary-fixed-dim
+ * + backdrop-blur (тот же приём, что в header-glass, и по той же причине —
+ * LightningCSS вырезает стандартный backdrop-filter, блюр даёт только
+ * Tailwind-утилита). Текст/иконка — --md-sys-color-on-secondary-fixed.
+ * HEX не хардкодим: пару токенов задаёт тема (см. globals.css).
  */
 export function FAB({ href = '#contact', ariaLabel = 'Contact us' }: FABProps) {
   return (
@@ -28,7 +31,7 @@ export function FAB({ href = '#contact', ariaLabel = 'Contact us' }: FABProps) {
       href={href}
       aria-label={ariaLabel}
       title={ariaLabel}
-      className="fixed bottom-8 right-8 z-50 inline-flex h-16 w-16 items-center justify-center rounded-tl-full rounded-tr-full rounded-bl-full rounded-br-none bg-secondary-fixed-dim shadow-lg hover:opacity-90 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      className="fixed bottom-8 right-8 z-50 inline-flex h-16 w-16 items-center justify-center rounded-tl-full rounded-tr-full rounded-bl-full rounded-br-none bg-secondary-fixed-dim backdrop-blur-md shadow-lg hover:opacity-90 transition-opacity focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <Mail size={24} className="text-on-secondary-fixed" aria-hidden />
     </Link>

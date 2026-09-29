@@ -3,7 +3,6 @@ import { getDb } from '@/db';
 import { projects } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
@@ -24,6 +23,7 @@ import { LinkButton } from '@/components/case/LinkButton';
 import { ResultsCard } from '@/components/case/ResultsCard';
 import { TagBadge } from '@/components/case/TagBadge';
 import { NextStepsList } from '@/components/case/NextStepsList';
+import { TestimonialCard } from '@/components/case/TestimonialCard';
 import { NextProjectShowcase } from '@/components/case/NextProjectShowcase';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import AuthBar from '@/components/AuthBar';
@@ -600,7 +600,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                         </div>
                                     )}
 
-                                    {/* Client reviews [Sec 08] — цитаты + аватар/имя/роль */}
+                                    {/* Client reviews [Sec 08] — TestimonialCard,
+                                        Figma 176:378 (white r=14 + shadow-card,
+                                        кавычка Poppins 100/76) */}
                                     {reviews.length > 0 && (
                                         <div className='flex flex-col gap-6'>
                                             <SectionLabel>
@@ -608,46 +610,26 @@ export default async function ProjectPage({ params }: PageProps) {
                                             </SectionLabel>
                                             <div className='flex flex-col gap-8'>
                                                 {reviews.map((r) => (
-                                                    <figure
+                                                    <TestimonialCard
                                                         key={r.id}
-                                                        className='flex flex-col gap-4'
-                                                    >
-                                                        <blockquote className='text-body-lg text-on-surface'>
-                                                            «{r.text}»
-                                                        </blockquote>
-                                                        <figcaption className='flex items-center gap-3'>
-                                                            {r.avatarFile
-                                                                ?.r2Key ? (
-                                                                <Image
-                                                                    src={getImageUrl(
-                                                                        r
-                                                                            .avatarFile
-                                                                            .r2Key,
-                                                                    )}
-                                                                    alt={
-                                                                        r.authorName
-                                                                    }
-                                                                    width={40}
-                                                                    height={40}
-                                                                    className='h-10 w-10 rounded-full object-cover'
-                                                                />
-                                                            ) : null}
-                                                            <div className='flex flex-col'>
-                                                                <span className='text-label-md font-semibold text-on-surface'>
-                                                                    {
-                                                                        r.authorName
-                                                                    }
-                                                                </span>
-                                                                {r.authorRole && (
-                                                                    <span className='text-body-sm text-on-surface-variant'>
-                                                                        {
-                                                                            r.authorRole
-                                                                        }
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        </figcaption>
-                                                    </figure>
+                                                        text={r.text}
+                                                        authorName={
+                                                            r.authorName
+                                                        }
+                                                        authorRole={
+                                                            r.authorRole
+                                                        }
+                                                        avatarUrl={
+                                                            r.avatarFile
+                                                                ?.r2Key
+                                                                ? getImageUrl(
+                                                                      r
+                                                                          .avatarFile
+                                                                          .r2Key,
+                                                                  )
+                                                                : null
+                                                        }
+                                                    />
                                                 ))}
                                             </div>
                                         </div>

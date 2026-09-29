@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CtaButton } from './CtaButton';
+import { Carousel } from './Carousel';
 import type { ButtonVariant } from '@/lib/mainPageContent';
 
 export interface GalleryItem {
@@ -104,15 +105,15 @@ export function PortfolioGallerySection({
           </>
         )}
 
-        {/* Mobile (<sm): карусель — flex-стрип со scroll-snap. Слева карточка
-            выровнена по контейнеру (паддинг 16 — фидбэк: «отличный»), справа
-            bleed до самого края экрана без правого поля: карточка =
-            100% − 16px (327px @ 375), за ней gap-4 и 16px соседа вплотную
-            к краю (решения (15), (16)). Тень карточки (вылет ~20px вниз) не
-            срезается скроллером: pb-7 внутри + компенсация −mb-5 снаружи
-            (вертикальный ритм прежний), sm:mb-0 — сброс в grid-режиме.
-            ≥sm — сетка 2/3 (решение (13)) */}
-        <div className="-mr-4 -mb-5 flex w-full snap-x snap-mandatory gap-4 overflow-x-auto pb-7 pr-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [&>*]:shrink-0 [&>*]:basis-[calc(100%-16px)] [&>*]:snap-start sm:mb-0 sm:mr-0 sm:grid sm:snap-none sm:grid-cols-2 sm:overflow-x-visible sm:pr-0 sm:pb-0 sm:[&>*]:basis-auto lg:grid-cols-3 lg:gap-6">
+        {/* <sm — карусель, общая с главной страницей (portfolio/Carousel).
+            Раньше здесь был отдельный стрип с basis-[calc(100%-16px)] и
+            правым полем 20px — карточки обеих страниц расходились на
+            мобильном, хотя по решению (34) должны быть идентичны.
+            Теперь геометрия стрипа, отступы и snap-цели считаются в одном
+            месте (эталон — главная страница UX42studio: full-bleed,
+            первых карточек по паддингу контейнера 24px, сосед — до края
+            экрана). ≥sm — сетка 2/3 (решение (13)). */}
+        <Carousel>
           {visibleItems
             ? visibleItems.map((it, i) => (
               // flex: карточка растягивается по высоте grid-ячейки —
@@ -122,7 +123,7 @@ export function PortfolioGallerySection({
               </div>
             ))
             : children}
-        </div>
+        </Carousel>
 
         {viewAllHref && viewAllLabel && (
           <CtaButton href={viewAllHref} variant={viewAllVariant ?? 'primary'}>

@@ -24,10 +24,16 @@ export default async function AuthBar({
             <div className='absolute top-2 right-2 z-50'>
                 <Link
                     href='/login'
-                    className='inline-flex items-center justify-center w-8 h-8 rounded-full opacity-10 hover:opacity-70 transition-opacity'
+                    // a11y: было w-8 h-8 opacity-10 — зона клика 32px и
+                    // контраст ~0.1 (не виден; WCAG 2.5.8 + 1.4.11). Теперь
+                    // 44×44 и токен on-surface-variant (8.87:1 в светлой,
+                    // 10.90:1 в тёмной) — минимально проходимое значение;
+                    // «спрятанность» сохранена размером, а не прозрачностью.
+                    className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:bg-surface-variant hover:text-primary'
                     title='Войти'
+                    aria-label='Войти'
                 >
-                    <LogIn className='w-4 h-4 text-on-surface' />
+                    <LogIn className='w-4 h-4' aria-hidden />
                 </Link>
             </div>
         );
@@ -42,10 +48,13 @@ export default async function AuthBar({
             <div className='fixed top-4 right-4 z-50'>
                 <Link
                     href='/login'
-                    className='inline-flex items-center justify-center w-8 h-8 rounded-full opacity-20 hover:opacity-60 transition-opacity'
+                    // Те же требования a11y, что и в ветке выше: 44×44
+                    // и текстовый токен вместо opacity-20.
+                    className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:bg-surface-variant hover:text-primary'
                     title='Войти'
+                    aria-label='Войти'
                 >
-                    <LogIn className='w-4 h-4 text-on-surface' />
+                    <LogIn className='w-4 h-4' aria-hidden />
                 </Link>
             </div>
         );
@@ -93,7 +102,12 @@ export default async function AuthBar({
                     {isOwner && projectId && (
                         <Link
                             href={`/admin/projects/${projectId}/edit/general`}
-                            className='text-label-sm text-primary hover:text-primary-variant transition-colors font-medium'
+                            // C2: класс hover:text-primary-variant ссылался на
+                            // несуществующий токен → hover просто не срабатывал.
+                            // Временно приглушение вместо цвета; как только
+                            // придёт реальный primary-variant из Figma —
+                            // вернуть hover:text-primary-variant.
+                            className='text-label-sm text-primary hover:opacity-80 transition-opacity font-medium'
                         >
                             Редактировать проект
                         </Link>
