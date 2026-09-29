@@ -26,7 +26,8 @@
 		"db:seed:local": "node scripts/apply-migrations.mjs --local --seed-only",
 		"db:seed:remote": "node scripts/apply-migrations.mjs --remote --seed-only",
 		"db:studio": "drizzle-kit studio --config=drizzle.config.ts",
-		"db:push": "drizzle-kit push --config=drizzle.config.ts"
+		"db:push": "drizzle-kit push --config=drizzle.config.ts",
+		"assets:flatten-png": "node scripts/flatten-png.cjs"
 	},
 	"dependencies": {
 		"@dnd-kit/core": "^6.3.1",
