@@ -120,7 +120,18 @@ function cpSyncCompat(src, dest, options = {}) {
  * ровно та же поломка, что и у cpSync.
  */
 function rmSyncCompat(target, options = {}) {
-    const { recursive = false, force = false, maxRetries = 0 } = options;
+    const {
+        recursive = false,
+        force = false,
+        // Свои значения по умолчанию вместо нативных `maxRetries: 0`.
+        // OpenNext чистит выходную папку `.open-next`, которую на Windows
+        // на секунду может придержать антивирус, поисковый индексатор или
+        // файловый вотчер — падает EBUSY. Нативный rmSync такие случаи
+        // переживает за счёт повторов с паузой, а здесь повторов не было
+        // вовсе: цикл при maxRetries = 0 выполнялся ровно один раз.
+        maxRetries = 3,
+        retryDelay = 100,
+    } = options;
 
     let stat;
     try {
@@ -146,7 +157,8 @@ function rmSyncCompat(target, options = {}) {
         }
 
         // Каталог может быть занят другим процессом (например, антивирусом) —
-        // повторяем, как это делает нативный rmSync на Windows.
+        // повторяем, как это делает нативный rmSync на Windows. Пауза между
+        // попытками обязательна: мгновенный повтор ловит тот же EBUSY.
         let lastError;
         for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
             try {
@@ -155,12 +167,20 @@ function rmSyncCompat(target, options = {}) {
             } catch (err) {
                 if (err.code === 'ENOENT') return;
                 lastError = err;
+                if (attempt < maxRetries && retryDelay > 0) {
+                    sleepSync(retryDelay);
+                }
             }
         }
         throw lastError;
     }
 
     fs.unlinkSync(target);
+}
+
+/** Синхронная пауза — чтобы не тянуть в polyfill async-обёртку. */
+function sleepSync(ms) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 }
 
 if (!fs[PATCHED]) {
