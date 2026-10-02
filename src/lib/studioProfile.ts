@@ -45,3 +45,50 @@ export function readStudioProfileSlug(env: unknown): string | null {
     const slug = typeof raw === 'string' ? raw.trim() : '';
     return slug ? slug : null;
 }
+
+/**
+ * Профиль студии с учётом видимости.
+ *
+ * Зачем отдельная функция, а не `findFirst` на месте: правило «скрытый
+ * сайт не показывается» должно выполняться одинаково на главной и на
+ * /platform, где резолвер скопирован вручную. Ошибка в одной из копий
+ * означала бы, что скрытая страница всё ещё видна.
+ *
+ * Правила:
+ *  • если slug задан и профиль скрыт — возвращаем null, НЕ подставляя
+ *    другой профиль: подстановка «раннего профиля» показала бы на главной
+ *    чужое портфолио;
+ *  • если slug не задан — берём самый ранний публичный профиль
+ *    (createdAt asc, isPublic = 1).
+ */
+export type StudioProfile = {
+    id: string;
+    slug: string;
+    fullName: string;
+};
+
+import type { getDb } from '@/db';
+
+type DbClient = ReturnType<typeof getDb>;
+
+export async function resolveStudioProfile(
+    db: DbClient,
+    env: unknown,
+): Promise<StudioProfile | null> {
+    const slug = readStudioProfileSlug(env);
+
+    if (slug) {
+        const configured = await db.query.profiles.findFirst({
+            where: { slug, isPublic: 1 },
+            columns: { id: true, slug: true, fullName: true },
+        });
+        return configured ?? null;
+    }
+
+    const earliest = await db.query.profiles.findFirst({
+        where: { isPublic: 1 },
+        orderBy: { createdAt: 'asc' },
+        columns: { id: true, slug: true, fullName: true },
+    });
+    return earliest ?? null;
+}

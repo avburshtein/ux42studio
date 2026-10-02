@@ -89,8 +89,8 @@ export default function DeleteAccountSection({
                     </p>
                     <p className='mt-2 text-body-sm text-on-surface-variant'>
                         Если хотите просто скрыть портфолио, не удаляйте
-                        профиль — его можно сделать приватным в настройках
-                        публикации.
+                        профиль — переключатель «Публикация сайта» в разделе
+                        «Аккаунт» настроек профиля.
                     </p>
                 </div>
             </div>

@@ -9,7 +9,9 @@ import { HeroSection } from '@/components/portfolio/HeroSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { PlatformBenefitsSection } from '@/components/portfolio/PlatformBenefitsSection';
 import { SectionLabel } from '@/components/portfolio/SectionLabel';
-import { readStudioProfileSlug } from '@/lib/studioProfile';
+import {
+    resolveStudioProfile,
+} from '@/lib/studioProfile';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -52,20 +54,13 @@ const STEPS = [
 ];
 
 export default async function PlatformPage() {
-    // Живой пример платформы в действии — профиль студии. Тот же
-    // резолвер, что на главной: STUDIO_PROFILE_SLUG → самый ранний профиль.
+    // Живой пример платформы в действии — профиль студии. Резолвер учитывает
+    // видимость: если профиль скрыт, пример не показывается вовсе — иначе
+    // промо обещало бы страницу, которая отдаёт 404.
     const { env } = await getCloudflareContext({ async: true });
     const db = getDb(env.DB);
 
-    const exampleProfile =
-        (await db.query.profiles.findFirst({
-            where: { slug: readStudioProfileSlug(env) ?? '' },
-            columns: { slug: true, fullName: true },
-        })) ??
-        (await db.query.profiles.findFirst({
-            orderBy: { createdAt: 'asc' },
-            columns: { slug: true, fullName: true },
-        }));
+    const exampleProfile = await resolveStudioProfile(db, env);
 
     return (
         <>
@@ -75,7 +70,11 @@ export default async function PlatformPage() {
                 wordmarkHref='/'
                 navItems={[
                     { label: 'Back to studio', href: '/' },
-                    { label: 'Example', href: '#example' },
+                    // Пример в меню — только если есть публичный профиль:
+                    // якорь на несуществующий раздел сбивает с толку.
+                    ...(exampleProfile
+                        ? [{ label: 'Example', href: '#example' }]
+                        : []),
                 ]}
                 menuMode
                 ctaHref='#contact'

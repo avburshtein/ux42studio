@@ -590,6 +590,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `DeleteAccountSection` | «Удаление профиля» (настройки): контейнер страницы оборачивает в `Card class='border-error'`, компонент рисует только содержимое. Триггер — `outline` с `border-error text-error hover:bg-error/10` (как Danger Zone в GitHub), финальное действие — сплошной `variant='destructive'`. Отбивка действий — `border-t border-outline-variant` + `pt-6` |
 | `AccountNameForm` | Имя и фамилия владельца (`admin/`), раздел «Аккаунт» настроек. Одно поле + панель сохранения по образцу `WizardSaveBar`; подсказка отсылает к «Брендинг и SEO» на `/admin/profile` |
 | `Field` (`ui/`) | Поле формы: `Label` + контрол + `min-h-[1.5rem]` под подсказку/ошибку (No-CLS, §3.3). Приоритет у ошибки, иначе показывается `hint` |
+| `PublicationToggle` | «Публикация сайта» (настройки → Аккаунт): `Switch` + кнопка-дубликат действия, статус словами (`role='status'` — состояние видно не только цветом/положением переключателя). Меняет `profiles.isPublic`: страница `/u/{slug}` отдаёт 404 всем кроме владельца, кейсы исчезают с главной и `/platform`, профиль выпадает из sitemap |
 
 **a11y админки:** каждая форма — `Label` + `Input` в паре, ошибки текстом рядом с полем; подтверждение деструктивных действий обязательно; загрузка файлов — с прогрессом и текстовым состоянием, не только спиннером.
 
@@ -630,7 +631,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | Паттерн | Маршруты | Структура |
 |---|---|---|
 | Главная студии | `/` | `SiteHeader menuMode` → `AuthBar` (если авторизован) → секции (`HeroSection` → About → Approach → Skills → `PortfolioGallerySection` → `ProBonoBanner` → `PlatformBenefitsSection` → `CtaSection id='contact'`) → `SiteFooter` + `FAB` |
-| Страница дизайнера | `/u/[slug]` | `SiteHeader profileSlug` → блоки визарда (TL;DR, кейсы, отзывы, контакты) → `SiteFooter profileSlug` + `FAB`; seed-палитра инлайном через `generateThemeCss` |
+| Страница дизайнера | `/u/[slug]` | `SiteHeader profileSlug` → блоки визарда (TL;DR, кейсы, отзывы, контакты) → `SiteFooter profileSlug` + `FAB`; seed-палитра инлайном через `generateThemeCss`. **Видимость:** при `isPublic = 0` — 404 всем, кроме владельца (JWT из куки), владельцу — баннер `secondary-container/on-secondary-container`; кейсы при этом исчезают с `/` и `/platform` (общий `resolveStudioProfile`) |
 | Кейс | `/u/[slug]/[projectSlug]` | `SiteHeaderBreadcrumb` → `Hero` → секции кейса → `NextProjectShowcase` → `SiteFooter` |
 | Короткая/печатная версия | `/u/[slug]/[projectSlug]/short` | `CaseShortView` + `PrintTldrButton`, корень `.print-short`; шапка/футер скрыты в печати |
 | Платформа | `/platform` | Отдельный вход для дизайнеров: `SiteHeader` с `navItems` (Back to studio / Example), выгоды + CTA |

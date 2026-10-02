@@ -11,7 +11,9 @@ import { SectionLabel } from '@/components/portfolio/SectionLabel';
 import { FloatingElements } from '@/components/FloatingElements';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
-import { readStudioProfileSlug } from '@/lib/studioProfile';
+import {
+    resolveStudioProfile,
+} from '@/lib/studioProfile';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -43,18 +45,10 @@ export default async function HomePage({
     const db = getDb(env.DB);
 
     // Профиль студии (решение (69)): главная показывает только его кейсы.
-    // Сначала пробуем slug из STUDIO_PROFILE_SLUG, иначе — самый ранний
-    // профиль (createdAt asc). Если профилей нет вообще, workProjects пуст
-    // и блок Work покажет пустое состояние, а не чужие работы.
-    const studioProfile =
-        (await db.query.profiles.findFirst({
-            where: { slug: readStudioProfileSlug(env) ?? '' },
-            columns: { id: true, slug: true },
-        })) ??
-        (await db.query.profiles.findFirst({
-            orderBy: { createdAt: 'asc' },
-            columns: { id: true, slug: true },
-        }));
+    // resolveStudioProfile учитывает видимость: если профиль скрыт
+    // (isPublic = 0), кейсы с главной пропадают вместе со ссылками на
+    // страницу дизайнера — и не подставляется чужой профиль.
+    const studioProfile = await resolveStudioProfile(db, env);
 
     const workProjects = studioProfile
         ? await db.query.projects.findMany({

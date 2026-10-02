@@ -1,6 +1,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyJwt } from '@/lib/jwt';
 import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
@@ -17,6 +19,7 @@ import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 // Вернуть: раскомментировать импорт и строку ниже.
 //   {mpc.cta.visible && <FAB href='#contact' />}
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
+import { EyeOff } from 'lucide-react';
 import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
 import { sql } from 'drizzle-orm';
 import type { CaseSortMode } from '@/db/schema/profiles';
@@ -121,7 +124,26 @@ export default async function ProfilePage({ params }: PageProps) {
         },
     });
     if (!profile) notFound();
-    if (!profile.isPublic) notFound();
+
+    // Владелец скрытой страницы должен видеть её сам — иначе после
+    // «скрыть сайт» он получает 404 и не понимает, куда делся его сайт.
+    // Проверяем JWT из куки так же, как это делает middleware для /admin:
+    // на /u/* middleware не работает (matcher его не покрывает).
+    let isOwner = false;
+    if (!profile.isPublic) {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth-token')?.value;
+        const jwtSecret = env.JWT_SECRET || process.env.JWT_SECRET;
+        if (token && jwtSecret) {
+            const payload = await verifyJwt(token, jwtSecret);
+            const viewerId =
+                payload && typeof payload.userId === 'string'
+                    ? payload.userId
+                    : null;
+            isOwner = viewerId === profile.userId;
+        }
+        if (!isOwner) notFound();
+    }
 
     // Порядок кейсов — выбранный дизайнером режим сортировки (панель
     // CaseSortManager в /admin; null = 'newest' — историческое поведение).
@@ -302,6 +324,26 @@ export default async function ProfilePage({ params }: PageProps) {
             )}
             {customVarsCss && (
                 <style dangerouslySetInnerHTML={{ __html: customVarsCss }} />
+            )}
+            {/* Баннер для владельца скрытой страницы: без него «скрыть сайт»
+                выглядит как поломка — владелец видит свой сайт, но не
+                понимает, что остальные его не видят. Пара
+                secondary-container/on-secondary-container — из проверенных
+                в DS плашек (§2.1.1). */}
+            {!profile.isPublic && isOwner && (
+                <div className='bg-secondary-container text-on-secondary-container'>
+                    <div className='section-container flex items-center gap-2 py-2'>
+                        <EyeOff
+                            className='h-4 w-4 shrink-0'
+                            aria-hidden='true'
+                        />
+                        <p className='text-body-sm'>
+                            Страница скрыта: её видите только вы, пока
+                            авторизованы. Опубликовать — «Настройки профиля»
+                            → «Аккаунт» → «Публикация».
+                        </p>
+                    </div>
+                </div>
             )}
             <SiteHeader
                 profileSlug={slug}

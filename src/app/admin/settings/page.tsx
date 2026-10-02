@@ -7,9 +7,13 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import AccountNameForm from '@/components/admin/AccountNameForm';
+import PublicationToggle from '@/components/admin/PublicationToggle';
 import DeleteAccountSection from '@/components/admin/DeleteAccountSection';
 import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
-import { getMyAccountEmail } from '@/lib/actions/profile';
+import {
+    getMyAccountEmail,
+    getMyPublicationStatus,
+} from '@/lib/actions/profile';
 
 // Разделы настроек. Порядок = от «кто я» к необратимым действиям.
 const SECTIONS = [
@@ -34,11 +38,18 @@ type SectionId = (typeof SECTIONS)[number]['id'];
 export default function SettingsPage() {
     const [section, setSection] = useState<SectionId>('account');
     const [accountEmail, setAccountEmail] = useState('');
+    const [publication, setPublication] = useState<{
+        profileId: string | null;
+        isPublic: boolean;
+    }>({ profileId: null, isPublic: true });
 
     useEffect(() => {
         getMyAccountEmail()
             .then((mail) => setAccountEmail(mail ?? ''))
             .catch(() => setAccountEmail(''));
+        getMyPublicationStatus()
+            .then(setPublication)
+            .catch(() => setPublication({ profileId: null, isPublic: true }));
     }, []);
 
     return (
@@ -122,6 +133,16 @@ export default function SettingsPage() {
                             </Card>
 
                             <AccountNameForm />
+
+                            {/* «Скрыть сайт» — здесь, рядом с удалением:
+                                обе настройки управляют доступностью
+                                страницы, а не её содержимым. */}
+                            {publication.profileId && (
+                                <PublicationToggle
+                                    profileId={publication.profileId}
+                                    initialIsPublic={publication.isPublic}
+                                />
+                            )}
                         </>
                     )}
 

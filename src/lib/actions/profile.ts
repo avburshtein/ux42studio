@@ -327,6 +327,80 @@ export async function removeSocialLink(linkId: string) {
     revalidatePath('/admin/settings');
 }
 
+export async function getMyPublicationStatus(): Promise<{
+    profileId: string | null;
+    isPublic: boolean;
+}> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return { profileId: null, isPublic: true };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { userId },
+        columns: { id: true, isPublic: true },
+    });
+
+    return {
+        profileId: profile?.id ?? null,
+        isPublic: (profile?.isPublic ?? 1) === 1,
+    };
+}
+
+/**
+ * Переключение видимости публичной страницы дизайнера («скрыть сайт»).
+ *
+ * Что даёт скрытие: страница /u/{slug} отдаёт 404 всем, кроме владельца,
+ * кейсы пропадают с главной и со страницы /platform, профиль выпадает из
+ * sitemap (фильтр по isPublic стоит там изначально). Кейсы и настройки
+ * при этом не трогаются — включение возвращает всё как было.
+ *
+ * Отдельная функция, а не updateProfile: у переключателя другая
+ * семантика — он меняет видимость публичных страниц, поэтому должен
+ * инвалицировать их кэш, а не только админку.
+ */
+export async function setProfileVisibility(
+    profileId: string,
+    isPublic: boolean,
+): Promise<{ ok?: boolean; error?: string }> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return { error: 'Не авторизован' };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { id: profileId },
+        columns: { id: true, slug: true, userId: true },
+    });
+    if (!profile) return { error: 'Профиль не найден' };
+    // Менять видимость может только владелец: иначе участник с сессией
+    // другого дизайнера мог бы скрыть чужой сайт, зная profileId.
+    if (profile.userId !== userId) {
+        return { error: 'Это не ваш профиль' };
+    }
+
+    await db
+        .update(profiles)
+        .set({ isPublic: isPublic ? 1 : 0, updatedAt: Math.floor(Date.now() / 1000) })
+        .where(eq(profiles.id, profileId));
+
+    // Публичные страницы кэшируются (revalidate = 300 / 3600), поэтому
+    // после переключения их нужно инвалидировать, иначе скрытие применится
+    // только через час.
+    revalidatePath('/');
+    revalidatePath('/platform');
+    revalidatePath(`/u/${profile.slug}`);
+    revalidatePath('/u/[slug]', 'page');
+    revalidatePath('/admin/settings');
+    revalidatePath('/admin/profile');
+
+    return { ok: true };
+}
+
 export async function updateSocialLinkOrder(
     profileId: string,
     links: Array<{ id: string; order: number }>,
