@@ -442,3 +442,119 @@ export function buildRegisteredEmail(data: {
     };
 }
 
+
+// ---------------------------------------------------------------------------
+// Обращение из публичной формы обратной связи («Contact us»)
+// ---------------------------------------------------------------------------
+
+export type ContactEmailData = {
+    /** Имя посетителя (поле формы). */
+    name: string;
+    /** Обратный адрес посетителя — становится Reply-To письма. */
+    email: string;
+    /** Текст обращения. */
+    message: string;
+    /** Откуда отправлено: «Home», «For designers», «Designer page: slug». */
+    source?: string;
+};
+
+/**
+ * Уведомление студии о сообщении из формы обратной связи.
+ *
+ * Письмо уходит студии (hello@ или адрес дизайнера), а Reply-To настроен
+ * на посетителя — можно ответить кнопкой «Ответить», не пересобирая адрес.
+ * Текст сообщения экранируется и переносится построчно: в письме нельзя
+ * доверять разметке пользователя.
+ */
+export function buildContactEmail(data: ContactEmailData): BuiltEmail {
+    const name = escapeHtml(data.name.trim());
+    const email = escapeHtml(data.email.trim());
+    const message = escapeHtml(data.message.trim())
+        .replace(/\r\n/g, '\n')
+        .replace(/\n/g, '<br />');
+    const source = escapeHtml((data.source ?? '').trim());
+
+    const metaRow = (label: string, value: string): string => `
+                        <tr>
+                            <td width="140" valign="top" style="padding:6px 12px 6px 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;color:${MUTED};">${label}</td>
+                            <td valign="top" style="padding:6px 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;color:${INK};">${value}</td>
+                        </tr>`;
+
+    const html = `<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body style="margin:0;padding:0;background:${SOFT};">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${SOFT};">
+            <tr>
+                <td align="center" style="padding:24px 12px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid ${LINE};border-radius:20px;">
+                        <tr>
+                            <td style="padding:28px 32px 0 32px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td style="font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;color:${BRAND};letter-spacing:.5px;">
+                                            UX42 Studio
+                                        </td>
+                                        <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:${MUTED};">
+                                            Обращение с сайта
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:20px 32px 0 32px;">
+                                <h1 style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:32px;color:${INK};">
+                                    Новое сообщение из формы обратной связи
+                                </h1>
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-top:1px solid ${LINE};">
+                                    ${metaRow('Имя', name)}
+                                    ${metaRow('Ответить на', email)}
+                                    ${metaRow('Страница', source || '—')}
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:16px 32px 0 32px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${SOFT};border:1px dashed ${BRAND};border-radius:14px;">
+                                    <tr>
+                                        <td style="padding:18px 20px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:${INK};">
+                                            ${message}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:20px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;color:${MUTED};">
+                                Reply-To настроен на адрес отправителя — можно отвечать прямо на это письмо.
+                                Форма обратной связи сайта ux42.studio; вопросы по данным: ${CONTACT_EMAIL.privacy}.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>`;
+
+    const text = `UX42 Studio — новое обращение с сайта
+
+Имя: ${data.name.trim()}
+Ответить на: ${data.email.trim()}
+Страница: ${(data.source ?? '').trim() || '—'}
+
+Сообщение:
+${data.message.trim()}
+
+Reply-To настроен на адрес отправителя — можно отвечать прямо на это письмо.`;
+
+    return {
+        subject: `Новое обращение с сайта — ${data.name.trim().slice(0, 60)}`,
+        html,
+        text,
+    };
+}

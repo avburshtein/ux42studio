@@ -206,6 +206,7 @@ export default async function PlatformPage() {
                     ]}
                     emailHref={`mailto:${CONTACT_EMAIL.hello}`}
                     emailLabel='Say hi'
+                    contactSource='For designers'
                 />
             </main>
             <SiteFooter

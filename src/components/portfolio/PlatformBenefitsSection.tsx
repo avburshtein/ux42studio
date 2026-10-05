@@ -7,6 +7,7 @@ import {
     Rocket,
 } from 'lucide-react';
 import { SectionLabel } from './SectionLabel';
+import ContactDialog from '../ContactDialog';
 import { CONTACT_EMAIL } from '@/lib/contact';
 
 /**
@@ -131,12 +132,13 @@ export function PlatformBenefitsSection({
                             Say hi.
                         </span>
                     </p>
-                    <a
-                        href={'mailto:' + CONTACT_EMAIL.hello}
-                        className='inline-flex h-14 shrink-0 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-                    >
-                        Say hi
-                    </a>
+                    {/* Форма обратной связи (модалка); mailto — фолбэк в ней. */}
+                    <ContactDialog
+                        label='Say hi'
+                        source='For designers'
+                        fallbackEmail={CONTACT_EMAIL.hello}
+                        className='shrink-0'
+                    />
                 </div>
             </div>
         </section>

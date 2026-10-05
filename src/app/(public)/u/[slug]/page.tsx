@@ -450,6 +450,8 @@ export default async function ProfilePage({ params }: PageProps) {
                     )}
                     emailHref={`mailto:${mpc.cta.emailAddress}`}
                     emailLabel={mpc.cta.emailLabel}
+                    contactSource={`Designer page: ${profile.slug}`}
+                    contactProfileId={profile.id}
                     emailVariant={mpc.cta.emailVariant}
                     whatsappHref={mpc.cta.whatsappUrl || undefined}
                     whatsappLabel={mpc.cta.whatsappLabel || undefined}

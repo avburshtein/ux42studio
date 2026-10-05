@@ -76,7 +76,7 @@ function resolveFrom(env: EmailEnv): { address: string; name: string } {
 
 async function sendViaCloudflare(
     env: EmailEnv,
-    params: { to: string; subject: string; html: string; text: string },
+    params: { to: string; subject: string; html: string; text: string; replyTo?: string },
 ): Promise<EmailSendStatus> {
     const { address, name } = resolveFrom(env);
     const result = await env.EMAIL!.send({
@@ -85,13 +85,14 @@ async function sendViaCloudflare(
         subject: params.subject,
         html: params.html,
         text: params.text,
+        replyTo: params.replyTo,
     });
     return { status: 'sent', provider: 'cloudflare', messageId: result.messageId };
 }
 
 async function sendViaResend(
     env: EmailEnv,
-    params: { to: string; subject: string; html: string; text: string },
+    params: { to: string; subject: string; html: string; text: string; replyTo?: string },
 ): Promise<EmailSendStatus> {
     const { address, name } = resolveFrom(env);
     const res = await fetch('https://api.resend.com/emails', {
@@ -106,6 +107,8 @@ async function sendViaResend(
             subject: params.subject,
             html: params.html,
             text: params.text,
+            // Ответ на письмо уходит напрямую отправителю (форма обратной связи).
+            reply_to: params.replyTo ? [params.replyTo] : undefined,
         }),
         // Страховка от зависания: создание инвайта не должно ждать
         // внешний сервис дольше нескольких секунд.
@@ -134,6 +137,8 @@ export async function sendEmail(params: {
     subject: string;
     html: string;
     text: string;
+    /** Адрес для «Ответить» — для формы обратной связи (посетитель). */
+    replyTo?: string;
 }): Promise<EmailSendStatus> {
     let env: EmailEnv;
     try {

@@ -381,6 +381,8 @@ CTA главной и секций (`src/components/portfolio/CtaButton.tsx`). *
 **Do:** для публичного CTA; выбирайте вариант из `ButtonVariant` (`src/lib/mainPageContent.ts`), не пишите новые классы кнопок в страницах.
 **Don't:** не ставить на кнопках инлайн-размеры; не использовать в админке (там `Button`).
 
+Классы пилюли вынесены в функцию `ctaButtonClass(variant, className?)` — её же использует триггер модалки `ContactDialog`, чтобы кнопка формы была визуально идентична CTA. **Не копируйте строку классов** в другие компоненты (анти-паттерн 13).
+
 ### 3.3 Поля форм
 
 Все поля: высота `h-10` (40px), радиус `rounded-md`, граница `border-outline`, фон `bg-surface` (в админке — `bg-surface-input` = `surface-container-lowest`), текст `text-body-md`, placeholder `text-on-surface-variant`, focus — `ring-2 ring-primary ring-offset-2`, disabled — `opacity-50` + `cursor-not-allowed`.
@@ -571,6 +573,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | `CtaSection` | Секция контакта (`id='contact'`) — цель `FAB` и якорей `#contact` |
 | `Carousel` | **Единственная** мобильная карусель карточек работ: `<sm` — full-bleed стрип со scroll-snap, `≥sm` — сетка 2/3. Классы: `-mx-6 -mb-5 -mt-3 w-[calc(100%+48px)] px-6 pb-7 pt-3 gap-4` + `scroll-px-6` (snap-цель = паддинг 24px, стрип всегда «доезжает» ровно); карточка `basis-full` = 327px @375 — ровно ширина сетки, сосед виден до края экрана (peek 8px). Требования к детям: корень с `w-full` (`PortfolioCard` ✓) и `[&>*]:min-w-0` против truncate | **Используется и главной, и страницей дизайнера** — геометрия живёт только здесь. Правка одной страницы «под себя» запрещена |
 | `FloatingElements` | Декоративный слой (bokeh и т.п.), **учитывает `prefers-reduced-motion`** |
+| `ContactDialog` | Форма обратной связи в модалке (`id` контактов, `CtaSection`/`PlatformBenefitsSection`). Триггер — `<button>` с `ctaButtonClass` (визуально = `CtaButton`); содержимое только из `ui/*` (`Dialog`, `Field`, `Input`, `Textarea`, `Button`) + RHF/zod (`src/lib/contactForm.ts`), honeypot-поле, success-состояние `role='status'` с переводом фокуса на Close, строка «Prefer email?» с `mailto:`-фолбэком. Сабмит — серверный экшн `sendContactMessage` (валидация, honeypot, rate limit 3/час, резолв адреса получателя из БД — адрес не приходит с клиента). Тексты EN (§6.1) | `src/components/ContactDialog.tsx` |
 | `CtaButton`, `SectionLabel` | См. §3.2, §3.4 |
 
 ### 3.10 Админ-компоненты — `src/components/admin/*`

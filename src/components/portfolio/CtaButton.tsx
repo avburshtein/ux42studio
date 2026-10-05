@@ -29,6 +29,15 @@ interface CtaButtonProps {
   external?: boolean;
 }
 
+/**
+ * Классы CTA-пилюли. Вынесены в отдельную функцию, чтобы триггер модалки
+ * ContactDialog был визуально идентичен кнопке — копирование строк
+ * компонентами запрещено дизайн-системой (§3.2, анти-паттерн 13).
+ */
+export function ctaButtonClass(variant: ButtonVariant = 'primary', className = ''): string {
+  return `inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 text-button font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${VARIANT_CLASS[variant]} ${className}`;
+}
+
 export function CtaButton({
   href,
   variant = 'primary',
@@ -36,7 +45,7 @@ export function CtaButton({
   children,
   external,
 }: CtaButtonProps) {
-  const cls = `inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 text-button font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${VARIANT_CLASS[variant]} ${className}`;
+  const cls = ctaButtonClass(variant, className);
 
   if (external) {
     return (

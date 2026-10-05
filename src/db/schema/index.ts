@@ -5,3 +5,4 @@ export * from './categories';
 export * from './projects';
 export * from './color-roles';
 export * from './project-details';
+export * from './contact';

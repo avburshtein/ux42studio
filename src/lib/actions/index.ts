@@ -3,3 +3,4 @@ export * from './projects';
 export * from './profile';
 export * from './admin';
 export * from './upload';
+export * from './contact';

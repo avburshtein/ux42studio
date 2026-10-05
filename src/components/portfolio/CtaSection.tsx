@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Mail } from 'lucide-react';
+import ContactDialog from '../ContactDialog';
 import { FloatingElements } from '../FloatingElements';
 import { CtaButton } from './CtaButton';
 import type { ButtonVariant } from '@/lib/mainPageContent';
@@ -10,6 +10,10 @@ interface CtaSectionProps {
   emailHref: string;
   emailLabel: string;
   emailVariant?: ButtonVariant;
+  /** Источник обращения для письма студии (ContactDialog). */
+  contactSource?: string;
+  /** Профиль дизайнера: адрес получателя берётся из его настроек. */
+  contactProfileId?: string;
   whatsappHref?: string;
   whatsappLabel?: string;
   whatsappVariant?: ButtonVariant;
@@ -23,6 +27,7 @@ interface CtaSectionProps {
 export function CtaSection({
   title, bodyLines,
   emailHref, emailLabel, emailVariant = 'primary',
+  contactSource, contactProfileId,
   whatsappHref, whatsappLabel, whatsappVariant = 'secondary',
   floatingElements = true,
   floatingColor, floatingShape,
@@ -53,10 +58,18 @@ export function CtaSection({
         </div>
 
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center">
-          <CtaButton href={emailHref} variant={emailVariant}>
-            <Mail size={24} />
-            {emailLabel}
-          </CtaButton>
+          {/* Кнопка почты открывает модалку формы: сайт отправляет письмо
+              сам (серверный экшн), mailto остаётся фолбэком внутри неё. */}
+          <ContactDialog
+            label={emailLabel}
+            variant={emailVariant}
+            icon
+            source={contactSource ?? 'Home'}
+            profileId={contactProfileId}
+            fallbackEmail={
+              emailHref.startsWith('mailto:') ? emailHref.slice(7) : undefined
+            }
+          />
 
           {whatsappHref && whatsappLabel && (
             <CtaButton href={whatsappHref} variant={whatsappVariant} external>

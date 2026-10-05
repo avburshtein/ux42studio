@@ -55,7 +55,7 @@ ux42.studio. 3600 IN TXT "v=spf1 include:_spf.mx.cloudflare.net ~all"
 
 | Адрес | Кто такой | Где используется в коде | Куда уходит |
 | --- | --- | --- | --- |
-| `hello@ux42.studio` | Публичный контакт студии | Кнопки «Contact us» на `/` и `/platform` (`CtaSection` → `mailto:`), блок выгод платформы (`PlatformBenefitsSection`), значение по умолчанию для контактов в настройках дизайнера (`mainPageContent.cta.emailAddress`), Terms of Use §LSSI Art. 10 | Email Routing → av.burshtein@gmail.com |
+| `hello@ux42.studio` | Публичный контакт студии | Кнопки «Send an email» / «Say hi» (`CtaSection`, `PlatformBenefitsSection` → модалка `ContactDialog`, фолбэк `mailto:`), значение по умолчанию для контактов в настройках дизайнера (`mainPageContent.cta.emailAddress`), Terms of Use §LSSI Art. 10 | Email Routing → av.burshtein@gmail.com |
 | `privacy@ux42.studio` | Контролёр ПДн | Privacy Policy и Terms of Use (много мест), все письма платформы: приглашение (`email/templates.ts`), подтверждение регистрации, подсказка в форме регистрации и в разделе удаления профиля | Email Routing → av.burshtein@gmail.com |
 | `no-reply@ux42.studio` | Отправитель писем платформы | `EMAIL_FROM` в `wrangler.toml`, `SENDER_EMAIL` в `src/lib/contact.ts` | Отправка через Resend (домен в Resend ещё не верифицирован) |
 
@@ -66,23 +66,36 @@ dig MX ux42.studio             # route1/2/3.mx.cloudflare.net
 dig TXT ux42.studio            # v=spf1 include:_spf.mx.cloudflare.net ~all
 ```
 
-## 3. Что делают кнопки сейчас
+## 3. Как устроена обратная связь сейчас
 
-Кнопки контакта — это ссылки `mailto:` (`CtaSection` рендерит `CtaButton
-href='mailto:…'` с иконкой `Mail`). Сайт **ничего не отправляет**: он
-просто открывает почтовую программу посетителя.
+Кнопки контакта («Send an email» на `/`, «Say hi» на `/platform` и в
+блоке выгод, кнопка на странице дизайнера) **открывают модалку с формой**
+— `ContactDialog` (`src/components/ContactDialog.tsx`). Сайт сам отправляет
+письмо через серверный экшн `sendContactMessage`
+(`src/lib/actions/contact.ts`):
 
-Следствия:
+1. zod-валидация — схема `src/lib/contactForm.ts`, общая клиенту и серверу;
+2. **honeypot** — скрытое поле `company`: бот получает «успех», письмо
+   не уходит и не пишется в БД;
+3. **rate limit** — 3 обращения в час с одного IP (таблица
+   `contact_messages`: IP хэшируется с солью, ретеншен 7 дней);
+4. **получатель** — адрес дизайнера из его настроек или `hello@`; адрес
+   НЕ приходит с клиента, иначе форма превращается в открытое почтовое
+   реле;
+5. письмо уходит через Resend/Cloudflare c **Reply-To на посетителя**,
+   результат пишется в `contact_messages` (`status`, `message_id`).
 
-* на телефоне без настроенного почтового клиента кнопка не делает ничего;
-* письмо зависит от того, что посетитель вообще знает, куда писать, — то
-  есть вся «доставляемость» лежит на нём;
-* аналитика не покажет, что человек хотел написать, но не смог.
+Внутри модалки — строка «Prefer email?» с `mailto:`-фолбэком на тот же
+адрес: если отправка не настроена или не удалась, посетитель видит адрес
+и пишет напрямую. Ошибка отправки **никогда не проглатывается** —
+экшн возвращает понятное сообщение с адресом.
 
-Форма обратной связи в проекте **отсутствует** (это осознанное решение
-для MVP, а не ошибка). Задача на доработку: `sendContactMessage` в
-`src/lib/email/` + форма в секции контактов — отправка через тот же
-Resend, что и для инвайтов.
+Письмо-уведомление студии — `buildContactEmail` в
+`src/lib/email/templates.ts` (тема «Новое обращение с сайта — {имя}»).
+
+Форма начинает реально отправляться только после настройки Resend
+(`RESEND_API_KEY`, §4) — до этого показывается фолбэк-адрес.
+Миграция таблицы: `drizzle/20261005000000_add_contact_messages/`.
 
 ## 4. Как было настроено (выполнено 30.09.2026)
 
