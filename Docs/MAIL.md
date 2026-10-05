@@ -4,42 +4,66 @@
 > Код отправки писем — `src/lib/email/` (см. `Docs/EMAIL.md` про провайдера).
 > Адреса в коде — `src/lib/contact.ts` (единый источник правды).
 
-## 1. Главное: почта на домен не настроена
+## 1. Состояние почты
 
-**Состояние на момент аудита:**
+**Настроено 30.09.2026.** Cloudflare Email Routing включён, оба адреса
+пересылаются на один ящик (`av.burshtein@gmail.com`):
 
 ```bash
-$ dig MX ux42.studio      # → ENODATA — MX-записей нет
-$ dig TXT ux42.studio     # → ENODATA — нет ни SPF, ни DKIM, ни DMARC
+$ dig MX ux42.studio
+ux42.studio. 3600 IN MX 21 route1.mx.cloudflare.net.
+ux42.studio. 3600 IN MX 45 route3.mx.cloudflare.net.
+ux42.studio. 3600 IN MX 91 route2.mx.cloudflare.net.
+
+$ dig TXT ux42.studio
+ux42.studio. 3600 IN TXT "v=spf1 include:_spf.mx.cloudflare.net ~all"
 ```
 
-Без MX-записей домен **не принимает почту**: письмо на `hello@ux42.studio`
-или `privacy@ux42.studio` не имеет куда прийти и будет отклонено
-почтовым сервером получателя (такой домен считается «без почты»).
+Правила маршрутизации:
 
-При этом оба адреса уже опубликованы на сайте: в политиках
-(Privacy Policy, Terms of Use — как контролёр ПДн по RGPD/LSSI) и в
-исходящих письмах платформы как канал поддержки. То есть сайт обещает
-канал связи, который физически не работает.
+| Адрес | Действие |
+| --- | --- |
+| `hello@ux42.studio` | forward → av.burshtein@gmail.com |
+| `privacy@ux42.studio` | forward → av.burshtein@gmail.com |
+| все остальные (catch-all) | drop (выключено — так и должно быть) |
 
-**Это блокер, который решается вручную в Dashboard** (см. §4) — API-токен,
-которым у нас пользуется `wrangler`, не имеет прав на DNS-записи зоны
-(`/zones/{id}/dns_records` отвечает «Authentication error»), а адрес
-получателя нужно подтвердить по ссылке из письма.
+До настройки MX-записей не было, поэтому письма на эти адреса
+не доставлялись вообще — при том что оба адреса были опубликованы в
+политиках (Privacy Policy, Terms of Use) и в исходящих письмах платформы
+как канал поддержки.
+
+> ### ⚠️ SPF: при настройке Resend записи нужно объединить
+>
+> Cloudflare Email Routing уже записал SPF для домена. Resend при
+> верификации домена **добавит свою запись**. Две TXT-записи `v=spf1`
+> на одном домене — это `permerror`: почтовые серверы отбрасывают такие
+> письма, то есть сломаются и пересылка, и отправка писем платформы.
+>
+> Правильно — одна запись с обоими `include`:
+>
+> ```bash
+> dig TXT ux42.studio
+> # было:  v=spf1 include:_spf.mx.cloudflare.net ~all
+> # стало: v=spf1 include:_spf.mx.cloudflare.net include:<resend> ~all
+> ```
+>
+> Если Resend покажет «MX record found» вместо добавления SPF-записи —
+> это нормально: DKIM он ставит через CNAME, а SPF нужно дописать
+> в существующую запись вручную.
 
 ## 2. Карта адресов
 
-| Адрес | Кто такой | Где используется в коде | Куда уходит сейчас |
+| Адрес | Кто такой | Где используется в коде | Куда уходит |
 | --- | --- | --- | --- |
-| `hello@ux42.studio` | Публичный контакт студии | Кнопки «Contact us» на `/` и `/platform` (`CtaSection` → `mailto:`), блок выгод платформы (`PlatformBenefitsSection`), значение по умолчанию для контактов в настройках дизайнера (`mainPageContent.cta.emailAddress`), Terms of Use §LSSI Art. 10 | **Никуда** — MX нет |
-| `privacy@ux42.studio` | Контролёр ПДн | Privacy Policy и Terms of Use (много мест), все письма платформы: приглашение (`email/templates.ts`), подтверждение регистрации, подсказка в форме регистрации и в разделе удаления профиля | **Никуда** — MX нет |
-| `no-reply@ux42.studio` | Отправитель писем платформы | `EMAIL_FROM` в `wrangler.toml`, `SENDER_EMAIL` в `src/lib/contact.ts` | Отправка через Resend (после настройки домена в Resend) |
+| `hello@ux42.studio` | Публичный контакт студии | Кнопки «Contact us» на `/` и `/platform` (`CtaSection` → `mailto:`), блок выгод платформы (`PlatformBenefitsSection`), значение по умолчанию для контактов в настройках дизайнера (`mainPageContent.cta.emailAddress`), Terms of Use §LSSI Art. 10 | Email Routing → av.burshtein@gmail.com |
+| `privacy@ux42.studio` | Контролёр ПДн | Privacy Policy и Terms of Use (много мест), все письма платформы: приглашение (`email/templates.ts`), подтверждение регистрации, подсказка в форме регистрации и в разделе удаления профиля | Email Routing → av.burshtein@gmail.com |
+| `no-reply@ux42.studio` | Отправитель писем платформы | `EMAIL_FROM` в `wrangler.toml`, `SENDER_EMAIL` в `src/lib/contact.ts` | Отправка через Resend (домен в Resend ещё не верифицирован) |
 
-Проверка после изменений (покажет, что адрес перестал «отваливаться»):
+Проверка, что пересылка настроена (состояние задокументировано в §1):
 
 ```bash
-dig MX ux42.studio             # ожидаются записи route1/2/3.mx.cloudflare.net
-dig TXT ux42.studio            # v=spf1 include:spf.cloudflareemail.net ~all
+dig MX ux42.studio             # route1/2/3.mx.cloudflare.net
+dig TXT ux42.studio            # v=spf1 include:_spf.mx.cloudflare.net ~all
 ```
 
 ## 3. Что делают кнопки сейчас
@@ -60,7 +84,7 @@ href='mailto:…'` с иконкой `Mail`). Сайт **ничего не от�
 `src/lib/email/` + форма в секции контактов — отправка через тот же
 Resend, что и для инвайтов.
 
-## 4. Что нужно сделать (Dashboard, ~5 минут)
+## 4. Как было настроено (выполнено 30.09.2026)
 
 Входящая почта: **Cloudflare Email Routing** — бесплатен на любом тарифе,
 письма пересылаются на обычный ящик (Gmail/Outlook), отправка с домена для
@@ -86,18 +110,17 @@ DKIM/SPF-записи для `no-reply@ux42.studio`.
 > через Resend использует TXT-записи (SPF/DKIM), поэтому эти две системы
 > не конфликтуют и работают вместе.
 
-## 5. Проверка после настройки
+## 5. Как проверить
+
+Пересылка уже задокументирована в §1; здесь — ручная проверка:
 
 ```bash
-# 1. MX на месте
+# 1. MX на месте (Cloudflare)
 dig MX ux42.studio
 
-# 2. Письмо доходит (подставьте свой адрес вместо получателя)
-#    Gmail: https://www.google.com/apps-script/send/email
+# 2. Живое письмо: отправить с любого ящика на hello@ux42.studio
+#    и дождаться пересылки в av.burshtein@gmail.com (обычно 1–5 минут)
 ```
-
-Проще — отправить письмо с любого ящика на `hello@ux42.studio` и дождаться
-пересылки (обычно 1–5 минут).
 
 ## 6. Правило для кода
 
