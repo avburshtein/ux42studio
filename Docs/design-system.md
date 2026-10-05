@@ -385,7 +385,7 @@ CTA главной и секций (`src/components/portfolio/CtaButton.tsx`). *
 
 ### 3.3 Поля форм
 
-Все поля: высота `h-10` (40px), радиус `rounded-md`, граница `border-outline`, фон `bg-surface` (в админке — `bg-surface-input` = `surface-container-lowest`), текст `text-body-md`, placeholder `text-on-surface-variant`, **focus — перекраска бордера в `primary` (`focus:border-primary`), без кольца**: кольцо поверх бордера давало двойной контур (исправлено 2026-10-05), disabled — `opacity-50` + `cursor-not-allowed`. Кольцо `ring-2 ring-primary ring-offset-2` остаётся только у элементов без собственной видимой границы (кнопки ghost/link, чекбокс, триггеры попапов) — там заменять нечего.
+Все поля: высота `h-10` (40px), радиус `rounded-md`, граница `border-outline`, фон `bg-surface` (в админке — `bg-surface-input` = `surface-container-lowest`), текст `text-body-md`, placeholder `text-on-surface-variant`, **focus — 2px-индикатор внутри поля**: бордер гаснет (`border-transparent`), поверх рисуется `outline-2 outline-primary outline-offset-[-2px]` — замена, а не добавление: ни сдвига раскладки, ни двойного контура (уточнено 2026-10-05: 1px-перекраска в светлой теме была почти незаметна), disabled — `opacity-50` + `cursor-not-allowed`. Кольцо `ring-2 ring-primary ring-offset-2` остаётся только у элементов без собственной видимой границы (кнопки ghost/link, чекбокс, триггеры попапов) — там заменять нечего.
 
 | Компонент | Специфика |
 |---|---|
@@ -677,7 +677,7 @@ Figma Switcher/Toggle 48×48: `h-12 w-12 shrink-0 rounded-full px-3 py-1 text-on
 | Требование | Как выполнено в проекте | Правило |
 |---|---|---|
 | Контраст текста 4.5:1 (крупный 3:1) | Пары `primary`/`on-primary`, `on-surface`/`surface` из M3-палитры; ошибки — `error`/`on-error`, **не** `error-container`/`on-error-container` (2.4:1, Lighthouse) | Пара `X-container`/`on-X-container` — только для крупных плашек, не для текста под кнопкой |
-| Фокус виден | `focus-visible:outline-2 outline-offset-2 outline-primary` (ссылки-кнопки, CTA), **перекраска бордера в `primary` (поля форм — фокусный бордер заменяет обычный, а не ложится поверх)** или `ring-2 ring-primary ring-offset-2` (элементы без видимой границы: кнопки ghost/link, чекбокс, Radix-триггеры) | Никогда не `outline-none` без равноценной замены |
+| Фокус виден | `focus-visible:outline-2 outline-offset-2 outline-primary` (ссылки-кнопки, CTA), **поля форм — 2px `outline-primary` внутри поля (бордер гаснет, `outline-offset: -2px`)**, `ring-2 ring-primary ring-offset-2` — только элементы без видимой границы (кнопки ghost/link, чекбокс, Radix-триггеры) | Никогда не `outline-none` без равноценной замены |
 | Не полагаться на цвет | Состояния через иконку/текст/подчёркивание, не только цвет | Активный таб — фон + `shadow-sm`; чекбокс — иконка `Check` |
 | Зона клика ≥ 44×44 | `h-11`/`h-12`/`h-14`/`h-16` для интерактивных; `ThemeToggle` 48×48, иконка 24px внутри `h-12` | Мелкие иконки оборачивать в контейнер 44px |
 | Имя у иконочных элементов | `aria-label` на кнопке-иконке и ссылке на соцсеть (`SocialIcon` — фолбэк на `platform`), `alt` у изображений | Декоративные иконки — `aria-hidden` |

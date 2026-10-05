@@ -159,7 +159,7 @@ export default function ResearchPage({
                             id='researchMethodology'
                             {...register('researchMethodology')}
                             placeholder='e.g. User interviews, competitive analysis, surveys…'
-                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                             rows={4}
                         />
                     </div>
@@ -170,7 +170,7 @@ export default function ResearchPage({
                             id='userStory'
                             {...register('userStory')}
                             placeholder='As a [user], I want to [action] so that [benefit]…'
-                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                             rows={4}
                         />
                     </div>
@@ -251,7 +251,7 @@ export default function ResearchPage({
                                     <textarea
                                         {...register(`personas.${index}.role`)}
                                         placeholder='Short bio describing background, occupation, and lifestyle…'
-                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                         rows={3}
                                     />
                                     {errors.personas?.[index]?.role && (
@@ -267,7 +267,7 @@ export default function ResearchPage({
                                             `personas.${index}.description`,
                                         )}
                                         placeholder='Describe a typical scenario: when, where, and why they use the product…'
-                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                         rows={3}
                                     />
                                     {errors.personas?.[index]?.description && (

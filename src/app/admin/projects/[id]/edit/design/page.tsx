@@ -105,7 +105,7 @@ export default function DesignPage({
                         id='visualDirection'
                         {...register('visualDirection')}
                         placeholder='Describe the visual style, mood, and aesthetic direction…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
                 </div>
@@ -134,7 +134,7 @@ export default function DesignPage({
                         id='designApproach'
                         {...register('designApproach')}
                         placeholder='Explain the design methodology, principles, and key decisions…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
                 </div>

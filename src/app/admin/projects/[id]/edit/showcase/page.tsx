@@ -141,7 +141,7 @@ export default function ShowcasePage({
                         id='finalDescription'
                         {...register('finalDescription')}
                         placeholder='Describe the final delivered solution and its impact…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
                 </div>
@@ -249,7 +249,7 @@ export default function ShowcasePage({
                                                 `comparisons.${index}.beforeText`,
                                             )}
                                             placeholder='Describe the state before the redesign…'
-                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                             rows={2}
                                         />
                                     </div>
@@ -260,7 +260,7 @@ export default function ShowcasePage({
                                                 `comparisons.${index}.afterText`,
                                             )}
                                             placeholder='Describe the improvements after the redesign…'
-                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
+                                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                             rows={2}
                                         />
                                     </div>
