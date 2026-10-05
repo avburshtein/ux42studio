@@ -243,7 +243,7 @@ export default function GeneralPage({
                         id='teaser'
                         {...register('teaser')}
                         placeholder='A short teaser describing the project in 1–2 sentences…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                         rows={3}
                         maxLength={200}
                     />

@@ -36,7 +36,7 @@ type Props = {
 };
 
 const textareaClass =
-    'w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary';
+    'w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary';
 
 /** Редактор одного тег-массива (skills / tools / process steps). */
 function TagList({

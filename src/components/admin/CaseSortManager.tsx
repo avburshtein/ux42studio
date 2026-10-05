@@ -351,7 +351,7 @@ export default function CaseSortManager({
                             handleModeChange(e.target.value as CaseSortMode)
                         }
                         disabled={pending}
-                        className='h-10 appearance-none rounded-md border border-outline-variant bg-surface pl-3 pr-10 text-body-md text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='h-10 appearance-none rounded-md border border-outline-variant bg-surface pl-3 pr-10 text-body-md text-on-surface focus:outline-none focus:border-primary'
                     >
                         {SORT_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>

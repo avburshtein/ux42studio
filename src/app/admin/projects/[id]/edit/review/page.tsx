@@ -166,7 +166,7 @@ export default function ReviewPage({
                         id='keyTakeaway'
                         {...register('keyTakeaway')}
                         placeholder='Summarise the main lesson or takeaway from this project…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                         rows={4}
                     />
                 </div>
@@ -214,7 +214,7 @@ export default function ReviewPage({
                                     <textarea
                                         {...register(`reviews.${index}.text`)}
                                         placeholder='What did the reviewer say about the project?'
-                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                                         rows={3}
                                     />
                                     {errors.reviews?.[index]?.text && (

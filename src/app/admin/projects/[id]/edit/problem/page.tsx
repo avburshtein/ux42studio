@@ -104,7 +104,7 @@ export default function ProblemPage({
                         id='problemStatement'
                         {...register('problemStatement')}
                         placeholder='Describe the problem this project aims to solve…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                         rows={5}
                     />
                 </div>
@@ -115,7 +115,7 @@ export default function ProblemPage({
                         id='projectGoal'
                         {...register('projectGoal')}
                         placeholder='What is the main goal of this project?'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                         rows={5}
                     />
                 </div>
@@ -126,7 +126,7 @@ export default function ProblemPage({
                         id='targetUsers'
                         {...register('targetUsers')}
                         placeholder='Who are the target users? Describe their needs and context…'
-                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:outline-none focus:border-primary'
                         rows={5}
                     />
                 </div>
