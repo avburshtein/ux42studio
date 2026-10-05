@@ -14,6 +14,7 @@ import { SiteFooter } from '@/components/case/SiteFooter';
 import {
     resolveStudioProfile,
 } from '@/lib/studioProfile';
+import { CONTACT_EMAIL } from '@/lib/contact';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -394,7 +395,7 @@ export default async function HomePage({
                         'Have a project in mind — or just want to say hi?',
                         'Tell us about it. We usually reply within 48 hours.',
                     ]}
-                    emailHref='mailto:hello@ux42.studio'
+                    emailHref={`mailto:${CONTACT_EMAIL.hello}`}
                     emailLabel='Send an email'
                 />
             </main>

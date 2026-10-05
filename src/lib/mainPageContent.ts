@@ -3,6 +3,8 @@
 // Хранение: JSON-колонка profiles.main_page_content. Отсутствующие/нулевые
 // значения дополняются дефолтами через normalizeMainPageContent().
 
+import { CONTACT_EMAIL } from '@/lib/contact';
+
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'link';
 
 export type ProcessStep = {
@@ -231,7 +233,7 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     description1: 'We answer emails fast.',
     description2: 'Pro bono spots available.',
     emailLabel: 'Send an email',
-    emailAddress: 'hello@ux42.studio',
+    emailAddress: CONTACT_EMAIL.hello,
     emailVariant: 'primary',
     whatsappLabel: 'WhatsApp',
     whatsappUrl: '',

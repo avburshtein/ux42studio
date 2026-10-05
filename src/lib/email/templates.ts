@@ -12,6 +12,8 @@
  * <style>-блоки.
  */
 
+import { CONTACT_EMAIL } from '@/lib/contact';
+
 export type InviteEmailData = {
     /** Адрес, на который создано приглашение. */
     toEmail: string;
@@ -262,7 +264,7 @@ export function buildInviteEmail(data: InviteEmailData): BuiltEmail {
                                                 <tr>
                                                     <td width="14" valign="top" style="padding:0;">—</td>
                                                     <td valign="top" style="padding:0;">
-                                                        Нужна помощь: privacy@ux42.studio — отвечаем по-русски и по-английски.
+                                                        Нужна помощь: ${CONTACT_EMAIL.privacy} — отвечаем по-русски и по-английски.
                                                     </td>
                                                 </tr>
                                             </table>
@@ -316,7 +318,7 @@ ${data.registerUrl}
 — код не подходит: проверьте, что ввели его целиком, без пробелов;
 — код истёк: попросите администратора создать новый инвайт;
 — письма нет во «Входящих»: проверьте папку «Спам» / «Нежелательные», а также адрес ${rawEmail};
-— нужна помощь: напишите на privacy@ux42.studio.
+— нужна помощь: напишите на ${CONTACT_EMAIL.privacy}.
 
 Вы получили это письмо, потому что администратор платформы создал приглашение на адрес ${rawEmail}. Если вы не ожидали это письмо — просто проигнорируйте его: аккаунт создан не будет.`;
 
@@ -411,7 +413,7 @@ export function buildRegisteredEmail(data: {
                         <tr>
                             <td style="padding:24px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;color:${MUTED};">
                                 Это письмо отправлено, потому что аккаунт создан на адрес
-                                ${toEmail}. Вопросы и поддержка: privacy@ux42.studio.
+                                ${toEmail}. Вопросы и поддержка: ${CONTACT_EMAIL.privacy}.
                             </td>
                         </tr>
                     </table>
@@ -431,7 +433,7 @@ export function buildRegisteredEmail(data: {
 
 Перейти в панель управления: ${data.profileUrl}
 
-Вопросы и поддержка: privacy@ux42.studio.`;
+Вопросы и поддержка: ${CONTACT_EMAIL.privacy}.`;
 
     return {
         subject: 'Аккаунт создан — добро пожаловать в UX42 Studio',

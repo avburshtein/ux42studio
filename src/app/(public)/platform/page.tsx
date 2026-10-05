@@ -12,6 +12,7 @@ import { SectionLabel } from '@/components/portfolio/SectionLabel';
 import {
     resolveStudioProfile,
 } from '@/lib/studioProfile';
+import { CONTACT_EMAIL } from '@/lib/contact';
 import AuthBar from '@/components/AuthBar';
 
 export const revalidate = 300;
@@ -203,7 +204,7 @@ export default async function PlatformPage() {
                         'Tell us a little about your work and we will set you up.',
                         'We usually reply within 48 hours.',
                     ]}
-                    emailHref='mailto:hello@ux42.studio'
+                    emailHref={`mailto:${CONTACT_EMAIL.hello}`}
                     emailLabel='Say hi'
                 />
             </main>
