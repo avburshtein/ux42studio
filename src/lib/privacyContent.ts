@@ -17,10 +17,16 @@
 //    ими персональные данные + наш контроль/модерация.
 //  • §14 (новый) — канал жалоб на контент (LSSI art. 8 notice-and-action).
 //
+//  • Правка 06.10.2026: публичная форма обратной связи (ContactDialog):
+//    §3 — данные из формы + IP-хэш против спама (хранение 7 дней),
+//    §4 — основание для обращений из формы,
+//    §5 — автоудаление журнала формы через 7 дней,
+//    §6 — Resend получает и данные формы; Gmail хранит и hello@-пересылку.
+//
 // ⚠️ ПЕРЕД ПУБЛИКАЦИЕЙ: заменить CO_CONTROLLER_ADDRESS_DENIS на реальный
 //    домашний адрес. Если вы живёте по одному адресу — укажите его же.
 
-export const PRIVACY_LAST_UPDATED = 'September 26, 2026';
+export const PRIVACY_LAST_UPDATED = 'October 6, 2026';
 
 /**
  * Домашний адрес второго со-ответственного (ст. 26 GDPR).
@@ -105,8 +111,8 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
             rows: [
                 [
                     'Email correspondence',
-                    'Name, email address, and the content of the message (company, project requirements, custom comments).',
-                    'To respond to user design inquiries, prepare initial design proposal briefs, and initiate pre-contractual discussions.',
+                    'Name, email address, and the content of the message (company, project requirements, custom comments), including messages sent through the on-site contact form. To protect the form against automated abuse, a salted hash of the sender IP address is kept for 7 days and deleted afterwards.',
+                    'To respond to user design inquiries, prepare initial design proposal briefs, and initiate pre-contractual discussions. Contact form messages are delivered to the studio (or to the designer whose page was used) and answered from the Reply-To address.',
                 ],
                 [
                     'Platform account',
@@ -165,6 +171,10 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
                     'Legitimate interest (Art. 6.1.f GDPR) and steps taken at the request of the administrator who issues the invitation (Art. 6.1.b): access is granted only to people the studio has decided to invite. Recipients who do not wish to receive these messages may ask us to delete their address at privacy@ux42.studio.',
                 ],
                 [
+                    'Contact form submissions',
+                    'Pre-contractual measures (Art. 6.1.b GDPR) when the message concerns a design request, plus legitimate interest (Art. 6.1.f GDPR) in protecting the public form against automated abuse and spam.',
+                ],
+                [
                     'Portfolio content published by a designer',
                     'Performance of a contract (Art. 6.1.b GDPR) for the data of the designer themselves, and legitimate interest (Art. 6.1.f GDPR) for the personal data of third parties that the designer chooses to make public (for example a client name or a customer review). See section 13 for the responsibilities this involves.',
                 ],
@@ -201,6 +211,10 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
                     'Until 12 months after creation, or until used — whichever comes first. Once an invitation is used, the associated email address is retained only as part of the account created from it. An unused invitation can be revoked at any time, which deletes the stored address immediately.',
                 ],
                 [
+                    'Contact form log entries',
+                    'Deleted automatically 7 days after submission. The forwarded message itself is kept as email correspondence (see above).',
+                ],
+                [
                     'Content published on a portfolio',
                     'For as long as the designer keeps the account active and the content published. On account closure, public content is removed from the web within 30 days.',
                 ],
@@ -223,8 +237,8 @@ export const EN_PRIVACY_SECTIONS: PrivacySection[] = [
         ],
         bullets: [
             '**Cloudflare, Inc.** — web hosting, CDN, object storage, database, anonymous cookieless web analytics, email routing for the privacy@ux42.studio address, and strict-necessity security cookies.',
-            '**Resend, Inc.** — transactional email delivery. When an administrator issues a registration invitation, the recipient\'s email address and the contents of the invitation message are transmitted to Resend in order to send that single email. Resend receives no portfolio content and no contact list.',
-            '**Google LLC** — Gmail, used to store correspondence forwarded to the privacy@ux42.studio address.',
+            '**Resend, Inc.** — transactional email delivery. When an administrator issues a registration invitation, the recipient\'s email address and the contents of the invitation message are transmitted to Resend in order to send that single email. When a visitor submits the contact form, their name, email address and message are transmitted to Resend in order to deliver that message, and only for that purpose. Resend receives no portfolio content and no contact list.',
+            '**Google LLC** — Gmail, used to store correspondence forwarded to the privacy@ux42.studio and hello@ux42.studio addresses.',
         ],
     },
 
@@ -362,8 +376,8 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
             rows: [
                 [
                     'Correspondencia por correo electrónico',
-                    'Nombre, email y contenido del mensaje (empresa, requisitos del proyecto, comentarios personalizados).',
-                    'Responder a consultas, elaborar presupuestos de diseño iniciales e iniciar gestiones precontractuales.',
+                    'Nombre, email y contenido del mensaje (empresa, requisitos del proyecto, comentarios personalizados), incluidos los enviados a través del formulario de contacto del sitio. Para proteger el formulario contra abusos automatizados, se conserva durante 7 días un hash con sal de la dirección IP del remitente, que luego se elimina.',
+                    'Responder a consultas, elaborar presupuestos de diseño iniciales e iniciar gestiones precontractuales. Los mensajes del formulario llegan al estudio (o al diseñador cuya página se utilizó) y se responden desde la dirección de respuesta del mensaje.',
                 ],
                 [
                     'Cuenta de la plataforma',
@@ -415,6 +429,10 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
                     'Medidas precontractuales (Art. 6.1.b RGPD) para elaborar propuestas de diseño y revisar especificaciones.',
                 ],
                 [
+                    'Envíos del formulario de contacto',
+                    'Medidas precontractuales (Art. 6.1.b RGPD) cuando el mensaje se refiere a una solicitud de diseño, e interés legítimo (Art. 6.1.f RGPD) en proteger el formulario público contra abusos automatizados y spam.',
+                ],
+                [
                     'Análisis Web',
                     'Interés legítimo (Art. 6.1.f RGPD) — estadísticas anónimas sin cookies; no se tratan datos personales.',
                 ],
@@ -447,6 +465,10 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
                     'Hasta 12 meses desde su creación o hasta que se utilicen, lo que ocurra primero. Una vez utilizada la invitación, la dirección de email asociada se conserva únicamente como parte de la cuenta creada. Una invitación no utilizada puede revocarse en cualquier momento, lo que elimina de inmediato la dirección almacenada.',
                 ],
                 [
+                    'Registros del formulario de contacto',
+                    'Se eliminan automáticamente 7 días después del envío. El mensaje reenviado se conserva como correspondencia por correo electrónico (véase arriba).',
+                ],
+                [
                     'Contenido publicado en el portafolio',
                     'Mientras el diseñador mantenga la cuenta activa y el contenido publicado. Al cerrar la cuenta, el contenido público se retira de la web en un máximo de 30 días.',
                 ],
@@ -469,8 +491,8 @@ export const ES_PRIVACY_SECTIONS: PrivacySection[] = [
         ],
         bullets: [
             '**Cloudflare, Inc.** — alojamiento web, CDN, almacenamiento de objetos, base de datos, analítica web anónima sin cookies, enrutamiento de correo para la dirección privacy@ux42.studio y cookies de seguridad estrictamente necesarias.',
-            '**Resend, Inc.** — envío de correos transaccionales. Cuando un administrador emite una invitación de registro, la dirección de correo del destinatario y el contenido del mensaje de invitación se transmiten a Resend para poder enviar ese único correo. Resend no recibe contenido de portafolios ni listas de contactos.',
-            '**Google LLC** — Gmail, utilizado para almacenar la correspondencia reenviada a la dirección privacy@ux42.studio.',
+            '**Resend, Inc.** — envío de correos transaccionales. Cuando un administrador emite una invitación de registro, la dirección de correo del destinatario y el contenido del mensaje de invitación se transmiten a Resend para poder enviar ese único correo. Cuando un visitante envía el formulario de contacto, su nombre, correo y mensaje se transmiten a Resend para entregar ese mensaje, y solo con ese fin. Resend no recibe contenido de portafolios ni listas de contactos.',
+            '**Google LLC** — Gmail, utilizado para almacenar la correspondencia reenviada a las direcciones privacy@ux42.studio y hello@ux42.studio.',
         ],
     },
 
