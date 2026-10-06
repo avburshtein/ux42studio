@@ -141,10 +141,15 @@ export default function ContactDialog({
             </DialogTrigger>
             <DialogContent>
                 <DialogHeader>
-                    <DialogTitle>Contact us</DialogTitle>
-                    <DialogDescription>
-                        Tell us about your project — we usually reply within two business days.
-                    </DialogDescription>
+                    <DialogTitle className='pr-8'>
+                        {sent ? 'Message sent' : 'Contact us'}
+                    </DialogTitle>
+                    {!sent && (
+                        <DialogDescription>
+                            Tell us about your project — we usually reply within
+                            two business days.
+                        </DialogDescription>
+                    )}
                 </DialogHeader>
 
                 {sent ? (
@@ -160,7 +165,7 @@ export default function ContactDialog({
                         <p className='text-body-sm text-on-surface-variant'>
                             Prefer email? {fallbackLink}
                         </p>
-                        <DialogFooter>
+                        <DialogFooter className='pt-2'>
                             <Button ref={closeRef} type='button' onClick={() => onOpenChange(false)}>
                                 Close
                             </Button>
