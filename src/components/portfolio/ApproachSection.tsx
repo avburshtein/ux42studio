@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import ContactDialog from '../ContactDialog';
 import { SectionLabel } from './SectionLabel';
 
 /**
@@ -63,12 +63,8 @@ export function ApproachSection() {
               meaningful.
             </p>
 
-            <Link
-              href='#contact'
-              className='inline-flex h-14 items-center justify-center whitespace-nowrap rounded-full bg-primary px-8 text-button font-medium text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-            >
-              Start a project
-            </Link>
+            {/* Форма вместо скролла к #contact: диалог открывается сразу. */}
+            <ContactDialog label='Start a project' source='Home' />
           </div>
 
           {/* Три принципа — тонкие разделители занимают место фотографии */}
