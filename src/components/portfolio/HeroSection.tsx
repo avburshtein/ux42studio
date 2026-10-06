@@ -1,5 +1,7 @@
 import { FloatingElements } from '../FloatingElements';
 import { CtaButton } from './CtaButton';
+import ContactDialog from '../ContactDialog';
+import { CONTACT_EMAIL } from '@/lib/contact';
 import type { ButtonVariant } from '@/lib/mainPageContent';
 
 interface HeroSectionProps {
@@ -13,6 +15,12 @@ interface HeroSectionProps {
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
   secondaryCtaVariant?: ButtonVariant;
+  /** Открыть форму обратной связи вместо ссылки (кнопки на #contact). */
+  secondaryCtaDialog?: {
+    source: string;
+    profileId?: string;
+    fallbackEmail?: string;
+  };
   /** Аватар дизайнера (из профиля) — круглая аватарка над заголовком */
   avatarUrl?: string;
   /** Cover дизайнера (из профиля) — фон Hero с оверлеем для читаемости */
@@ -43,6 +51,7 @@ export function HeroSection({
   primaryCtaVariant = 'primary',
   secondaryCtaLabel, secondaryCtaHref,
   secondaryCtaVariant = 'secondary',
+  secondaryCtaDialog,
   avatarUrl, coverUrl, displayName,
   floatingElements = true,
   floatingColor, floatingShape,
@@ -101,9 +110,20 @@ export function HeroSection({
           </CtaButton>
 
           {secondaryCtaLabel && secondaryCtaHref && (
-            <CtaButton href={secondaryCtaHref} variant={secondaryCtaVariant}>
-              {secondaryCtaLabel}
-            </CtaButton>
+            secondaryCtaDialog ? (
+              /* Форма вместо скролла к #contact: диалог открывается сразу. */
+              <ContactDialog
+                label={secondaryCtaLabel}
+                variant={secondaryCtaVariant}
+                source={secondaryCtaDialog.source}
+                profileId={secondaryCtaDialog.profileId}
+                fallbackEmail={secondaryCtaDialog.fallbackEmail ?? CONTACT_EMAIL.hello}
+              />
+            ) : (
+              <CtaButton href={secondaryCtaHref} variant={secondaryCtaVariant}>
+                {secondaryCtaLabel}
+              </CtaButton>
+            )
           )}
         </div>
       </div>

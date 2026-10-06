@@ -351,6 +351,9 @@ export default async function ProfilePage({ params }: PageProps) {
                 navItems={navItems}
                 ctaLabel="Hire me"
                 ctaHref="#contact"
+                contactDialogSource={`Designer page: ${profile.slug}`}
+                contactDialogProfileId={profile.id}
+                contactDialogFallbackEmail={mpc.cta.emailAddress}
                 variant={headerMode}
                 style={headerStyle}
             />
@@ -366,6 +369,15 @@ export default async function ProfilePage({ params }: PageProps) {
                     secondaryCtaLabel={mpc.hero.ctaSecondaryLabel}
                     secondaryCtaHref={mpc.hero.ctaSecondaryUrl || '#contact'}
                     secondaryCtaVariant={mpc.hero.ctaSecondaryVariant}
+                    secondaryCtaDialog={
+                        (mpc.hero.ctaSecondaryUrl || '#contact') === '#contact'
+                            ? {
+                                  source: `Designer page: ${profile.slug}`,
+                                  profileId: profile.id,
+                                  fallbackEmail: mpc.cta.emailAddress,
+                              }
+                            : undefined
+                    }
                     avatarUrl={avatarUrl}
                     coverUrl={coverUrl}
                     displayName={profile.fullName}

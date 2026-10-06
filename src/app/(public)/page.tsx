@@ -118,6 +118,7 @@ export default async function HomePage({
                 ]}
                 menuMode
                 ctaHref='#contact'
+                contactDialogSource='Home'
             />
             <main>
                 <HeroSection
@@ -129,6 +130,7 @@ export default async function HomePage({
                     primaryCtaHref='#work'
                     secondaryCtaLabel='Get in touch'
                     secondaryCtaHref='#contact'
+                    secondaryCtaDialog={{ source: 'Home' }}
                 />
 
                 {/* Work — каталог проектов (Main_page_Spec §6 паттерн) */}

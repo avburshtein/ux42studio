@@ -5,6 +5,8 @@ import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { ArrowLeft, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import ContactDialog from '../ContactDialog';
+import { CONTACT_EMAIL } from '@/lib/contact';
 import { ThemeToggle } from './ThemeToggle';
 
 interface NavItem {
@@ -32,6 +34,13 @@ interface SiteHeaderProps {
     ctaLabel?: string;
     /** CTA button href (default: #contact) */
     ctaHref?: string;
+    /** Форма обратной связи вместо ссылки: кнопки на #contact открывают диалог.
+     *  Источник для письма студии: 'Home', 'Designer page: …'. */
+    contactDialogSource?: string;
+    /** Чей профиль — определяет адрес получателя (настройки дизайнера). */
+    contactDialogProfileId?: string;
+    /** Адрес в строке «Prefer email?» — фолбэк, если форма не работает. */
+    contactDialogFallbackEmail?: string;
     /** Режим фона шапки (раздел 06 Color Theme): default — стекло как есть,
      *  transparent — без заливки, solid — заливка через style (+контрастный
      *  текст через локальные --md-sys-color-* токены). */
@@ -64,12 +73,26 @@ export function SiteHeader({
     menuMode = false,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
+    contactDialogSource,
+    contactDialogProfileId,
+    contactDialogFallbackEmail,
     variant = 'default',
     style,
     className,
 }: SiteHeaderProps) {
     const [menuOpen, setMenuOpen] = useState(false);
     const closeMenu = () => setMenuOpen(false);
+    // CTA и пункт меню на #contact открывают форму, а не скроллят вниз.
+    // Кастомные ссылки дизайнера (ctaHref !== '#contact') — как есть.
+    const contactDialog =
+        contactDialogSource && ctaHref === '#contact'
+            ? {
+                  source: contactDialogSource,
+                  profileId: contactDialogProfileId,
+                  fallbackEmail:
+                      contactDialogFallbackEmail ?? CONTACT_EMAIL.hello,
+              }
+            : undefined;
 
     // Escape закрывает оба меню (панель страницы дизайнера и menuMode-панель
     // главной) — релиз-гейт B6, стандартное a11y-поведение для overlay
@@ -135,13 +158,30 @@ export function SiteHeader({
                                 </MobileNavLink>
                             ))}
                             <div className='my-3 h-px bg-outline/30' aria-hidden='true' />
-                            <Link
-                                href={ctaHref}
-                                onClick={closeMenu}
-                                className='inline-flex h-14 self-center items-center justify-center rounded-full bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
-                            >
-                                {ctaLabel}
-                            </Link>
+                            {contactDialog ? (
+                                <div
+                                    onClick={closeMenu}
+                                    className='inline-flex self-center'
+                                >
+                                    <ContactDialog
+                                        label={ctaLabel}
+                                        source={contactDialog.source}
+                                        profileId={contactDialog.profileId}
+                                        fallbackEmail={
+                                            contactDialog.fallbackEmail
+                                        }
+                                        triggerClassName='inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
+                                    />
+                                </div>
+                            ) : (
+                                <Link
+                                    href={ctaHref}
+                                    onClick={closeMenu}
+                                    className='inline-flex h-14 items-center justify-center self-center rounded-full bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
+                                >
+                                    {ctaLabel}
+                                </Link>
+                            )}
                         </nav>
                     </div>
                 </>
@@ -186,7 +226,16 @@ export function SiteHeader({
                     ) : (
                         <>
                             <div className='hidden md:inline-flex'>
-                                <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                                {contactDialog ? (
+                                    <ContactDialog
+                                        label={ctaLabel}
+                                        source={contactDialog.source}
+                                        profileId={contactDialog.profileId}
+                                        fallbackEmail={contactDialog.fallbackEmail}
+                                    />
+                                ) : (
+                                    <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
+                                )}
                             </div>
                             <button
                                 type='button'
@@ -238,16 +287,37 @@ export function SiteHeader({
 
                             <nav className='mt-10 flex flex-col items-start gap-2'>
                                 {[...items, { label: 'Contact', href: ctaHref }].map(
-                                    (item) => (
-                                        <Link
-                                            key={item.label}
-                                            href={item.href}
-                                            onClick={closeMenu}
-                                            className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
-                                        >
-                                            {item.label}
-                                        </Link>
-                                    ),
+                                    (item) =>
+                                        item.label === 'Contact' &&
+                                        contactDialog ? (
+                                            // Пункт меню открывает форму; меню
+                                            // закрываем вручную (см. выше).
+                                            <div
+                                                key={item.label}
+                                                onClick={closeMenu}
+                                            >
+                                                <ContactDialog
+                                                    label={item.label}
+                                                    source={contactDialog.source}
+                                                    profileId={
+                                                        contactDialog.profileId
+                                                    }
+                                                    fallbackEmail={
+                                                        contactDialog.fallbackEmail
+                                                    }
+                                                    triggerClassName='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                                />
+                                            </div>
+                                        ) : (
+                                            <Link
+                                                key={item.label}
+                                                href={item.href}
+                                                onClick={closeMenu}
+                                                className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                            >
+                                                {item.label}
+                                            </Link>
+                                        ),
                                 )}
                             </nav>
 

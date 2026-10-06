@@ -42,6 +42,9 @@ type ContactDialogProps = {
     /** Адрес в строке «Prefer email?» — фолбэк, если форма не работает. */
     fallbackEmail?: string;
     className?: string;
+    /** Класс кнопки-триггера (по умолчанию пилюля ctaButtonClass).
+     *  Пункт меню шапки передаёт свой стиль вместо пилюли. */
+    triggerClassName?: string;
 };
 
 /**
@@ -62,6 +65,7 @@ export default function ContactDialog({
     profileId,
     fallbackEmail,
     className,
+    triggerClassName,
 }: ContactDialogProps) {
     const [open, setOpen] = useState(false);
     const [sending, setSending] = useState(false);
@@ -127,7 +131,10 @@ export default function ContactDialog({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogTrigger asChild>
-                <button type='button' className={ctaButtonClass(variant, className)}>
+                <button
+                    type='button'
+                    className={triggerClassName ?? ctaButtonClass(variant, className)}
+                >
                     {icon && <Mail size={24} aria-hidden />}
                     {label}
                 </button>
