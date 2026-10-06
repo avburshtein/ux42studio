@@ -6,7 +6,7 @@
  * Цепочка обработки:
  *   1. zod-валидация — схема общая с клиентом (`src/lib/contactForm.ts`),
  *      но сервер обязан проверять сам: клиентской валидации недостаточно;
- *   2. honeypot — непустое поле `company` означает бота: возвращаем
+ *   2. honeypot — непустое поле `website_url` означает бота: возвращаем
  *      «успех», но ничего не отправляем и не пишем в БД. Иначе бот
  *      понимает, что пойман, и меняет тактику;
  *   3. rate limit — 3 обращения в час с одного IP (таблица
@@ -28,6 +28,7 @@ import { getDb } from '@/db';
 import { contactMessages } from '@/db/schema/contact';
 import { CONTACT_EMAIL } from '@/lib/contact';
 import {
+    CONTACT_HONEYPOT_FIELD,
     CONTACT_RATE_LIMIT,
     contactFormSchema,
     type ContactFormData,
@@ -93,10 +94,11 @@ export async function sendContactMessage(
             error: parsed.error.issues[0]?.message ?? 'Please check the form fields.',
         };
     }
-    const { name, email, message, company } = parsed.data;
+    const { name, email, message } = parsed.data;
+    const honeypot = parsed.data[CONTACT_HONEYPOT_FIELD];
 
     // 2. Honeypot: молчаливый успех, никаких следов.
-    if (company?.trim()) {
+    if (honeypot?.trim()) {
         console.info('[contact] honeypot triggered — message dropped');
         return { ok: true };
     }

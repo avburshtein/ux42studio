@@ -152,6 +152,45 @@ function rmSyncCompat(target, options = {}) {
             throw err;
         }
 
+        // EBUSY на пустом каталоге под Windows: процесс (или его cwd)
+        // держит сам узел. Вариант: переименовать каталог в сторону и
+        // удалить уже по новому имени — переименование занятого каталога
+        // на NTFS обычно работает, а rmdir занятого — нет.
+        // Важно: переименование делаем ДО любых рекурсивных обходов —
+        // путь target после rename может указывать уже не туда.
+        {
+            const tmpName = `${target}.rm-${process.pid}-${Date.now()}`;
+            let renamed = false;
+            try {
+                fs.renameSync(target, tmpName);
+                renamed = true;
+            } catch {
+                // Переименовать не вышло (непустой? чужая блокировка?) —
+                // работаем по исходному пути обычным путём.
+            }
+            if (renamed) {
+                const entries = fs.readdirSync(tmpName);
+                for (const entry of entries) {
+                    rmSyncCompat(path.join(tmpName, entry), options);
+                }
+                for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+                    try {
+                        fs.rmdirSync(tmpName);
+                        return;
+                    } catch (err) {
+                        if (err.code === 'ENOENT') return;
+                        if (attempt < maxRetries && retryDelay > 0) {
+                            sleepSync(retryDelay);
+                        }
+                    }
+                }
+                // Даже если rmdir так и не прошёл — каталог уже пустой и
+                // лежит в стороне; OpenNext дальше пересоздаст структуру.
+                // Падать с EBUSY и ронять всю сборку из-за мусора — хуже.
+                return;
+            }
+        }
+
         for (const entry of fs.readdirSync(target)) {
             rmSyncCompat(path.join(target, entry), options);
         }

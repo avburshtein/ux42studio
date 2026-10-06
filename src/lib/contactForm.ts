@@ -13,8 +13,8 @@ import { z } from 'zod';
  * дизайн-системы на английском.
  */
 
-/** Имя скрытого honeypot-поля. Боты заполняют всё, что видят в разметке. */
-export const CONTACT_HONEYPOT_FIELD = 'company';
+/** Имя скрытого honeypot-поля. Нейтральное, без смысла для автозаполнения. */
+export const CONTACT_HONEYPOT_FIELD = 'website_url';
 
 export const contactFormSchema = z.object({
     name: z
@@ -34,9 +34,10 @@ export const contactFormSchema = z.object({
      * Реальная проверка — на сервере: непустой honeypot = молчаливый успех
      * без отправки (см. `sendContactMessage`). Без `.default()`: он делал
      * входной и выходной типы схемы разными, и zodResolver не совпадал
-     * с `useForm<ContactFormData>`.
+     * с `useForm<ContactFormData>`. Ключ — вычисляемый из
+     * CONTACT_HONEYPOT_FIELD, чтобы имя нельзя было рассинхронизировать.
      */
-    company: z.string().optional(),
+    [CONTACT_HONEYPOT_FIELD]: z.string().optional(),
 });
 
 export type ContactFormData = z.infer<typeof contactFormSchema>;

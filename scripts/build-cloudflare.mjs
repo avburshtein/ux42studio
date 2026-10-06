@@ -124,6 +124,38 @@ if (isBuild) {
     fs.rmSync(NEXT_ENV_OUTPUT, { force: true });
 }
 
+// 2a. Предочистка .open-next: OpenNext начинает build с rmSync всего
+//    выходного каталога, который на Windows стабильно падает с EBUSY —
+//    каталог держит сам процесс (cwd) или индексатор/антивирус, и пустой
+//    узел не удаляется даже после рекурсивной очистки содержимого.
+//    Чистим здесь заранее нативным rmSync с повторами: в этот момент
+//    OpenNext ещё не стартовал, и каталог, как правило, свободен.
+//    Если не вышло — не роняем: OpenNext попробует сам (у него свой
+//    полифилл и ретраи), а при его падении соберём вывод из лога.
+if (isBuild) {
+    const openNextDir = path.join(projectRoot, '.open-next');
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+        try {
+            fs.rmSync(openNextDir, { recursive: true, force: true });
+            break;
+        } catch (err) {
+            if (err.code === 'ENOENT') break;
+            if (attempt === 3) {
+                console.warn(
+                    `[ux42] не удалось пред-очистить .open-next (${err.code}), продолжает OpenNext`,
+                );
+            } else {
+                Atomics.wait(
+                    new Int32Array(new SharedArrayBuffer(4)),
+                    0,
+                    0,
+                    500,
+                );
+            }
+        }
+    }
+}
+
 process.on('exit', restoreEnvFiles);
 
 try {

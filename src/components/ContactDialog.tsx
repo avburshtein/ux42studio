@@ -73,10 +73,11 @@ export default function ContactDialog({
         register,
         handleSubmit,
         reset,
+        setValue,
         formState: { errors },
     } = useForm<ContactFormData>({
         resolver: zodResolver(contactFormSchema),
-        defaultValues: { name: '', email: '', message: '', company: '' },
+        defaultValues: { name: '', email: '', message: '', [CONTACT_HONEYPOT_FIELD]: '' },
     });
 
     // Успех заменяет форму: фокус переводим на кнопку Close, иначе он
@@ -197,21 +198,24 @@ export default function ContactDialog({
                         </Field>
 
                         {/*
-                            Honeypot: вне экрана, без фокуса, скрыт для
-                            скринридеров. Боты заполняют всё, что видят
-                            в разметке — непустое поле означает бота.
+                            Honeypot: display:none (автозаполнение его не видит,
+                            в отличие от offscreen), без label, имя нейтральное,
+                            tabIndex -1. Боты заполняют всё, что есть в DOM —
+                            непустое поле означает бота.
                         */}
-                        <div
-                            aria-hidden='true'
-                            className='absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden'
-                        >
-                            <label htmlFor='contact-company'>Company</label>
+                        <div aria-hidden='true' className='hidden'>
                             <input
-                                id='contact-company'
+                                id='contact-hp'
                                 type='text'
+                                name={CONTACT_HONEYPOT_FIELD}
                                 tabIndex={-1}
                                 autoComplete='off'
-                                {...register(CONTACT_HONEYPOT_FIELD)}
+                                defaultValue=''
+                                onChange={(e) =>
+                                    setValue(CONTACT_HONEYPOT_FIELD, e.target.value, {
+                                        shouldDirty: false,
+                                    })
+                                }
                             />
                         </div>
 

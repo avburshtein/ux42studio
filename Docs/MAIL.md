@@ -75,7 +75,7 @@ dig TXT ux42.studio            # v=spf1 include:_spf.mx.cloudflare.net ~all
 (`src/lib/actions/contact.ts`):
 
 1. zod-валидация — схема `src/lib/contactForm.ts`, общая клиенту и серверу;
-2. **honeypot** — скрытое поле `company`: бот получает «успех», письмо
+2. **honeypot** — скрытое поле `website_url` (`display:none`, без label, имя нейтральное): бот получает «успех», письмо
    не уходит и не пишется в БД;
 3. **rate limit** — 3 обращения в час с одного IP (таблица
    `contact_messages`: IP хэшируется с солью, ретеншен 7 дней);
