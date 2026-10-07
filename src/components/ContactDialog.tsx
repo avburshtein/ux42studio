@@ -140,20 +140,33 @@ export default function ContactDialog({
                 </button>
             </DialogTrigger>
             <DialogContent>
+                {/* Живая область для скринридеров: смонтирована С ОТКРЫТИЯ
+                    диалога (пустая) — live-регионы, появляющиеся вместе с
+                    текстом (mount + update), скринридеры молча пропускают.
+                    Текст наполнится на экране успеха и будет озвучен. */}
+                <span role='status' aria-live='polite' className='sr-only'>
+                    {sent
+                        ? 'Message sent. Thanks! Your message is on its way — we will get back to you soon.'
+                        : ''}
+                </span>
                 <DialogHeader>
                     <DialogTitle className='pr-8'>
                         {sent ? 'Message sent' : 'Contact us'}
                     </DialogTitle>
                     {!sent && (
-                        <DialogDescription>
+                        <DialogDescription className='pr-8'>
                             Tell us about your project — we usually reply within
                             two business days.
                         </DialogDescription>
                     )}
                 </DialogHeader>
 
+            {/* pr-8: колонка текста успеха заканчивается на левом крае
+                колонки крестика (right-4 + 16px = правые 32px модалки),
+                как в Cline. Анонс — постоянный sr-only регион выше:
+                role='status' на mount'е скринридеры не озвучивают. */}
                 {sent ? (
-                    <div role='status' className='flex flex-col gap-4'>
+                    <div className='flex flex-col gap-4 pr-8'>
                         <p className='flex items-start gap-3 text-body-md text-on-surface'>
                             <CheckCircle2
                                 size={20}

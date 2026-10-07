@@ -349,6 +349,7 @@ export default async function ProfilePage({ params }: PageProps) {
                 profileSlug={slug}
                 displayName={profile.fullName}
                 navItems={navItems}
+                studioWordmark
                 ctaLabel="Hire me"
                 ctaHref="#contact"
                 contactDialogSource={`Designer page: ${profile.slug}`}

@@ -26,6 +26,11 @@ interface SiteHeaderProps {
     wordmarkHref?: string;
     /** Свои nav-ссылки (по умолчанию Work/About страницы дизайнера) */
     navItems?: NavItem[];
+    /** Wordmark студии слева (ссылка на главную) + якоря в правой зоне.
+     *  Режим страницы дизайнера: центральный wordmark (имя) был self-link'ом,
+     *  возврат на главную отсутствовал (фидбэк 2026-10-07). Имя дизайнера
+     *  остаётся в hero и футере. Главная (menuMode) не затрагивается. */
+    studioWordmark?: boolean;
     /** Режим главной: вместо CTA «Hire me» — бургер, открывающий правую
      *  панель-меню для посетителя (nav + Sign In + legal), как в исходнике
      *  главного сайта. Решение 2026-09-02 (20). */
@@ -70,6 +75,7 @@ export function SiteHeader({
     wordmarkText,
     wordmarkHref,
     navItems,
+    studioWordmark = false,
     menuMode = false,
     ctaLabel = 'Hire me',
     ctaHref = '#contact',
@@ -123,6 +129,9 @@ export function SiteHeader({
     const brandHref =
         wordmarkHref ?? (profileSlug ? `/u/${profileSlug}` : '/');
     const brandLabel = wordmarkText ?? displayName ?? 'UX42.studio';
+    // Режим страницы дизайнера: wordmark студии слева (ссылка на главную),
+    // якоря в правой зоне. menuMode не затрагиваем — режим только !menuMode.
+    const showStudioWordmark = studioWordmark && !menuMode;
 
     return (
         <header
@@ -189,28 +198,49 @@ export function SiteHeader({
 
             {/* Контент шапки — в общем контейнере секций (max-w 1280 + pads 24/48/64) */}
             <div className='section-container relative flex w-full items-center justify-between'>
-                {/* Left zone: Nav Links — только ≥768 */}
-                {/* Left zone: Nav Links — только ≥768; на главной (menuMode)
-                    навигация живёт в панели меню — левая зона пуста */}
-                <nav
-                    className={cn(
-                        'hidden items-center gap-6 md:flex',
-                        menuMode && 'invisible',
-                    )}
-                    aria-hidden={menuMode || undefined}
-                >
-                    {items.map((item) => (
-                        <NavLink key={item.href} href={item.href}>
-                            {item.label}
-                        </NavLink>
-                    ))}
-                </nav>
+                {/* Left zone: в режиме studioWordmark — wordmark студии
+                    (ссылка на главную: возврат домой, был недоступен).
+                    Иначе — Nav-якоря (только ≥768); на главной (menuMode)
+                    навигация живёт в панели меню — левая зона пуста. */}
+                {showStudioWordmark ? (
+                    <LogoLink href='/' />
+                ) : (
+                    <nav
+                        className={cn(
+                            'hidden items-center gap-6 md:flex',
+                            menuMode && 'invisible',
+                        )}
+                        aria-hidden={menuMode || undefined}
+                    >
+                        {items.map((item) => (
+                            <NavLink key={item.href} href={item.href}>
+                                {item.label}
+                            </NavLink>
+                        ))}
+                    </nav>
+                )}
 
-                {/* Center (desktop) / Left (mobile): имя дизайнера или wordmark студии */}
-                <WordmarkLink href={brandHref} label={brandLabel} />
+                {/* Center (desktop) / Left (mobile): имя дизайнера или wordmark студии.
+                    В режиме studioWordmark имя убрано: дублировало hero и было
+                    self-link'ом; wordmark студии слева покрывает и мобильные. */}
+                {!showStudioWordmark && (
+                    <WordmarkLink href={brandHref} label={brandLabel} />
+                )}
 
-                {/* Right zone: Theme Toggle + CTA/menu-burger */}
+                {/* Right zone: якоря (studioWordmark) + Theme Toggle + CTA/бургер */}
                 <div className='flex items-center justify-end gap-3 md:gap-6'>
+                    {showStudioWordmark && (
+                        <nav
+                            className='hidden items-center gap-6 md:flex'
+                            aria-label='Section navigation'
+                        >
+                            {items.map((item) => (
+                                <NavLink key={item.href} href={item.href}>
+                                    {item.label}
+                                </NavLink>
+                            ))}
+                        </nav>
+                    )}
                     <ThemeToggle />
                     {menuMode ? (
                         // Главная: бургер вместо CTA — открывает правую панель
