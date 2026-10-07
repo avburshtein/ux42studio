@@ -90,3 +90,11 @@ npm run deploy     # Deploy to Cloudflare
 4. Log in as the created admin at `/super-admin`. To assign other admins: `/super-admin/users` → "Set Admin".
 
 > **Important:** the `/api/auth/init` endpoint fires only once. Calling it again returns `403 Forbidden`.
+
+## License
+This project is licensed under the [Apache License 2.0](./LICENSE).
+
+Copyright 2026 avburshtein.
+
+You may use, copy, modify, and distribute the software under the terms of the Apache License 2.0.
+The license includes patent protection and requires preserving copyright and license notices in source distributions.
