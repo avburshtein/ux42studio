@@ -173,19 +173,66 @@ function rmSyncCompat(target, options = {}) {
                 for (const entry of entries) {
                     rmSyncCompat(path.join(tmpName, entry), options);
                 }
+                // NTFS-нюанс: узел может оказаться «файлом-джанкшном» —
+                // lstat говорит «каталог», но readdir вернул пустоту, а rmdir
+                // упорно отвечает EBUSY/unlink. Проверяем содержимое по
+                // факту: если узел читается как пустой — чистим unlink-веткой
+                // с повторами и выходим, не трогая rmdir.
+                let drained = false;
                 for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
-                    try {
-                        fs.rmdirSync(tmpName);
-                        return;
-                    } catch (err) {
-                        if (err.code === 'ENOENT') return;
-                        if (attempt < maxRetries && retryDelay > 0) {
-                            sleepSync(retryDelay);
-                        }
+                    const rest = fs.readdirSync(tmpName);
+                    if (rest.length === 0) {
+                        drained = true;
+                        break;
+                    }
+                    if (attempt < maxRetries && retryDelay > 0) {
+                        sleepSync(retryDelay);
                     }
                 }
-                // Даже если rmdir так и не прошёл — каталог уже пустой и
-                // лежит в стороне; OpenNext дальше пересоздаст структуру.
+                if (drained) {
+                    for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+                        try {
+                            fs.rmdirSync(tmpName);
+                            return;
+                        } catch (err) {
+                            if (err.code === 'ENOENT') return;
+                            if (
+                                err.code === 'EBUSY' ||
+                                err.code === 'ENOTEMPTY' ||
+                                err.code === 'EPERM'
+                            ) {
+                                break; // ниже — unlink-ветка
+                            }
+                            if (attempt < maxRetries && retryDelay > 0) {
+                                sleepSync(retryDelay);
+                            } else if (attempt >= maxRetries) {
+                                break;
+                            }
+                        }
+                    }
+                    // rmdir не берёт пустой узел (живой дескриптор) —
+                    // пробуем unlink с повторами: в NTFS это иногда снимает
+                    // «файловую» блокировку узла.
+                    for (
+                        let attempt = 0;
+                        attempt <= maxRetries;
+                        attempt += 1
+                    ) {
+                        try {
+                            fs.unlinkSync(tmpName);
+                            return;
+                        } catch (err) {
+                            if (err.code === 'ENOENT') return;
+                            if (attempt < maxRetries && retryDelay > 0) {
+                                sleepSync(retryDelay);
+                            }
+                        }
+                    }
+                } else if (maxRetries > 0 && retryDelay > 0) {
+                    sleepSync(retryDelay);
+                }
+                // Даже если узел так и не ушёл — он уже пустой и лежит
+                // в стороне; OpenNext дальше пересоздаст структуру.
                 // Падать с EBUSY и ронять всю сборку из-за мусора — хуже.
                 return;
             }
@@ -198,6 +245,10 @@ function rmSyncCompat(target, options = {}) {
         // Каталог может быть занят другим процессом (например, антивирусом) —
         // повторяем, как это делает нативный rmSync на Windows. Пауза между
         // попытками обязательна: мгновенный повтор ловит тот же EBUSY.
+        // NTFS-нюанс: пустой каталог с живым дескриптором (антивирус/вотчер
+        // дочитывает файлы) не удаляется через rmdir — возвращает EBUSY или
+        // ENOTEMPTY, хотя readdir показывает пустоту. В этом случае просто
+        // пробуем дальше: rmdir всегда последним, без досрочного успеха.
         let lastError;
         for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
             try {
@@ -211,7 +262,24 @@ function rmSyncCompat(target, options = {}) {
                 }
             }
         }
-        throw lastError;
+        // Пробуем rmdir напоследок: если каталог реально пуст, но rmdir
+        // всё ещё упирается в живой дескриптор — это не повод ронять сборку.
+        // OpenNext пересоздаст структуру сам. Финальный rmdir делаем только
+        // если в каталоге действительно пусто. Непустой → пробрасываем ошибку.
+        try {
+            if (fs.readdirSync(target).length > 0) throw lastError;
+        } catch (err) {
+            // readdir упал с ENOENT — каталога уже нет, это успех.
+            if (err && err.code === 'ENOENT') return;
+            if (err === lastError) throw lastError;
+            return;
+        }
+        // Пусто: последняя попытка rmdir, ошибку EBUSY/ENOTEMPTY глушим.
+        try {
+            fs.rmdirSync(target);
+        } catch (err) {
+            if (err.code !== 'EBUSY' && err.code !== 'ENOTEMPTY') throw err;
+        }
     }
 
     fs.unlinkSync(target);
