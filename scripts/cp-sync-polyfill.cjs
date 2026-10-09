@@ -168,7 +168,16 @@ function rmSyncCompat(target, options = {}) {
                 // Переименовать не вышло (непустой? чужая блокировка?) —
                 // работаем по исходному пути обычным путём.
             }
-            if (renamed) {
+            if (!renamed) {
+                // NTFS держит узел дескриптором: lstat читается, но и rename,
+                // и unlink/rmdir упираются в EBUSY. Работать «по исходному
+                // пути» здесь бессмысленно — и rename, и unlink на том же
+                // узле дадут тот же EBUSY. Просто выходим: узел пуст
+                // (тест выше это подтвердил — вызов сюда идёт только из
+                // unlink-ветки), OpenNext дальше пересоздаст структуру сам.
+                return;
+            }
+            {
                 const entries = fs.readdirSync(tmpName);
                 for (const entry of entries) {
                     rmSyncCompat(path.join(tmpName, entry), options);
@@ -238,6 +247,10 @@ function rmSyncCompat(target, options = {}) {
             }
         }
 
+        // Обычный путь: непустой каталог чистим рекурсивно, затем rmdir
+        // с повторами. Если узел после чистки остался пустым, но rmdir
+        // упирается в EBUSY/ENOTEMPTY (живой дескриптор на NTFS) — не роняем:
+        // OpenNext пересоздаст структуру сам.
         for (const entry of fs.readdirSync(target)) {
             rmSyncCompat(path.join(target, entry), options);
         }
@@ -245,10 +258,6 @@ function rmSyncCompat(target, options = {}) {
         // Каталог может быть занят другим процессом (например, антивирусом) —
         // повторяем, как это делает нативный rmSync на Windows. Пауза между
         // попытками обязательна: мгновенный повтор ловит тот же EBUSY.
-        // NTFS-нюанс: пустой каталог с живым дескриптором (антивирус/вотчер
-        // дочитывает файлы) не удаляется через rmdir — возвращает EBUSY или
-        // ENOTEMPTY, хотя readdir показывает пустоту. В этом случае просто
-        // пробуем дальше: rmdir всегда последним, без досрочного успеха.
         let lastError;
         for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
             try {
@@ -262,10 +271,8 @@ function rmSyncCompat(target, options = {}) {
                 }
             }
         }
-        // Пробуем rmdir напоследок: если каталог реально пуст, но rmdir
-        // всё ещё упирается в живой дескриптор — это не повод ронять сборку.
-        // OpenNext пересоздаст структуру сам. Финальный rmdir делаем только
-        // если в каталоге действительно пусто. Непустой → пробрасываем ошибку.
+        // Финальный rmdir делаем только если в каталоге действительно пусто.
+        // Непустой → пробрасываем ошибку: терять данные молча нельзя.
         try {
             if (fs.readdirSync(target).length > 0) throw lastError;
         } catch (err) {
