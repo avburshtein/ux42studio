@@ -19,15 +19,15 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 | **Alex** ([@avburshtein](https://github.com/avburshtein)) | Markup and design system: public pages (`/`, `/platform`, the designer's page `/u/[slug]`, case study and its TL;DR/PDF), components in `src/components/portfolio/*` and `src/components/case/*`, design tokens and styles (`src/app/globals.css`, `src/tokens.md`), component UI specs (`Docs/ui/`), admin UI (profile editor, case wizard, section visibility, TL;DR/PDF). Branches: `verstka`, `token`, `cursor/*` |
 | **Denis Zakharchenko** (<den.zakh@gmail.com>) | Backend and platform: authentication (`src/middleware.ts`, `src/lib/jwt.ts`, `/api/auth`), Server Actions (`src/lib/actions/`), database schema and migrations (D1 + Drizzle), admin panel and super admin core (`/admin`, `/super-admin`), file uploads to R2, Cloudflare/Next.js configuration |
 
-> Active development ran from August to September 2026. The admin UI layer (main page content editor) on top of the backend — Alex; the server side and admin core — Denis.
+> Active development: August — October 2026 (`verstka` branch, 115+ commits after the last merge into `main`). The admin UI layer (main page content editor) on top of the backend — Alex; the server side and admin core — Denis (last activity — 2026-08-24).
 
 ## Branches
 
-- **`main`** — stable branch, integration point (PRs from `verstka`).
+- **`main`** — stable branch, integration point (PRs from `verstka`; last merge — 2026-08-24). Lags `verstka` by 115+ commits.
 - **`verstka`** — active UI development (Alex), periodically merged into `main` via PRs.
 - **`token`**, **`cursor/case-page-surface-tokens`**, **`cursor/agent-docs-and-guidelines`** — Alex's historical branches (design tokens, case page surface tokens, agent documentation), fully merged into `main`.
 
-## What's New in `verstka` (September 2026)
+## What's New in `verstka` (September — October 2026)
 
 - **Designer home page & case page** — fully rebuilt from Figma specs (`Docs/ui/`), responsive mobile layout, gallery carousel, header with menu panel and hash navigation.
 - **Main page content from DB** — "Main Page Content" editor in `/admin/profile` (sections, gallery, social links, OG cover, favicon); `/u/[slug]` renders content from D1.
@@ -37,9 +37,12 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **Case TL;DR & PDF** — a short case version for hiring managers (`/u/[slug]/[projectSlug]/short`) with share buttons and a "Download PDF" button (print CSS, `?print=1`, light theme when printing).
 - **Case gallery** — selectable layout (editorial / masonry / justified) and a lightbox.
 - **Case section visibility** — checkboxes in the wizard (Review step) on top of auto-hiding empty sections; section numbers are renumbered on the public page.
-- **Admin** — image cropping before upload (avatar, cover, About, OG, favicon), separate Save and Save & Next buttons in the wizard, manual/auto case sorting (`profiles.case_sort_mode`), light/dark theme toggle in the private area.
-- **Legal** — `/privacy` and `/terms` (EN + ES), cookies section.
-- **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark).
+- **Admin** — image cropping before upload (avatar, cover, About, OG, favicon), separate Save and Save & Next buttons in the wizard, manual/auto case sorting (`profiles.case_sort_mode`), light/dark theme toggle in the private area, the Profile Settings section (`/admin/settings`).
+- **Contact form** — a dialog instead of `mailto:` (opened from the hero, header and Approach), the `contact_messages` table, a honeypot against spam, reply emails and an inquiry log; a single contacts source `src/lib/contact.ts` + a mail audit in `Docs/MAIL.md` (Email Routing on `hello@ux42.studio`).
+- **Legal** — `/privacy` and `/terms` (EN + ES), cookies section, contact form data in EN+ES, account deletion per GDPR Art. 17, invite and password-reset emails.
+- **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark), global `prefers-reduced-motion`, 2px in-field focus indicators, WCAG contrast for components.
+- **Site visibility** — the "Publish site" toggle hides the designer's page (`/admin/settings`).
+- **Documentation** — the canonical design-system document (`Docs/design-system.md` + `Docs/figma-tokens.md`), specs (`Docs/specs/`, `Docs/ui/`), briefs (`Docs/roadmap/`, `Docs/ds-chat-brief.md`), mail (`Docs/MAIL.md`), domain analytics snapshot (`Docs/ANALYTICS.md`).
 
 ## Pages
 
@@ -70,7 +73,7 @@ npm run check       # both
 npm run verify      # check + smoke test
 ```
 
-**Site smoke test** — 41 checks against a running server (pages, the split
+**Site smoke test** — 45 checks against a running server (pages, the split
 between the studio homepage and /platform, legal documents,
 robots/sitemap/manifest, security headers, admin protection,
 database availability). Start the server first:
