@@ -9,7 +9,8 @@ import type { MetadataRoute } from 'next';
  * цвета статус-бара. Статические ассеты, поэтому HEX разрешён (те же
  * значения, что в globals.css: primary-container #0B6E4F, background #F7FAF5).
  *
- * Цвета иконок: `src/app/icon.png` (фавикон 634×634, PNG) и
+ * Цвета иконок: `src/app/icon.png` (фавикон 634×634 RGBA, белые «42»
+ * на прозрачном) и
  * `public/og/og-cover.png` (1200×630). Отдельные 192/512 PNG не заведены —
  * браузеры при отсутствии PNG-иконок просто не показывают install-промпт,
  * что не ломает страницу. См. Docs/DEPLOY.md, раздел «PWA».

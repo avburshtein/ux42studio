@@ -72,8 +72,8 @@ export default function RootLayout({
                 {/* Фавикон — file-convention src/app/icon.png: Next сам
                     вставляет <link rel="icon">. Ручная ссылка на /favicon.svg
                     удалена — файла в public/ не было, битый 404
-                    (C1, решение (43)). Старый icon.svg заменён на PNG
-                    634×634 из public/ («favicon UX42.png»). */}
+                    (C1, решение (43)). Фавикон — белые «42» на прозрачном:
+                    634×634 RGBA из public/ («favicon-42-transparent.png»). */}
                 <script
                     dangerouslySetInnerHTML={{
                         __html: `(function(){try{var t=localStorage.getItem('theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);return}if(window.matchMedia('(prefers-color-scheme:dark)').matches){document.documentElement.setAttribute('data-theme','dark')}}catch(e){}})()`,
