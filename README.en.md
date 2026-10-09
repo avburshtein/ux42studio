@@ -40,7 +40,14 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **Admin** — image cropping before upload (avatar, cover, About, OG, favicon), separate Save and Save & Next buttons in the wizard, manual/auto case sorting (`profiles.case_sort_mode`), light/dark theme toggle in the private area, the Profile Settings section (`/admin/settings`).
 - **Contact form** — a dialog instead of `mailto:` (opened from the hero, header and Approach), the `contact_messages` table, a honeypot against spam, reply emails and an inquiry log; a single contacts source `src/lib/contact.ts` + a mail audit in `Docs/MAIL.md` (Email Routing on `hello@ux42.studio`).
 - **Legal** — `/privacy` and `/terms` (EN + ES), cookies section, contact form data in EN+ES, account deletion per GDPR Art. 17, invite and password-reset emails.
-- **Accessibility** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark), global `prefers-reduced-motion`, 2px in-field focus indicators, WCAG contrast for components.
+- **Accessibility & speed** — Lighthouse 13.4.1, production `ux42.studio/`, 2026-10-09 (reports: [`Lighthouse/`](Lighthouse/)):
+
+  | | Performance | Accessibility | Best Practices | SEO |
+  | --- | --- | --- | --- | --- |
+  | Desktop | 100 | 100 | 100 | 100 |
+  | Mobile | 95 | 100 | 100 | 100 |
+
+  Plus a historical a11y measurement from 2026-09-11: desktop/mobile × light/dark → Accessibility 100 everywhere; global `prefers-reduced-motion`, 2px in-field focus indicators, WCAG contrast for components.
 - **Site visibility** — the "Publish site" toggle hides the designer's page (`/admin/settings`).
 - **Documentation** — the canonical design-system document (`Docs/design-system.md` + `Docs/figma-tokens.md`), specs (`Docs/specs/`, `Docs/ui/`), briefs (`Docs/roadmap/`, `Docs/ds-chat-brief.md`), mail (`Docs/MAIL.md`), domain analytics snapshot (`Docs/ANALYTICS.md`).
 

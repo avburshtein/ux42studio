@@ -40,7 +40,14 @@
 - **Админка** — кадрирование изображений перед загрузкой (аватар, обложка, About, OG, favicon), раздельные кнопки Save и Save & Next на шагах визарда, ручная/авто сортировка кейсов (`profiles.case_sort_mode`), переключатель светлой и тёмной темы в приватной зоне, раздел «Настройки профиля» (`/admin/settings`).
 - **Контактная форма** — модалка вместо `mailto:` (открывается из hero, хедера и Approach), таблица `contact_messages`, honeypot против спама, ответы-письма и журнал обращений; единый источник контактов `src/lib/contact.ts` + аудит почты в `Docs/MAIL.md` (Email Routing на `hello@ux42.studio`).
 - **Legal** — `/privacy` и `/terms` (EN + ES), микрораздел cookies, данные контактной формы в EN+ES, удаление аккаунта по GDPR Art. 17, инвайт-письма и смены пароля.
-- **Доступность** — Lighthouse Accessibility 100/100 (desktop/mobile × light/dark), глобальный `prefers-reduced-motion`, 2px-индикаторы фокуса внутри полей, контраст по WCAG для компонентов.
+- **Доступность и скорость** — Lighthouse 13.4.1, прод `ux42.studio/`, 09.10.2026 (отчёты: [`Lighthouse/`](Lighthouse/)):
+
+  | | Performance | Accessibility | Best Practices | SEO |
+  | --- | --- | --- | --- | --- |
+  | Desktop | 100 | 100 | 100 | 100 |
+  | Mobile | 95 | 100 | 100 | 100 |
+
+  Плюс historical a11y-замер 11.09: desktop/mobile × light/dark → Accessibility 100 везде; глобальный `prefers-reduced-motion`, 2px-индикаторы фокуса внутри полей, контраст по WCAG для компонентов.
 - **Видимость сайта** — тумблер «Публикация сайта» скрывает страницу дизайнера (`/admin/settings`).
 - **Документация** — канонический документ по дизайн-системе (`Docs/design-system.md` + `Docs/figma-tokens.md`), спеки (`Docs/specs/`, `Docs/ui/`), брифы (`Docs/roadmap/`, `Docs/ds-chat-brief.md`), почта (`Docs/MAIL.md`), снимок аналитики домена (`Docs/ANALYTICS.md`).
 
