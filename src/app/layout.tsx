@@ -51,6 +51,24 @@ export const metadata: Metadata = {
         images: ['/og/og-cover.png'],
     },
     robots: { index: true, follow: true },
+    // Адаптивный фавикон: на светлых вкладках — зелёный фон с белыми «42»
+    // (/icon-light.png), на тёмных — белые «42» на прозрачном (/icon.png,
+    // file-convention: Next вставляет его сам). Для надёжности оба варианта
+    // прописаны явно с media — file-convention без media браузер может взять
+    // первым и проигнорировать выбор по теме.
+    icons: {
+        icon: [
+            {
+                url: '/icon-light.png',
+                media: '(prefers-color-scheme: light)',
+            },
+            {
+                url: '/icon.png',
+                media: '(prefers-color-scheme: dark)',
+            },
+        ],
+        apple: '/icon.png',
+    },
 };
 
 export default function RootLayout({
