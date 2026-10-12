@@ -23,6 +23,7 @@
 # misc
 .DS_Store
 *.pem
+.cf-token
 
 # debug
 npm-debug.log*

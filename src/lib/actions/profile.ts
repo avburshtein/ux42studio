@@ -8,6 +8,8 @@ import { eq, inArray } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { headers } from 'next/headers';
 import { normalizeMainPageContent, type MainPageContent } from '@/lib/mainPageContent';
+import { slugify } from '@/lib/utils/slug';
+import { readStudioProfileSlug } from '@/lib/studioProfile';
 
 export async function getMyProfileId(): Promise<string | null> {
     const headersList = await headers();
@@ -189,7 +191,10 @@ export async function saveMainPageContent(
 export async function updateProfile(
     profileId: string,
     data: {
-        slug?: string;
+        // slug НЕ здесь намеренно: смена адреса идёт через отдельный
+        // безопасный экшн updateProfileSlug (валидация + уникальность +
+        // ревалидация старых путей). Слепая запись слага сломала бы
+        // уникальный индекс или главную (STUDIO_PROFILE_SLUG).
         fullName?: string;
         headline?: string;
         bio?: string;
@@ -272,6 +277,90 @@ export async function updateProfile(
     // Личные данные теперь редактируются в /admin/settings — страница
     // должна увидеть изменения сразу после сохранения.
     revalidatePath('/admin/settings');
+}
+
+/**
+ * Смена адреса публичной страницы (/u/{slug}).
+ *
+ * Отдельный безопасный экшн, а не поле в updateProfile: слепая запись слага
+ * ломает уникальный индекс (profiles.slug unique) или главную (если профиль
+ * студийный — STUDIO_PROFILE_SLUG указывает на старый адрес, и после смены
+ * resolveStudioProfile вернёт null → пустая галерея). Поэтому здесь:
+ *   1) нормализация через slugify (транслит, нижний регистр, дефисы);
+ *   2) проверка длины и уникальности (кроме самого профиля);
+ *   3) инвалидация СТАРОГО и НОВОГО публичных путей + sitemap;
+ *   4) возврат флага wasStudioSlug — форма предупреждает, что нужно
+ *      обновить STUDIO_PROFILE_SLUG в wrangler.toml / .dev.vars.
+ *
+ * Менять адрес может только владелец профиля (иначе участник с чужой
+ * сессией мог бы угнать адрес, зная profileId).
+ */
+export async function updateProfileSlug(
+    profileId: string,
+    rawSlug: string,
+): Promise<{ ok?: boolean; error?: string; slug?: string; wasStudioSlug?: boolean }> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return { error: 'Не авторизован' };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const profile = await db.query.profiles.findFirst({
+        where: { id: profileId },
+        columns: { id: true, slug: true, userId: true },
+    });
+    if (!profile) return { error: 'Профиль не найден' };
+    if (profile.userId !== userId) return { error: 'Это не ваш профиль' };
+
+    // 1) Нормализация: slugify приводит кириллицу к латинице, мусор — к дефисам.
+    const newSlug = slugify(rawSlug);
+    if (!newSlug) return { error: 'Адрес не может быть пустым' };
+    if (newSlug.length < 2) {
+        return { error: 'Адрес слишком короткий (минимум 2 символа)' };
+    }
+    if (newSlug.length > 50) {
+        return { error: 'Адрес слишком длинный (максимум 50 символов)' };
+    }
+
+    // Адрес фактически тот же — обновлять нечего, но флаг студийности важен.
+    if (newSlug === profile.slug) {
+        return {
+            ok: true,
+            slug: profile.slug,
+            wasStudioSlug: readStudioProfileSlug(env) === profile.slug,
+        };
+    }
+
+    // 2) Уникальность. Занять чужой адрес нельзя — иначе уникальный индекс
+    // упадёт с невнятной ошибкой.
+    const taken = await db.query.profiles.findFirst({
+        where: { slug: newSlug },
+        columns: { id: true },
+    });
+    if (taken) return { error: 'Этот адрес уже занят' };
+
+    // Показывается ли профиль на главной (по STUDIO_PROFILE_SLUG)?
+    const wasStudioSlug = readStudioProfileSlug(env) === profile.slug;
+
+    await db
+        .update(profiles)
+        .set({ slug: newSlug, updatedAt: Math.floor(Date.now() / 1000) })
+        .where(eq(profiles.id, profileId));
+
+    // 3) Инвалидация публичных путей. Публичные страницы кэшируются
+    // (revalidate = 300 / 3600), поэтому без сброса старая ссылка висела бы
+    // в кэше до часа, а новая — отдавала бы 404.
+    revalidatePath(`/u/${profile.slug}`); // старый адрес
+    revalidatePath(`/u/${newSlug}`); // новый адрес
+    revalidatePath('/u/[slug]', 'page');
+    revalidatePath('/');
+    revalidatePath('/platform');
+    revalidatePath('/sitemap.xml');
+    revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
+
+    return { ok: true, slug: newSlug, wasStudioSlug };
 }
 
 export async function addSocialLink(

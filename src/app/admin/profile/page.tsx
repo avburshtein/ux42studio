@@ -23,19 +23,14 @@ import { Eye } from 'lucide-react';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import SocialLinksEditor from '@/components/SocialLinksEditor';
 import MainPageContentEditor from '@/components/admin/MainPageContentEditor';
+import ProfileSlugForm from '@/components/admin/ProfileSlugForm';
 import { DEFAULT_MAIN_PAGE_CONTENT, type MainPageContent } from '@/lib/mainPageContent';
 
 // В разделе «Брендинг и SEO» живёт всё, что описывает публичную страницу:
-// адрес, заголовок, био, город, сайт, ссылки и превью. Имя владельца и
-// email — в /admin/settings (раздел «Настройки профиля»).
+// заголовок, био, город, сайт, ссылки и превью. Адрес страницы — отдельной
+// карточкой ниже (ProfileSlugForm). Имя владельца и email — в /admin/settings
+// (раздел «Настройки профиля»).
 const formSchema = z.object({
-    slug: z
-        .string()
-        .min(1, 'Slug обязателен')
-        .regex(
-            /^[a-z0-9-]+$/i,
-            'Только латиница, цифры и дефис — например ivan-petrov',
-        ),
     headline: z.string().optional().or(z.literal('')),
     bio: z.string().optional().or(z.literal('')),
     location: z.string().optional().or(z.literal('')),
@@ -107,7 +102,6 @@ export default function ProfilePage() {
     } = useForm<FormData>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            slug: '',
             headline: '',
             bio: '',
             location: '',
@@ -127,7 +121,6 @@ export default function ProfilePage() {
                 const profile = await getMyProfile();
                 if (profile) {
                     reset({
-                        slug: profile.slug,
                         headline: profile.headline ?? '',
                         bio: profile.bio ?? '',
                         location: profile.location ?? '',
@@ -174,7 +167,6 @@ export default function ProfilePage() {
                 return;
             }
             await updateProfile(id, {
-                slug: data.slug,
                 headline: data.headline || undefined,
                 bio: data.bio || undefined,
                 location: data.location || undefined,
@@ -254,30 +246,12 @@ export default function ProfilePage() {
                             </h2>
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
                                 Всё, что описывает вашу публичную страницу:
-                                адрес, тексты, ссылки и превью. Имя владельца
+                                тексты, ссылки и превью. Адрес страницы — отдельная
+                                карточка ниже. Имя владельца
                                 и email — в «Настройках профиля».
                             </p>
 
                             <div className='mt-6 grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2'>
-                                <Field
-                                    id='slug'
-                                    label='Адрес страницы *'
-                                    error={errors.slug?.message}
-                                    hint='Это часть ссылки /u/ваш-slug'
-                                >
-                                    <div className='flex items-center gap-2'>
-                                        <span className='shrink-0 text-body-sm text-on-surface-variant'>
-                                            /u/
-                                        </span>
-                                        <Input
-                                            id='slug'
-                                            className='font-mono'
-                                            disabled={!profileLoaded}
-                                            {...register('slug')}
-                                        />
-                                    </div>
-                                </Field>
-
                                 <Field
                                     id='headline'
                                     label='Заголовок'
@@ -431,6 +405,14 @@ export default function ProfilePage() {
                             </div>
                         </Card>
                     </form>
+
+                    {/* Адрес страницы — отдельная карточка со своей формой
+                        (нельзя вкладывать <form> в <form>). Защищённая смена
+                        слага: updateProfileSlug с нормализацией, уникальностью
+                        и инвалидацией старых путей). */}
+                    <div className='mt-6'>
+                        <ProfileSlugForm />
+                    </div>
                 </div>
 
                 {/* Редактор контента главной страницы дизайнера (/u/[slug]) —
