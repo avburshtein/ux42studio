@@ -42,8 +42,10 @@ export async function updateProjectMeta(
         devices?: string;
         tags?: string;
         coverFileId?: string | null;
-        figmaPrototypeUrl?: string;
-        webPrototypeUrl?: string;
+        // null = очистить ссылку (раньше undefined пропускался drizzle-ом
+        // и кнопку прототипа было невозможно убрать)
+        figmaPrototypeUrl?: string | null;
+        webPrototypeUrl?: string | null;
         categoryIds?: string[];
     },
 ) {

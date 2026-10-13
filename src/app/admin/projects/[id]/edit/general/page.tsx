@@ -174,8 +174,10 @@ export default function GeneralPage({
                 devices: data.devices || undefined,
                 tags: data.tags || undefined,
                 coverFileId: data.coverFileId || null,
-                figmaPrototypeUrl: data.figmaPrototypeUrl || undefined,
-                webPrototypeUrl: data.webPrototypeUrl || undefined,
+                // null (не undefined!): пустое поле должно ОЧИЩАТЬ ссылку —
+                // иначе кнопка «View … prototype» остаётся на кейсе навсегда
+                figmaPrototypeUrl: data.figmaPrototypeUrl || null,
+                webPrototypeUrl: data.webPrototypeUrl || null,
                 categoryIds: data.categoryIds ?? [],
             });
             return true;

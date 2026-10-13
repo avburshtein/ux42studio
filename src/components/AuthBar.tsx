@@ -73,9 +73,11 @@ export default async function AuthBar({
     });
 
     return (
-        <div className='bg-surface-variant/60 border-b border-outline-variant'>
+        // Дизайн — как у SiteHeader (стекло: header-glass + blur), только
+        // ниже: одна строка py-2, не sticky (SiteHeader сам sticky top-0).
+        <div className='header-glass w-full border-b border-outline-variant backdrop-blur-md backdrop-saturate-[1.8]'>
             <div className='mx-auto w-full max-w-container-content'>
-                <div className='px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-end gap-3'>
+                <div className='px-4 py-1.5 flex items-center justify-end gap-4 sm:px-6 lg:px-8'>
                     {isSuperAdmin && (
                         <Link
                             href='/super-admin'

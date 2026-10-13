@@ -42,6 +42,22 @@ function contrastLevel(ratio: number): string {
     return 'AA+';
 }
 
+/** Авто-цвет подписи для одиночной роли (пары on-цвета нет):
+ *  чёрный или белый — что контрастнее на фоне свотча. */
+function autoOnColor(hex: string): string {
+    const m = hex.replace('#', '');
+    if (m.length < 6) return '#FFFFFF';
+    const lin = (c: number) => {
+        const v = c / 255;
+        return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    };
+    const L =
+        0.2126 * lin(parseInt(m.slice(0, 2), 16)) +
+        0.7152 * lin(parseInt(m.slice(2, 4), 16)) +
+        0.0722 * lin(parseInt(m.slice(4, 6), 16));
+    return L > 0.4 ? '#1B1B1D' : '#FFFFFF';
+}
+
 // ---------------------------------------------------------------------------
 // Вспомогательные компоненты
 // ---------------------------------------------------------------------------
@@ -107,7 +123,9 @@ function SwatchBlock({
     );
 }
 
-/** Колонка-пара: верхний свотч 112px + нижний On-свотч 34px */
+/** Колонка-пара: верхний свотч 112px + нижний On-свотч 34px.
+ *  Одиночная роль (on-цвет не задан): один свотч высотой 148px —
+ *  сумма обоих контейнеров пары и гэпа (2px) между ними. */
 function ColorPairColumn({
     main,
     on,
@@ -115,6 +133,33 @@ function ColorPairColumn({
     main: SwatchData;
     on: SwatchData;
 }) {
+    if (!on.fill) {
+        return (
+            <div
+                className='flex w-full items-end justify-between overflow-hidden border border-outline-variant'
+                style={{
+                    backgroundColor: main.fill,
+                    height: '148px',
+                    borderRadius: '10px',
+                    padding: '8px',
+                }}
+            >
+                <span
+                    className='text-[10px] font-semibold uppercase leading-4 tracking-[0.5px]'
+                    style={{ color: main.onFill }}
+                >
+                    {main.name}
+                </span>
+                {main.contrast > 0 && (
+                    <ContrastBadge
+                        ratio={main.contrast}
+                        level={contrastLevel(main.contrast)}
+                        textColor={main.onFill}
+                    />
+                )}
+            </div>
+        );
+    }
     return (
         <div className='flex flex-col gap-0.5'>
             {/* Верхний (основной) свотч — скругления только сверху */}
@@ -181,14 +226,19 @@ export function DesignSystemColors({
 
     const isDark = darkMode;
 
-    // Только админские роли → Semantic swatches
-    const semanticTokens: SwatchData[] = roles.map((role) => ({
-        name: role.name1,
-        fill: isDark ? role.darkColor1 : role.lightColor1,
-        onFill: isDark ? role.darkColor2 : role.lightColor2,
-        onName: role.name2,
-        contrast: (isDark ? role.darkContrastRatio : role.lightContrastRatio) ?? 0,
-    }));
+    // Только админские роли → Semantic swatches.
+    // Одиночная роль (color2 пуст) — автоподбор цвета подписи.
+    const semanticTokens: SwatchData[] = roles.map((role) => {
+        const fill = isDark ? role.darkColor1 : role.lightColor1;
+        const onColor = isDark ? role.darkColor2 : role.lightColor2;
+        return {
+            name: role.name1,
+            fill,
+            onFill: onColor || autoOnColor(fill),
+            onName: role.name2,
+            contrast: (isDark ? role.darkContrastRatio : role.lightContrastRatio) ?? 0,
+        };
+    });
 
     // Кол-во колонок в гриде: 1 роль → 1, 2 → 2, 3+ → 4
     const gridCols =

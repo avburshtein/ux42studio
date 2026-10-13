@@ -113,11 +113,13 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
         setEditingId(role.id);
         setForm({
             name1: role.name1,
-            name2: role.name2,
+            // Одиночная роль: color2 пуст — подставляем color1 (монохром),
+            // чтобы при добавлении пары не остался «чёрный по умолчанию»
+            name2: role.name2.endsWith('-on') ? '' : role.name2,
             lightColor1: role.lightColor1,
-            lightColor2: role.lightColor2,
+            lightColor2: role.lightColor2 || role.lightColor1,
             darkColor1: role.darkColor1,
-            darkColor2: role.darkColor2,
+            darkColor2: role.darkColor2 || role.darkColor1,
             lightContrastRatio: role.lightContrastRatio?.toString() ?? '',
             darkContrastRatio: role.darkContrastRatio?.toString() ?? '',
         });
@@ -130,26 +132,31 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
             setError('Введите основной цвет');
             return;
         }
-        if (!form.name2.trim()) {
-            setError('Введите дополнительный цвет');
-            return;
-        }
+        // Дополнительный цвет необязателен: без него роль сохраняется как
+        // одиночный цвет (на публичной странице — один свотч 148px).
+        const isSingle = !form.name2.trim();
         setSaving(true);
         setError(null);
         try {
             const payload = {
                 name1: form.name1.trim(),
-                name2: form.name2.trim(),
+                // name2 хранит уникальный ключ пары; для одиночной роли —
+                // производный от name1 (не конфликтует с уникальным индексом)
+                name2: isSingle
+                    ? `${form.name1.trim()}-on`
+                    : form.name2.trim(),
                 lightColor1: form.lightColor1,
-                lightColor2: form.lightColor2,
+                lightColor2: isSingle ? '' : form.lightColor2,
                 darkColor1: form.darkColor1,
-                darkColor2: form.darkColor2,
-                lightContrastRatio: form.lightContrastRatio
-                    ? Number(form.lightContrastRatio)
-                    : null,
-                darkContrastRatio: form.darkContrastRatio
-                    ? Number(form.darkContrastRatio)
-                    : null,
+                darkColor2: isSingle ? '' : form.darkColor2,
+                lightContrastRatio:
+                    !isSingle && form.lightContrastRatio
+                        ? Number(form.lightContrastRatio)
+                        : null,
+                darkContrastRatio:
+                    !isSingle && form.darkContrastRatio
+                        ? Number(form.darkContrastRatio)
+                        : null,
             };
 
             if (editingId) {
@@ -253,23 +260,27 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                     }}
                                     title={`${role.name1} light 1`}
                                 />
-                                <div
-                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                    style={{
-                                        backgroundColor: role.lightColor2,
-                                    }}
-                                    title={`${role.name1} light 2`}
-                                />
+                                {role.lightColor2 && (
+                                    <div
+                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                        style={{
+                                            backgroundColor: role.lightColor2,
+                                        }}
+                                        title={`${role.name1} light 2`}
+                                    />
+                                )}
                                 <div
                                     className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
                                     style={{ backgroundColor: role.darkColor1 }}
                                     title={`${role.name1} dark 1`}
                                 />
-                                <div
-                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                    style={{ backgroundColor: role.darkColor2 }}
-                                    title={`${role.name1} dark 2`}
-                                />
+                                {role.darkColor2 && (
+                                    <div
+                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                        style={{ backgroundColor: role.darkColor2 }}
+                                        title={`${role.name1} dark 2`}
+                                    />
+                                )}
                             </div>
                             <div className='flex flex-col min-w-0'>
                                 <span className='text-body-sm text-[var(--md-sys-color-on-surface)] truncate'>
@@ -334,7 +345,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 htmlFor='roleName2'
                                 className='font-medium text-md pl-2'
                             >
-                                Дополнительный цвет
+                                Дополнительный цвет (необязательно)
                             </Label>
                             <Input
                                 id='roleName2'
@@ -342,7 +353,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 onChange={(e) =>
                                     setForm({ ...form, name2: e.target.value })
                                 }
-                                placeholder='Например: onPrimary'
+                                placeholder='Например: onPrimary — пусто = одиночный цвет'
                             />
                         </div>
                         <div className=''>Контраст</div>

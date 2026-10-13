@@ -3,12 +3,16 @@
 import { useEffect, useState } from 'react';
 import { Images, X } from 'lucide-react';
 import { GRID_PRESETS } from '@/lib/grid-presets.config';
+import { MasonryGallery } from './MasonryGallery';
 
 interface MoodboardAsset {
     id: string;
     url?: string;
     caption?: string | null;
     alt?: string;
+    /** Натуральные размеры (files.width/height) — нужны masonry-пресету */
+    width?: number | null;
+    height?: number | null;
 }
 
 interface MoodboardGridProps {
@@ -36,6 +40,13 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
     }, [expanded]);
 
     if (assets.length === 0) return null;
+
+    // Masonry-пресет: оригинальные пропорции кадров (Pinterest-стиль),
+    // тот же компонент, что у masonry-варианта финальной галереи —
+    // един общий лайтбокс и поведение.
+    if (presetId === 'masonry') {
+        return <MasonryGallery assets={assets} />;
+    }
 
     if (!preset) {
         // Fallback: простая сетка 2 колонки

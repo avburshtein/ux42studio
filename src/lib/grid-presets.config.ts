@@ -282,4 +282,31 @@ export const GRID_PRESETS: Record<string, GridPreset> = {
             'lg:col-span-2 lg:row-span-1',
         ],
     },
+    // Masonry: в админке — равные слоты-превью (загрузка/замена фото),
+    // на публичной странице — Pinterest-рендер с оригинальными
+    // пропорциями кадров (MasonryGallery, ветка в MoodboardGrid).
+    masonry: {
+        name: 'Masonry',
+        slots: 8,
+        layoutClasses: [
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+            'col-span-2 row-span-2',
+        ],
+        layoutClassesLg: [
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+            'lg:col-span-2 lg:row-span-2',
+        ],
+    },
 } as const;

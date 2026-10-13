@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
 import { Upload, GripVertical, RefreshCw } from 'lucide-react';
+import ImageCropperDialog from '@/components/ImageCropperDialog';
 
 export interface GridImage {
     id: string;
@@ -54,6 +55,44 @@ export default function GridSlot({
 }: GridSlotProps) {
     const hiddenInputRef = useRef<HTMLInputElement>(null);
 
+    // Редактор изображений (как у обложек ImageUploader): выбранный файл
+    // сначала кадрируется в ImageCropperDialog, кадр уходит в upload.
+    // aspectRatio не задаём — свободные пропорции (слоты разных пресетов
+    // имеют разные формы, жёсткое соотношение мешало бы).
+    const [cropping, setCropping] = useState<{
+        file: File;
+        url: string;
+    } | null>(null);
+
+    const startCropFlow = useCallback((file: File) => {
+        // SVG не кадрируется растровым редактором — уходит напрямую
+        if (file.type === 'image/svg+xml') {
+            onFileUpload(file, slotIndex);
+            return;
+        }
+        setCropping({ file, url: URL.createObjectURL(file) });
+    }, [onFileUpload, slotIndex]);
+
+    const handleCropApply = useCallback(
+        (blob: Blob) => {
+            const source = cropping?.file;
+            const ext =
+                blob.type === 'image/png'
+                    ? 'png'
+                    : blob.type === 'image/webp'
+                      ? 'webp'
+                      : 'jpg';
+            const base = (source?.name ?? 'image').replace(/\.[^.]+$/, '');
+            const file = new File([blob], `${base}-cropped.${ext}`, {
+                type: blob.type,
+            });
+            if (cropping) URL.revokeObjectURL(cropping.url);
+            setCropping(null);
+            onFileUpload(file, slotIndex);
+        },
+        [cropping, onFileUpload, slotIndex],
+    );
+
     // 1. react-dropzone — загрузка файлов с ОС
     const {
         getRootProps,
@@ -66,10 +105,10 @@ export default function GridSlot({
         onDrop: useCallback(
             (acceptedFiles: File[]) => {
                 if (acceptedFiles.length > 0) {
-                    onFileUpload(acceptedFiles[0], slotIndex);
+                    startCropFlow(acceptedFiles[0]);
                 }
             },
-            [onFileUpload, slotIndex],
+            [startCropFlow],
         ),
     });
 
@@ -195,6 +234,19 @@ export default function GridSlot({
                         Нажмите или перетащите файл
                     </span>
                 </div>
+            )}
+
+            {/* Редактор изображений — кадрирование перед загрузкой */}
+            {cropping && (
+                <ImageCropperDialog
+                    src={cropping.url}
+                    fileType={cropping.file.type}
+                    onApply={handleCropApply}
+                    onCancel={() => {
+                        URL.revokeObjectURL(cropping.url);
+                        setCropping(null);
+                    }}
+                />
             )}
         </div>
     );
