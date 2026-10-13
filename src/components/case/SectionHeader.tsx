@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { RichText } from './RichText';
 
 interface SectionHeaderProps {
     title: string;
@@ -6,7 +7,9 @@ interface SectionHeaderProps {
     className?: string;
 }
 
-// Заголовок секции: H2 (headline/medium) + описание (body/medium)
+// Заголовок секции: H2 (headline/medium) + описание (body/medium).
+// Описание — RichText (markdown-lite): переносы строк, списки с
+// зелёными маркерами, **жирный**, *курсив*.
 export function SectionHeader({
     title,
     description,
@@ -17,11 +20,7 @@ export function SectionHeader({
             <h2 className='font-display text-headline-md text-on-surface'>
                 {title}
             </h2>
-            {description ? (
-                <p className='text-body-md text-on-surface-variant'>
-                    {description}
-                </p>
-            ) : null}
+            <RichText text={description} />
         </div>
     );
 }

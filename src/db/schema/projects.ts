@@ -51,7 +51,10 @@ export const projects = sqliteTable(
         // Section 04: Design System
         visualDirection: text('visual_direction'), //[cite: 1]
         displayFont: text('display_font'), //[cite: 1]
+        // Характеристики шрифта свободной формой: «Bold 64/72», «Italic» и т.п.
+        displayFontSpec: text('display_font_spec'),
         bodyFont: text('body_font'), //[cite: 1]
+        bodyFontSpec: text('body_font_spec'),
         moodboardPresetId: text('moodboard_preset_id'), // WYSIWYG grid preset
 
         // Section 05: Process

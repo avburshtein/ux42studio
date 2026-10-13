@@ -3,7 +3,10 @@ import { SectionLabel } from './BlockLabel';
 
 interface TypographyScaleProps {
     displayFont?: string | null;
+    /** Характеристики display-шрифта свободной формой («Bold 64/72») */
+    displayFontSpec?: string | null;
     bodyFont?: string | null;
+    bodyFontSpec?: string | null;
     className?: string;
 }
 
@@ -11,7 +14,9 @@ interface TypographyScaleProps {
 // Figma: Moodboard/TypeScale Grid [280:214] — 2 ряда по 3 образца
 export function TypographyScale({
     displayFont,
+    displayFontSpec,
     bodyFont,
+    bodyFontSpec,
     className,
 }: TypographyScaleProps) {
     if (!displayFont && !bodyFont) return null;
@@ -33,6 +38,11 @@ export function TypographyScale({
                         <div className='flex flex-col gap-3 border-b border-outline-faint px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
                             <span className='shrink-0 text-label-md text-on-surface-variant'>
                                 Display Large
+                                {displayFontSpec && (
+                                    <span className='mt-0.5 block text-label-sm text-on-surface-variant/70'>
+                                        {displayFontSpec}
+                                    </span>
+                                )}
                             </span>
                             <span className='font-display text-display-sm text-on-surface'>
                                 {displayFont} — Aa Bb Cc
@@ -55,6 +65,11 @@ export function TypographyScale({
                         <div className='flex flex-col gap-3 border-b border-outline-faint px-6 py-5 sm:flex-row sm:items-center sm:justify-between'>
                             <span className='shrink-0 text-label-md text-on-surface-variant'>
                                 Body Large
+                                {bodyFontSpec && (
+                                    <span className='mt-0.5 block text-label-sm text-on-surface-variant/70'>
+                                        {bodyFontSpec}
+                                    </span>
+                                )}
                             </span>
                             <span className='font-body text-body-lg text-on-surface'>
                                 {bodyFont} — The quick brown fox jumps over the lazy dog

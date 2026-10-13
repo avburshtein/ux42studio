@@ -158,10 +158,14 @@ export default function ResearchPage({
                         <textarea
                             id='researchMethodology'
                             {...register('researchMethodology')}
-                            placeholder='e.g. User interviews, competitive analysis, surveys…'
+                            placeholder={'e.g. User interviews, competitive analysis, surveys…\n- 5 user interviews\n- Competitive analysis of 3 products'}
                             className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                             rows={4}
                         />
+                        <p className='mt-1 text-body-sm text-on-surface-variant'>
+                            Переносы сохраняются; «- » — список с зелёным
+                            маркером; **жирный**, *курсив*.
+                        </p>
                     </div>
 
                     <div>
@@ -331,11 +335,13 @@ export default function ResearchPage({
                                 </div>
                                 <div>
                                     <Label>Description *</Label>
-                                    <Input
+                                    <textarea
                                         {...register(
                                             `keyMetrics.${index}.description`,
                                         )}
                                         placeholder='Increase in user engagement'
+                                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                                        rows={2}
                                     />
                                     {errors.keyMetrics?.[index]
                                         ?.description && (

@@ -18,7 +18,9 @@ import { updateProjectDesign, getProjectDesign } from '@/lib/actions/projects';
 const formSchema = z.object({
     visualDirection: z.string().optional().or(z.literal('')),
     displayFont: z.string().optional().or(z.literal('')),
+    displayFontSpec: z.string().optional().or(z.literal('')),
     bodyFont: z.string().optional().or(z.literal('')),
+    bodyFontSpec: z.string().optional().or(z.literal('')),
     designApproach: z.string().optional().or(z.literal('')),
 });
 
@@ -44,7 +46,9 @@ export default function DesignPage({
         defaultValues: {
             visualDirection: '',
             displayFont: '',
+            displayFontSpec: '',
             bodyFont: '',
+            bodyFontSpec: '',
             designApproach: '',
         },
     });
@@ -55,7 +59,9 @@ export default function DesignPage({
             .then((d) => {
                 setValue('visualDirection', d?.visualDirection ?? '');
                 setValue('displayFont', d?.displayFont ?? '');
+                setValue('displayFontSpec', d?.displayFontSpec ?? '');
                 setValue('bodyFont', d?.bodyFont ?? '');
+                setValue('bodyFontSpec', d?.bodyFontSpec ?? '');
                 setValue('designApproach', d?.designApproach ?? '');
             })
             .catch(() => {});
@@ -69,7 +75,9 @@ export default function DesignPage({
             await updateProjectDesign(projectId, {
                 visualDirection: data.visualDirection || undefined,
                 displayFont: data.displayFont || undefined,
+                displayFontSpec: data.displayFontSpec || undefined,
                 bodyFont: data.bodyFont || undefined,
+                bodyFontSpec: data.bodyFontSpec || undefined,
                 designApproach: data.designApproach || undefined,
             });
             return true;
@@ -104,10 +112,14 @@ export default function DesignPage({
                     <textarea
                         id='visualDirection'
                         {...register('visualDirection')}
-                        placeholder='Describe the visual style, mood, and aesthetic direction…'
+                        placeholder={'Describe the visual style, mood, and aesthetic direction…\n- Calm and trustworthy\n- Rounded shapes, soft shadows'}
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Переносы сохраняются; «- » — список с зелёным маркером;
+                        **жирный**, *курсив*.
+                    </p>
                 </div>
 
                 <div>
@@ -120,11 +132,37 @@ export default function DesignPage({
                 </div>
 
                 <div>
+                    <Label htmlFor='displayFontSpec'>
+                        Display Font — характеристики
+                    </Label>
+                    <Input
+                        id='displayFontSpec'
+                        {...register('displayFontSpec')}
+                        placeholder='Например: Bold 64/72, Black для заголовков, Italic для акцентов'
+                    />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Необязательно: вес, размеры, начертания — если не
+                        следуете стандартам Material.
+                    </p>
+                </div>
+
+                <div>
                     <Label htmlFor='bodyFont'>Body Font</Label>
                     <Input
                         id='bodyFont'
                         {...register('bodyFont')}
                         placeholder='Roboto'
+                    />
+                </div>
+
+                <div>
+                    <Label htmlFor='bodyFontSpec'>
+                        Body Font — характеристики
+                    </Label>
+                    <Input
+                        id='bodyFontSpec'
+                        {...register('bodyFontSpec')}
+                        placeholder='Например: Regular 16/24, Medium для выделений'
                     />
                 </div>
 

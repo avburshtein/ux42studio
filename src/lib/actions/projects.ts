@@ -333,7 +333,9 @@ export async function updateProjectDesign(
     data: {
         visualDirection?: string;
         displayFont?: string;
+        displayFontSpec?: string;
         bodyFont?: string;
+        bodyFontSpec?: string;
         designApproach?: string;
     },
 ) {
@@ -1200,7 +1202,9 @@ export async function getProjectDesign(projectId: string) {
         .select({
             visualDirection: projects.visualDirection,
             displayFont: projects.displayFont,
+            displayFontSpec: projects.displayFontSpec,
             bodyFont: projects.bodyFont,
+            bodyFontSpec: projects.bodyFontSpec,
             designApproach: projects.designApproach,
         })
         .from(projects)

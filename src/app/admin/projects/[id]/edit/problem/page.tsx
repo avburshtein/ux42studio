@@ -97,6 +97,10 @@ export default function ProblemPage({
             <Title className='mb-6' tag='h1'>
                 Problem & Audience
             </Title>
+            <p className='mb-4 text-body-sm text-on-surface-variant'>
+                Форматирование: переносы строк сохраняются, строка с «- » —
+                элемент списка с зелёным маркером, **жирный**, *курсив*.
+            </p>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='problemStatement'>Problem Statement</Label>

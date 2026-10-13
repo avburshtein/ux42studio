@@ -30,6 +30,9 @@ const comparisonSchema = z.object({
 
 const formSchema = z.object({
     finalDescription: z.string().optional().or(z.literal('')),
+    // Секция 05 «Testing & Iteration»: описание процесса тестирования —
+    // секция видна при testingProcess и/или comparisons
+    testingProcess: z.string().optional().or(z.literal('')),
     comparisons: z.array(comparisonSchema),
 });
 
@@ -62,6 +65,7 @@ export default function ShowcasePage({
         resolver: zodResolver(formSchema),
         defaultValues: {
             finalDescription: '',
+            testingProcess: '',
             comparisons: [],
         },
     });
@@ -78,6 +82,7 @@ export default function ShowcasePage({
             .then((s) => {
                 reset({
                     finalDescription: s?.finalDescription ?? '',
+                    testingProcess: s?.testingProcess ?? '',
                     comparisons: (s?.comparisons ?? []).map((c) => ({
                         ...c,
                         beforeFileId: c.beforeFileId ?? '',
@@ -97,6 +102,7 @@ export default function ShowcasePage({
         try {
             await updateProjectShowcase(projectId, {
                 finalDescription: data.finalDescription || undefined,
+                testingProcess: data.testingProcess || undefined,
                 comparisons: data.comparisons.map((c) => ({
                     ...c,
                     beforeFileId: c.beforeFileId || undefined,
@@ -144,6 +150,23 @@ export default function ShowcasePage({
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
+                </div>
+
+                {/* Testing & Iteration — секция 05 публичного кейса. Видна,
+                    если заполнено это поле и/или есть comparisons. */}
+                <div>
+                    <Label htmlFor='testingProcess'>Testing Process</Label>
+                    <textarea
+                        id='testingProcess'
+                        {...register('testingProcess')}
+                        placeholder={'How you tested and iterated on the solution…\n- Usability tests with 5 users\n- Iterated on navigation based on findings'}
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        rows={4}
+                    />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Необязательно. Переносы строк сохраняются; строки с
+                        «- » становятся списком; **жирный**, *курсив*.
+                    </p>
                 </div>
 
                 {/* Before/After Comparisons */}

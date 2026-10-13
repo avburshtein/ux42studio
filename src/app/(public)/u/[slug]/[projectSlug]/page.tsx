@@ -9,6 +9,7 @@ import type { Metadata } from 'next';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
 import { CaseSection } from '@/components/case/CaseSection';
+import { RichText } from '@/components/case/RichText';
 import { SectionLabel } from '@/components/case/BlockLabel';
 import { PortfolioCard } from '@/components/case/PortfolioCard';
 import { MetricCard } from '@/components/case/MetricCard';
@@ -138,7 +139,7 @@ export default async function ProjectPage({ params }: PageProps) {
     }
 
     // 3. Параллельная загрузка всех данных кейса
-    const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews] =
+    const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews, baCardsData] =
         await Promise.all([
             db.query.projectAssets.findMany({
                 where: { projectId: project.id },
@@ -169,6 +170,10 @@ export default async function ProjectPage({ params }: PageProps) {
             db.query.projectReviews.findMany({
                 where: { projectId: project.id },
                 with: { avatarFile: true },
+                orderBy: { order: 'asc' },
+            }),
+            db.query.baCards.findMany({
+                where: { projectId: project.id },
                 orderBy: { order: 'asc' },
             }),
         ]);
@@ -250,7 +255,8 @@ export default async function ProjectPage({ params }: PageProps) {
         project.displayFont ||
         project.bodyFont
     );
-    const showTesting = comparisons.length > 0;
+    const showTesting =
+        comparisons.length > 0 || !!project.testingProcess?.trim();
     const showFinalDesign = !!(
         finalGalleryAssets.length > 0 ||
         resultItems.length > 0 ||
@@ -486,7 +492,11 @@ export default async function ProjectPage({ params }: PageProps) {
                                         {/* 4c. Typography Scale [280:217] */}
                                         <TypographyScale
                                             displayFont={project.displayFont}
+                                            displayFontSpec={
+                                                project.displayFontSpec
+                                            }
                                             bodyFont={project.bodyFont}
+                                            bodyFontSpec={project.bodyFontSpec}
                                         />
                                     </div>
                                 </CaseSection>
@@ -588,6 +598,53 @@ export default async function ProjectPage({ params }: PageProps) {
                                                                 item.content
                                                             }
                                                         />
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Textual Before/After (шаг results
+                                            в админке) — текстовые карточки
+                                            фич: было → стало */}
+                                        {baCardsData.length > 0 && (
+                                            <div className='flex flex-col gap-6'>
+                                                <SectionLabel>
+                                                    Before / After
+                                                </SectionLabel>
+                                                <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+                                                    {baCardsData.map((c) => (
+                                                        <div
+                                                            key={c.id}
+                                                            className='rounded-base border border-outline-faint bg-surface-container-lowest p-5'
+                                                        >
+                                                            <p className='text-title-sm text-on-surface'>
+                                                                {c.featureName}
+                                                            </p>
+                                                            <div className='mt-3 flex flex-col gap-3'>
+                                                                <div>
+                                                                    <p className='text-label-sm font-medium uppercase tracking-[0.5px] text-on-surface-variant'>
+                                                                        Before
+                                                                    </p>
+                                                                    <RichText
+                                                                        text={
+                                                                            c.beforeText
+                                                                        }
+                                                                        className='mt-1 text-body-sm'
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <p className='text-label-sm font-medium uppercase tracking-[0.5px] text-primary'>
+                                                                        After
+                                                                    </p>
+                                                                    <RichText
+                                                                        text={
+                                                                            c.afterText
+                                                                        }
+                                                                        className='mt-1 text-body-sm'
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
                                                     ))}
                                                 </div>
                                             </div>
