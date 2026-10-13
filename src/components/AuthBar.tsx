@@ -73,11 +73,11 @@ export default async function AuthBar({
     });
 
     return (
-        // Дизайн — как у SiteHeader (стекло: header-glass + blur), только
-        // ниже: одна строка py-2, не sticky (SiteHeader сам sticky top-0).
-        <div className='header-glass w-full border-b border-outline-variant backdrop-blur-md backdrop-saturate-[1.8]'>
-            <div className='mx-auto w-full max-w-container-content'>
-                <div className='px-4 py-1.5 flex items-center justify-end gap-4 sm:px-6 lg:px-8'>
+        // Один визуальный хедер с SiteHeader: тот же фон-стекло и тот же
+        // section-container (max-w 1280 + pads 24/48/64), без разделительной
+        // черты — полоса выглядит верхней строкой единой шапки.
+        <div className='header-glass w-full backdrop-blur-md backdrop-saturate-[1.8]'>
+            <div className='section-container flex w-full items-center justify-end gap-6 py-1.5'>
                     {isSuperAdmin && (
                         <Link
                             href='/super-admin'
@@ -113,7 +113,6 @@ export default async function AuthBar({
                         </Link>
                     )}
                 </div>
-            </div>
         </div>
     );
 }
