@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { RichTextInline } from './RichText';
 
 interface TestimonialCardProps {
   text: string;
@@ -36,7 +37,7 @@ export function TestimonialCard({
         “
       </span>
       <blockquote className='text-body-lg text-on-surface'>
-        «{text}»
+        «<RichTextInline text={text} />»
       </blockquote>
       <figcaption className='flex items-center gap-3'>
         {avatarUrl ? (

@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { MetadataCard } from './MetadataCard';
+import { RichText, RichTextInline } from './RichText';
 
 interface HeroProps {
     title: string;
@@ -86,12 +87,13 @@ export function Hero({
                         40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
                         заголовок не помещается и оверлей срезается под шапкой. */}
                     <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
-                        {title}
+                        <RichTextInline text={title} />
                     </h1>
                     {teaser && (
-                        <p className='max-w-3xl text-body-md text-white/80 sm:text-body-lg'>
-                            {teaser}
-                        </p>
+                        <RichText
+                            text={teaser}
+                            className='max-w-3xl text-body-md text-white/80 sm:text-body-lg'
+                        />
                     )}
                 </div>
             </div>

@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { RichText, RichTextInline } from './RichText';
 
 interface PersonaCardProps {
     nameAndAge: string;
@@ -52,19 +53,20 @@ export function PersonaCard({
                 {/* Name + Role */}
                 <div className='flex min-w-0 flex-1 flex-col gap-2 overflow-hidden'>
                     <h3 className='font-display text-title-lg text-on-surface'>
-                        {nameAndAge}
+                        <RichTextInline text={nameAndAge} />
                     </h3>
                     <p className='text-body-md tracking-[0.25px] text-on-surface-variant'>
-                        {role}
+                        <RichTextInline text={role} />
                     </p>
                 </div>
             </div>
 
             {/* Section 3 — Quote with left border */}
             <div className='mt-5 border-l-2 border-primary-container/30 pl-4'>
-                <p className='text-body-md tracking-[0.25px] text-on-surface-variant'>
-                    {description}
-                </p>
+                <RichText
+                    text={description}
+                    className='tracking-[0.25px]'
+                />
             </div>
         </div>
     );

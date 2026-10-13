@@ -126,4 +126,11 @@ export function RichText({ text, className }: RichTextProps) {
     );
 }
 
+/** Инлайн-вариант для заголовков и однострочных текстов:
+ *  поддерживает **жирный** и *курсив* (без абзацев и списков). */
+export function RichTextInline({ text, className }: RichTextProps) {
+    if (!text?.trim()) return null;
+    return <span className={cn(className)}>{renderInline(text.trim(), 'i')}</span>;
+}
+
 export default RichText;

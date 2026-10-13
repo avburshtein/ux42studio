@@ -171,9 +171,11 @@ export default function ResultsPage({
                             className='mb-3 flex items-start gap-3'
                         >
                             <div className='flex-1'>
-                                <Input
+                                <textarea
                                     {...register(`results.${index}.content`)}
-                                    placeholder='Result description'
+                                    placeholder='Result description — переносы сохраняются, «- » — список'
+                                    className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                                    rows={2}
                                 />
                                 {errors.results?.[index]?.content && (
                                     <p className='mt-1 text-body-sm text-error'>
@@ -285,11 +287,13 @@ export default function ResultsPage({
                                 </Button>
                             </div>
                             <div>
-                                <Input
+                                <textarea
                                     {...register(
                                         `baCards.${index}.featureName`,
                                     )}
                                     placeholder='Feature name'
+                                    className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                                    rows={2}
                                 />
                                 {errors.baCards?.[index]?.featureName && (
                                     <p className='mt-1 text-body-sm text-error'>
@@ -298,9 +302,11 @@ export default function ResultsPage({
                                 )}
                             </div>
                             <div>
-                                <Input
+                                <textarea
                                     {...register(`baCards.${index}.beforeText`)}
-                                    placeholder='Before text'
+                                    placeholder='Before text — переносы сохраняются, «- » — список'
+                                    className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                                    rows={3}
                                 />
                                 {errors.baCards?.[index]?.beforeText && (
                                     <p className='mt-1 text-body-sm text-error'>
@@ -309,9 +315,11 @@ export default function ResultsPage({
                                 )}
                             </div>
                             <div>
-                                <Input
+                                <textarea
                                     {...register(`baCards.${index}.afterText`)}
-                                    placeholder='After text'
+                                    placeholder='After text — переносы сохраняются, «- » — список'
+                                    className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                                    rows={3}
                                 />
                                 {errors.baCards?.[index]?.afterText && (
                                     <p className='mt-1 text-body-sm text-error'>

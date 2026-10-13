@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { RichText } from './RichText';
 
 interface ResultsCardProps {
     content: string;
@@ -31,11 +32,12 @@ export function ResultsCard({ content, className }: ResultsCardProps) {
                     strokeLinejoin='round'
                 />
             </svg>
-            {/* min-w-0: иначе flex не сжимает span ниже самого длинного слова
+            {/* min-w-0: иначе flex не сжимает текст ниже самого длинного слова
                 (длинная строка без пробелов уезжала за карточку, mobile) */}
-            <span className='min-w-0 break-words text-body-md text-on-surface'>
-                {content}
-            </span>
+            <RichText
+                text={content}
+                className='min-w-0 break-words text-body-md text-on-surface'
+            />
         </div>
     );
 }

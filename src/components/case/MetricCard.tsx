@@ -1,3 +1,5 @@
+import { RichText } from './RichText';
+
 interface MetricCardProps {
     value: string;
     description: string;
@@ -12,9 +14,10 @@ export function MetricCard({ value, description }: MetricCardProps) {
             <span className='font-display text-headline-sm text-primary'>
                 {value}
             </span>
-            <span className='text-body-sm text-on-surface-variant'>
-                {description}
-            </span>
+            <RichText
+                text={description}
+                className='text-body-sm text-on-surface-variant'
+            />
         </div>
     );
 }

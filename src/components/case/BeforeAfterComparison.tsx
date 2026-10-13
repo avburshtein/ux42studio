@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SectionLabel } from './BlockLabel';
+import { RichText } from './RichText';
 
 interface BeforeAfterComparisonProps {
     featureName: string;
@@ -48,9 +49,10 @@ export function BeforeAfterComparison({
                         )}
                     </div>
                     {beforeText && (
-                        <p className='text-body-sm text-on-surface-variant'>
-                            {beforeText}
-                        </p>
+                        <RichText
+                            text={beforeText}
+                            className='text-body-sm text-on-surface-variant'
+                        />
                     )}
                 </div>
 
@@ -75,9 +77,10 @@ export function BeforeAfterComparison({
                         )}
                     </div>
                     {afterText && (
-                        <p className='text-body-sm text-on-surface-variant'>
-                            {afterText}
-                        </p>
+                        <RichText
+                            text={afterText}
+                            className='text-body-sm text-on-surface-variant'
+                        />
                     )}
                 </div>
             </div>

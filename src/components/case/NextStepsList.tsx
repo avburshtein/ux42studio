@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { RichText } from './RichText';
 
 interface NextStepsListProps {
     items: Array<{ id: string; content: string }>;
@@ -17,9 +18,10 @@ export function NextStepsList({ items, className }: NextStepsListProps) {
                 >
                     <span className='mt-[9px] h-1.5 w-1.5 shrink-0 rounded-full bg-primary' />
                     {/* min-w-0 — та же причина, что в ResultsCard */}
-                    <span className='min-w-0 break-words text-body-md text-on-surface-variant'>
-                        {item.content}
-                    </span>
+                    <RichText
+                        text={item.content}
+                        className='min-w-0 break-words text-body-md text-on-surface-variant'
+                    />
                 </li>
             ))}
         </ul>
