@@ -88,15 +88,15 @@ export default async function AuthBar({
                         href='/admin'
                         className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                     >
-                        Админка
+                        Мой профиль
                     </Link>
 
                     {profile?.slug && (
                         <Link
-                            href={`/u/${profile.slug}`}
+                            href='/admin/profile'
                             className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                         >
-                            Мой профиль
+                            Редактировать сайт
                         </Link>
                     )}
                     {isOwner && projectId && (

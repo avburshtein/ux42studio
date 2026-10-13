@@ -22,10 +22,14 @@ import Link from 'next/link';
 import SectionsVisibilityEditor from '@/components/admin/SectionsVisibilityEditor';
 import { TldrShareButtons } from '@/components/admin/TldrShareButtons';
 
+// Поля опциональны намеренно: добавленная, но ещё не заполненная строка
+// не должна блокировать сохранение шага и публикацию кейса («гибкость в
+// заполнении разделов»). Полностью пустые строки отфильтровываются в
+// onSubmit перед отправкой.
 const reviewItemSchema = z.object({
     id: z.string().optional(),
-    text: z.string().min(1, 'Text is required'),
-    authorName: z.string().min(1, 'Author name is required'),
+    text: z.string().optional().or(z.literal('')),
+    authorName: z.string().optional().or(z.literal('')),
     authorRole: z.string().optional().or(z.literal('')),
     avatarFileId: z.string().optional().or(z.literal('')),
     order: z.number().int(),
@@ -33,7 +37,7 @@ const reviewItemSchema = z.object({
 
 const projectItemSchema = z.object({
     id: z.string().optional(),
-    content: z.string().min(1, 'Content is required'),
+    content: z.string().optional().or(z.literal('')),
     order: z.number().int(),
 });
 
@@ -121,12 +125,18 @@ export default function ReviewPage({
         try {
             const result = await updateProjectReview(projectId, {
                 keyTakeaway: data.keyTakeaway || undefined,
-                reviews: data.reviews.map((r) => ({
+                // Пустые строки не отправляем: сгенерированные сервером
+                // пустые отзывы/шаги не должны попадать в БД и на публикацию.
+                reviews: data.reviews
+                    .filter((r) => r.text?.trim() || r.authorName?.trim())
+                    .map((r) => ({
                     ...r,
                     authorRole: r.authorRole || undefined,
                     avatarFileId: r.avatarFileId || undefined,
                 })),
-                nextSteps: data.nextSteps.map((n, i) => ({
+                nextSteps: data.nextSteps
+                    .filter((n) => n.content?.trim())
+                    .map((n, i) => ({
                     ...n,
                     order: i,
                 })),

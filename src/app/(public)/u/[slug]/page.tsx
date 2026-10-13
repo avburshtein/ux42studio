@@ -19,6 +19,7 @@ import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 // Вернуть: раскомментировать импорт и строку ниже.
 //   {mpc.cta.visible && <FAB href='#contact' />}
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
+import AuthBar from '@/components/AuthBar';
 import { EyeOff } from 'lucide-react';
 import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
 import { sql } from 'drizzle-orm';
@@ -345,6 +346,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     </div>
                 </div>
             )}
+            <AuthBar profileUserId={profile.userId} />
             <SiteHeader
                 profileSlug={slug}
                 displayName={profile.fullName}

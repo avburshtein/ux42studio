@@ -1,6 +1,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyJwt } from '@/lib/jwt';
 import { Suspense } from 'react';
 import type { Metadata } from 'next';
 import { CaseShortView } from '@/components/case/CaseShortView';
@@ -54,6 +56,7 @@ export default async function CaseShortPage({ params }: PageProps) {
         where: { slug },
         columns: {
             id: true,
+            userId: true,
             slug: true,
             fullName: true,
             headline: true,
@@ -64,12 +67,11 @@ export default async function CaseShortPage({ params }: PageProps) {
     });
     if (!profile) notFound();
 
-    // Проект (только опубликованный)
+    // Проект (опубликованный — или любой для владельца, см. ниже)
     const project = await db.query.projects.findFirst({
         where: {
             profileId: profile.id,
             slug: projectSlug,
-            status: 'published',
         },
         with: {
             coverFile: true,
@@ -77,6 +79,23 @@ export default async function CaseShortPage({ params }: PageProps) {
         },
     });
     if (!project) notFound();
+
+    // Превью черновиков: неопубликованный кейс виден только владельцу.
+    let isOwner = false;
+    if (project.status !== 'published') {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth-token')?.value;
+        const jwtSecret = env.JWT_SECRET || process.env.JWT_SECRET;
+        if (token && jwtSecret) {
+            const payload = await verifyJwt(token, jwtSecret);
+            const viewerId =
+                payload && typeof payload.userId === 'string'
+                    ? payload.userId
+                    : null;
+            isOwner = viewerId === profile.userId;
+        }
+        if (!isOwner) notFound();
+    }
 
     // Параллельная загрузка: ассеты (showcase) + key metrics
     const [assets, keyMetrics] = await Promise.all([

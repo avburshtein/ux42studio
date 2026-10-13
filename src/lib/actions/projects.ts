@@ -780,17 +780,19 @@ export async function updateProjectReview(
     projectId: string,
     data: {
         keyTakeaway?: string;
+        // Поля опциональны: пустые строки фильтруются клиентом, а частично
+        // заполненные отзывы сохраняются как есть (гибкость заполнения).
         reviews?: Array<{
             id?: string;
-            text: string;
-            authorName: string;
+            text?: string;
+            authorName?: string;
             authorRole?: string;
             avatarFileId?: string;
             order: number;
         }>;
         nextSteps?: Array<{
             id?: string;
-            content: string;
+            content?: string;
             order: number;
         }>;
         publish?: boolean;
@@ -854,8 +856,8 @@ export async function updateProjectReview(
             db.insert(projectReviews).values({
                 id: r.id || crypto.randomUUID(),
                 projectId,
-                text: r.text,
-                authorName: r.authorName,
+                text: r.text ?? '',
+                authorName: r.authorName ?? '',
                 authorRole: r.authorRole,
                 avatarFileId:
                     r.avatarFileId && validFileIds.has(r.avatarFileId)
@@ -879,7 +881,7 @@ export async function updateProjectReview(
                 id: n.id || crypto.randomUUID(),
                 projectId,
                 type: 'next_step',
-                content: n.content,
+                content: n.content ?? '',
                 order: n.order,
             }),
         ),
@@ -941,6 +943,11 @@ export async function getProjectPreviewInfo(projectId: string): Promise<{
 // ---- Archive / Restore ----
 
 export async function archiveProject(projectId: string) {
+    // Владелец-only: раньше экшн менял статус по голому id — любой
+    // залогиненный пользователь мог заархивировать чужой кейс.
+    const ctx = await getOwnedProjectContext(projectId);
+    if (!ctx) return;
+
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
@@ -952,11 +959,14 @@ export async function archiveProject(projectId: string) {
         })
         .where(eq(projects.id, projectId));
 
-    revalidatePath('/admin');
-    revalidatePath('/');
+    revalidateCasePaths(ctx);
 }
 
 export async function unarchiveProject(projectId: string) {
+    // Владелец-only, как в archiveProject.
+    const ctx = await getOwnedProjectContext(projectId);
+    if (!ctx) return;
+
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
 
@@ -968,8 +978,104 @@ export async function unarchiveProject(projectId: string) {
         })
         .where(eq(projects.id, projectId));
 
+    revalidateCasePaths(ctx);
+}
+
+// ---- Publish / Unpublish (переключатель статуса в списке /admin) ----
+
+/**
+ * Владелец ли текущий пользователь владеет проектом + контекст для
+ * ревалидации публичных путей. null = не авторизован / не владелец /
+ * проект не найден.
+ */
+async function getOwnedProjectContext(projectId: string): Promise<{
+    profileSlug: string;
+    projectSlug: string;
+} | null> {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return null;
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ slug: projects.slug, profileId: projects.profileId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+    if (!project) return null;
+
+    const profile = await db
+        .select({ slug: profiles.slug, userId: profiles.userId })
+        .from(profiles)
+        .where(eq(profiles.id, project.profileId))
+        .get();
+    if (!profile || profile.userId !== userId) return null;
+
+    return { profileSlug: profile.slug, projectSlug: project.slug };
+}
+
+/** Публичные пути кейса — чтобы статус менялся без часа кэша. */
+function revalidateCasePaths(ctx: { profileSlug: string; projectSlug: string }) {
     revalidatePath('/admin');
     revalidatePath('/');
+    revalidatePath('/sitemap.xml');
+    revalidatePath(`/u/${ctx.profileSlug}`);
+    revalidatePath(`/u/${ctx.profileSlug}/${ctx.projectSlug}`);
+}
+
+/**
+ * Опубликовать черновик из списка /admin (без формы review).
+ * Валидация та же, что при публикации из review-шага: нужен заголовок.
+ */
+export async function publishProject(
+    projectId: string,
+): Promise<{ error?: string }> {
+    const ctx = await getOwnedProjectContext(projectId);
+    if (!ctx) return { error: 'Нет доступа к проекту' };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ title: projects.title })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+    if (!project?.title?.trim()) {
+        return { error: 'Title is required before publishing' };
+    }
+
+    await db
+        .update(projects)
+        .set({
+            status: 'published',
+            publishedAt: Math.floor(Date.now() / 1000),
+        })
+        .where(eq(projects.id, projectId));
+
+    revalidateCasePaths(ctx);
+    return {};
+}
+
+/** Снять с публикации (published → draft), не трогая архив. */
+export async function unpublishProject(
+    projectId: string,
+): Promise<{ error?: string }> {
+    const ctx = await getOwnedProjectContext(projectId);
+    if (!ctx) return { error: 'Нет доступа к проекту' };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(projects)
+        .set({ status: 'draft' })
+        .where(eq(projects.id, projectId));
+
+    revalidateCasePaths(ctx);
+    return {};
 }
 
 export async function getProjectStatus(projectId: string) {

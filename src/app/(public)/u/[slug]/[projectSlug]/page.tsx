@@ -3,6 +3,8 @@ import { getDb } from '@/db';
 import { projects } from '@/db/schema';
 import { eq, sql } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
+import { verifyJwt } from '@/lib/jwt';
 import type { Metadata } from 'next';
 import { SiteHeaderBreadcrumb } from '@/components/case/SiteHeader';
 import { Hero } from '@/components/case/Hero';
@@ -104,12 +106,11 @@ export default async function ProjectPage({ params }: PageProps) {
     });
     if (!profile) notFound();
 
-    // 2. Найти проект
+    // 2. Найти проект (любой статус — черновик видит владелец, см. ниже)
     const project = await db.query.projects.findFirst({
         where: {
             profileId: profile.id,
             slug: projectSlug,
-            status: 'published',
         },
         with: {
             coverFile: true,
@@ -117,6 +118,24 @@ export default async function ProjectPage({ params }: PageProps) {
         },
     });
     if (!project) notFound();
+
+    // Превью черновиков: неопубликованный кейс виден только владельцу,
+    // остальным — 404 (тот же паттерн, что на странице профиля).
+    let isOwner = false;
+    if (project.status !== 'published') {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('auth-token')?.value;
+        const jwtSecret = env.JWT_SECRET || process.env.JWT_SECRET;
+        if (token && jwtSecret) {
+            const payload = await verifyJwt(token, jwtSecret);
+            const viewerId =
+                payload && typeof payload.userId === 'string'
+                    ? payload.userId
+                    : null;
+            isOwner = viewerId === profile.userId;
+        }
+        if (!isOwner) notFound();
+    }
 
     // 3. Параллельная загрузка всех данных кейса
     const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews] =
@@ -287,6 +306,20 @@ export default async function ProjectPage({ params }: PageProps) {
         <div className='min-h-screen w-full bg-surface-container-low'>
             <AuthBar projectId={project?.id} profileUserId={profile?.userId} />
 
+            {/* Превью черновика: видит только владелец (страница не отдаёт
+                404 хозяину кейса). role='status' — озвучивается скринридером. */}
+            {project.status !== 'published' && (
+                <div
+                    role='status'
+                    className='border-b border-outline-variant bg-primary-container text-on-primary-container'
+                >
+                    <div className='mx-auto max-w-container-content px-4 py-2 text-label-sm sm:px-6 lg:px-8'>
+                        Draft — only you can see this case. Publish it from
+                        your dashboard.
+                    </div>
+                </div>
+            )}
+
             {/* Header [245:1632] — Breadcrumb variant with glass effects.
                 Паттерн главной: full-bleed ленты + section-container —
                 столбец max-w-container-content удалён (фидбэк (13) §14:
@@ -326,7 +359,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.problem}
                                     label='Problem & Audience'
-                                    title='What problem are we solving?'
+                                    title='The challenge'
                                     description={project.problemStatement}
                                 >
                                     <div className='flex flex-col gap-6 md:flex-row'>
@@ -351,7 +384,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.research}
                                     label='User Research'
-                                    title='What the data revealed.'
+                                    title='What the data revealed'
                                     description={project.researchMethodology}
                                 >
                                     {keyMetrics.length > 0 && (
@@ -391,7 +424,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.designProcess}
                                     label='Design Process'
-                                    title='From blank page to structure.'
+                                    title='From blank page to structure'
                                     description={project.designApproach}
                                 >
                                     <div className='flex flex-col gap-8'>
@@ -424,7 +457,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.designSystem}
                                     label='Design System'
-                                    title='Visual language & token system.'
+                                    title='Visual language & token system'
                                     description={project.visualDirection}
                                 >
                                     <div className='flex flex-col gap-8'>
@@ -464,7 +497,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.testing}
                                     label='Testing & Iteration'
-                                    title='What users taught me.'
+                                    title='What users taught me'
                                     description={project.testingProcess}
                                 >
                                     {/* Карусель <sm: слайд = один Before/After
@@ -586,7 +619,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.reflection}
                                     label='Reflection'
-                                    title='What I learned.'
+                                    title='What I learned'
                                     description={project.keyTakeaway}
                                 >
                                         {nextStepItems.length > 0 && (

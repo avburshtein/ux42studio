@@ -28,8 +28,10 @@ import { Button } from '@/components/ui/Button';
 import {
     archiveProject,
     deleteProject,
+    publishProject,
     reorderProjects,
     setCaseSortMode,
+    unpublishProject,
     unarchiveProject,
 } from '@/lib/actions/projects';
 import type { CaseSortMode } from '@/db/schema/profiles';
@@ -81,7 +83,10 @@ interface RowActionsProps {
     row: CaseProjectRow;
     profileSlug: string;
     onDelete: (id: string) => void;
-    onSetStatus: (id: string, action: 'archive' | 'unarchive') => void;
+    onSetStatus: (
+        id: string,
+        action: 'archive' | 'unarchive' | 'publish' | 'unpublish',
+    ) => void;
     pending: boolean;
 }
 
@@ -134,10 +139,29 @@ function RowContent({
                 {row.status === 'published' && (
                     <Button
                         variant='ghost'
+                        onClick={() => onSetStatus(row.id, 'unpublish')}
+                        disabled={pending}
+                    >
+                        Снять с&nbsp;публикации
+                    </Button>
+                )}
+                {row.status === 'published' && (
+                    <Button
+                        variant='ghost'
                         onClick={() => onSetStatus(row.id, 'archive')}
                         disabled={pending}
                     >
                         В&nbsp;архив
+                    </Button>
+                )}
+                {row.status === 'draft' && (
+                    <Button
+                        variant='ghost'
+                        onClick={() => onSetStatus(row.id, 'publish')}
+                        disabled={pending}
+                        className='text-primary'
+                    >
+                        Опубликовать
                     </Button>
                 )}
                 {row.status === 'archived' && (
@@ -307,12 +331,19 @@ export default function CaseSortManager({
         });
     };
 
-    const setStatus = (id: string, action: 'archive' | 'unarchive') => {
+    const setStatus = (
+        id: string,
+        action: 'archive' | 'unarchive' | 'publish' | 'unpublish',
+    ) => {
         startTransition(async () => {
             if (action === 'archive') {
                 await archiveProject(id);
-            } else {
+            } else if (action === 'unarchive') {
                 await unarchiveProject(id);
+            } else if (action === 'publish') {
+                await publishProject(id);
+            } else {
+                await unpublishProject(id);
             }
             router.refresh();
         });
