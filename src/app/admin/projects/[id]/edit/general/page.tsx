@@ -209,10 +209,12 @@ export default function GeneralPage({
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
                     <Label htmlFor='title'>Title *</Label>
-                    <Input
+                    <textarea
                         id='title'
                         {...register('title')}
                         placeholder='My Awesome Project'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        rows={2}
                     />
                     {errors.title && (
                         <p className='mt-1 text-body-sm text-error'>

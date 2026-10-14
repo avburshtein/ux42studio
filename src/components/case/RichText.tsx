@@ -23,25 +23,28 @@ interface RichTextProps {
     className?: string;
 }
 
-/** Инлайн-разметка: **жирный** и *курсив*. */
+/** Инлайн-разметка: **жирный**, *курсив* и переносы строк (→ <br>). */
 function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
-    const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-    return parts.map((part, i) => {
-        if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
-            return (
-                <strong key={`${keyPrefix}-${i}`} className='font-semibold text-on-surface'>
-                    {part.slice(2, -2)}
-                </strong>
-            );
-        }
-        if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
-            return (
-                <em key={`${keyPrefix}-${i}`} className='italic'>
-                    {part.slice(1, -1)}
-                </em>
-            );
-        }
-        return <React.Fragment key={`${keyPrefix}-${i}`}>{part}</React.Fragment>;
+    const lines = text.split('\n');
+    return lines.flatMap((line, i) => {
+        const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, j) => {
+            if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+                return (
+                    <strong key={`${keyPrefix}-${i}-${j}`} className='font-semibold text-on-surface'>
+                        {part.slice(2, -2)}
+                    </strong>
+                );
+            }
+            if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+                return (
+                    <em key={`${keyPrefix}-${i}-${j}`} className='italic'>
+                        {part.slice(1, -1)}
+                    </em>
+                );
+            }
+            return <React.Fragment key={`${keyPrefix}-${i}-${j}`}>{part}</React.Fragment>;
+        });
+        return i === 0 ? parts : [<br key={`${keyPrefix}-br-${i}`} />, ...parts];
     });
 }
 

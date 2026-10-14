@@ -91,6 +91,7 @@ export async function updateProjectMeta(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Files ----
@@ -231,6 +232,7 @@ export async function updateProjectProblem(
 
     await db.update(projects).set(data).where(eq(projects.id, projectId));
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Section 03: Research (db.batch) ----
@@ -324,6 +326,7 @@ export async function updateProjectResearch(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Section 04: Design System ----
@@ -344,6 +347,7 @@ export async function updateProjectDesign(
 
     await db.update(projects).set(data).where(eq(projects.id, projectId));
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 export async function getProjectColorRoles(projectId: string) {
@@ -428,6 +432,7 @@ export async function createColorRole(
     });
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 export async function updateColorRole(
@@ -513,6 +518,7 @@ export async function reorderColorRoles(projectId: string, roleIds: string[]) {
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Section 06b: Gallery (project assets) ----
@@ -586,6 +592,7 @@ export async function updateProjectGallery(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
     // Публичная страница кейса кэшируется (revalidate = 3600) — сбрасываем
     revalidatePath('/', 'layout');
 }
@@ -703,6 +710,7 @@ export async function updateProjectShowcase(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Section 07b: Results & Tools ----
@@ -776,6 +784,7 @@ export async function updateProjectResults(
     ]);
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Section 08: Review (db.batch) ----
@@ -916,6 +925,7 @@ export async function updateProjectReview(
     }
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
     revalidatePath('/');
 }
 
@@ -1027,6 +1037,34 @@ function revalidateCasePaths(ctx: { profileSlug: string; projectSlug: string }) 
     revalidatePath('/sitemap.xml');
     revalidatePath(`/u/${ctx.profileSlug}`);
     revalidatePath(`/u/${ctx.profileSlug}/${ctx.projectSlug}`);
+}
+
+/**
+ * Ревалидация публичных страниц кейса после сохранения в админке.
+ * Публичный кейс кэшируется (revalidate = 3600) — без этого переносы и
+ * правки текстов видны посетителям только через час.
+ */
+async function revalidateCaseData(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const project = await db
+        .select({ slug: projects.slug, profileId: projects.profileId })
+        .from(projects)
+        .where(eq(projects.id, projectId))
+        .get();
+    if (!project) return;
+
+    const profile = await db
+        .select({ slug: profiles.slug })
+        .from(profiles)
+        .where(eq(profiles.id, project.profileId))
+        .get();
+    if (!profile) return;
+
+    revalidatePath(`/u/${profile.slug}/${project.slug}`);
+    revalidatePath(`/u/${profile.slug}`);
+    revalidatePath('/sitemap.xml');
 }
 
 /**
@@ -1443,6 +1481,7 @@ export async function updateProjectSectionsVisibility(
         .where(eq(projects.id, projectId));
 
     revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
 }
 
 // ---- Delete ----
