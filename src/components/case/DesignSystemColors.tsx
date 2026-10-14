@@ -30,6 +30,8 @@ interface SwatchData {
     onFill: string;
     onName: string;
     contrast: number;
+    /** Одиночная роль: один свотч вместо пары */
+    single?: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,16 +126,19 @@ function SwatchBlock({
 }
 
 /** Колонка-пара: верхний свотч 112px + нижний On-свотч 34px.
- *  Одиночная роль (on-цвет не задан): один свотч высотой 148px —
- *  сумма обоих контейнеров пары и гэпа (2px) между ними. */
+ *  Одиночная роль (single): один свотч высотой 148px — сумма обоих
+ *  контейнеров пары и гэпа (2px) между ними, без бейджа (сравнивать
+ *  не с чем) и без нижнего On-свотча. */
 function ColorPairColumn({
     main,
     on,
+    single = false,
 }: {
     main: SwatchData;
     on: SwatchData;
+    single?: boolean;
 }) {
-    if (!on.fill) {
+    if (single) {
         return (
             <div
                 className='flex w-full items-end justify-between overflow-hidden border border-outline-variant'
@@ -178,11 +183,13 @@ function ColorPairColumn({
                 >
                     {main.name}
                 </span>
-                <ContrastBadge
-                    ratio={main.contrast}
-                    level={contrastLevel(main.contrast)}
-                    textColor={main.onFill}
-                />
+                {main.contrast > 0 && (
+                    <ContrastBadge
+                        ratio={main.contrast}
+                        level={contrastLevel(main.contrast)}
+                        textColor={main.onFill}
+                    />
+                )}
             </div>
 
             {/* Нижний On-свотч — скругления только снизу */}
@@ -227,16 +234,24 @@ export function DesignSystemColors({
     const isDark = darkMode;
 
     // Только админские роли → Semantic swatches.
-    // Одиночная роль (color2 пуст) — автоподбор цвета подписи.
+    // Одиночная роль (color2 пуст): флаг single идёт в рендер; подпись
+    // автоконтрастная (чёрный/белый). Тёмная тема: пустые dark-цвета
+    // подменяются светлыми (дизайнер ввёл один цвет — он же в тёмной).
     const semanticTokens: SwatchData[] = roles.map((role) => {
-        const fill = isDark ? role.darkColor1 : role.lightColor1;
-        const onColor = isDark ? role.darkColor2 : role.lightColor2;
+        const single = !(isDark ? role.darkColor2 : role.lightColor2);
+        const fill = isDark
+            ? role.darkColor1 || role.lightColor1
+            : role.lightColor1;
+        const onColor = isDark
+            ? role.darkColor2 || role.lightColor2
+            : role.lightColor2;
         return {
             name: role.name1,
             fill,
             onFill: onColor || autoOnColor(fill),
             onName: role.name2,
             contrast: (isDark ? role.darkContrastRatio : role.lightContrastRatio) ?? 0,
+            single,
         };
     });
 
@@ -302,6 +317,7 @@ export function DesignSystemColors({
                         <ColorPairColumn
                             key={i}
                             main={token}
+                            single={token.single}
                             on={{
                                 name: token.onName,
                                 fill: token.onFill,

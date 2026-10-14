@@ -47,10 +47,12 @@ type NewRoleForm = {
 const EMPTY_FORM: NewRoleForm = {
     name1: '',
     name2: '',
+    // Дополнительный цвет не дефолтим: пусто = одиночная роль
+    // (один свотч 148px на публичной странице)
     lightColor1: '#0066FF',
-    lightColor2: '#0052CC',
+    lightColor2: '',
     darkColor1: '#3385FF',
-    darkColor2: '#66A3FF',
+    darkColor2: '',
     lightContrastRatio: '',
     darkContrastRatio: '',
 };
@@ -113,13 +115,13 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
         setEditingId(role.id);
         setForm({
             name1: role.name1,
-            // Одиночная роль: color2 пуст — подставляем color1 (монохром),
-            // чтобы при добавлении пары не остался «чёрный по умолчанию»
+            // Пустые цвета показываем как есть (пустые поля) — без
+            // подстановок: дизайнер сразу видит, что не задано
             name2: role.name2.endsWith('-on') ? '' : role.name2,
             lightColor1: role.lightColor1,
-            lightColor2: role.lightColor2 || role.lightColor1,
+            lightColor2: role.lightColor2,
             darkColor1: role.darkColor1,
-            darkColor2: role.darkColor2 || role.darkColor1,
+            darkColor2: role.darkColor2,
             lightContrastRatio: role.lightContrastRatio?.toString() ?? '',
             darkContrastRatio: role.darkContrastRatio?.toString() ?? '',
         });
@@ -253,13 +255,15 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         >
                             <GripVertical className='h-4 w-4 text-[var(--md-sys-color-on-surface-variant)] shrink-0' />
                             <div className='flex gap-1'>
-                                <div
-                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                    style={{
-                                        backgroundColor: role.lightColor1,
-                                    }}
-                                    title={`${role.name1} light 1`}
-                                />
+                                {role.lightColor1 && (
+                                    <div
+                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                        style={{
+                                            backgroundColor: role.lightColor1,
+                                        }}
+                                        title={`${role.name1} light 1`}
+                                    />
+                                )}
                                 {role.lightColor2 && (
                                     <div
                                         className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
@@ -269,11 +273,13 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                         title={`${role.name1} light 2`}
                                     />
                                 )}
-                                <div
-                                    className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
-                                    style={{ backgroundColor: role.darkColor1 }}
-                                    title={`${role.name1} dark 1`}
-                                />
+                                {role.darkColor1 && (
+                                    <div
+                                        className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
+                                        style={{ backgroundColor: role.darkColor1 }}
+                                        title={`${role.name1} dark 1`}
+                                    />
+                                )}
                                 {role.darkColor2 && (
                                     <div
                                         className='h-5 w-5 rounded-full border border-[var(--md-sys-color-outline-variant)]'
@@ -373,18 +379,23 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         <div className=''>Светлый</div>
                         <div>
                             <div className='flex items-center gap-2'>
-                                <input
-                                    type='color'
-                                    id='lightColor1'
-                                    value={form.lightColor1}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            lightColor1: e.target.value,
-                                        })
-                                    }
-                                    className='h-10 w-10 cursor-pointer'
-                                />
+                                {/* Квадрат-пипетка виден только при заданном
+                                    цвете: пустое поле = пустая ячейка, без
+                                    «чёрной заглушки» */}
+                                {form.lightColor1 && (
+                                    <input
+                                        type='color'
+                                        id='lightColor1'
+                                        value={form.lightColor1}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                lightColor1: e.target.value,
+                                            })
+                                        }
+                                        className='h-10 w-10 cursor-pointer'
+                                    />
+                                )}
                                 <Input
                                     value={form.lightColor1}
                                     onChange={(e) =>
@@ -398,18 +409,20 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         </div>
                         <div>
                             <div className='flex items-center gap-2'>
-                                <input
-                                    type='color'
-                                    id='lightColor2'
-                                    value={form.lightColor2}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            lightColor2: e.target.value,
-                                        })
-                                    }
-                                    className='h-10 w-10'
-                                />
+                                {form.lightColor2 && (
+                                    <input
+                                        type='color'
+                                        id='lightColor2'
+                                        value={form.lightColor2}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                lightColor2: e.target.value,
+                                            })
+                                        }
+                                        className='h-10 w-10'
+                                    />
+                                )}
                                 <Input
                                     value={form.lightColor2}
                                     onChange={(e) =>
@@ -440,18 +453,20 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         <div className=''>Темный </div>
                         <div>
                             <div className='flex items-center gap-2'>
-                                <input
-                                    type='color'
-                                    id='darkColor1'
-                                    value={form.darkColor1}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            darkColor1: e.target.value,
-                                        })
-                                    }
-                                    className='h-10 w-10'
-                                />
+                                {form.darkColor1 && (
+                                    <input
+                                        type='color'
+                                        id='darkColor1'
+                                        value={form.darkColor1}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                darkColor1: e.target.value,
+                                            })
+                                        }
+                                        className='h-10 w-10'
+                                    />
+                                )}
                                 <Input
                                     value={form.darkColor1}
                                     onChange={(e) =>
@@ -465,18 +480,20 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                         </div>
                         <div>
                             <div className='flex items-center gap-2'>
-                                <input
-                                    type='color'
-                                    id='darkColor2'
-                                    value={form.darkColor2}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            darkColor2: e.target.value,
-                                        })
-                                    }
-                                    className='h-10 w-10'
-                                />
+                                {form.darkColor2 && (
+                                    <input
+                                        type='color'
+                                        id='darkColor2'
+                                        value={form.darkColor2}
+                                        onChange={(e) =>
+                                            setForm({
+                                                ...form,
+                                                darkColor2: e.target.value,
+                                            })
+                                        }
+                                        className='h-10 w-10'
+                                    />
+                                )}
                                 <Input
                                     value={form.darkColor2}
                                     onChange={(e) =>
