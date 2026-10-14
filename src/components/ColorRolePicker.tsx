@@ -324,7 +324,10 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 <span>роли</span>
                             </Title>
                         </div>
-                        <div>
+                        {/* Инпуты прижаты к низу ячейки (mt-auto): метки могут
+                            занимать разное число строк, поля остаются на одном
+                            уровне. */}
+                        <div className='flex flex-col'>
                             <Label
                                 htmlFor='roleName'
                                 className='font-medium text-md pl-2'
@@ -333,6 +336,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             </Label>
                             <Input
                                 id='roleName'
+                                className='mt-auto'
                                 value={form.name1}
                                 onChange={(e) =>
                                     setForm({ ...form, name1: e.target.value })
@@ -340,15 +344,19 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 placeholder='Например: Primary'
                             />
                         </div>
-                        <div>
+                        <div className='flex flex-col'>
                             <Label
                                 htmlFor='roleName2'
                                 className='font-medium text-md pl-2'
                             >
-                                Дополнительный цвет (необязательно)
+                                Дополнительный цвет{' '}
+                                <span className='whitespace-nowrap text-label-sm font-normal text-on-surface-variant'>
+                                    (необязательно)
+                                </span>
                             </Label>
                             <Input
                                 id='roleName2'
+                                className='mt-auto'
                                 value={form.name2}
                                 onChange={(e) =>
                                     setForm({ ...form, name2: e.target.value })
