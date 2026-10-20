@@ -2,6 +2,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import {
     buildInviteEmail,
     buildRegisteredEmail,
+    buildPasswordResetEmail,
     type InviteEmailData,
 } from './templates';
 
@@ -182,6 +183,16 @@ export async function sendRegisteredEmail(data: {
     passwordUrl: string;
 }): Promise<EmailSendStatus> {
     const mail = buildRegisteredEmail(data);
+    return sendEmail({ to: data.toEmail.trim(), ...mail });
+}
+
+/** Письмо «сброс пароля» с одноразовой ссылкой. */
+export async function sendPasswordResetEmail(data: {
+    toEmail: string;
+    resetUrl: string;
+    expiresAt: number;
+}): Promise<EmailSendStatus> {
+    const mail = buildPasswordResetEmail(data);
     return sendEmail({ to: data.toEmail.trim(), ...mail });
 }
 

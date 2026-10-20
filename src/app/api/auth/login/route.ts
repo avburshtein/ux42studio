@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
+import { users } from '@/db/schema';
 import { signJwt } from '@/lib/jwt';
 import { verifyPassword } from '@/lib/crypto';
+import { sql } from 'drizzle-orm';
 
 export async function POST(req: Request) {
     try {
@@ -22,12 +24,13 @@ export async function POST(req: Request) {
         const { env } = await getCloudflareContext();
         const db = getDb(env.DB);
 
-        // 1. Поиск пользователя по email
-        const user = await db.query.users.findFirst({
-            where: {
-                email,
-            },
-        });
+        // 1. Поиск пользователя по email (регистр букв не важен: в БД
+        // встречаются «Av.…» с заглавной — пользователь этого не знает)
+        const [user] = await db
+            .select()
+            .from(users)
+            .where(sql`lower(${users.email}) = ${email.toLowerCase()}`)
+            .limit(1);
 
         if (!user) {
             return NextResponse.json(

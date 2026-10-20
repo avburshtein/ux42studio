@@ -71,7 +71,13 @@ export default function LoginForm() {
                     {error}
                 </p>
             )}
-            <div className='flex justify-end'>
+            <div className='flex items-center justify-between gap-4'>
+                <Link
+                    href='/forgot-password'
+                    className='text-body-sm text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80'
+                >
+                    Забыли пароль?
+                </Link>
                 <Button type='submit' disabled={loading}>
                     {loading ? 'Загрузка...' : 'Войти'}
                 </Button>

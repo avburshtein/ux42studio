@@ -11,6 +11,21 @@ export const users = sqliteTable('users', {
   updatedAt: integer('updated_at').notNull().default(sql`(unixepoch())`),
 });
 
+export const passwordResetTokens = sqliteTable(
+    'password_reset_tokens',
+    {
+        id: text('id').primaryKey(), // crypto.randomUUID()
+        userId: text('user_id')
+            .notNull()
+            .references(() => users.id, { onDelete: 'cascade' }),
+        // В БД только SHA-256 от токена; сырой токен живёт лишь в ссылке письма
+        tokenHash: text('token_hash').notNull().unique(),
+        expiresAt: integer('expires_at').notNull(),
+        usedAt: integer('used_at'),
+        createdAt: integer('created_at').notNull().default(sql`(unixepoch())`),
+    },
+);
+
 export const invites = sqliteTable('invites', {
   id: text('id').primaryKey(),
   code: text('code').notNull().unique(),

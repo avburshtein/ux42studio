@@ -466,6 +466,113 @@ export type ContactEmailData = {
  * Текст сообщения экранируется и переносится построчно: в письме нельзя
  * доверять разметке пользователя.
  */
+/** Письмо «сброс пароля»: одноразовая ссылка + правила безопасности. */
+export function buildPasswordResetEmail(data: {
+    toEmail: string;
+    resetUrl: string;
+    expiresAt: number;
+}): BuiltEmail {
+    const url = escapeHtml(data.resetUrl);
+    const when = formatDate(data.expiresAt);
+    const untilTime = new Date(data.expiresAt * 1000).toLocaleTimeString(
+        'ru-RU',
+        { hour: '2-digit', minute: '2-digit' },
+    );
+
+    const html = `<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body style="margin:0;padding:0;background:${SOFT};">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${SOFT};">
+            <tr>
+                <td align="center" style="padding:24px 12px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid ${LINE};border-radius:20px;">
+                        <tr>
+                            <td style="padding:28px 32px 0 32px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td style="font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:bold;color:${BRAND};letter-spacing:.5px;">
+                                            UX42 Studio
+                                        </td>
+                                        <td align="right" style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:${MUTED};">
+                                            Сброс пароля
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:20px 32px 0 32px;">
+                                <h1 style="margin:0 0 12px 0;font-family:Arial,Helvetica,sans-serif;font-size:24px;line-height:32px;color:${INK};">
+                                    Сброс пароля для вашего аккаунта
+                                </h1>
+                                <p style="margin:0 0 20px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:24px;color:${INK};">
+                                    Вы запросили смену пароля. Нажмите кнопку ниже и придумайте новый пароль — после этого входите с ним как обычно.
+                                </p>
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                                    <tr>
+                                        <td align="center" bgcolor="${BRAND}" style="border-radius:14px;">
+                                            <a href="${url}" style="display:inline-block;padding:16px 28px;font-family:Arial,Helvetica,sans-serif;font-size:16px;font-weight:bold;color:#ffffff;text-decoration:none;">
+                                                Придумать новый пароль
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <p style="margin:20px 0 0 0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:${MUTED};">
+                                    Если кнопка не работает, скопируйте ссылку в браузер:<br />
+                                    <a href="${url}" style="color:${BRAND};word-break:break-all;">${url}</a>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:20px 32px 0 32px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${SOFT};border:1px dashed ${BRAND};border-radius:14px;">
+                                    <tr>
+                                        <td style="padding:16px 20px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;color:${INK};">
+                                            <strong>Три простых правила:</strong><br />
+                                            1. Ссылка работает один раз и действует до ${when}, ${untilTime} (1 час).<br />
+                                            2. Ссылку не нужно никуда пересылать — она личная.<br />
+                                            3. Если вы не запрашивали сброс — просто игнорируйте это письмо, старый пароль продолжит работать.
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="padding:20px 32px 28px 32px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;color:${MUTED};">
+                                Письмо отправлено с сайта ux42.studio по запросу сброса пароля. Вопросы и данные: ${CONTACT_EMAIL.privacy}.
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>`;
+
+    const text = `UX42 Studio — сброс пароля
+
+Вы запросили смену пароля. Откройте ссылку и придумайте новый пароль:
+
+${data.resetUrl}
+
+Правила:
+1. Ссылка работает один раз и действует до ${when}, ${untilTime} (1 час).
+2. Ссылку не нужно никуда пересылать — она личная.
+3. Если вы не запрашивали сброс — просто игнорируйте это письмо, старый пароль продолжит работать.
+
+Письмо отправлено с сайта ux42.studio.`;
+
+    return {
+        subject: 'Сброс пароля — UX42 Studio',
+        html,
+        text,
+    };
+}
+
 export function buildContactEmail(data: ContactEmailData): BuiltEmail {
     const name = escapeHtml(data.name.trim());
     const email = escapeHtml(data.email.trim());
