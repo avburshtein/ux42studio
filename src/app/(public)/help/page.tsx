@@ -14,63 +14,67 @@ export const metadata: Metadata = {
 export default function HelpIndexPage() {
     return (
         <LegalPageShell breadcrumbLabel='Help'>
-            <div className='flex flex-col gap-12'>
-                <header className='flex flex-col gap-4'>
-                    <h1 className='font-display text-headline-lg font-medium text-on-surface'>
-                        Help center
-                    </h1>
-                    <p className='max-w-2xl text-body-lg text-on-surface-variant'>
-                        Everything about how the platform works — registration, your page, the
-                        case editor, publishing and privacy. Search or browse by topic.
-                    </p>
-                </header>
+            <div className='section-container pb-16 pt-16 md:pb-24 md:pt-24'>
+                <div className='mx-auto w-full max-w-5xl'>
+                    <header className='flex flex-col gap-4'>
+                        <h1 className='font-display text-headline-lg font-medium text-on-surface'>
+                            Help center
+                        </h1>
+                        <p className='max-w-2xl text-body-lg text-on-surface-variant'>
+                            Everything about how the platform works — registration, your page,
+                            the case editor, publishing and privacy. Search or browse by topic.
+                        </p>
+                    </header>
 
-                <HelpSearch articles={HELP_ARTICLES} categories={HELP_CATEGORIES} />
+                    <div className='mt-10 flex flex-col gap-12'>
+                        <HelpSearch articles={HELP_ARTICLES} categories={HELP_CATEGORIES} />
 
-                <nav aria-label='Help categories' className='flex flex-col gap-10'>
-                    {HELP_CATEGORIES.map((category) => {
-                        const articles = HELP_ARTICLES.filter(
-                            (a) => a.category === category.id,
-                        );
-                        if (articles.length === 0) return null;
-                        return (
-                            <section
-                                key={category.id}
-                                aria-labelledby={`help-cat-${category.id}`}
-                                className='flex flex-col gap-4'
-                            >
-                                <div className='flex flex-col gap-1'>
-                                    <h2
-                                        id={`help-cat-${category.id}`}
-                                        className='font-display text-title-lg font-medium text-on-surface'
+                        <nav aria-label='Help categories' className='flex flex-col gap-10'>
+                            {HELP_CATEGORIES.map((category) => {
+                                const articles = HELP_ARTICLES.filter(
+                                    (a) => a.category === category.id,
+                                );
+                                if (articles.length === 0) return null;
+                                return (
+                                    <section
+                                        key={category.id}
+                                        aria-labelledby={`help-cat-${category.id}`}
+                                        className='flex flex-col gap-4'
                                     >
-                                        {category.title}
-                                    </h2>
-                                    <p className='text-body-md text-on-surface-variant'>
-                                        {category.description}
-                                    </p>
-                                </div>
-                                <ul className='flex flex-col divide-y divide-outline-variant'>
-                                    {articles.map((article) => (
-                                        <li key={article.slug}>
-                                            <a
-                                                href={`/help/${article.slug}`}
-                                                className='group flex flex-col gap-1 py-4 transition-colors'
+                                        <div className='flex flex-col gap-1'>
+                                            <h2
+                                                id={`help-cat-${category.id}`}
+                                                className='font-display text-title-lg font-medium text-on-surface'
                                             >
-                                                <span className='text-title-sm font-medium text-primary transition-opacity group-hover:opacity-80'>
-                                                    {article.title}
-                                                </span>
-                                                <span className='text-body-md text-on-surface-variant'>
-                                                    {article.summary}
-                                                </span>
-                                            </a>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </section>
-                        );
-                    })}
-                </nav>
+                                                {category.title}
+                                            </h2>
+                                            <p className='text-body-md text-on-surface-variant'>
+                                                {category.description}
+                                            </p>
+                                        </div>
+                                        <ul className='flex flex-col divide-y divide-outline-variant'>
+                                            {articles.map((article) => (
+                                                <li key={article.slug}>
+                                                    <a
+                                                        href={`/help/${article.slug}`}
+                                                        className='group flex flex-col gap-1 py-4 transition-colors'
+                                                    >
+                                                        <span className='text-title-sm font-medium text-primary transition-opacity group-hover:opacity-80'>
+                                                            {article.title}
+                                                        </span>
+                                                        <span className='text-body-md text-on-surface-variant'>
+                                                            {article.summary}
+                                                        </span>
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </section>
+                                );
+                            })}
+                        </nav>
+                    </div>
+                </div>
             </div>
         </LegalPageShell>
     );

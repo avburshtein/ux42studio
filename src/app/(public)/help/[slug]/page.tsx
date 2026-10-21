@@ -38,7 +38,11 @@ export default async function HelpArticlePage({ params }: HelpArticlePageProps) 
             breadcrumbLabel={article.title}
             breadcrumbParent={{ href: '/help', label: 'Help' }}
         >
-            <HelpArticleBody article={article} related={related} />
+            <div className='section-container pb-16 pt-16 md:pb-24 md:pt-24'>
+                <div className='mx-auto w-full max-w-5xl'>
+                    <HelpArticleBody article={article} related={related} />
+                </div>
+            </div>
         </LegalPageShell>
     );
 }
