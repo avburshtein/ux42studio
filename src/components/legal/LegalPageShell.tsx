@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import BackButton from '@/components/BackButton';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import { ThemeToggle } from '@/components/case/ThemeToggle';
 
@@ -31,13 +31,12 @@ export function LegalPageShell({
             <header className='sticky top-0 z-30 bg-background shadow-card'>
                 <div className='section-container flex h-14 items-center justify-between gap-4'>
                     <div className='flex min-w-0 items-center gap-3 md:gap-6'>
-                        <Link
-                            href='/'
+                        <BackButton
+                            fallbackHref='/'
                             className='inline-flex h-10 shrink-0 items-center gap-1.5 text-body-sm text-on-surface transition-colors hover:text-primary'
                         >
-                            <ArrowLeft size={18} aria-hidden='true' />
                             Back
-                        </Link>
+                        </BackButton>
                         <nav aria-label='Breadcrumb' className='flex min-w-0 items-center gap-2'>
                             <Link
                                 href='/'

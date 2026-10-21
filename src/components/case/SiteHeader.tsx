@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
-import { ArrowLeft, Menu, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
+import BackButton from '@/components/BackButton';
 import { cn } from '@/lib/utils';
 import ContactDialog from '../ContactDialog';
 import { CONTACT_EMAIL } from '@/lib/contact';
@@ -425,14 +426,15 @@ export function SiteHeaderBreadcrumb({
             <div className='section-container flex w-full items-center justify-between gap-0'>
                 {/* Left zone: Back + Breadcrumb — gap 24 */}
                 <div className='flex min-w-0 items-center gap-6'>
-                    {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8, radius 8 */}
-                    <Link
-                        href={`/u/${profileSlug}`}
+                    {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8, radius 8.
+                        Шаг назад по истории (кнопка, не ссылка): фолбэк — страница
+                        дизайнера, если возвращаться некуда. */}
+                    <BackButton
+                        fallbackHref={`/u/${profileSlug}`}
+                        label={backLabel}
+                        iconSize={24}
                         className='inline-flex h-12 shrink-0 items-center gap-2 rounded-sm px-4 py-3 text-button font-medium text-on-surface-variant transition-colors hover:bg-surface-variant'
-                    >
-                        <ArrowLeft size={24} aria-hidden='true' />
-                        {backLabel}
-                    </Link>
+                    />
 
                     {/* Breadcrumb Navigation — gap 8 */}
                     <nav
