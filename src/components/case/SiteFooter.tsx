@@ -103,6 +103,12 @@ export function SiteFooter({
                         </Link>
                     )}
                     <Link
+                        href='/help'
+                        className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
+                    >
+                        Help
+                    </Link>
+                    <Link
                         href='/privacy'
                         className='inline-flex h-11 items-center text-body-md text-on-surface-variant transition-opacity hover:opacity-70'
                     >

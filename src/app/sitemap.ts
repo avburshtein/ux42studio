@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
+import { HELP_ARTICLES } from '@/lib/help/content';
 
 // C3 (решение (42)): sitemap.xml — статика + динамика из D1 (публичные
 // профили isPublic и их published-проекты). force-dynamic: prerender на
@@ -18,6 +19,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         { url: `${BASE_URL}/platform`, changeFrequency: 'monthly', priority: 0.9 },
         { url: `${BASE_URL}/privacy`, changeFrequency: 'yearly', priority: 0.5 },
         { url: `${BASE_URL}/terms`, changeFrequency: 'yearly', priority: 0.5 },
+    ];
+
+    // Справка: индекс + статьи (статический реестр, БД не нужен).
+    const helpEntries: MetadataRoute.Sitemap = [
+        { url: `${BASE_URL}/help`, changeFrequency: 'monthly', priority: 0.7 },
+        ...HELP_ARTICLES.map(
+            (article) =>
+                ({
+                    url: `${BASE_URL}/help/${article.slug}`,
+                    changeFrequency: 'yearly' as const,
+                    priority: 0.5,
+                }) satisfies MetadataRoute.Sitemap[number],
+        ),
     ];
 
     try {
@@ -58,9 +72,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             });
         }
 
-        return [...staticEntries, ...dynamicEntries];
+        return [...staticEntries, ...helpEntries, ...dynamicEntries];
     } catch {
         // D1 недоступна — отдаём только статику (страница не падает)
-        return staticEntries;
+        return [...staticEntries, ...helpEntries];
     }
 }

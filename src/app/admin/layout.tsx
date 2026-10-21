@@ -82,6 +82,12 @@ export default async function AuthLayout({
                                         Мой сайт
                                     </Link>
                                 )}
+                                <Link
+                                    href='/help'
+                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                >
+                                    Справка
+                                </Link>
                             </nav>
                         </div>
                         <div className='flex items-center gap-2'>

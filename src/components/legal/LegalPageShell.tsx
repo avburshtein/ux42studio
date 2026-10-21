@@ -12,10 +12,20 @@ import { ThemeToggle } from '@/components/case/ThemeToggle';
 interface LegalPageShellProps {
     /** Название страницы — последний сегмент breadcrumb */
     breadcrumbLabel: string;
+    /** Промежуточный сегмент breadcrumb перед текущей страницей
+     *  (например, Help → статья): Main / {parent.label} / {breadcrumbLabel} */
+    breadcrumbParent?: {
+        href: string;
+        label: string;
+    };
     children: ReactNode;
 }
 
-export function LegalPageShell({ breadcrumbLabel, children }: LegalPageShellProps) {
+export function LegalPageShell({
+    breadcrumbLabel,
+    breadcrumbParent,
+    children,
+}: LegalPageShellProps) {
     return (
         <div className='flex min-h-screen flex-col bg-background'>
             <header className='sticky top-0 z-30 bg-background shadow-card'>
@@ -41,6 +51,22 @@ export function LegalPageShell({ breadcrumbLabel, children }: LegalPageShellProp
                             >
                                 /
                             </span>
+                            {breadcrumbParent && (
+                                <>
+                                    <Link
+                                        href={breadcrumbParent.href}
+                                        className='shrink-0 text-body-sm text-primary transition-opacity hover:opacity-80'
+                                    >
+                                        {breadcrumbParent.label}
+                                    </Link>
+                                    <span
+                                        aria-hidden='true'
+                                        className='shrink-0 select-none text-body-sm text-outline'
+                                    >
+                                        /
+                                    </span>
+                                </>
+                            )}
                             <span className='min-w-0 truncate text-body-sm text-on-surface'>
                                 {breadcrumbLabel}
                             </span>
