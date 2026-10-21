@@ -253,29 +253,6 @@ export default function AdminGridEditor({
                     ) : null}
                 </DragOverlay>
             </DndContext>
-
-            {/* Отладочная информация (можно убрать) */}
-            <details className='mt-4 text-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                <summary className='cursor-pointer font-medium'>
-                    Данные для отправки (JSON)
-                </summary>
-                <pre className='mt-2 p-3 bg-[var(--md-sys-color-surface-variant)] rounded-lg overflow-x-auto text-xs'>
-                    {JSON.stringify(
-                        {
-                            presetId,
-                            images: images
-                                .filter((img) => img.url)
-                                .map(({ id, url, slotIndex }) => ({
-                                    id,
-                                    url,
-                                    slotIndex,
-                                })),
-                        },
-                        null,
-                        2,
-                    )}
-                </pre>
-            </details>
         </div>
     );
 }
