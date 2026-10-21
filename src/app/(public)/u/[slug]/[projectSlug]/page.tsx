@@ -214,6 +214,9 @@ export default async function ProjectPage({ params }: PageProps) {
         // editorial-слоты их не используют (кроп в фикс. слоты)
         width: a.file?.width,
         height: a.file?.height,
+        // Фокус-точка object-position (мудборд: панорамирование в слоте)
+        posX: a.posX ?? 50,
+        posY: a.posY ?? 50,
     });
 
     const moodboardAssets = assets

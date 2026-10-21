@@ -145,4 +145,8 @@ export const projectAssets = sqliteTable('project_assets', {
     }).notNull(), //[cite: 1]
     caption: text('caption'),
     order: integer('order').notNull().default(0),
+    // Фокус-точка для object-position (0..100%, дефолт — центр).
+    // См. drizzle/20261020000000_add_asset_position — почему проценты.
+    posX: integer('pos_x').notNull().default(50),
+    posY: integer('pos_y').notNull().default(50),
 });

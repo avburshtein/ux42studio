@@ -13,6 +13,9 @@ interface MoodboardAsset {
     /** Натуральные размеры (files.width/height) — нужны masonry-пресету */
     width?: number | null;
     height?: number | null;
+    /** Фокус-точка object-position, 0..100 (дефолт 50 — центр). */
+    posX?: number;
+    posY?: number;
 }
 
 interface MoodboardGridProps {
@@ -60,6 +63,9 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                                 src={asset.url}
                                 alt={asset.alt ?? asset.caption ?? ''}
                                 className='w-full h-full object-cover'
+                                style={{
+                                    objectPosition: `${asset.posX ?? 50}% ${asset.posY ?? 50}%`,
+                                }}
                             />
                         ) : (
                             <div className='w-full aspect-video bg-[var(--md-sys-color-surface-variant)] flex items-center justify-center text-[var(--md-sys-color-on-surface-variant)] text-sm'>
@@ -96,6 +102,9 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                                     src={asset.url}
                                     alt={asset.alt ?? asset.caption ?? ''}
                                     className='h-full w-full object-cover'
+                                    style={{
+                                        objectPosition: `${asset.posX ?? 50}% ${asset.posY ?? 50}%`,
+                                    }}
                                 />
                             ) : (
                                 <div className='flex h-full w-full items-center justify-center text-sm text-[var(--md-sys-color-on-surface-variant)]'>
@@ -160,6 +169,9 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                                                     ''
                                                 }
                                                 className='h-full w-full object-cover'
+                                                style={{
+                                                    objectPosition: `${asset.posX ?? 50}% ${asset.posY ?? 50}%`,
+                                                }}
                                             />
                                         ) : (
                                             <div className='flex h-full w-full items-center justify-center text-[10px] text-white/40'>

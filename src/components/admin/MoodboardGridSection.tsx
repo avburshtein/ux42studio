@@ -20,6 +20,19 @@ export default function MoodboardGridSection({
     const [images, setImages] = useState<GridImage[]>(initialImages);
     const isInitialMount = useRef(true);
 
+    // Фокус-точка слота: обновляем картинку в состоянии — дальше позиция
+    // уходит наверх обычным onImagesChange-каналом и сохраняется шагом.
+    const handlePositionChange = useCallback(
+        (slotIndex: number, posX: number, posY: number) => {
+            setImages((prev) =>
+                prev.map((img) =>
+                    img.slotIndex === slotIndex ? { ...img, posX, posY } : img,
+                ),
+            );
+        },
+        [],
+    );
+
     // Синхронизируем initialImages -> images (только при изменении извне)
     useEffect(() => {
         setImages(initialImages);
@@ -127,6 +140,8 @@ export default function MoodboardGridSection({
             onImagesChange={handleImagesChange}
             onPresetChange={handlePresetChange}
             onFileUpload={handleFileUpload}
+            pannable
+            onPositionChange={handlePositionChange}
         />
     );
 }

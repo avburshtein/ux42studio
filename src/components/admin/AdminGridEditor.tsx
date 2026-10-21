@@ -20,6 +20,13 @@ interface AdminGridEditorProps {
     onImagesChange?: (images: GridImage[]) => void;
     onPresetChange?: (presetId: string) => void;
     onFileUpload?: (file: File, slotIndex: number) => void;
+    /** Режим «двигать фото» (фокус-точка) — см. GridSlot. */
+    pannable?: boolean;
+    onPositionChange?: (
+        slotIndex: number,
+        posX: number,
+        posY: number,
+    ) => void;
 }
 
 export default function AdminGridEditor({
@@ -28,6 +35,8 @@ export default function AdminGridEditor({
     onImagesChange,
     onPresetChange,
     onFileUpload,
+    pannable,
+    onPositionChange,
 }: AdminGridEditorProps) {
     // Если presetId невалиден (например, null из БД), используем первый доступный пресет
     const presetId =
@@ -223,6 +232,8 @@ export default function AdminGridEditor({
                                 className={className}
                                 image={image}
                                 onFileUpload={onFileUpload ?? handleFileUpload}
+                                pannable={pannable}
+                                onPositionChange={onPositionChange}
                             />
                         );
                     })}

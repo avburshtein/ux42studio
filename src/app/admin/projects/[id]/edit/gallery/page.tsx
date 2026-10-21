@@ -163,6 +163,8 @@ export default function GalleryPage({
                             assetType: type,
                             caption: a.caption ?? '',
                             order: index,
+                            posX: a.posX ?? 50,
+                            posY: a.posY ?? 50,
                         }));
 
                 // Загружаем moodboardPresetId и лейаут финальной галереи
@@ -214,6 +216,8 @@ export default function GalleryPage({
                     assetType: 'moodboard' as const,
                     caption: '',
                     order: index,
+                    posX: img.posX ?? 50,
+                    posY: img.posY ?? 50,
                 }));
 
             const assets = [

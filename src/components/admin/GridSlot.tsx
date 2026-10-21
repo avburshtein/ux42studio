@@ -4,7 +4,7 @@ import React, { useCallback, useRef, useState } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { useDropzone } from 'react-dropzone';
 import { cn } from '@/lib/utils';
-import { Upload, GripVertical, RefreshCw } from 'lucide-react';
+import { Upload, GripVertical, RefreshCw, Move } from 'lucide-react';
 import ImageCropperDialog from '@/components/ImageCropperDialog';
 
 export interface GridImage {
@@ -13,6 +13,9 @@ export interface GridImage {
     slotIndex: number;
     file?: File;
     fileId?: string;
+    /** Фокус-точка object-position, 0..100 (дефолт 50 — центр). */
+    posX?: number;
+    posY?: number;
 }
 
 interface GridSlotProps {
@@ -20,6 +23,17 @@ interface GridSlotProps {
     className: string;
     image?: GridImage;
     onFileUpload: (file: File, slotIndex: number) => void;
+    /**
+     * Разрешить режим «двигать фото» (фокус-точка для object-cover).
+     * Включается для мудборда: его слоты разной формы, и картинка
+     * «кропится как получится» — позиция в процентах это чинит.
+     */
+    pannable?: boolean;
+    onPositionChange?: (
+        slotIndex: number,
+        posX: number,
+        posY: number,
+    ) => void;
 }
 
 /**
@@ -52,8 +66,94 @@ export default function GridSlot({
     className,
     image,
     onFileUpload,
+    pannable,
+    onPositionChange,
 }: GridSlotProps) {
     const hiddenInputRef = useRef<HTMLInputElement>(null);
+
+    // ---- Режим «двигать фото» (фокус-точка) ----
+    // В обычном режиме картинку тащит dnd-kit (сортировка по слотам).
+    // Панорамирование конфликтует с ним, поэтому — явный режим: кнопка
+    // Move включает, дроп/«Готово» коммитит позицию и выключает.
+    const [panMode, setPanMode] = useState(false);
+    // Живое значение во время перетаскивания (коммит — на pointerup)
+    const [livePos, setLivePos] = useState<{ x: number; y: number } | null>(
+        null,
+    );
+    const panStartRef = useRef<{
+        pointerId: number;
+        startX: number;
+        startY: number;
+        startPosX: number;
+        startPosY: number;
+    } | null>(null);
+    const slotBoxRef = useRef<HTMLDivElement | null>(null);
+    const imgRef = useRef<HTMLImageElement | null>(null);
+
+    const displayedPos = {
+        x: livePos?.x ?? image?.posX ?? 50,
+        y: livePos?.y ?? image?.posY ?? 50,
+    };
+
+    const handlePanStart = (e: React.PointerEvent<HTMLDivElement>) => {
+        if (!panMode || !image) return;
+        e.stopPropagation(); // не открывать file-picker dropzone
+        e.preventDefault();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        panStartRef.current = {
+            pointerId: e.pointerId,
+            startX: e.clientX,
+            startY: e.clientY,
+            startPosX: displayedPos.x,
+            startPosY: displayedPos.y,
+        };
+        setLivePos({ x: displayedPos.x, y: displayedPos.y });
+    };
+
+    const handlePanMove = (e: React.PointerEvent<HTMLDivElement>) => {
+        const start = panStartRef.current;
+        if (!start || start.pointerId !== e.pointerId) return;
+        // Максимальный сдвиг: картинка в object-cover вылезает из слота
+        // на разницу «накрыть»-размера и бокса. Смещение в % = сдвиг px /
+        // запас px × 100; тянем картинку вправо → точка фокуса уменьшается.
+        const box = slotBoxRef.current;
+        const img = imgRef.current;
+        if (!box || !img || !img.naturalWidth) return;
+        const scale = Math.max(
+            box.clientWidth / img.naturalWidth,
+            box.clientHeight / img.naturalHeight,
+        );
+        const shiftX = img.naturalWidth * scale - box.clientWidth;
+        const shiftY = img.naturalHeight * scale - box.clientHeight;
+        const clampPct = (v: number) => Math.min(100, Math.max(0, v));
+        const x =
+            shiftX > 1
+                ? clampPct(
+                      start.startPosX -
+                          ((e.clientX - start.startX) / shiftX) * 100,
+                  )
+                : 50;
+        const y =
+            shiftY > 1
+                ? clampPct(
+                      start.startPosY -
+                          ((e.clientY - start.startY) / shiftY) * 100,
+                  )
+                : 50;
+        setLivePos({ x, y });
+    };
+
+    const handlePanEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+        const start = panStartRef.current;
+        if (!start || start.pointerId !== e.pointerId) return;
+        panStartRef.current = null;
+        setLivePos((pos) => {
+            if (pos) onPositionChange?.(slotIndex, pos.x, pos.y);
+            return null;
+        });
+        setPanMode(false);
+    };
+
 
     // Редактор изображений (как у обложек ImageUploader): выбранный файл
     // сначала кадрируется в ImageCropperDialog, кадр уходит в upload.
@@ -145,7 +245,7 @@ export default function GridSlot({
     } = useDraggable({
         id: image?.id ?? `empty-${slotIndex}`,
         data: { slotIndex },
-        disabled: !image,
+        disabled: !image || panMode,
     });
 
     // Мерж ref: dropzone callback + dnd-kit droppable callback
@@ -197,34 +297,77 @@ export default function GridSlot({
 
             {image ? (
                 <div
-                    ref={setDraggableRef}
+                    ref={(node) => {
+                        setDraggableRef(node);
+                        slotBoxRef.current = node;
+                    }}
                     style={dndStyle}
-                    {...listeners}
+                    {...(panMode
+                        ? {
+                              onPointerDown: handlePanStart,
+                              onPointerMove: handlePanMove,
+                              onPointerUp: handlePanEnd,
+                              onPointerCancel: handlePanEnd,
+                          }
+                        : listeners)}
                     {...attributes}
-                    className='w-full h-full cursor-grab active:cursor-grabbing group touch-none rounded-lg overflow-hidden'
+                    className={cn(
+                        'w-full h-full group touch-none rounded-lg overflow-hidden',
+                        panMode ? 'cursor-move' : 'cursor-grab active:cursor-grabbing',
+                    )}
                 >
                     {/* Фото в слоте: R2/blob-URL, размеры неизвестны,
-                        пропорции задаёт контейнер слота. */}
+                        пропорции задаёт контейнер слота. object-position —
+                        фокус-точка (pan-режим мудборда), по умолчанию центр. */}
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
+                        ref={imgRef}
                         src={image.url}
                         alt={`Фото в слоте ${slotIndex}`}
                         className='w-full h-full object-cover pointer-events-none select-none rounded-lg'
+                        style={{
+                            objectPosition: `${displayedPos.x}% ${displayedPos.y}%`,
+                        }}
                         draggable={false}
                     />
 
-                    <button
-                        type='button'
-                        onClick={handleReplaceClick}
-                        className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white/90 hover:bg-white p-1.5 rounded shadow-sm transition-opacity z-30 cursor-pointer'
-                        aria-label='Заменить фото'
-                    >
-                        <RefreshCw className='h-4 w-4 text-slate-700' />
-                    </button>
+                    {!panMode && (
+                        <>
+                            <button
+                                type='button'
+                                onClick={handleReplaceClick}
+                                className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white/90 hover:bg-white p-1.5 rounded shadow-sm transition-opacity z-30 cursor-pointer'
+                                aria-label='Заменить фото'
+                            >
+                                <RefreshCw className='h-4 w-4 text-slate-700' />
+                            </button>
 
-                    <div className='absolute top-2 left-2 opacity-0 group-hover:opacity-100 bg-white/90 p-1 rounded shadow-sm transition-opacity z-30 pointer-events-none'>
-                        <GripVertical className='h-4 w-4 text-slate-500' />
-                    </div>
+                            {pannable && (
+                                <button
+                                    type='button'
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setPanMode(true);
+                                    }}
+                                    className='absolute top-2 right-11 opacity-0 group-hover:opacity-100 bg-white/90 hover:bg-white p-1.5 rounded shadow-sm transition-opacity z-30 cursor-pointer'
+                                    aria-label='Двигать фото внутри слота'
+                                    title='Двигать фото внутри слота'
+                                >
+                                    <Move className='h-4 w-4 text-slate-700' />
+                                </button>
+                            )}
+
+                            <div className='absolute top-2 left-2 opacity-0 group-hover:opacity-100 bg-white/90 p-1 rounded shadow-sm transition-opacity z-30 pointer-events-none'>
+                                <GripVertical className='h-4 w-4 text-slate-500' />
+                            </div>
+                        </>
+                    )}
+
+                    {panMode && (
+                        <div className='absolute inset-x-2 bottom-2 z-30 flex items-center justify-center rounded bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-700 pointer-events-none'>
+                            Двигайте фото — отпустите, чтобы зафиксировать
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className='flex flex-col items-center justify-center w-full h-full text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-variant)]/30 cursor-pointer transition-colors p-2'>

@@ -532,6 +532,9 @@ export async function updateProjectGallery(
             assetType: 'moodboard' | 'wireframe' | 'final_gallery';
             caption?: string;
             order: number;
+            /** Фокус-точка object-position, 0..100 (дефолт 50 — центр). */
+            posX?: number;
+            posY?: number;
         }>;
         moodboardPresetId?: string | null;
         galleryLayout?: GalleryLayout | null;
@@ -561,6 +564,8 @@ export async function updateProjectGallery(
                 assetType: a.assetType,
                 caption: a.caption,
                 order: a.order,
+                posX: a.posX ?? 50,
+                posY: a.posY ?? 50,
             }),
         ),
         // Update moodboardPresetId / galleryLayout if provided
@@ -617,6 +622,8 @@ export async function getProjectGallery(projectId: string) {
             assetType: projectAssets.assetType,
             caption: projectAssets.caption,
             order: projectAssets.order,
+            posX: projectAssets.posX,
+            posY: projectAssets.posY,
         })
         .from(projectAssets)
         .where(eq(projectAssets.projectId, projectId))
