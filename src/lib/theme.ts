@@ -142,7 +142,26 @@ export function generateThemeCss(seed?: string): string {
   const block = (selector: string, tokens: ThemeTokens) =>
     selector + ' {\n' + Object.entries(tokens).map(([k, v]) => '  ' + k + ': ' + v + ';').join('\n') + '\n}';
 
-  return block(":root", make(false)) + "\n" + block("[data-theme=dark]", make(true));
+  const light = make(false);
+  const dark = make(true);
+  return (
+    // 1. Светлая тема
+    block(":root", light) +
+    "\n" +
+    // 2. Явный тёмный режим (переключатель)
+    block("[data-theme=dark]", dark) +
+    "\n" +
+    // 3. Системный фолбэк — ОБЯЗАТЕЛЬНЫЙ дубль блока 2. В globals.css
+    //    тёмная тема объявлена и через этот же media-селектор
+    //    (:root:not([data-theme=light]), специфичность (0,2,0)), который
+    //    ВЫШЕ, чем у [data-theme=dark] (0,1,0). Без этого дубля посетитель
+    //    с тёмной ОС видел дефолтную тёмную палитру globals.css вместо
+    //    кастомной: media-фолбэк перебивал seed по специфичности, даже
+    //    когда переключатель ставил data-theme=dark явно.
+    "@media (prefers-color-scheme: dark) {\n" +
+    block(":root:not([data-theme=light])", dark) +
+    "\n}"
+  );
 }
 
 /** Ext-акценты ч/б темы: та же нейтральная палитра, без цвета. */
