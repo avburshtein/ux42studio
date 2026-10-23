@@ -42,7 +42,9 @@ const nextConfig: NextConfig = {
         // В dev /cdn-cgi/image недоступен — loader возвращает src без width,
         // и Next 16 сыплет предупреждениями next-image-missing-loader-width.
         unoptimized: process.env.NODE_ENV === 'development',
-        deviceSizes: [828, 1920],
+        // 2560 добавлен для Retina: герой кейса 1072 CSS-px × DPR 2 = 2144,
+        // без него браузер растягивал 1920-кандидат → обложка мылилась.
+        deviceSizes: [828, 1920, 2560],
         remotePatterns: [
             {
                 protocol: 'https',
