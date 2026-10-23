@@ -86,7 +86,8 @@ export default function LoginForm() {
             {/* RGPD Art. 13: вход тоже обрабатывает email (аутентификация).
                 Уведомление + ссылка на политику. */}
             <p className='text-xs leading-relaxed text-on-surface-variant'>
-                Вход использует email для аутентификации. Подробности об
+                При входе используется email для аутентификации.
+                Подробности об
                 обработке данных — в{' '}
                 <Link
                     href='/privacy'
