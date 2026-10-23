@@ -4,11 +4,12 @@ import BackButton from '@/components/BackButton';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import { ThemeToggle } from '@/components/case/ThemeToggle';
 
-// Оболочка legal-страниц /privacy и /terms (решения (36)/(38)): sticky-панель
-// Back + breadcrumb + ThemeToggle (SiteHeader не используется — у него якорная
-// навигация главной) + SiteFooter. Футер без иконок соцсетей (источник ссылок
-// студии не определён — не хардкодить); Terms/Cookies скрыты через profileName
-// — как на страницах дизайнера (решение (29)).
+// Оболочка legal-страниц /help, /privacy и /terms (решения (36)/(38)):
+// sticky-панель Back + breadcrumb + ThemeToggle (SiteHeader не используется —
+// у него якорная навигация главной) + SiteFooter. Футер универсальный — как на
+// главной платформе: бренд UX42.studio + «Product design studio» без имени
+// дизайнера; иконок соцсетей нет (источник ссылок студии не определён —
+// не хардкодить).
 interface LegalPageShellProps {
     /** Название страницы — последний сегмент breadcrumb */
     breadcrumbLabel: string;
@@ -78,9 +79,9 @@ export function LegalPageShell({
             <main className='flex-1'>{children}</main>
 
             <SiteFooter
-                profileName='Aleksandra Burshtein'
-                profileHeadline='UX/UI Designer'
+                profileHeadline='Product design studio'
                 socialLinks={[]}
+                showPlatformLink
             />
         </div>
     );

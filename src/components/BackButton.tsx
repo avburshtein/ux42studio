@@ -23,6 +23,12 @@ interface BackButtonProps {
  *  - либо пустой referrer при истории > 1 (SPA-навигация внутри сайта).
  * Иначе (переход с внешнего сайта / прямая ссылка) — фолбэк fallbackHref:
  * посетитель остаётся на сайте, а не улетает обратно на источник трафика.
+ *
+ * Особый случай: страницу открыли в новой вкладке (target='_blank') с нашей же
+ * страницы — например, «Просмотр проекта» из редактора кейсов. referrer
+ * same-origin, но history пуста (length = 1), и router.back() уводит в никуда.
+ * Тогда идём прямо на URL-источник (router.push(referrer)) — кнопка ведёт
+ * обратно в редактор, а не в тупик.
  */
 export default function BackButton({
     fallbackHref,
@@ -36,8 +42,12 @@ export default function BackButton({
     const handleClick = () => {
         const ref = document.referrer;
         const sameOrigin = ref.startsWith(window.location.origin);
-        const internalSpa = ref === '' && window.history.length > 1;
-        if (sameOrigin || internalSpa) {
+        const hasHistory = window.history.length > 1;
+        if (sameOrigin && !hasHistory) {
+            // Новая вкладка с нашей же страницы: back() бесполезен —
+            // переносим на страницу-источник (редактор и т.п.).
+            router.push(ref);
+        } else if (sameOrigin || (ref === '' && hasHistory)) {
             router.back();
         } else {
             router.push(fallbackHref);
