@@ -51,6 +51,10 @@ interface CaseSortManagerProps {
     mode: CaseSortMode;
     autoRows: CaseProjectRow[];
     manualRows: CaseProjectRow[];
+    /** Колбэк для клиентского дашборда (/admin): страница теперь статический
+     *  shell, данные приходят из /api/admin/projects, поэтому router.refresh()
+     *  не доставит новые пропсы — родитель сам перезагружает данные. */
+    onRefresh?: () => void;
 }
 
 const SORT_OPTIONS: Array<{ value: CaseSortMode; label: string }> = [
@@ -266,6 +270,7 @@ export default function CaseSortManager({
     mode: initialMode,
     autoRows,
     manualRows,
+    onRefresh,
 }: CaseSortManagerProps) {
     const router = useRouter();
     const [mode, setMode] = useState<CaseSortMode>(initialMode);
@@ -304,7 +309,10 @@ export default function CaseSortManager({
             await setCaseSortMode(next);
             // Auto-режимы пересчитываются на сервере; для Manual строки
             // (manualRows) уже загружены — refresh не нужен
-            if (next !== 'manual') router.refresh();
+            if (next !== 'manual') {
+                router.refresh();
+                onRefresh?.();
+            }
             flashSaved();
         });
     };
@@ -328,6 +336,7 @@ export default function CaseSortManager({
         startTransition(async () => {
             await deleteProject(id);
             router.refresh();
+            onRefresh?.();
         });
     };
 
@@ -346,6 +355,7 @@ export default function CaseSortManager({
                 await unpublishProject(id);
             }
             router.refresh();
+            onRefresh?.();
         });
     };
 

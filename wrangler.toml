@@ -13,6 +13,13 @@ migrations_dir = "drizzle"
 binding = "MY_BUCKET"
 bucket_name = "ux42-assets"
 
+# Кеш ISR/SSG (open-next.config.ts → r2IncrementalCache) живёт в том же
+# bucket, но в собственном префиксе OpenNext — данные сайта не затрагиваются.
+# Отдельный bucket не нужен: экономия одного ресурса на Free-тарифе.
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "ux42-assets"
+
 [[routes]]
 pattern = "ux42.studio"
 custom_domain = true
@@ -49,6 +56,18 @@ APP_URL = "https://ux42.studio"
 [[services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "ux42next"
+
+# DO-очередь revalidation (open-next.config.ts → queue: doQueue).
+# Класс DOQueueHandler экспортируется воркером OpenNext
+# (.build/durable-objects/queue.js); при апгрейде @opennextjs/cloudflare
+# проверить, что имя класса не изменилось (см. Docs/DEPLOY.md).
+[[durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DOQueueHandler"]
 
 [observability]
 enabled = true

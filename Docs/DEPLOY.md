@@ -18,6 +18,57 @@ Next.js (App Router)  ──build──>  .open-next/  ──deploy──>  Clou
 `ux42.studio` как custom domain), `open-next.config.ts` (адаптер),
 `next.config.ts` (инициализация локальной эмуляции D1/R2 для `next dev`).
 
+## 0.1. Кеш ISR/SSG (R2 + DO-очередь)
+
+С 23.10.2026 включён incremental cache OpenNext — без него воркер рендерил
+**каждую** страницу через Next-сервер на каждый запрос (CPU Free-плана
+10 мс/запрос быстро исчерпывался).
+
+Состав (`open-next.config.ts`):
+- `incrementalCache: r2IncrementalCache` — SSG/ISR-страницы и data cache
+  хранятся в R2. Биндинг `NEXT_INC_CACHE_R2_BUCKET` → bucket `ux42-assets`
+  (общий с ассетами: кеш OpenNext живёт в собственном префиксе).
+- `queue: doQueue` — Durable Object дедуплицирует time-based revalidation
+  (`revalidate=300` на `/` и `/platform`), чтобы одна просроченная страница
+  не пересобиралась параллельно каждым запросом. Биндинг
+  `NEXT_CACHE_DO_QUEUE`, класс `DOQueueHandler` + миграция `new_sqlite_classes`
+  в `wrangler.toml`. При апгрейде `@opennextjs/cloudflare` проверить, что имя
+  класса не изменилось (`grep DOQueueHandler node_modules/@opennextjs/cloudflare/dist/cli/templates/worker.js`).
+
+Кеш заполняется при деплое автоматически: команды `deploy`/`upload`/`preview`
+(`npm run deploy` и т.д.) прогоняют populate-шаг. Отдельных действий не нужно.
+
+Пререндер маршрутов (по выводу `npm run build`):
+- ○ Static: `/` (ISR 5m), `/platform` (ISR 5m), `/privacy`, `/terms`,
+  `/help`, `/help/[slug]` (SSG, 16 статей), `/admin`, `/admin/profile`,
+  `/admin/settings`, `/admin/profile/password`, `/login`, `/register`.
+- ƒ Dynamic (осознанно): `/super-admin/*` (только роль admin, мизерный
+  трафик), `/admin/projects/new` (создаёт проект на GET), edit-страницы
+  кейсов и `/u/[slug]` (динамические сегменты; их SSR рендерит только
+  клиентский shell — данные грузит браузер).
+
+Почему админка статическая: `admin/layout.tsx` читал `headers()` + D1 на
+каждый запрос — это делало всю ветку `/admin/*` динамической. Теперь layout —
+статический, проверка сессии — клиентская (`GET /api/session`), дашборд
+`/admin` берёт данные из `GET /api/admin/projects`. Данные для авторизованных
+всегда живые (запрос в момент открытия), приватные данные в HTML кеша не
+попадают.
+
+⚠️ Данные на билде: `/` и `/platform` пререндерятся во время `next build`
+через локальный wrangler-прокси, то есть из **локальной** D1 (сид из
+`npm run db:seed:local`). Задеплоенный кеш покажет локальные данные до
+первой revalidation (5 минут после первого запроса). Если нужно рендерить
+сразу прод-данными — включите remote bindings для `DB`
+(`experimental_remote = true` у биндинга в wrangler.toml + `experimental:
+{ remoteBindings: true }` в `initOpenNextCloudflareForDev`; требует
+wrangler ≥ 4.36 и авторизацию на машине сборки).
+
+Debug кеша: `NEXT_PRIVATE_DEBUG_CACHE=1` в `.env` — логи каждого обращения.
+
+Не удалять из `wrangler.toml`: `WORKER_SELF_REFERENCE` и
+`global_fetch_strictly_public` — обязательные части адаптера OpenNext
+(воркер вызывает сам себя для внутреннего роутинга Next.js).
+
 ## 1. Переменные окружения
 
 | Переменная | Где | Обязательна | Комментарий |

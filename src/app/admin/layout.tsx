@@ -1,11 +1,4 @@
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
-import { getCloudflareContext } from '@opennextjs/cloudflare';
-import { getDb } from '@/db';
-import Link from 'next/link';
-import { logout } from '@/lib/actions/auth';
-import { LogOut } from 'lucide-react';
-import { ThemeToggle } from '@/components/case/ThemeToggle';
+import AdminShell from '@/components/admin/AdminShell';
 import type { Metadata } from 'next';
 
 // C4 (решение (42)): приватная зона — noindex/nofollow (robots.txt уже
@@ -14,102 +7,22 @@ export const metadata: Metadata = {
     robots: { index: false, follow: false },
 };
 
-export default async function AuthLayout({
+/**
+ * Layout админки — теперь статический серверный компонент (только metadata
+ * + рендер клиентской оболочки). Раньше здесь были headers() + два запроса
+ * в D1 на каждый запрос любой админ-страницы: это делало всю ветку /admin/*
+ * динамической (SSR на каждый просмотр, CPU воркера впустую), даже страницы,
+ * которые сами по себе клиентские и могли бы быть пререндерены.
+ *
+ * Проверка сессии переехала в клиентскую AdminShell (GET /api/session):
+ * неавторизованных на /login отправляет middleware на edge — он и раньше
+ * был первым рубежом; AdminShell дублирует его на случай истёкшего токена.
+ */
+export default function AuthLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const headersList = await headers();
-    const userId = headersList.get('x-user-id');
-    if (!userId) redirect('/login');
-
-    const { env } = await getCloudflareContext();
-    const db = getDb(env.DB);
-
-    const user = await db.query.users.findFirst({
-        where: { id: userId },
-        columns: { role: true },
-    });
-
-    const profile = await db.query.profiles.findFirst({
-        where: { userId },
-        columns: { id: true, slug: true },
-    });
-
-    const isSuperAdmin = user?.role === 'admin';
-
-    return (
-        <div className='admin-layout min-h-screen bg-surface'>
-            <header className='border-b border-outline-variant bg-surface'>
-                <div className='mx-auto max-w-7xl px-8'>
-                    <div className='flex items-center justify-between py-3'>
-                        <div className='flex items-center gap-6'>
-                            <div className='text-title-md text-on-surface font-semibold'>
-                                Admin
-                            </div>
-                            <nav className='flex gap-1 mr-4'>
-                                {isSuperAdmin && (
-                                    <Link
-                                        href='/super-admin'
-                                        className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                    >
-                                        Суперадминка
-                                    </Link>
-                                )}
-                                <Link
-                                    href='/admin'
-                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Ред. проекты
-                                </Link>
-                                <Link
-                                    href='/admin/profile'
-                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Редактировать страницу сайта
-                                </Link>
-                                <Link
-                                    href='/admin/settings'
-                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Настройки профиля
-                                </Link>
-                                {profile?.slug && (
-                                    <Link
-                                        href={`/u/${profile.slug}`}
-                                        className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                    >
-                                        Мой сайт
-                                    </Link>
-                                )}
-                                <Link
-                                    href='/help'
-                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Справка
-                                </Link>
-                            </nav>
-                        </div>
-                        <div className='flex items-center gap-2'>
-                            {/* Переключатель темы доступен на всех шагах
-                                админки (ThemeProvider — в корневом layout).
-                                Размер 48×48 — по спеке (§74) и WCAG 2.5.5
-                                Target Size (AAA, 44px min); Material 3 = 48 */}
-                            <ThemeToggle />
-                            <form action={logout}>
-                                <button
-                                    type='submit'
-                                    className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    <LogOut className='h-4 w-4' />
-                                    Выйти
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </header>
-            <div className='mx-auto max-w-7xl p-8'>{children}</div>
-        </div>
-    );
+    return <AdminShell>{children}</AdminShell>;
 }
+

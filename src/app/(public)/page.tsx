@@ -2,8 +2,10 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { getDb } from '@/db';
-import { PortfolioCard } from '@/components/PortfolioCard';
-import { Carousel } from '@/components/portfolio/Carousel';
+import WorkGallery, {
+    type WorkGalleryCard,
+    type WorkGalleryCategory,
+} from '@/components/home/WorkGallery';
 import { HeroSection } from '@/components/portfolio/HeroSection';
 import { CtaSection } from '@/components/portfolio/CtaSection';
 import { ApproachSection } from '@/components/portfolio/ApproachSection';
@@ -35,13 +37,13 @@ const NavLabel = SectionLabel;
  * − чипы категорий строятся по фактическим работам студии.
  *
  * Решения (19) и (22), 2026-09-02/04: каталог проектов на главной.
+ *
+ * Пререндер (ISR, revalidate=300): searchParams убраны — фильтр категорий
+ * переехал в клиентский WorkGallery, AuthBar стал клиентским. Раньше
+ * страница была динамической (SSR + запросы в D1 на каждый просмотр);
+ * теперь рендерится один раз на билде и далее из кеша.
  */
-export default async function HomePage({
-    searchParams,
-}: {
-    searchParams: Promise<{ category?: string }>;
-}) {
-    const { category } = await searchParams;
+export default async function HomePage() {
     const { env } = await getCloudflareContext({ async: true });
     const db = getDb(env.DB);
 
@@ -86,25 +88,28 @@ export default async function HomePage({
         orderBy: { order: 'asc' },
     })).filter((c) => usedCategoryIds.has(c.id));
 
-    const selectedCategory = category
-        ? allCategories.find((c) => c.slug === category)
-        : undefined;
+    // Фильтрация по категории переехала в клиентский WorkGallery:
+    // страница целиком пререндерится (ISR), клики по чипам больше не
+    // порождают SSR-рендеры и запросы в D1.
+    const galleryCards: WorkGalleryCard[] = workProjects
+        .filter((p) => p.coverFile)
+        .map((p) => ({
+            id: p.id,
+            projectSlug: p.slug,
+            title: p.title,
+            profileName: p.profile?.fullName ?? null,
+            profileSlug: p.profile?.slug ?? null,
+            coverR2Key: p.coverFile?.r2Key ?? null,
+            categories: p.projectCategories.flatMap((pc) =>
+                pc.category
+                    ? [{ slug: pc.category.slug, name: pc.category.name }]
+                    : [],
+            ),
+        }));
 
-    const filteredProjects = selectedCategory
-        ? workProjects.filter((p) =>
-              p.projectCategories.some(
-                  (pc) => pc.category?.slug === selectedCategory.slug,
-              ),
-          )
-        : workProjects;
-
-    // Карточка нового стиля требует обложку — проекты без неё не рендерим
-    const cards = filteredProjects.filter((p) => p.coverFile);
-
-    const chipClass = (selected: boolean) =>
-        selected
-            ? 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-primary bg-surface-tint shadow-[2px_2px_4px_0_rgba(0,0,0,0.10)] transition-[box-shadow,opacity] duration-150 ease-out hover:opacity-90 hover:shadow-[4px_4px_12px_0_rgba(0,0,0,0.20)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
-            : 'inline-flex items-center justify-center rounded-full border-none px-6 py-3 text-label-md font-medium text-on-background bg-surface/8 transition-colors duration-150 ease-out hover:bg-[rgba(11,110,79,0.1)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
+    const galleryCategories: WorkGalleryCategory[] = allCategories.map(
+        (c) => ({ id: c.id, slug: c.slug, name: c.name }),
+    );
 
     return (
         <>
@@ -162,71 +167,10 @@ export default async function HomePage({
                             )}
                         </div>
 
-                        {allCategories.length > 0 && (
-                            <div className='hidden flex-wrap justify-center gap-3 md:flex'>
-                                <Link
-                                    href='/'
-                                    scroll={false}
-                                    className={chipClass(!selectedCategory)}
-                                    aria-current={!selectedCategory || undefined}
-                                >
-                                    All
-                                </Link>
-                                {allCategories.map((cat) => {
-                                    const active =
-                                        selectedCategory?.slug === cat.slug;
-                                    return (
-                                        <Link
-                                            key={cat.id}
-                                            href={`/?category=${encodeURIComponent(cat.slug)}#work`}
-                                            scroll={false}
-                                            className={chipClass(active)}
-                                            aria-current={active || undefined}
-                                        >
-                                            {cat.name}
-                                        </Link>
-                                    );
-                                })}
-                            </div>
-                        )}
-
-                        {cards.length === 0 ? (
-                            <div className='py-16 text-body-lg text-on-surface-variant'>
-                                {/* Публичных кейсов пока нет — вместо сухого
-                                    «No published projects yet» объясняем, что
-                                    происходит: сайт в разработке, галерея
-                                    наполняется, скоро будут проекты (тон §6.2:
-                                    первое лицо во множественном числе, без
-                                    канцелярита). */}
-                                <p>
-                                    Still in development — we’re filling
-                                    the gallery with projects worth seeing.
-                                    They’ll be here very soon.
-                                </p>
-                            </div>
-                        ) : (
-                            /* <sm — карусель (решение (34): карточки главной и страницы
-                                дизайнера идентичны: ширина 327 @375 = ширине сетки,
-                                сосед виден до края экрана), ≥sm — сетка 2/3 */
-                            <Carousel>
-                                {cards.map((project) => (
-                                    <PortfolioCard
-                                        key={project.id}
-                                        title={project.title}
-                                        tag={
-                                            project.profile?.fullName ??
-                                            project.projectCategories[0]?.category?.name ??
-                                            'Case study'
-                                        }
-                                        imageUrl={`/r2/${project.coverFile!.r2Key}`}
-                                        href={`/u/${project.profile?.slug ?? 'unknown'}/${project.slug}`}
-                                        overlayTags={project.projectCategories
-                                            .map((pc) => pc.category?.name)
-                                            .filter((n): n is string => Boolean(n))}
-                                    />
-                                ))}
-                            </Carousel>
-                        )}
+                        <WorkGallery
+                            cards={galleryCards}
+                            categories={galleryCategories}
+                        />
                     </div>
                 </section>
 
