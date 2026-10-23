@@ -129,11 +129,15 @@ await check('На /platform есть инструкция «как начать�
 );
 await check('На /platform есть ссылка на живой пример страницы', async () => {
     const html = await (await expectOk('/platform')).text();
+    // Slug живого примера не фиксируем: он задаётся STUDIO_PROFILE_SLUG
+    // (сейчас av-burshtein, раньше был aleksandra-burshtein) и меняется
+    // вместе с данными. Исключаем только плейсхолдер /u/your-name из CTA.
+    const match = html.match(/\/u\/(?!your-name)[a-z0-9-]+/);
     assert(
-        html.includes('/u/aleksandra-burshtein'),
+        match,
         'нет ссылки на реальную страницу дизайнера — обещание без доказательства',
     );
-    return '/u/aleksandra-burshtein';
+    return match[0];
 });
 
 await check('Язык страницы объявлен как английский', async () => {
