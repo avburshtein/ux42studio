@@ -20,7 +20,11 @@ export default function cloudflareLoader({
     }
 
     const params = [`width=${width}`, 'format=auto'];
-    params.push(`quality=${quality || 75}`);
+    // 85 вместо дефолтных 75: обложки кейсов — UI-скриншоты с мелким
+    // текстом, на q75 заметны мыло и артефакты (фидбэк 2026-10-23).
+    // Компонент может переопределить пропом quality у <Image>;
+    // это значение — только когда проп не задан.
+    params.push(`quality=${quality || 85}`);
 
     const paramsString = params.join(',');
 
