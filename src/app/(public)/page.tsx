@@ -150,27 +150,30 @@ export default async function HomePage() {
                                 Projects we are proud of — each one a full case
                                 study with process, results and lessons.
                             </p>
-                            {studioProfile && (
-                                /* Ссылка на личную страницу основателя:
-                                    главная студии и страница дизайнера —
-                                    разные аудитории (решение (69)). */
-                                <Link
-                                    href={`/u/${studioProfile.slug}`}
-                                    className='inline-flex items-center gap-2 text-body-md font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary'
-                                >
-                                    See the full case library
-                                    <ArrowRight
-                                        size={18}
-                                        aria-hidden='true'
-                                    />
-                                </Link>
-                            )}
                         </div>
 
                         <WorkGallery
                             cards={galleryCards}
                             categories={galleryCategories}
                         />
+
+                        {studioProfile && (
+                            /* Ссылка на личную страницу основателя:
+                                главная студии и страница дизайнера —
+                                разные аудитории (решение (69)). Стоит
+                                после карточек (фидбэк 2026-10-26) —
+                                читатель доходит до неё, просмотрев работы */
+                            <Link
+                                href={`/u/${studioProfile.slug}`}
+                                className='inline-flex items-center gap-2 text-body-md font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary'
+                            >
+                                See the full case library
+                                <ArrowRight
+                                    size={18}
+                                    aria-hidden='true'
+                                />
+                            </Link>
+                        )}
                     </div>
                 </section>
 
