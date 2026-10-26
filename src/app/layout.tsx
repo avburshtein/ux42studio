@@ -51,22 +51,13 @@ export const metadata: Metadata = {
         images: ['/og/og-cover.png'],
     },
     robots: { index: true, follow: true },
-    // Адаптивный фавикон: на светлых вкладках — зелёный фон с белыми «42»
-    // (/icon-light.png), на тёмных — белые «42» на прозрачном (/icon.png,
-    // file-convention: Next вставляет его сам). Для надёжности оба варианта
-    // прописаны явно с media — file-convention без media браузер может взять
-    // первым и проигнорировать выбор по теме.
+    // Фавикон единый для обеих тем: зелёный фон с белыми «42». Адаптив
+    // light/dark через media в rel=icon не работает в Chrome (игнорирует
+    // media на фавиконах) — а прежний тёмный вариант (белые «42» на
+    // прозрачном) растворялся на светлых вкладках (фидбэк 2026-10-26).
+    // Зелёный #0B6E4F читаем на любой полосе вкладок.
     icons: {
-        icon: [
-            {
-                url: '/icon-light.png',
-                media: '(prefers-color-scheme: light)',
-            },
-            {
-                url: '/icon.png',
-                media: '(prefers-color-scheme: dark)',
-            },
-        ],
+        icon: '/icon.png',
         apple: '/icon.png',
     },
 };

@@ -79,10 +79,14 @@ export async function generateMetadata({
               },
           ];
 
+    // title без суффикса: layout применяет template '%s — UX42 Studio'.
+    // icons через условный spread, а не `icons: undefined` — явный ключ
+    // undefined при мерже метаданных затирает иконки root layout
+    // (фидбэк 2026-10-26: на /u/* пропадал зелёный фавикон).
     return {
-        title: `${p.fullName} — UX42 Studio`,
+        title: p.fullName,
         description: p.headline ?? `Portfolio of ${p.fullName}`,
-        icons: faviconUrl ? { icon: faviconUrl } : undefined,
+        ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
         openGraph: {
             title: `${p.fullName} — UX42 Studio`,
             description: p.headline ?? `Portfolio of ${p.fullName}`,
