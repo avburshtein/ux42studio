@@ -263,6 +263,11 @@ export function SiteHeader({
                                         source={contactDialog.source}
                                         profileId={contactDialog.profileId}
                                         fallbackEmail={contactDialog.fallbackEmail}
+                                        // Тихий триггер как у CtaButton (общая
+                                        // константа): был дефолтный filled-пилюля
+                                        // — на фоне тихого CTA страниц кейсов
+                                        // выглядел кричаще (фидбэк 2026-10-26)
+                                        triggerClassName={QUIET_CTA_CLASS}
                                     />
                                 ) : (
                                     <CtaButton href={ctaHref}>{ctaLabel}</CtaButton>
@@ -516,6 +521,18 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
     );
 }
 
+// Nav CTA "Hire me" — пилюля семейства secondary (решение 2026-08-27 (10)
+// в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон):
+// дефолт — только текст (прозрачный фон и бордер); в hover/focus
+// появляется тонкий бордер primary-container — как у secondary,
+// + его ховер-фидбек opacity-90. border-transparent держит место —
+// layout не сдвигается при появлении рамки. Размер как у secondary:
+// h-14 px-8 (в Make: px-[32px] py-[16px] rounded-[48px]).
+// Общая константа: тот же стиль у триггера ContactDialog в шапке
+// страницы дизайнера (иначе у диалога дефолт — filled-пилюля).
+const QUIET_CTA_CLASS =
+    'inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90';
+
 function CtaButton({
     href,
     children,
@@ -523,17 +540,10 @@ function CtaButton({
     href: string;
     children: React.ReactNode;
 }) {
-    // Nav CTA "Hire me" — пилюля семейства secondary (решение 2026-08-27 (10)
-    // в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон):
-    // дефолт — только текст (прозрачный фон и бордер); в hover/focus
-    // появляется тонкий бордер primary-container — как у secondary,
-    // + его ховер-фидбек opacity-90. border-transparent держит место —
-    // layout не сдвигается при появлении рамки. Размер как у secondary:
-    // h-14 px-8 (в Make: px-[32px] py-[16px] rounded-[48px]).
     return (
         <Link
             href={href}
-            className='inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90'
+            className={QUIET_CTA_CLASS}
         >
             {children}
         </Link>
