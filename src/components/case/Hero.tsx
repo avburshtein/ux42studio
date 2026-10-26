@@ -72,21 +72,23 @@ export function Hero({
                     {/* Пропорциональное уменьшение на мобильных (паттерн главной
                         40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
                         заголовок не помещается и оверлей срезается под шапкой. */}
-                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
+                    {/* Заголовок ≤ 2 строк, teaser ≤ 1 строки (фидбэк
+                        2026-10-26: без teaser заголовок «одинокий», но
+                        длинные тексты на обложке плохо читаемы — обрезаем
+                        с многоточием). Пропорциональное уменьшение на
+                        мобильных (паттерн главной 40/48→68/76): 32/40 →
+                        sm display-sm 52/60. */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] line-clamp-2'>
                         <RichTextInline text={title} />
                     </h1>
+                    {teaser && (
+                        <RichText
+                            text={teaser}
+                            className='max-w-3xl text-body-md text-white/80 sm:text-body-lg line-clamp-1'
+                        />
+                    )}
                 </div>
             </AdaptiveHeroCover>
-
-            {/* Teaser — под обложкой (фидбэк 2026-10-26: длинный текст на
-                обложке лишний). <lg скрыт: на мобиле обложка full-bleed и
-                teaser удваивал объём текста в hero. */}
-            {teaser && (
-                <RichText
-                    text={teaser}
-                    className='hidden max-w-3xl text-body-md text-on-surface-variant lg:block lg:text-body-lg'
-                />
-            )}
 
             {/* === Metadata Grid — 4 cards, gap=24, pad=64 ===
                 Адаптив: на <sm складывается в колонку (Mobile Frame §11
