@@ -19,14 +19,22 @@ interface AdaptiveHeroCoverProps {
  * rgba(27,27,29,.75→0) слишком слаб в средней зоне, где лежит высокий
  * display-заголовок).
  *
- * Принцип: текст оверлея ВСЕГДА белый (консистентность с плашками
- * категорий и teaser white/80 — менять цвет текста не стали бы: сломало бы
- * токены и тёмную тему). Подстраивается scrim: после загрузки обложки
- * замеряем среднюю относительную яркость ТОЙ зоны кадра, где лежит текст
- * (нижние ~55%, левые ~82% — с учётом object-fit: cover), и строим
- * инлайн-градиент: тёмная обложка → скрим слабее (картинка и так
- * контрастна), светлая → сильнее и выше. При L≈0.45 градиент совпадает
- * со статичным из globals.css — переход незаметен.
+ * Принцип: текст оверлея ВСЕГДА белый (консистентность с плашками категорий
+ * и teaser white/80 — менять цвет текста не стали бы: сломало бы токены и
+ * тёмную тему). Подстраивается scrim:
+ *
+ * 1. Яркость меряется НЕ процентами кадра, а по реальному rect оверлея
+ *    (overlayRef — children обёрнуты в реальный бокс): p85 гистограммы по
+ *    двум полосам — верхняя (заголовок) и нижняя (teaser). Перцентиль, а не
+ *    среднее — пёстрые светлые обложки с белыми пятнами дают высокий p85.
+ * 2. Альфа — из формулы контраста a ≥ 1 − порог/L (L_eff = L·(1−a)):
+ *    низ порог 0.13 (≥4.5:1 для body), верх порог 0.21 (≥3.9:1 для крупного
+ *    заголовка). Тёмная обложка → скрим слабее (минимумы), светлая → почти
+ *    сплошное затемнение overlay-зоны.
+ * 3. Градиент якорится к верхней границе overlay (стоп T = 1 − ry): на
+ *    мобиле overlay занимает почти всю обложку → весь кадр затемнён
+ *    (заголовок уезжает вверх и был нечитаем), на десктопе выше overlay
+ *    картинка остаётся чистой.
  *
  * Замер только на клиенте: Workers Free = 10ms CPU/query — декодировать
  * обложку 2560px на сервере нельзя. Канвас 200px шириной + getImageData —
@@ -39,23 +47,73 @@ export function AdaptiveHeroCover({
     children,
 }: AdaptiveHeroCoverProps) {
     const containerRef = useRef<HTMLDivElement>(null);
+    const overlayRef = useRef<HTMLDivElement>(null);
     const [scrimStyle, setScrimStyle] = useState<CSSProperties | undefined>();
 
     useEffect(() => {
         if (!coverUrl) return;
         const container = containerRef.current;
-        if (!container) return;
+        const overlay = overlayRef.current;
+        if (!container || !overlay) return;
 
         let raf = 0;
         let resizeTimer: number | undefined;
 
-        // Средняя относительная яркость зоны текста (0=чёрный, 1=белый)
-        const measureTextZone = (): number | null => {
+        // Яркость региона: p85 (85-й перцентиль через гистограмму 256 бинов).
+        // Перцентиль, а не среднее — пёстрые обложки с белыми пятнами дают
+        // высокий p85 и получают более плотный скрим (фидбэк: «пестрит белым»).
+        const regionLum = (
+            ctx: CanvasRenderingContext2D,
+            x: number,
+            y: number,
+            w: number,
+            h: number,
+        ): number | null => {
+            if (w <= 0 || h <= 0) return null;
+            try {
+                const data = ctx.getImageData(x, y, w, h).data;
+                const hist = new Uint32Array(256);
+                for (let i = 0; i < data.length; i += 4) {
+                    hist[
+                        (0.2126 * data[i] +
+                            0.7152 * data[i + 1] +
+                            0.0722 * data[i + 2]) |
+                            0
+                    ]++;
+                }
+                const target = Math.ceil((data.length / 4) * 0.85);
+                let acc = 0;
+                for (let v = 0; v < 256; v++) {
+                    acc += hist[v];
+                    if (acc >= target) return v / 255;
+                }
+                return 1;
+            } catch {
+                // Cross-origin канвас → SecurityError: остаёмся на статичном скриме
+                return null;
+            }
+        };
+
+        // L полосы → альфа из формулы контраста: под чёрным скримом
+        // L_eff = L·(1−a); нужен L_eff ≤ порог → a ≥ 1 − порог/L.
+        // Низ (teaser, body) — порог 0.13 (≥4.5:1), верх (заголовок, large)
+        // — 0.21 (≥3.9:1). Минимумы оставляют тёмным обложкам «воздух».
+        const alphaFor = (
+            l: number,
+            threshold: number,
+            min: number,
+            max: number,
+        ) => Math.min(max, Math.max(min, 1 - threshold / Math.max(l, 0.3)));
+
+        const applyScrim = () => {
             const img = container.querySelector('img');
-            if (!img || !img.complete || !img.naturalWidth) return null;
+            if (!img || !img.complete || !img.naturalWidth) return;
             const cw = container.clientWidth;
             const ch = container.clientHeight;
-            if (!cw || !ch) return null;
+            if (!cw || !ch) return;
+            const cRect = container.getBoundingClientRect();
+            const oRect = overlay.getBoundingClientRect();
+            if (oRect.height <= 0) return;
             try {
                 const W = 200;
                 const H = Math.max(1, Math.round((ch / cw) * W));
@@ -65,7 +123,7 @@ export function AdaptiveHeroCover({
                 const ctx = canvas.getContext('2d', {
                     willReadFrequently: true,
                 });
-                if (!ctx) return null;
+                if (!ctx) return;
                 // Тот же object-fit: cover (center), что у <Image fill>
                 const scale = Math.max(
                     W / img.naturalWidth,
@@ -78,46 +136,53 @@ export function AdaptiveHeroCover({
                     img.naturalWidth * scale,
                     img.naturalHeight * scale,
                 );
-                // Зона текста: x 3–82%, y 42–100% (паддинги 16/32/64,
-                // заголовок+teaser прижаты к низу). Cross-origin канвас
-                // бросит SecurityError — ловим и остаёмся на статичном скриме.
-                const x0 = Math.round(W * 0.03);
-                const x1 = Math.round(W * 0.82);
-                const y0 = Math.round(H * 0.42);
-                const data = ctx.getImageData(x0, y0, x1 - x0, H - y0).data;
-                let sum = 0;
-                const n = data.length / 4;
-                for (let i = 0; i < data.length; i += 4) {
-                    sum +=
-                        (0.2126 * data[i] +
-                            0.7152 * data[i + 1] +
-                            0.0722 * data[i + 2]) /
-                        255;
-                }
-                return n ? sum / n : null;
+                // Rect overlay в координатах канваса — градиент якорится
+                // к РЕАЛЬНОМУ блоку текста, а не к низу контейнера процентами:
+                // на мобиле заголовок занимает почти всю обложку и процентные
+                // стопы оставляли верхние строки без скрима (фидбэк 2026-10-26).
+                const x0 = Math.max(
+                    0,
+                    Math.round(((oRect.left - cRect.left) / cRect.width) * W),
+                );
+                const x1 = Math.min(
+                    W,
+                    Math.round(((oRect.right - cRect.left) / cRect.width) * W),
+                );
+                const yTop = Math.max(
+                    0,
+                    Math.round(((oRect.top - cRect.top) / cRect.height) * H),
+                );
+                const yBot = Math.min(
+                    H,
+                    Math.round(
+                        ((oRect.bottom - cRect.top) / cRect.height) * H,
+                    ),
+                );
+                const bandH = yBot - yTop;
+                if (bandH < 8) return;
+                // Верхняя полоса overlay — заголовок, нижняя — teaser
+                const topBand = yTop + Math.round(bandH * 0.25);
+                const botBand = yBot - Math.round(bandH * 0.25);
+                const lt = regionLum(ctx, x0, yTop, x1 - x0, topBand - yTop);
+                const lb = regionLum(ctx, x0, botBand, x1 - x0, yBot - botBand);
+                if (lt == null || lb == null) return;
+                const a0 = alphaFor(lb, 0.13, 0.55, 0.96);
+                const a1 = alphaFor(lt, 0.21, 0.45, 0.9);
+                // T — верхняя граница overlay в % от низа контейнера
+                const T = Math.round(
+                    (1 - (oRect.top - cRect.top) / cRect.height) * 100,
+                );
+                const fade = Math.min(100, T + 14);
+                setScrimStyle({
+                    backgroundImage:
+                        T >= 100
+                            ? // Overlay доходит до верха: без прозрачного хвоста
+                              `linear-gradient(0deg, rgba(27,27,29,${a0.toFixed(2)}) 0%, rgba(27,27,29,${a1.toFixed(2)}) 100%)`
+                            : `linear-gradient(0deg, rgba(27,27,29,${a0.toFixed(2)}) 0%, rgba(27,27,29,${a1.toFixed(2)}) ${T}%, rgba(27,27,29,0) ${fade}%)`,
+                });
             } catch {
-                return null;
+                return;
             }
-        };
-
-        // L → градиент. boost 0..1 на участке L 0.45..0.75:
-        //   тёмная (L≈0.2): низ 0.55, середина 0.08 — скрим почти прозрачный;
-        //   средняя (L≈0.45): низ 0.75, середина 0.16 — как статичный CSS;
-        //   светлая (L≈0.75+): низ 0.95, середина 0.70, верх 0.15,
-        //   нижний стоп поднят до 38% — зона под высоким заголовком.
-        // Контроль контраста (белый текст): низ ≥ 12:1, зона заголовка ≥ 3:1
-        // (WCAG AA large), teaser в нижней зоне ≥ 4.5:1.
-        const applyScrim = () => {
-            const l = measureTextZone();
-            if (l == null) return;
-            const boost = Math.min(1, Math.max(0, (l - 0.45) / 0.3));
-            const bottom = 0.55 + 0.4 * boost;
-            const mid = 0.08 + 0.62 * boost;
-            const top = 0.15 * boost;
-            const stop = Math.round(18 + 20 * boost);
-            setScrimStyle({
-                backgroundImage: `linear-gradient(0deg, rgba(27,27,29,${bottom.toFixed(2)}) ${stop}%, rgba(24,29,26,${mid.toFixed(2)}) 55%, rgba(27,27,29,${top.toFixed(2)}) 100%)`,
-            });
         };
 
         const schedule = () => {
@@ -166,14 +231,17 @@ export function AdaptiveHeroCover({
             )}
 
             {/* Scrim: статичный из globals.css до замера, затем инлайн
-                градиент под яркость обложки (см. комментарий выше) */}
+                градиент, якорящийся к overlay-боксу (см. комментарий выше) */}
             <div
                 className='hero-image-scrim absolute inset-0'
                 aria-hidden='true'
                 style={scrimStyle}
             />
 
-            {children}
+            {/* Дети в реальном боксе с ref — по нему замеряется rect оверлея
+                (заголовок+teaser) для якорного градиента. Без этого бокса
+                замерять нечего: children — просто узел без своего rect */}
+            <div ref={overlayRef}>{children}</div>
         </div>
     );
 }
