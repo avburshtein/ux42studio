@@ -1,5 +1,5 @@
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import { AdaptiveHeroCover } from './AdaptiveHeroCover';
 import { MetadataCard } from './MetadataCard';
 import { RichText, RichTextInline } from './RichText';
 
@@ -39,30 +39,16 @@ export function Hero({
             {/* Паттерн главной: full-bleed band → section-container
                 (max-w 1280 + px 24/48/64) — все блоки кейса одной ширины. */}
             <div className='section-container flex w-full flex-col gap-8'>
-            {/* === Cover: <lg — full-bleed на всю ширину экрана (возврат
-                одобренного мобильного вида; -mx-4/-mx-8 повторяют паддинги
-                section-container 16/32), ≥lg — карта 1072 в контейнере:
-                верхние углы прямые, нижние скруглены (24) === */}
-            <div className='relative -mx-4 flex min-h-[400px] w-[calc(100%+32px)] flex-col justify-end overflow-hidden bg-background sm:min-h-[480px] md:-mx-8 md:w-[calc(100%+64px)] lg:mx-0 lg:min-h-[555px] lg:w-auto lg:rounded-b-3xl'>
-                {coverUrl ? (
-                    <Image
-                        src={coverUrl}
-                        alt={title}
-                        fill
-                        sizes='(max-width: 1023px) 100vw, (max-width: 1263px) calc(100vw - 128px), 1072px'
-                        className='object-cover'
-                        priority
-                    />
-                ) : (
-                    <div className='hero-block-gradient absolute inset-0' />
-                )}
-
-                {/* Scrim gradient (bottom→top dark) */}
-                <div
-                    className='hero-image-scrim absolute inset-0'
-                    aria-hidden='true'
-                />
-
+            {/* === Cover: <lg — full-bleed на всю ширину экрана, ≥lg — карта
+                1072 с нижними скруглениями. Адаптивный скрим (клиент):
+                градиент подстраивается под яркость обложки в зоне текста —
+                белые заголовок/teaser читаемы и на светлых обложках
+                (фидбэк 2026-10-26) === */}
+            <AdaptiveHeroCover
+                coverUrl={coverUrl}
+                alt={title}
+                sizes='(max-width: 1023px) 100vw, (max-width: 1263px) calc(100vw - 128px), 1072px'
+            >
                 {/* Title overlay — in-flow, прижат к низу (justify-end).
                     Раньше был absolute bottom-0 в фикс. по высоте контейнере:
                     длинные заголовок/teaser росли вверх и срезались верхним
@@ -96,7 +82,7 @@ export function Hero({
                         />
                     )}
                 </div>
-            </div>
+            </AdaptiveHeroCover>
 
             {/* === Metadata Grid — 4 cards, gap=24, pad=64 ===
                 Адаптив: на <sm складывается в колонку (Mobile Frame §11
