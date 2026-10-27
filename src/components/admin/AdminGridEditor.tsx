@@ -265,23 +265,33 @@ export default function AdminGridEditor({
                 onDragEnd={handleDragEnd}
                 sensors={sensors}
             >
-                <div className='grid grid-cols-8 gap-3 auto-rows-[160px]'>
-                    {preset.layoutClasses.map((className, index) => {
-                        const image = images.find(
-                            (img) => img.slotIndex === index && img.url,
-                        );
-                        return (
-                            <GridSlot
-                                key={index}
-                                slotIndex={index}
-                                className={className}
-                                image={image}
-                                onFileUpload={onFileUpload ?? handleFileUpload}
-                                pannable={pannable}
-                                onPositionChange={onPositionChange}
-                            />
-                        );
-                    })}
+                {/* Мобила: 8 колонок физически не влезают в 375px — сетка
+                    живёт в горизонтальной ленте (min-w) с подсказкой; dnd
+                    внутри ленты работает. ≥md — сетка как была (D-008). */}
+                <p className='text-body-sm text-on-surface-variant md:hidden'>
+                    Прокрутите вбок, чтобы увидеть все слоты →
+                </p>
+                <div className='overflow-x-auto pb-2 md:overflow-visible'>
+                    <div className='grid min-w-[760px] grid-cols-8 gap-3 auto-rows-[140px] md:min-w-0 md:auto-rows-[160px]'>
+                        {preset.layoutClasses.map((className, index) => {
+                            const image = images.find(
+                                (img) => img.slotIndex === index && img.url,
+                            );
+                            return (
+                                <GridSlot
+                                    key={index}
+                                    slotIndex={index}
+                                    className={className}
+                                    image={image}
+                                    onFileUpload={
+                                        onFileUpload ?? handleFileUpload
+                                    }
+                                    pannable={pannable}
+                                    onPositionChange={onPositionChange}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
                 <DragOverlay dropAnimation={null}>
                     {activeDragImage ? (

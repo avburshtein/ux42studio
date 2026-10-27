@@ -322,7 +322,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
             {showForm ? (
                 <div className='space-y-3 rounded-lg border border-[var(--md-sys-color-outline-variant)] p-4 bg-surface-container-highest'>
-                    <div className='grid grid-cols-4 gap-5'>
+                    <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5'>
                         <div className=''>
                             <Title tag='div' variant='title-lg'>
                                 {editingId ? 'Редактирование' : 'Создание'}
@@ -375,7 +375,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
                     <hr />
 
-                    <div className='grid grid-cols-4 gap-5 items-center'>
+                    <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5 items-center'>
                         <div className=''>Светлый</div>
                         <div>
                             <div className='flex items-center gap-2'>
@@ -449,7 +449,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
                     <hr />
 
-                    <div className='grid grid-cols-4 gap-5 items-center'>
+                    <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5 items-center'>
                         <div className=''>Темный </div>
                         <div>
                             <div className='flex items-center gap-2'>
