@@ -109,7 +109,7 @@ export default function AdminShell({
                 навигация (6 ссылок в строку не влезают в md). */}
             <header className='header-glass sticky top-0 z-40 border-b border-outline-variant backdrop-blur-md backdrop-saturate-[1.8]'>
                 <div className='mx-auto max-w-7xl px-4 md:px-8'>
-                    <div className='flex items-center justify-between py-3'>
+                    <div className='flex h-18 items-center justify-between'>
                         <div className='flex items-center gap-3 md:gap-6'>
                             <button
                                 type='button'
@@ -154,6 +154,7 @@ export default function AdminShell({
                         </div>
                     </div>
                 </div>
+            </header>
                 {/* Drawer: затемнение + панель слева. Ссылки крупнее десктопа
                     (py-3, body-lg) — тач-таргеты ≥44px */}
                 {menuOpen && (
@@ -212,7 +213,6 @@ export default function AdminShell({
                         </div>
                     </div>
                 )}
-            </header>
             <div className='mx-auto max-w-7xl p-4 md:p-8'>{children}</div>
         </div>
     );

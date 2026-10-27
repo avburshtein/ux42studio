@@ -12,6 +12,7 @@ import {
     useSensors,
 } from '@dnd-kit/core';
 import { GRID_PRESETS, type GridPreset } from '@/lib/grid-presets.config';
+import { Check, ChevronDown } from 'lucide-react';
 import GridSlot, { type GridImage } from './GridSlot';
 
 interface AdminGridEditorProps {
@@ -48,6 +49,7 @@ export default function AdminGridEditor({
     const [activeDragImage, setActiveDragImage] = useState<GridImage | null>(
         null,
     );
+    const [presetOpen, setPresetOpen] = useState(false);
 
     const [images, setImages] = useState<GridImage[]>(() => {
         if (initialImages.length > 0) return initialImages;
@@ -187,29 +189,72 @@ export default function AdminGridEditor({
 
     return (
         <div className='space-y-6'>
-            {/* Выбор пресета */}
+            {/* Выбор пресета — dropdown-меню (D-008, фидбэк 2026-10-26:
+                единый паттерн с фильтром шагов визарда; flex-wrap кнопки
+                переполняли мобилу). Меню и на десктопе — компактно и не
+                зависит от числа пресетов. Клик-вне закрывает overlay. */}
             <div className='space-y-3'>
                 <h3 className='text-lg font-semibold text-[var(--md-sys-color-on-surface)]'>
                     Выберите шаблон сетки
                 </h3>
-                <div className='flex flex-wrap gap-3'>
-                    {Object.entries(GRID_PRESETS).map(([id, p]) => (
-                        <button
-                            key={id}
-                            type='button'
-                            onClick={() => handlePresetChange(id)}
-                            className={`px-4 py-2 rounded-lg border-2 text-sm font-medium transition-all cursor-pointer ${
-                                id === presetId
-                                    ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
-                                    : 'border-[var(--md-sys-color-outline-variant)] bg-[var(--md-sys-color-surface)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-outline)]'
-                            }`}
-                        >
-                            {p.name}
-                            <span className='ml-1.5 text-xs opacity-70'>
-                                ({p.slots} фото)
+                <div className='relative sm:max-w-sm'>
+                    <button
+                        type='button'
+                        onClick={() => setPresetOpen((v) => !v)}
+                        aria-expanded={presetOpen}
+                        aria-label='Выбрать шаблон сетки мудборда'
+                        className='flex w-full items-center justify-between gap-2 rounded-md border border-outline-variant bg-surface px-4 py-3 text-title-md text-on-surface'
+                    >
+                        <span className='truncate'>
+                            {preset.name}{' '}
+                            <span className='text-body-sm text-on-surface-variant'>
+                                ({preset.slots} фото)
                             </span>
-                        </button>
-                    ))}
+                        </span>
+                        <ChevronDown
+                            className={`h-5 w-5 shrink-0 transition-transform ${
+                                presetOpen ? 'rotate-180' : ''
+                            }`}
+                        />
+                    </button>
+                    {presetOpen && (
+                        <>
+                            <div
+                                className='fixed inset-0 z-10'
+                                onClick={() => setPresetOpen(false)}
+                            />
+                            <ul className='absolute inset-x-0 top-full z-20 mt-1 overflow-hidden rounded-md border border-outline-variant bg-surface shadow-lg'>
+                                {Object.entries(GRID_PRESETS).map(([id, p]) => (
+                                    <li
+                                        key={id}
+                                        className='border-b border-outline-variant last:border-b-0'
+                                    >
+                                        <button
+                                            type='button'
+                                            onClick={() => {
+                                                handlePresetChange(id);
+                                                setPresetOpen(false);
+                                            }}
+                                            className={`flex w-full items-center justify-between gap-2 px-4 py-3 text-left text-body-lg ${
+                                                id === presetId
+                                                    ? 'font-medium text-on-surface'
+                                                    : 'text-on-surface-variant hover:bg-surface-variant'
+                                            }`}
+                                        >
+                                            {p.name}
+                                            {id === presetId ? (
+                                                <Check className='h-5 w-5 shrink-0 text-primary' />
+                                            ) : (
+                                                <span className='shrink-0 text-body-sm text-on-surface-variant'>
+                                                    {p.slots} фото
+                                                </span>
+                                            )}
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
             </div>
 
