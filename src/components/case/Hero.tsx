@@ -72,19 +72,17 @@ export function Hero({
                     {/* Пропорциональное уменьшение на мобильных (паттерн главной
                         40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
                         заголовок не помещается и оверлей срезается под шапкой. */}
-                    {/* Заголовок ≤ 2 строк, teaser ≤ 1 строки (фидбэк
-                        2026-10-26: без teaser заголовок «одинокий», но
-                        длинные тексты на обложке плохо читаемы — обрезаем
-                        с многоточием). Пропорциональное уменьшение на
-                        мобильных (паттерн главной 40/48→68/76): 32/40 →
-                        sm display-sm 52/60. */}
-                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] line-clamp-2'>
+                    {/* Заголовок ≤2 строк на десктопе, на мобиле — целиком
+                        без обрезки (фидбэк 2026-10-26: кейс — единственное
+                        место с полным названием). Teaser на мобиле скрыт:
+                        поджимал заголовок, на десктопе ≤1 строки. */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] lg:line-clamp-2'>
                         <RichTextInline text={title} />
                     </h1>
                     {teaser && (
                         <RichText
                             text={teaser}
-                            className='max-w-3xl text-body-md text-white/80 sm:text-body-lg line-clamp-1'
+                            className='hidden max-w-3xl text-body-md text-white/80 sm:text-body-lg lg:block lg:line-clamp-1'
                         />
                     )}
                 </div>

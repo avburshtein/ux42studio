@@ -21,10 +21,32 @@ import {
 } from '@/lib/actions/projects';
 import { slugify } from '@/lib/utils/slug';
 
+// Лимиты hero (фидбэк 2026-10-26): заголовок ≤2 строки на десктопе
+// (~40 симв./строка при display-sm), teaser ≤1 строка (~92 симв. при
+// body-lg на max-w-3xl). maxLength блокирует ввод сверх лимита,
+// счётчик показывает остаток; zod не даст сохранить старые длинные значения.
+const TITLE_MAX = 80;
+const TEASER_MAX = 92;
+// Остаток, при котором счётчик подсвечивается ошибкой
+const COUNTER_WARN = 10;
+
 const formSchema = z.object({
-    title: z.string().min(1, 'Title is required'),
+    title: z
+        .string()
+        .min(1, 'Title is required')
+        .max(
+            TITLE_MAX,
+            `Max ${TITLE_MAX} characters (2 lines on the case page)`,
+        ),
     slug: z.string().optional().or(z.literal('')),
-    teaser: z.string().max(200).optional().or(z.literal('')),
+    teaser: z
+        .string()
+        .max(
+            TEASER_MAX,
+            `Max ${TEASER_MAX} characters (1 line on the case page)`,
+        )
+        .optional()
+        .or(z.literal('')),
     client: z.string().optional().or(z.literal('')),
     year: z.any().optional(),
     duration: z.string().optional().or(z.literal('')),
@@ -126,6 +148,7 @@ export default function GeneralPage({
 
     const selectedCategoryIds = watch('categoryIds') ?? [];
     const titleValue = watch('title');
+    const teaserValue = watch('teaser');
 
     // Auto-fill slug from title until the user manually edits it
     useEffect(() => {
@@ -208,14 +231,27 @@ export default function GeneralPage({
             </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 <div>
-                    <Label htmlFor='title'>Title *</Label>
+                    <Label htmlFor='title'>Title * (max {TITLE_MAX})</Label>
                     <textarea
                         id='title'
                         {...register('title')}
                         placeholder='My Awesome Project'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={2}
+                        maxLength={TITLE_MAX}
                     />
+                    <p
+                        className={
+                            TITLE_MAX - (titleValue?.length ?? 0) <=
+                            COUNTER_WARN
+                                ? 'mt-1 text-right text-body-sm text-error'
+                                : 'mt-1 text-right text-body-sm text-on-surface-variant'
+                        }
+                        aria-live='polite'
+                    >
+                        {(titleValue?.length ?? 0)} / {TITLE_MAX} — fits 2
+                        lines on the case page
+                    </p>
                     {errors.title && (
                         <p className='mt-1 text-body-sm text-error'>
                             {errors.title.message}
@@ -242,15 +278,34 @@ export default function GeneralPage({
                 </div>
 
                 <div>
-                    <Label htmlFor='teaser'>Teaser (max 200)</Label>
+                    <Label htmlFor='teaser'>
+                        Teaser (max {TEASER_MAX})
+                    </Label>
                     <textarea
                         id='teaser'
                         {...register('teaser')}
                         placeholder='A short teaser describing the project in 1–2 sentences…'
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={3}
-                        maxLength={200}
+                        maxLength={TEASER_MAX}
                     />
+                    <p
+                        className={
+                            TEASER_MAX - (teaserValue?.length ?? 0) <=
+                            COUNTER_WARN
+                                ? 'mt-1 text-right text-body-sm text-error'
+                                : 'mt-1 text-right text-body-sm text-on-surface-variant'
+                        }
+                        aria-live='polite'
+                    >
+                        {(teaserValue?.length ?? 0)} / {TEASER_MAX} — fits 1
+                        line on the case page
+                    </p>
+                    {errors.teaser && (
+                        <p className='mt-1 text-body-sm text-error'>
+                            {errors.teaser.message}
+                        </p>
+                    )}
                 </div>
 
                 <div>
