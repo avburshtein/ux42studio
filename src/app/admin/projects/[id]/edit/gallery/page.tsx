@@ -25,6 +25,21 @@ import {
     getProjectGallery,
     getFileR2Key,
 } from '@/lib/actions/projects';
+import {
+    DndContext,
+    closestCenter,
+    PointerSensor,
+    useSensor,
+    useSensors,
+    type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+    SortableContext,
+    useSortable,
+    verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { GripVertical } from 'lucide-react';
 
 const ASSET_TYPES = ['moodboard', 'wireframe', 'final_gallery'] as const;
 
@@ -95,6 +110,37 @@ const GALLERY_LAYOUTS: Array<{
 
 type AssetDraft = z.infer<typeof assetSchema>;
 
+// Строка ассета с drag-handle — reorder секций Wireframe / Final gallery
+// (фидбэк 2026-10-26: пользователь не должен продумывать порядок слайдов
+// заранее — двигает их после загрузки. Moodboard уже WYSIWYG-слоты).
+// listeners вешаем только на handle, чтобы не конфликтовать с кропом
+// и инпутом внутри строки.
+function SortableRow({
+    id,
+    children,
+}: {
+    id: string;
+    children: (handle: ReturnType<typeof useSortable>) => React.ReactNode;
+}) {
+    const sortable = useSortable({ id });
+    return (
+        <div
+            ref={sortable.setNodeRef}
+            style={{
+                transform: CSS.Translate.toString(sortable.transform),
+                transition: sortable.transition,
+            }}
+            className={cn(
+                'mb-3 flex items-start gap-3 rounded-md border border-outline-variant bg-surface p-3',
+                sortable.isDragging &&
+                    'relative z-10 border-primary opacity-60',
+            )}
+        >
+            {children(sortable)}
+        </div>
+    );
+}
+
 export default function GalleryPage({
     params,
 }: {
@@ -148,6 +194,24 @@ export default function GalleryPage({
         moodboard,
         wireframe,
         final_gallery: finalGallery,
+    };
+
+    // DnD-сортировка строк: distance 6 — клик по кропу/инпуту не считается
+    // драгом, тянуть можно только за grip-handle (listeners на нём одном)
+    const dndSensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    );
+
+    const handleRowDragEnd = (
+        e: DragEndEvent,
+        fa: UseFieldArrayReturn<FormData, AssetType>,
+    ) => {
+        const { active, over } = e;
+        if (!over || active.id === over.id) return;
+        const from = fa.fields.findIndex((f) => f.id === active.id);
+        const to = fa.fields.findIndex((f) => f.id === over.id);
+        if (from < 0 || to < 0) return;
+        fa.move(from, to);
     };
 
     useEffect(() => {
@@ -293,57 +357,103 @@ export default function GalleryPage({
                     </Button>
                 </div>
 
-                {fa.fields.map((field, index) => (
-                    <div
-                        key={field.id}
-                        className='mb-3 flex items-start gap-3 rounded-md border border-outline-variant p-3'
+                {fa.fields.length > 1 && (
+                    <p className='mb-3 text-body-sm text-on-surface-variant'>
+                        Drag the handle to reorder — the order here is the
+                        order on the case.
+                    </p>
+                )}
+
+                {fa.fields.length > 0 && (
+                    <DndContext
+                        sensors={dndSensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={(e) => handleRowDragEnd(e, fa)}
                     >
-                        <div className='min-w-0 flex-1'>
-                            <ImageUploaderField
-                                compact
-                                crop
-                                value={
-                                    watch(`${section.key}.${index}.fileId`) ||
-                                    null
-                                }
-                                onChange={(fileId) =>
-                                    setValue(
-                                        `${section.key}.${index}.fileId`,
-                                        fileId ?? '',
-                                    )
-                                }
-                                aspectRatio={4 / 3}
-                            />
-                            {errors[section.key]?.[index]?.fileId && (
-                                <p className='mt-1 text-body-sm text-error'>
-                                    Required
-                                </p>
-                            )}
-                        </div>
-
-                        <div className='min-w-0 flex-1'>
-                            <Input
-                                {...register(`${section.key}.${index}.caption`)}
-                                placeholder={section.placeholder}
-                            />
-                        </div>
-
-                        <Button
-                            type='button'
-                            variant='ghost'
-                            className='h-auto shrink-0 p-0 text-error'
-                            onClick={() => fa.remove(index)}
+                        <SortableContext
+                            items={fa.fields.map((f) => f.id)}
+                            strategy={verticalListSortingStrategy}
                         >
-                            Remove
-                        </Button>
+                            {fa.fields.map((field, index) => (
+                                <SortableRow key={field.id} id={field.id}>
+                                    {({
+                                        setActivatorNodeRef,
+                                        attributes,
+                                        listeners,
+                                    }) => (
+                                        <>
+                                            <button
+                                                type='button'
+                                                ref={setActivatorNodeRef}
+                                                {...attributes}
+                                                {...listeners}
+                                                className='mt-2 shrink-0 cursor-grab touch-none rounded p-1 text-on-surface-variant transition-colors hover:text-on-surface active:cursor-grabbing'
+                                                aria-label={`Move ${section.placeholder} ${index + 1}`}
+                                            >
+                                                <GripVertical className='h-5 w-5' />
+                                            </button>
 
-                        <input
-                            type='hidden'
-                            {...register(`${section.key}.${index}.order`)}
-                            value={index}
-                        />
-                    </div>
-                ))}
+                                            <div className='min-w-0 flex-1'>
+                                                <ImageUploaderField
+                                                    compact
+                                                    crop
+                                                    value={
+                                                        watch(
+                                                            `${section.key}.${index}.fileId`,
+                                                        ) || null
+                                                    }
+                                                    onChange={(fileId) =>
+                                                        setValue(
+                                                            `${section.key}.${index}.fileId`,
+                                                            fileId ?? '',
+                                                        )
+                                                    }
+                                                    aspectRatio={4 / 3}
+                                                />
+                                                {errors[section.key]?.[index]
+                                                    ?.fileId && (
+                                                    <p className='mt-1 text-body-sm text-error'>
+                                                        Required
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            <div className='min-w-0 flex-1'>
+                                                <Input
+                                                    {...register(
+                                                        `${section.key}.${index}.caption`,
+                                                    )}
+                                                    placeholder={
+                                                        section.placeholder
+                                                    }
+                                                />
+                                            </div>
+
+                                            <Button
+                                                type='button'
+                                                variant='ghost'
+                                                className='h-auto shrink-0 p-0 text-error'
+                                                onClick={() =>
+                                                    fa.remove(index)
+                                                }
+                                            >
+                                                Remove
+                                            </Button>
+
+                                            <input
+                                                type='hidden'
+                                                {...register(
+                                                    `${section.key}.${index}.order`,
+                                                )}
+                                                value={index}
+                                            />
+                                        </>
+                                    )}
+                                </SortableRow>
+                            ))}
+                        </SortableContext>
+                    </DndContext>
+                )}
 
                 {fa.fields.length === 0 && (
                     <p className='mb-3 text-body-sm text-on-surface-variant'>

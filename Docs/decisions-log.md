@@ -8,6 +8,13 @@
 
 ---
 
+## D-007 · 2026-10-26 · Сортировка галереи drag-and-drop · ✅ Принято
+
+- **Контекст:** Пользователь должен был продумывать порядок слайдов до загрузки («пользователи не любят думать»): новые ассеты вставлялись в начало списка, поменять местами после загрузки было нельзя. Moodboard при этом уже был WYSIWYG-слотами с dnd-kit.
+- **Решение:** строки Wireframe / Final gallery в визарде — `@dnd-kit/sortable` (библиотека уже была в deps, консистентно с moodboard). Ручка-грип: `PointerSensor` c `activationConstraint: {distance: 6}`, listeners только на ручке (иначе конфликт с crop-панорамированием и инпутами). Reorder через `useFieldArray.move` — скрытые поля `order` и submit-логика не изменились (order = индекс массива).
+- **Где:** `src/app/admin/projects/[id]/edit/gallery/page.tsx` (`SortableRow`, `handleRowDragEnd`).
+- **Мёртвый код-кандидат:** `src/components/AssetGallery.tsx` (табы + собственный HTML5 DnD) нигде не используется — кандидат на удаление при следующей чистке.
+
 ## D-006 · 2026-10-26 · Кнопки прототипов: привязка к полям админки · ✅ Принято
 
 - **Контекст:** На кейсе ссылка из поля «Web Prototype URL» подписывалась «View Lo-Fi prototype in Figma» — веб-прототип не является ни Figma, ни lo-fi. Поля перепутаны при вёрстке по макету (в макете Design Process содержал lo-fi прототип, Final Design — hi-fi, обе кнопки «в Figma»).

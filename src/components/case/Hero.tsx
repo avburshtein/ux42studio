@@ -75,8 +75,11 @@ export function Hero({
                     {/* Заголовок ≤2 строк на десктопе, на мобиле — целиком
                         без обрезки (фидбэк 2026-10-26: кейс — единственное
                         место с полным названием). Teaser на мобиле скрыт:
-                        поджимал заголовок, на десктопе ≤1 строки. */}
-                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] lg:line-clamp-2'>
+                        поджимал заголовок, на десктопе ≤1 строки.
+                        lg:pb-3 — line-clamp клипает по padding-box: без
+                        паддинга overflow:hidden срезает хвостик «g» у
+                        последней строки (выносная ниже полей строки 52/60). */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] lg:line-clamp-2 lg:pb-3'>
                         <RichTextInline text={title} />
                     </h1>
                     {teaser && (
