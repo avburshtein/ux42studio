@@ -27,7 +27,7 @@ const CASE_SECTIONS: Array<{ key: string; label: string; hint: string }> = [
     {
         key: 'designProcess',
         label: 'Design Process',
-        hint: 'design approach, wireframes, Lo-Fi prototype',
+        hint: 'design approach, wireframes',
     },
     {
         key: 'designSystem',

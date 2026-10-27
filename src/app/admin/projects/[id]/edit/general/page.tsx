@@ -390,6 +390,10 @@ export default function GeneralPage({
                         {...register('figmaPrototypeUrl')}
                         placeholder='https://www.figma.com/proto/…'
                     />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Показывается на кейсе кнопкой «View prototype in
+                        Figma» в секции Final Design
+                    </p>
                 </div>
 
                 <div>
@@ -400,6 +404,10 @@ export default function GeneralPage({
                         {...register('webPrototypeUrl')}
                         placeholder='https://prototype.example.com'
                     />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Веб-демка прототипа (не Figma): кнопка «View Web
+                        prototype» в секции Final Design
+                    </p>
                 </div>
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}

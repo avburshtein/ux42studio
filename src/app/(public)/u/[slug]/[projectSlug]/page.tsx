@@ -248,9 +248,7 @@ export default async function ProjectPage({ params }: PageProps) {
         personas.length > 0
     );
     const showDesignProcess = !!(
-        project.designApproach ||
-        wireframeAssets.length > 0 ||
-        project.webPrototypeUrl
+        project.designApproach || wireframeAssets.length > 0
     );
     const showDesignSystem = !!(
         moodboardAssets.length > 0 ||
@@ -264,7 +262,8 @@ export default async function ProjectPage({ params }: PageProps) {
         finalGalleryAssets.length > 0 ||
         resultItems.length > 0 ||
         toolItems.length > 0 ||
-        project.figmaPrototypeUrl
+        project.figmaPrototypeUrl ||
+        project.webPrototypeUrl
     );
     const showReflection = !!(project.keyTakeaway || nextStepItems.length > 0);
 
@@ -450,13 +449,10 @@ export default async function ProjectPage({ params }: PageProps) {
                                             </div>
                                         )}
 
-                                        {/* Lo-Fi Prototype Link [412:854] */}
-                                        {project.webPrototypeUrl && (
-                                            <LinkButton
-                                                href={project.webPrototypeUrl}
-                                                label='View Lo-Fi prototype in Figma'
-                                            />
-                                        )}
+                                        {/* Prototype link перенесён в Final
+                                            Design — webPrototypeUrl это
+                                            финальная веб-демка, а не lo-fi
+                                            (фидбэк 2026-10-26) */}
                                     </div>
                                 </CaseSection>
                             )}
@@ -579,12 +575,35 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 />
                                             ))}
 
-                                        {/* Hi-Fi Prototype Link */}
-                                        {project.figmaPrototypeUrl && (
-                                            <LinkButton
-                                                href={project.figmaPrototypeUrl}
-                                                label='View Hi-Fi prototype in Figma'
-                                            />
+                                        {/* Prototype links — привязка строго
+                                            к полям админки (фидбэк 2026-10-26:
+                                            webPrototypeUrl подписывался «View
+                                            Lo-Fi prototype in Figma», хотя
+                                            web-прототип — не Figma и не
+                                            обязательно lo-fi). Лейбл по
+                                            инструменту, без утверждений о
+                                            fidelity; обе ссылки в Final
+                                            Design — это финальные демки */}
+                                        {(project.figmaPrototypeUrl ||
+                                            project.webPrototypeUrl) && (
+                                            <div className='flex flex-wrap items-center gap-x-8 gap-y-2'>
+                                                {project.figmaPrototypeUrl && (
+                                                    <LinkButton
+                                                        href={
+                                                            project.figmaPrototypeUrl
+                                                        }
+                                                        label='View prototype in Figma'
+                                                    />
+                                                )}
+                                                {project.webPrototypeUrl && (
+                                                    <LinkButton
+                                                        href={
+                                                            project.webPrototypeUrl
+                                                        }
+                                                        label='View Web prototype'
+                                                    />
+                                                )}
+                                            </div>
                                         )}
 
                                         {/* Results — 2-col grid, gap=24 */}
