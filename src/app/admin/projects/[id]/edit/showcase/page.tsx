@@ -226,7 +226,7 @@ export default function ShowcasePage({
                                         </p>
                                     )}
                                 </div>
-                                <div className='grid grid-cols-2 gap-3'>
+                                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
                                     <div>
                                         <Label>Before Image</Label>
                                         <ImageUploaderField
@@ -264,7 +264,7 @@ export default function ShowcasePage({
                                         />
                                     </div>
                                 </div>
-                                <div className='grid grid-cols-2 gap-3'>
+                                <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
                                     <div>
                                         <Label>Before Text</Label>
                                         <textarea
@@ -300,7 +300,7 @@ export default function ShowcasePage({
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
-                <div className='flex justify-between gap-3 pt-4'>
+                <div className='sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
                     <Button
                         type='button'
                         variant='ghost'

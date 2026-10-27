@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { logout } from '@/lib/actions/auth';
-import { LogOut } from 'lucide-react';
+import { LogOut, Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/case/ThemeToggle';
 
 /** Ответ GET /api/session (тот же эндпоинт, что использует AuthBar). */
@@ -65,57 +65,74 @@ export default function AdminShell({
 
     const isSuperAdmin = session?.role === 'admin';
     const profileSlug = session?.profileSlug ?? null;
+    const pathname = usePathname();
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    // Глобальная навигация: одна коллекция для десктоп-навигации и drawer
+    const navLinks: Array<{ href: string; label: string }> = [
+        ...(isSuperAdmin
+            ? [{ href: '/super-admin', label: 'Суперадминка' }]
+            : []),
+        { href: '/admin', label: 'Ред. проекты' },
+        { href: '/admin/profile', label: 'Редактировать страницу сайта' },
+        { href: '/admin/settings', label: 'Настройки профиля' },
+        ...(profileSlug
+            ? [{ href: `/u/${profileSlug}`, label: 'Мой сайт' }]
+            : []),
+        { href: '/help', label: 'Справка' },
+    ];
+
+    // Drawer закрывается при переходе, Escape и блокирует скролл фона
+    useEffect(() => {
+        setMenuOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        if (!menuOpen) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setMenuOpen(false);
+        };
+        document.addEventListener('keydown', onKey);
+        const prevOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.removeEventListener('keydown', onKey);
+            document.body.style.overflow = prevOverflow;
+        };
+    }, [menuOpen]);
 
     return (
         <div className='admin-layout min-h-screen bg-surface'>
-            <header className='border-b border-outline-variant bg-surface'>
-                <div className='mx-auto max-w-7xl px-8'>
+            {/* Моб. хедер: гамбургер + drawer (фидбэк 2026-10-26 — админка
+                не адаптивна). Глассморфизм тот же, что у SiteHeader
+                (header-glass + backdrop-blur). <lg — drawer, ≥lg — инлайн
+                навигация (6 ссылок в строку не влезают в md). */}
+            <header className='header-glass sticky top-0 z-40 border-b border-outline-variant backdrop-blur-md backdrop-saturate-[1.8]'>
+                <div className='mx-auto max-w-7xl px-4 md:px-8'>
                     <div className='flex items-center justify-between py-3'>
-                        <div className='flex items-center gap-6'>
-                            <div className='text-title-md text-on-surface font-semibold'>
+                        <div className='flex items-center gap-3 md:gap-6'>
+                            <button
+                                type='button'
+                                onClick={() => setMenuOpen(true)}
+                                aria-label='Открыть меню'
+                                aria-expanded={menuOpen}
+                                className='-ml-2 rounded-md p-2 text-on-surface hover:bg-surface-variant lg:hidden'
+                            >
+                                <Menu className='h-6 w-6' />
+                            </button>
+                            <div className='text-title-md font-semibold text-on-surface'>
                                 Admin
                             </div>
-                            <nav className='flex gap-1 mr-4'>
-                                {isSuperAdmin && (
+                            <nav className='mr-4 hidden gap-1 lg:flex'>
+                                {navLinks.map((link) => (
                                     <Link
-                                        href='/super-admin'
-                                        className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
+                                        key={link.href}
+                                        href={link.href}
+                                        className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant transition-colors hover:bg-surface-variant hover:text-on-surface'
                                     >
-                                        Суперадминка
+                                        {link.label}
                                     </Link>
-                                )}
-                                <Link
-                                    href='/admin'
-                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Ред. проекты
-                                </Link>
-                                <Link
-                                    href='/admin/profile'
-                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Редактировать страницу сайта
-                                </Link>
-                                <Link
-                                    href='/admin/settings'
-                                    className='whitespace-nowrap rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Настройки профиля
-                                </Link>
-                                {profileSlug && (
-                                    <Link
-                                        href={`/u/${profileSlug}`}
-                                        className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                    >
-                                        Мой сайт
-                                    </Link>
-                                )}
-                                <Link
-                                    href='/help'
-                                    className='rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
-                                >
-                                    Справка
-                                </Link>
+                                ))}
                             </nav>
                         </div>
                         <div className='flex items-center gap-2'>
@@ -124,7 +141,8 @@ export default function AdminShell({
                                 Размер 48×48 — по спеке (§74) и WCAG 2.5.5
                                 Target Size (AAA, 44px min); Material 3 = 48 */}
                             <ThemeToggle />
-                            <form action={logout}>
+                            {/* Выход на мобиле — в drawer (кнопка узкая) */}
+                            <form action={logout} className='hidden lg:block'>
                                 <button
                                     type='submit'
                                     className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
@@ -136,8 +154,66 @@ export default function AdminShell({
                         </div>
                     </div>
                 </div>
+                {/* Drawer: затемнение + панель слева. Ссылки крупнее десктопа
+                    (py-3, body-lg) — тач-таргеты ≥44px */}
+                {menuOpen && (
+                    <div
+                        className='fixed inset-0 z-50 lg:hidden'
+                        role='dialog'
+                        aria-modal='true'
+                        aria-label='Меню админки'
+                    >
+                        <div
+                            className='absolute inset-0 bg-black/40'
+                            onClick={() => setMenuOpen(false)}
+                        />
+                        <div className='absolute inset-y-0 left-0 flex w-72 max-w-[85vw] flex-col overflow-y-auto border-r border-outline-variant bg-surface shadow-2xl'>
+                            <div className='flex items-center justify-between border-b border-outline-variant px-4 py-3'>
+                                <span className='text-title-md font-semibold text-on-surface'>
+                                    Admin
+                                </span>
+                                <button
+                                    type='button'
+                                    onClick={() => setMenuOpen(false)}
+                                    aria-label='Закрыть меню'
+                                    className='rounded-md p-2 text-on-surface hover:bg-surface-variant'
+                                >
+                                    <X className='h-6 w-6' />
+                                </button>
+                            </div>
+                            <nav className='flex flex-col gap-1 p-2'>
+                                {navLinks.map((link) => (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        onClick={() => setMenuOpen(false)}
+                                        className={`rounded-md px-3 py-3 text-body-lg ${
+                                            pathname === link.href
+                                                ? 'bg-primary-container font-medium text-on-primary-container'
+                                                : 'text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'
+                                        }`}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                ))}
+                            </nav>
+                            <form
+                                action={logout}
+                                className='mt-auto border-t border-outline-variant p-2'
+                            >
+                                <button
+                                    type='submit'
+                                    className='flex w-full items-center gap-2 rounded-md px-3 py-3 text-body-lg text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'
+                                >
+                                    <LogOut className='h-4 w-4' />
+                                    Выйти
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </header>
-            <div className='mx-auto max-w-7xl p-8'>{children}</div>
+            <div className='mx-auto max-w-7xl p-4 md:p-8'>{children}</div>
         </div>
     );
 }

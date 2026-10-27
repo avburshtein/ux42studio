@@ -1,6 +1,7 @@
 'use client';
 
-import { Eye } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Check, ChevronDown, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -27,9 +28,83 @@ export function WizardSidebar({
     projectSlug?: string;
 }) {
     const pathname = usePathname();
+    // Моб. dropdown-«фильтр» шагов (референс 2026-10-26: хедер + фильтр
+    // разделов). Закрывается при переходе.
+    const [open, setOpen] = useState(false);
+    useEffect(() => {
+        setOpen(false);
+    }, [pathname]);
+
+    const stepHref = (path: string) =>
+        `/admin/projects/${projectId}/edit/${path}`;
+    const activeStep = STEPS.find((s) => pathname === stepHref(s.path));
 
     return (
-        <aside className='w-64 shrink-0'>
+        <>
+            {/* === Мобила (<lg): dropdown-селектор шагов вместо сайдбара ===
+                Свёрнут — кнопка с названием текущего шага; раскрыт — список
+                с галочкой у активного (как в референсе). Тач-таргеты ≥44px. */}
+            <div className='mb-6 lg:hidden'>
+                <button
+                    type='button'
+                    onClick={() => setOpen((v) => !v)}
+                    aria-expanded={open}
+                    aria-label='Выбрать раздел кейса'
+                    className='flex w-full items-center justify-between gap-2 rounded-md border border-outline-variant bg-surface px-4 py-3 text-title-md text-on-surface'
+                >
+                    <span className='truncate'>
+                        {activeStep?.label ?? projectTitle}
+                    </span>
+                    <ChevronDown
+                        className={`h-5 w-5 shrink-0 transition-transform ${
+                            open ? 'rotate-180' : ''
+                        }`}
+                    />
+                </button>
+                {open && (
+                    <ul className='mt-1 overflow-hidden rounded-md border border-outline-variant bg-surface'>
+                        {STEPS.map((step) => {
+                            const isActive = pathname === stepHref(step.path);
+                            return (
+                                <li
+                                    key={step.key}
+                                    className='border-b border-outline-variant last:border-b-0'
+                                >
+                                    <Link
+                                        href={stepHref(step.path)}
+                                        className={`flex items-center justify-between gap-2 px-4 py-3 text-body-lg ${
+                                            isActive
+                                                ? 'font-medium text-on-surface'
+                                                : 'text-on-surface-variant'
+                                        }`}
+                                    >
+                                        {step.label}
+                                        {isActive && (
+                                            <Check className='h-5 w-5 shrink-0 text-primary' />
+                                        )}
+                                    </Link>
+                                </li>
+                            );
+                        })}
+                        {profileSlug && projectSlug && (
+                            <li className='border-t border-outline-variant'>
+                                <Link
+                                    href={`/u/${profileSlug}/${projectSlug}`}
+                                    target='_blank'
+                                    rel='noopener noreferrer'
+                                    className='flex items-center gap-2 px-4 py-3 text-body-lg text-primary'
+                                >
+                                    <Eye className='h-5 w-5' />
+                                    Просмотр проекта
+                                </Link>
+                            </li>
+                        )}
+                    </ul>
+                )}
+            </div>
+
+            {/* === Десктоп (≥lg): сайдбар как был === */}
+            <aside className='hidden w-64 shrink-0 lg:block'>
             <nav className='sticky top-8'>
                 <div className=''>
                     <h2 className='mb-4 text-title-lg text-on-background'>
@@ -80,5 +155,6 @@ export function WizardSidebar({
                 )}
             </nav>
         </aside>
+        </>
     );
 }
