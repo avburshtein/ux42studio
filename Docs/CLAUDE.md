@@ -29,6 +29,22 @@
 4. **Конструктор кейсов и Спецификация формы:** Читай `case-template-spec.md` (на базе `case-template — Flow Description.pdf`).
 5. **Юридический комплаенс (Испания/ЕС 2026):** Читай `legal-and-compliance.md` (LSSI, RGPD, EAA 2025, VeriFactu).
 6. **Стратегия, Роли и Команда:** Читай `positioning-and-offers.md` и `УСТАВ КОМАНДЫ «DIGITAL CRAFTSMANSHIP»`.
+7. **Журнал решений (почему так, а не иначе):** Читай `Docs/decisions-log.md` — контекст, отменённые попытки и финальные решения по фичам. Перед переделкой существующей фичи проверь, нет ли там отменённого подхода.
+
+
+## 🤖 AI Context Contract
+
+Все ИИ-агенты должны следовать `docs/ai-context-contract.md` — единому стандарту контекста, источников правды и критериев приёмки.
+
+Порядок чтения:
+1. `CLAUDE.md`
+2. `docs/ai-context-contract.md`
+3. `docs/ai-manifesto.md`
+4. `Docs/design-system.md`
+5. `Docs/figma-tokens.md`
+6. `Docs/specs/`
+7. `Docs/ui/`
+8. `TEST_PLAN.md`
 
 ---
 
