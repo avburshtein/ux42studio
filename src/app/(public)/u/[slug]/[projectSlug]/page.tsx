@@ -367,7 +367,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.problem}
                                     label='Problem & Audience'
-                                    title='The challenge'
+                                    title={project.problemTitle ?? 'The challenge'}
                                     description={project.problemStatement}
                                 >
                                     <div className='flex flex-col gap-6 md:flex-row'>
@@ -392,7 +392,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.research}
                                     label='User Research'
-                                    title='What the data revealed'
+                                    title={project.researchTitle ?? 'What the data revealed'}
                                     description={project.researchMethodology}
                                 >
                                     {keyMetrics.length > 0 && (
@@ -432,7 +432,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.designProcess}
                                     label='Design Process'
-                                    title='From blank page to structure'
+                                    title={project.designProcessTitle ?? 'From blank page to structure'}
                                     description={project.designApproach}
                                 >
                                     <div className='flex flex-col gap-8'>
@@ -462,7 +462,10 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.designSystem}
                                     label='Design System'
-                                    title='Visual language & token system'
+                                    title={
+                                        project.designSystemTitle ??
+                                        'Visual language & token system'
+                                    }
                                     description={project.visualDirection}
                                 >
                                     <div className='flex flex-col gap-8'>
@@ -506,7 +509,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.testing}
                                     label='Testing & Iteration'
-                                    title='What users taught me'
+                                    title={project.testingTitle ?? 'What users taught me'}
                                     description={project.testingProcess}
                                 >
                                     {/* Карусель <sm: слайд = один Before/After
@@ -545,7 +548,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.finalDesign}
                                     label='Final Design'
-                                    title='The Finished Product'
+                                    title={project.finalDesignTitle ?? 'The Finished Product'}
                                     description={project.finalDescription}
                                 >
                                     <div className='flex flex-col gap-8'>
@@ -698,7 +701,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                 <CaseSection
                                     number={caseNumbers.reflection}
                                     label='Reflection'
-                                    title='What I learned'
+                                    title={project.reflectionTitle ?? 'What I learned'}
                                     description={project.keyTakeaway}
                                 >
                                         {nextStepItems.length > 0 && (

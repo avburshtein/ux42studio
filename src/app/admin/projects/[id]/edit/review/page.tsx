@@ -43,6 +43,8 @@ const projectItemSchema = z.object({
 
 const formSchema = z.object({
     keyTakeaway: z.string().optional().or(z.literal('')),
+    // Кастомный заголовок секции на кейс-странице (D-009)
+    reflectionTitle: z.string().optional().or(z.literal('')),
     reviews: z.array(reviewItemSchema),
     nextSteps: z.array(projectItemSchema),
     publish: z.boolean().optional(),
@@ -81,6 +83,7 @@ export default function ReviewPage({
         resolver: zodResolver(formSchema),
         defaultValues: {
             keyTakeaway: '',
+            reflectionTitle: '',
             reviews: [],
             nextSteps: [],
             publish: false,
@@ -105,6 +108,7 @@ export default function ReviewPage({
             .then((r) => {
                 reset({
                     keyTakeaway: r?.keyTakeaway ?? '',
+                    reflectionTitle: r?.reflectionTitle ?? '',
                     reviews: (r?.reviews ?? []).map((rev) => ({
                         ...rev,
                         authorRole: rev.authorRole ?? '',
@@ -125,6 +129,7 @@ export default function ReviewPage({
         try {
             const result = await updateProjectReview(projectId, {
                 keyTakeaway: data.keyTakeaway || undefined,
+                reflectionTitle: data.reflectionTitle || undefined,
                 // Пустые строки не отправляем: сгенерированные сервером
                 // пустые отзывы/шаги не должны попадать в БД и на публикацию.
                 reviews: data.reviews
@@ -170,6 +175,19 @@ export default function ReviewPage({
                 Review & Publish
             </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+                {/* Кастомный заголовок секции (D-009): пусто → дефолт «What I learned» */}
+                <div>
+                    <Label htmlFor='reflectionTitle'>
+                        Заголовок секции (необязательно)
+                    </Label>
+                    <input
+                        id='reflectionTitle'
+                        {...register('reflectionTitle')}
+                        placeholder='What I learned'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                    />
+                </div>
+
                 <div>
                     <Label htmlFor='keyTakeaway'>Key Takeaway</Label>
                     <textarea

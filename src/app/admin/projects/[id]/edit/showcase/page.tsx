@@ -33,6 +33,9 @@ const formSchema = z.object({
     // Секция 05 «Testing & Iteration»: описание процесса тестирования —
     // секция видна при testingProcess и/или comparisons
     testingProcess: z.string().optional().or(z.literal('')),
+    // Кастомные заголовки секций на кейс-странице (D-009)
+    finalDesignTitle: z.string().optional().or(z.literal('')),
+    testingTitle: z.string().optional().or(z.literal('')),
     comparisons: z.array(comparisonSchema),
 });
 
@@ -66,6 +69,8 @@ export default function ShowcasePage({
         defaultValues: {
             finalDescription: '',
             testingProcess: '',
+            finalDesignTitle: '',
+            testingTitle: '',
             comparisons: [],
         },
     });
@@ -83,6 +88,8 @@ export default function ShowcasePage({
                 reset({
                     finalDescription: s?.finalDescription ?? '',
                     testingProcess: s?.testingProcess ?? '',
+                    finalDesignTitle: s?.finalDesignTitle ?? '',
+                    testingTitle: s?.testingTitle ?? '',
                     comparisons: (s?.comparisons ?? []).map((c) => ({
                         ...c,
                         beforeFileId: c.beforeFileId ?? '',
@@ -103,6 +110,8 @@ export default function ShowcasePage({
             await updateProjectShowcase(projectId, {
                 finalDescription: data.finalDescription || undefined,
                 testingProcess: data.testingProcess || undefined,
+                finalDesignTitle: data.finalDesignTitle || undefined,
+                testingTitle: data.testingTitle || undefined,
                 comparisons: data.comparisons.map((c) => ({
                     ...c,
                     beforeFileId: c.beforeFileId || undefined,
@@ -141,6 +150,33 @@ export default function ShowcasePage({
                 onSubmit={handleSubmit(onSubmit)}
                 className='flex flex-col gap-12'
             >
+                {/* Кастомные заголовки секций (D-009): пусто → дефолты
+                    «The Finished Product» / «What users taught me» */}
+                <div className='grid gap-4 sm:grid-cols-2'>
+                    <div>
+                        <Label htmlFor='finalDesignTitle'>
+                            Заголовок «Final Design» (необязательно)
+                        </Label>
+                        <input
+                            id='finalDesignTitle'
+                            {...register('finalDesignTitle')}
+                            placeholder='The Finished Product'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor='testingTitle'>
+                            Заголовок «Testing & Iteration» (необязательно)
+                        </Label>
+                        <input
+                            id='testingTitle'
+                            {...register('testingTitle')}
+                            placeholder='What users taught me'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        />
+                    </div>
+                </div>
+
                 <div>
                     <Label htmlFor='finalDescription'>Final Description</Label>
                     <textarea

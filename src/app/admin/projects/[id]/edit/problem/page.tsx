@@ -20,6 +20,8 @@ const formSchema = z.object({
     problemStatement: z.string().optional().or(z.literal('')),
     projectGoal: z.string().optional().or(z.literal('')),
     targetUsers: z.string().optional().or(z.literal('')),
+    // Кастомный заголовок секции на кейс-странице (D-009)
+    problemTitle: z.string().optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -45,6 +47,7 @@ export default function ProblemPage({
             problemStatement: '',
             projectGoal: '',
             targetUsers: '',
+            problemTitle: '',
         },
     });
 
@@ -56,6 +59,7 @@ export default function ProblemPage({
                     problemStatement: p?.problemStatement ?? '',
                     projectGoal: p?.projectGoal ?? '',
                     targetUsers: p?.targetUsers ?? '',
+                    problemTitle: p?.problemTitle ?? '',
                 });
             })
             .catch(() => {});
@@ -70,6 +74,7 @@ export default function ProblemPage({
                 problemStatement: data.problemStatement || undefined,
                 projectGoal: data.projectGoal || undefined,
                 targetUsers: data.targetUsers || undefined,
+                problemTitle: data.problemTitle || undefined,
             });
             return true;
         } catch (e) {
@@ -102,6 +107,19 @@ export default function ProblemPage({
                 элемент списка с зелёным маркером, **жирный**, *курсив*.
             </p>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+                {/* Кастомный заголовок секции (D-009): пусто → дефолт «The challenge» */}
+                <div>
+                    <Label htmlFor='problemTitle'>
+                        Заголовок секции (необязательно)
+                    </Label>
+                    <input
+                        id='problemTitle'
+                        {...register('problemTitle')}
+                        placeholder='The challenge'
+                        className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                    />
+                </div>
+
                 <div>
                     <Label htmlFor='problemStatement'>Problem Statement</Label>
                     <textarea

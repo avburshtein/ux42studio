@@ -8,6 +8,14 @@
 
 ---
 
+## D-009 · 2026-10-29 · Кастомные заголовки секций кейса · ✅ Принято
+
+- **Контекст:** Заголовки секций публичного кейса захардкожены («The challenge», «What the data revealed»…), пользователь хочет менять их под каждый кейс.
+- **Варианты:** (а) общее поле-JSON со картой заголовков; (б) плоские nullable-колонки в `projects`.
+- **Решение:** (б) — 7 колонок (`problem_title`, `research_title`, `design_process_title`, `design_system_title`, `testing_title`, `final_design_title`, `reflection_title`), миграция `20261029000000_add_section_titles`. Поля ввода — в верхах соответствующих шагов визарда (Problem, Research, Design ×2, Showcase ×2, Review), с плейсхолдером-дефолтом. Кейс-страница: `title={project.xxxTitle ?? 'дефолт'}`.
+- **Почему:** плоские колонки соответствуют существующей схеме `projects` и серверным экшенам (update-функции уже принимают плоские объекты); null = дефолт даёт обратную совместимость без бэкфилла; редактирование в «своём» шаге визарда не плодит отдельную страницу настроек.
+- **Где:** `src/db/schema/projects.ts`, `drizzle/20261029000000_add_section_titles/`, `src/lib/actions/projects.ts`, шаги `problem|research|design|showcase|review`, `src/app/(public)/u/[slug]/[projectSlug]/page.tsx`.
+
 ## D-008 · 2026-10-26 · Адаптив админки: каркас (хедер + drawer, фильтр шагов, sticky save-bar) · ✅ Принято (этапы 3–4 в работе)
 
 - **Контекст:** Вся админка неадаптивна на мобиле: хедер с 6 инлайн-ссылками переполнялся, WizardSidebar w-64 сжимал контент.

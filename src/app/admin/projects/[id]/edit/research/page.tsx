@@ -35,6 +35,8 @@ const keyMetricSchema = z.object({
 const formSchema = z.object({
     researchMethodology: z.string().optional().or(z.literal('')),
     userStory: z.string().optional().or(z.literal('')),
+    // Кастомный заголовок секции на кейс-странице (D-009)
+    researchTitle: z.string().optional().or(z.literal('')),
     personas: z.array(personaSchema).max(5),
     keyMetrics: z.array(keyMetricSchema).max(3),
 });
@@ -69,6 +71,7 @@ export default function ResearchPage({
         defaultValues: {
             researchMethodology: '',
             userStory: '',
+            researchTitle: '',
             personas: [],
             keyMetrics: [],
         },
@@ -93,6 +96,7 @@ export default function ResearchPage({
                 reset({
                     researchMethodology: r?.researchMethodology ?? '',
                     userStory: r?.userStory ?? '',
+                    researchTitle: r?.researchTitle ?? '',
                     personas: (r?.personas ?? []).map((p) => ({
                         ...p,
                         avatarFileId: p.avatarFileId ?? undefined,
@@ -111,6 +115,7 @@ export default function ResearchPage({
             await updateProjectResearch(projectId, {
                 researchMethodology: data.researchMethodology || undefined,
                 userStory: data.userStory || undefined,
+                researchTitle: data.researchTitle || undefined,
                 personas: data.personas.map((p) => ({
                     ...p,
                     avatarFileId: p.avatarFileId || undefined,
@@ -151,6 +156,19 @@ export default function ResearchPage({
                 className='flex flex-col gap-12'
             >
                 <div className=''>
+                    {/* Кастомный заголовок секции (D-009): пусто → дефолт «What the data revealed» */}
+                    <div>
+                        <Label htmlFor='researchTitle'>
+                            Заголовок секции (необязательно)
+                        </Label>
+                        <input
+                            id='researchTitle'
+                            {...register('researchTitle')}
+                            placeholder='What the data revealed'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        />
+                    </div>
+
                     <div>
                         <Label htmlFor='researchMethodology'>
                             Research Methodology

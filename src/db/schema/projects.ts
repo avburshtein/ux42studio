@@ -76,6 +76,17 @@ export const projects = sqliteTable(
         // Section 08: Reflections
         keyTakeaway: text('key_takeaway'), //[cite: 1]
 
+        // Кастомные заголовки секций кейса (D-009): null → дефолтный
+        // заголовок из кода кейс-страницы. Пользователь может переименовать
+        // любую секцию под свой кейс.
+        problemTitle: text('problem_title'),
+        researchTitle: text('research_title'),
+        designProcessTitle: text('design_process_title'),
+        designSystemTitle: text('design_system_title'),
+        testingTitle: text('testing_title'),
+        finalDesignTitle: text('final_design_title'),
+        reflectionTitle: text('reflection_title'),
+
         // Видимость секций на публичной странице кейса (JSON-карта sectionKey →
         // boolean; отсутствующий ключ = секция видна при наличии данных)
         sectionsVisibility: text('sections_visibility', {

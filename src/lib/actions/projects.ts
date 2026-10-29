@@ -225,6 +225,7 @@ export async function updateProjectProblem(
         problemStatement?: string;
         projectGoal?: string;
         targetUsers?: string;
+        problemTitle?: string;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -242,6 +243,7 @@ export async function updateProjectResearch(
     data: {
         researchMethodology?: string;
         userStory?: string;
+        researchTitle?: string;
         personas?: Array<{
             id?: string;
             nameAndAge: string;
@@ -279,6 +281,7 @@ export async function updateProjectResearch(
             .set({
                 researchMethodology: data.researchMethodology,
                 userStory: data.userStory,
+                researchTitle: data.researchTitle,
             })
             .where(eq(projects.id, projectId)),
 
@@ -340,6 +343,8 @@ export async function updateProjectDesign(
         bodyFont?: string;
         bodyFontSpec?: string;
         designApproach?: string;
+        designProcessTitle?: string;
+        designSystemTitle?: string;
     },
 ) {
     const { env } = await getCloudflareContext();
@@ -645,6 +650,8 @@ export async function updateProjectShowcase(
         finalDescription?: string;
         designApproach?: string;
         testingProcess?: string;
+        finalDesignTitle?: string;
+        testingTitle?: string;
         comparisons?: Array<{
             id?: string;
             featureName: string;
@@ -683,6 +690,8 @@ export async function updateProjectShowcase(
                 finalDescription: data.finalDescription,
                 designApproach: data.designApproach,
                 testingProcess: data.testingProcess,
+                finalDesignTitle: data.finalDesignTitle,
+                testingTitle: data.testingTitle,
             })
             .where(eq(projects.id, projectId)),
 
@@ -800,6 +809,7 @@ export async function updateProjectReview(
     projectId: string,
     data: {
         keyTakeaway?: string;
+        reflectionTitle?: string;
         // Поля опциональны: пустые строки фильтруются клиентом, а частично
         // заполненные отзывы сохраняются как есть (гибкость заполнения).
         reviews?: Array<{
@@ -865,7 +875,7 @@ export async function updateProjectReview(
         // Update project-level fields
         db
             .update(projects)
-            .set({ keyTakeaway: data.keyTakeaway })
+            .set({ keyTakeaway: data.keyTakeaway, reflectionTitle: data.reflectionTitle })
             .where(eq(projects.id, projectId)),
 
         // Replace reviews
@@ -1188,6 +1198,7 @@ export async function getProjectProblem(projectId: string) {
             problemStatement: projects.problemStatement,
             projectGoal: projects.projectGoal,
             targetUsers: projects.targetUsers,
+            problemTitle: projects.problemTitle,
         })
         .from(projects)
         .where(eq(projects.id, projectId))
@@ -1202,6 +1213,7 @@ export async function getProjectResearch(projectId: string) {
         .select({
             researchMethodology: projects.researchMethodology,
             userStory: projects.userStory,
+            researchTitle: projects.researchTitle,
         })
         .from(projects)
         .where(eq(projects.id, projectId))
@@ -1234,6 +1246,7 @@ export async function getProjectResearch(projectId: string) {
     return {
         researchMethodology: project?.researchMethodology,
         userStory: project?.userStory,
+        researchTitle: project?.researchTitle,
         personas,
         keyMetrics,
     };
@@ -1251,6 +1264,8 @@ export async function getProjectDesign(projectId: string) {
             bodyFont: projects.bodyFont,
             bodyFontSpec: projects.bodyFontSpec,
             designApproach: projects.designApproach,
+            designProcessTitle: projects.designProcessTitle,
+            designSystemTitle: projects.designSystemTitle,
         })
         .from(projects)
         .where(eq(projects.id, projectId))
@@ -1266,6 +1281,8 @@ export async function getProjectShowcase(projectId: string) {
             finalDescription: projects.finalDescription,
             designApproach: projects.designApproach,
             testingProcess: projects.testingProcess,
+            finalDesignTitle: projects.finalDesignTitle,
+            testingTitle: projects.testingTitle,
         })
         .from(projects)
         .where(eq(projects.id, projectId))
@@ -1348,6 +1365,8 @@ export async function getProjectShowcase(projectId: string) {
         finalDescription: project?.finalDescription,
         designApproach: project?.designApproach,
         testingProcess: project?.testingProcess,
+        finalDesignTitle: project?.finalDesignTitle,
+        testingTitle: project?.testingTitle,
         assets,
         comparisons,
         results,
@@ -1361,7 +1380,7 @@ export async function getProjectReview(projectId: string) {
     const db = getDb(env.DB);
 
     const project = await db
-        .select({ keyTakeaway: projects.keyTakeaway })
+        .select({ keyTakeaway: projects.keyTakeaway, reflectionTitle: projects.reflectionTitle })
         .from(projects)
         .where(eq(projects.id, projectId))
         .get();
@@ -1398,6 +1417,7 @@ export async function getProjectReview(projectId: string) {
 
     return {
         keyTakeaway: project?.keyTakeaway,
+        reflectionTitle: project?.reflectionTitle,
         reviews,
         nextSteps,
     };

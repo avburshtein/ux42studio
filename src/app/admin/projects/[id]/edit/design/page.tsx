@@ -22,6 +22,9 @@ const formSchema = z.object({
     bodyFont: z.string().optional().or(z.literal('')),
     bodyFontSpec: z.string().optional().or(z.literal('')),
     designApproach: z.string().optional().or(z.literal('')),
+    // Кастомные заголовки секций на кейс-странице (D-009)
+    designProcessTitle: z.string().optional().or(z.literal('')),
+    designSystemTitle: z.string().optional().or(z.literal('')),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -50,6 +53,8 @@ export default function DesignPage({
             bodyFont: '',
             bodyFontSpec: '',
             designApproach: '',
+            designProcessTitle: '',
+            designSystemTitle: '',
         },
     });
 
@@ -63,6 +68,11 @@ export default function DesignPage({
                 setValue('bodyFont', d?.bodyFont ?? '');
                 setValue('bodyFontSpec', d?.bodyFontSpec ?? '');
                 setValue('designApproach', d?.designApproach ?? '');
+                setValue(
+                    'designProcessTitle',
+                    d?.designProcessTitle ?? '',
+                );
+                setValue('designSystemTitle', d?.designSystemTitle ?? '');
             })
             .catch(() => {});
     }, [projectId, setValue]);
@@ -79,6 +89,8 @@ export default function DesignPage({
                 bodyFont: data.bodyFont || undefined,
                 bodyFontSpec: data.bodyFontSpec || undefined,
                 designApproach: data.designApproach || undefined,
+                designProcessTitle: data.designProcessTitle || undefined,
+                designSystemTitle: data.designSystemTitle || undefined,
             });
             return true;
         } catch (e) {
@@ -107,6 +119,33 @@ export default function DesignPage({
                 Design
             </Title>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+                {/* Кастомные заголовки секций (D-009): пусто → дефолты
+                    «From blank page to structure» / «Visual language & token system» */}
+                <div className='grid gap-4 sm:grid-cols-2'>
+                    <div>
+                        <Label htmlFor='designProcessTitle'>
+                            Заголовок «Design Process» (необязательно)
+                        </Label>
+                        <input
+                            id='designProcessTitle'
+                            {...register('designProcessTitle')}
+                            placeholder='From blank page to structure'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor='designSystemTitle'>
+                            Заголовок «Design System» (необязательно)
+                        </Label>
+                        <input
+                            id='designSystemTitle'
+                            {...register('designSystemTitle')}
+                            placeholder='Visual language & token system'
+                            className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
+                        />
+                    </div>
+                </div>
+
                 <div>
                     <Label htmlFor='visualDirection'>Visual Direction</Label>
                     <textarea
