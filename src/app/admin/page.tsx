@@ -172,7 +172,9 @@ export default function AdminDashboardPage() {
 
                 <div>
                     <Link href='/admin/projects/new'>
-                        <Button>Создать проект</Button>
+                        <Button className='whitespace-nowrap'>
+                            Создать проект
+                        </Button>
                     </Link>
                 </div>
             </div>

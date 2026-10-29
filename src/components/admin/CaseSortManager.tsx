@@ -105,33 +105,37 @@ function RowContent({
 }: RowActionsProps) {
     const meta = STATUS_META[row.status];
     return (
-        <>
-            <div className='min-w-0 flex-1 px-2'>
-                <Link
-                    href={`/admin/projects/${row.id}/edit/general`}
-                    className='block overflow-hidden text-ellipsis whitespace-nowrap text-body-md font-medium text-on-surface hover:text-primary'
+        // Мобила: заголовок+badge и кнопки действий — двумя строками,
+        // чтобы действия не уезжали за край (D-008). ≥sm — один ряд.
+        <div className='flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-0'>
+            <div className='flex min-w-0 flex-1 items-center gap-2 px-2'>
+                <div className='min-w-0 flex-1'>
+                    <Link
+                        href={`/admin/projects/${row.id}/edit/general`}
+                        className='block overflow-hidden text-ellipsis whitespace-nowrap text-body-md font-medium text-on-surface hover:text-primary'
+                    >
+                        {row.title}
+                    </Link>
+                </div>
+
+                <span
+                    className={cn(
+                        'inline-block shrink-0 rounded-full px-2 py-0.5 text-label-sm',
+                        meta.className,
+                    )}
                 >
-                    {row.title}
-                </Link>
+                    {meta.label}
+                </span>
+
+                <span className='hidden w-14 shrink-0 text-right text-body-sm text-on-surface-variant sm:block'>
+                    {row.viewsCount}
+                </span>
+                <span className='hidden w-24 shrink-0 text-right text-body-sm text-on-surface-variant md:block'>
+                    {row.updatedLabel}
+                </span>
             </div>
 
-            <span
-                className={cn(
-                    'mr-2 inline-block shrink-0 rounded-full px-2 py-0.5 text-label-sm',
-                    meta.className,
-                )}
-            >
-                {meta.label}
-            </span>
-
-            <span className='hidden w-14 shrink-0 text-right text-body-sm text-on-surface-variant sm:block'>
-                {row.viewsCount}
-            </span>
-            <span className='hidden w-24 shrink-0 text-right text-body-sm text-on-surface-variant md:block'>
-                {row.updatedLabel}
-            </span>
-
-            <div className='flex shrink-0 items-center gap-1 pl-2'>
+            <div className='flex flex-wrap items-center gap-1 sm:pl-2'>
                 <Button
                     variant='ghost'
                     onClick={() => onDelete(row.id)}
@@ -182,7 +186,7 @@ function RowContent({
                     <Button variant='ghost'>На&nbsp;сайт</Button>
                 </Link>
             </div>
-        </>
+        </div>
     );
 }
 

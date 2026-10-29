@@ -393,7 +393,12 @@ export default function GalleryPage({
                                                 <GripVertical className='h-5 w-5' />
                                             </button>
 
-                                            <div className='min-w-0 flex-1'>
+                                            {/* Мобила: uploader, caption и Remove
+                                                стекаются в колонку, чтобы строка
+                                                не уезжала за край (D-008).
+                                                ≥sm — один ряд, как было. */}
+                                            <div className='flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3'>
+                                                <div className='min-w-0 flex-1'>
                                                 <ImageUploaderField
                                                     compact
                                                     crop
@@ -432,13 +437,14 @@ export default function GalleryPage({
                                             <Button
                                                 type='button'
                                                 variant='ghost'
-                                                className='h-auto shrink-0 p-0 text-error'
+                                                className='h-auto shrink-0 self-start p-0 text-error sm:self-center'
                                                 onClick={() =>
                                                     fa.remove(index)
                                                 }
                                             >
                                                 Remove
                                             </Button>
+                                            </div>
 
                                             <input
                                                 type='hidden'

@@ -240,6 +240,7 @@ export default function GridSlot({
         attributes,
         listeners,
         setNodeRef: setDraggableRef,
+        setActivatorNodeRef,
         transform,
         isDragging,
     } = useDraggable({
@@ -296,6 +297,9 @@ export default function GridSlot({
             )}
 
             {image ? (
+                // Тач: слушатели drag не вешаем на весь слот — иначе тач-свайп
+                // перехватывается и лента мудборда не скроллится (D-008).
+                // Тянут только за ручку (левый верхний угол).
                 <div
                     ref={(node) => {
                         setDraggableRef(node);
@@ -309,11 +313,10 @@ export default function GridSlot({
                               onPointerUp: handlePanEnd,
                               onPointerCancel: handlePanEnd,
                           }
-                        : listeners)}
-                    {...attributes}
+                        : {})}
                     className={cn(
-                        'w-full h-full group touch-none rounded-lg overflow-hidden',
-                        panMode ? 'cursor-move' : 'cursor-grab active:cursor-grabbing',
+                        'w-full h-full group rounded-lg overflow-hidden',
+                        panMode && 'cursor-move touch-none',
                     )}
                 >
                     {/* Фото в слоте: R2/blob-URL, размеры неизвестны,
@@ -357,9 +360,20 @@ export default function GridSlot({
                                 </button>
                             )}
 
-                            <div className='absolute top-2 left-2 opacity-0 group-hover:opacity-100 bg-white/90 p-1 rounded shadow-sm transition-opacity z-30 pointer-events-none'>
+                            {/* Ручка drag-and-drop: отдельный активатор.
+                                Всегда видна — на таче нет hover, а до этого
+                                пользователи мобильных вообще не могли
+                                перетащить фото между слотами (D-008). */}
+                            <button
+                                type='button'
+                                ref={setActivatorNodeRef}
+                                {...attributes}
+                                {...listeners}
+                                className='absolute top-2 left-2 flex h-7 w-7 touch-none cursor-grab items-center justify-center rounded bg-white/90 p-1 shadow-sm z-30 active:cursor-grabbing'
+                                aria-label='Переместить фото в другой слот'
+                            >
                                 <GripVertical className='h-4 w-4 text-slate-500' />
-                            </div>
+                            </button>
                         </>
                     )}
 
