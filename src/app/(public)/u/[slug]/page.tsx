@@ -222,6 +222,13 @@ export default async function ProfilePage({ params }: PageProps) {
     const customVarsCss = customVars.join('\n');
 
     // Инлайн-стили ссылаются на переменные — в dark они уже другие.
+    // ВАЖНО: переопределяем ОБЕ цепочки переменных — и --md-sys-color-*
+    // (инлайн var(--md-sys...) в коде), и --color-* (Tailwind-утилиты
+    // text-on-surface и т.п.). С каким-то одним набором solid-хедер
+    // ломался: @theme (не inline) вычисляет --color-* на :root, и
+    // оверрайд --md-sys-color-* на потомке (хедере) на утилиты уже
+    // не действовал — текст не менял цвет на тёмном solid-хедере
+    // (фидбэк 2026-10-30).
     const headerStyle: React.CSSProperties | undefined =
         headerMode === 'solid' && mpc.theme.header.color
             ? ({
@@ -238,6 +245,20 @@ export default async function ProfilePage({ params }: PageProps) {
                   '--md-sys-color-on-surface-variant': 'var(--mp-header-fg)',
                   '--md-sys-color-on-background': 'var(--mp-header-fg)',
                   '--md-sys-color-outline': 'var(--mp-header-fg)',
+                  '--md-sys-color-outline-variant': 'var(--mp-header-fg)',
+                  '--color-primary': 'var(--mp-header-fg)',
+                  '--color-on-primary': 'var(--mp-header-bg)',
+                  '--color-primary-container': 'var(--mp-header-fg)',
+                  '--color-on-primary-container': 'var(--mp-header-bg)',
+                  '--color-secondary': 'var(--mp-header-fg)',
+                  '--color-on-secondary': 'var(--mp-header-bg)',
+                  '--color-secondary-container': 'var(--mp-header-fg)',
+                  '--color-on-secondary-container': 'var(--mp-header-bg)',
+                  '--color-on-surface': 'var(--mp-header-fg)',
+                  '--color-on-surface-variant': 'var(--mp-header-fg)',
+                  '--color-on-background': 'var(--mp-header-fg)',
+                  '--color-outline': 'var(--mp-header-fg)',
+                  '--color-outline-variant': 'var(--mp-header-fg)',
               } as React.CSSProperties)
             : undefined;
 

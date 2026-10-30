@@ -5,7 +5,11 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Plus, Trash2 } from 'lucide-react';
-import { saveMainPageContent, updateProfile } from '@/lib/actions/profile';
+import {
+    saveMainPageContent,
+    updateProfile,
+    updateProfileThemeSettings,
+} from '@/lib/actions/profile';
 import ImageUploaderField from '@/components/ImageUploaderField';
 import {
     Select,
@@ -33,6 +37,8 @@ type Props = {
     coverFileId: string;
     /** Активный раздел сайдбара — рендерим только его */
     visibleSection: string;
+    /** D-010: применять кастомную тему к кейс-страницам (чекбокс в 06) */
+    applyThemeToChildPages: boolean;
 };
 
 const textareaClass =
@@ -248,13 +254,31 @@ export default function MainPageContentEditor({
     avatarFileId: initialAvatar,
     coverFileId: initialCover,
     visibleSection,
+    applyThemeToChildPages: initialApplyTheme,
 }: Props) {
     const [content, setContent] = useState<MainPageContent>(initialContent);
     const [avatarFileId, setAvatarFileId] = useState(initialAvatar);
     const [coverFileId, setCoverFileId] = useState(initialCover);
+    // D-010: применение темы к кейсам — автосейв отдельно от контента
+    const [applyThemeToChildPages, setApplyThemeToChildPages] =
+        useState(initialApplyTheme);
+    const [applyThemeSaving, setApplyThemeSaving] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+
+    // Автосейв чекбокса «тема на кейсах» (как у SectionsVisibilityEditor)
+    const onApplyThemeChange = async (checked: boolean) => {
+        setApplyThemeToChildPages(checked);
+        setApplyThemeSaving(true);
+        try {
+            await updateProfileThemeSettings(profileId, checked);
+        } catch {
+            setApplyThemeToChildPages(!checked);
+        } finally {
+            setApplyThemeSaving(false);
+        }
+    };
 
     // Обёртка секции: показываем только активный раздел сайдбара
     const wrap = (id: string, node: React.ReactNode) => (
@@ -744,6 +768,40 @@ export default function MainPageContentEditor({
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
                         Custom color theme (seed → M3 light &amp; dark)
+                    </label>
+
+                    {/* D-010: распространение темы на кейс-страницы — здесь,
+                        рядом с настройкой темы (фидбэк 2026-10-30: пользователь
+                        изучает интерфейс сверху вниз и в первом разделе не
+                        поймёт, о чём речь). Автосейв, работает только вместе
+                        с кастомной темой. */}
+                    <label
+                        className={`flex items-center gap-2 rounded-lg border border-outline-variant bg-surface-container-lowest p-3 pl-4 text-body-sm ${
+                            content.theme.useCustomTheme
+                                ? 'cursor-pointer text-on-surface'
+                                : 'cursor-not-allowed text-on-surface-variant opacity-60'
+                        }`}
+                    >
+                        <input
+                            type='checkbox'
+                            checked={applyThemeToChildPages}
+                            disabled={
+                                !content.theme.useCustomTheme ||
+                                applyThemeSaving
+                            }
+                            onChange={(e) =>
+                                onApplyThemeChange(e.target.checked)
+                            }
+                            className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
+                        />
+                        <span>
+                            Применять мою цветовую тему к кейсам
+                            <span className='mt-0.5 block text-body-sm text-on-surface-variant'>
+                                Страницы всех кейсов портфолио получат эту же
+                                тему (светлую и тёмную). Без галочки кейсы
+                                используют стандартную тему платформы.
+                            </span>
+                        </span>
                     </label>
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>

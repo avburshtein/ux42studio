@@ -14,7 +14,6 @@ import { Textarea } from '@/components/ui/Textarea';
 import PageTitle from '@/components/ui/PageTitle';
 import {
     updateProfile,
-    updateProfileThemeSettings,
     getOrCreateProfileId,
     getMyProfile,
     getMyMainPageContent,
@@ -42,8 +41,6 @@ const formSchema = z.object({
         .or(z.literal('')),
     ogImageFileId: z.string().optional().or(z.literal('')),
     faviconFileId: z.string().optional().or(z.literal('')),
-    // Распространять кастомную тему на все кейс-страницы (opt-in)
-    applyThemeToChildPages: z.boolean().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -78,6 +75,9 @@ export default function ProfilePage() {
     // Slug живёт в настройках (/admin/settings), но нужен здесь для ссылки
     // «Просмотр страницы» в сайдбаре.
     const [profileSlug, setProfileSlug] = useState('');
+    // D-010: чекбокс «тема на кейсах» переехал в раздел 06 (MainPageContentEditor)
+    const [applyThemeToChildPages, setApplyThemeToChildPages] =
+        useState(false);
     // Пока профиль не загружен, форму показываем, но сохранять нельзя:
     // значения по умолчанию пустые, и сохранение затёрло бы OG-обложку.
     const [profileLoaded, setProfileLoaded] = useState(false);
@@ -111,7 +111,6 @@ export default function ProfilePage() {
             website: '',
             ogImageFileId: '',
             faviconFileId: '',
-            applyThemeToChildPages: false,
         },
     });
 
@@ -131,7 +130,6 @@ export default function ProfilePage() {
                         website: profile.website ?? '',
                         ogImageFileId: profile.ogImageFileId ?? '',
                         faviconFileId: profile.faviconFileId ?? '',
-                        applyThemeToChildPages: !!profile.applyThemeToChildPages,
                     });
                     setInitialFiles({
                         avatar: profile.avatarFileId ?? '',
@@ -140,6 +138,9 @@ export default function ProfilePage() {
                         favicon: profile.faviconFileId ?? '',
                     });
                     setProfileSlug(profile.slug);
+                    setApplyThemeToChildPages(
+                        !!profile.applyThemeToChildPages,
+                    );
                     setSocialLinks(
                         (profile.socialLinks ?? []).map((link) => ({
                             id: link.id,
@@ -179,9 +180,6 @@ export default function ProfilePage() {
                 ogImageFileId: data.ogImageFileId || null,
                 faviconFileId: data.faviconFileId || null,
             });
-            // Чекбокс «применять тему к кейс-страницам» — отдельный экшен
-            // (D-010): инвалидация всех дочерних страниц профиля
-            await updateProfileThemeSettings(id, !!data.applyThemeToChildPages);
             setSuccess(true);
             router.refresh();
         } catch (e) {
@@ -383,35 +381,6 @@ export default function ProfilePage() {
                                 </div>
                             </div>
 
-                            {/* D-010: распространение кастомной темы (раздел 06
-                                «Color Theme») на все кейс-страницы дизайнера.
-                                opt-in — по умолчанию кейсы используют дефолтные
-                                токены платформы. */}
-                            <div className='mt-8 border-t border-outline-variant pt-6'>
-                                <div className='flex items-start gap-2'>
-                                    <input
-                                        type='checkbox'
-                                        id='applyThemeToChildPages'
-                                        {...register('applyThemeToChildPages')}
-                                        disabled={!profileLoaded}
-                                        className='mt-1 h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary'
-                                    />
-                                    <div>
-                                        <Label htmlFor='applyThemeToChildPages'>
-                                            Применять мою цветовую тему к
-                                            кейсам
-                                        </Label>
-                                        <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                            Тема из раздела «06 · Color Theme»
-                                            будет действовать и на страницах
-                                            всех кейсов портфолио. Без галочки
-                                            кейсы используют стандартную тему
-                                            платформы.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
                             {error && (
                                 <p
                                     role='alert'
@@ -464,6 +433,7 @@ export default function ProfilePage() {
                             avatarFileId={initialFiles.avatar}
                             coverFileId={initialFiles.cover}
                             visibleSection={section}
+                            applyThemeToChildPages={applyThemeToChildPages}
                         />
                     </div>
                 )}
