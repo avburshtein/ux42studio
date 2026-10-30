@@ -15,6 +15,7 @@ import {
     updateProjectProblem,
     getProjectProblem,
 } from '@/lib/actions/projects';
+import SubsectionsEditor from '@/components/admin/SubsectionsEditor';
 
 const formSchema = z.object({
     problemStatement: z.string().optional().or(z.literal('')),
@@ -159,6 +160,21 @@ export default function ProblemPage({
                         rows={5}
                     />
                 </div>
+
+                {/* D-011: подразделы внутри секции Problem & Audience */}
+                {projectId && (
+                    <div className='mt-12'>
+                        <SubsectionsEditor
+                            projectId={projectId}
+                            sectionKeys={[
+                                {
+                                    key: 'problem',
+                                    label: 'Problem & Audience',
+                                },
+                            ]}
+                        />
+                    </div>
+                )}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 

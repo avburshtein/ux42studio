@@ -18,6 +18,7 @@ import {
     getProjectPreviewInfo,
     getProjectReview,
 } from '@/lib/actions/projects';
+import SubsectionsEditor from '@/components/admin/SubsectionsEditor';
 import Link from 'next/link';
 import SectionsVisibilityEditor from '@/components/admin/SectionsVisibilityEditor';
 import { TldrShareButtons } from '@/components/admin/TldrShareButtons';
@@ -358,6 +359,18 @@ export default function ReviewPage({
 
                 {/* Section visibility on the public case page (автосейв) */}
                 {projectId && <SectionsVisibilityEditor projectId={projectId} />}
+
+                {/* D-011: подразделы внутри секции Reflection */}
+                {projectId && (
+                    <div className='mt-12'>
+                        <SubsectionsEditor
+                            projectId={projectId}
+                            sectionKeys={[
+                                { key: 'reflection', label: 'Reflection' },
+                            ]}
+                        />
+                    </div>
+                )}
 
                 <div className='mt-12'></div>
 

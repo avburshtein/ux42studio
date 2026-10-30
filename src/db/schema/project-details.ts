@@ -72,3 +72,18 @@ export const projectItems = sqliteTable('project_items', {
     content: text('content').notNull(), //[cite: 1]
     order: integer('order').notNull().default(0),
 });
+
+// D-011: Подразделы внутри секций кейса — кастомные блоки
+// «заголовок + многопараграфный текст» (RichText: ссылки, списки, **жирный**).
+// sectionKey = ключ секции кейс-страницы (как в SectionsVisibilityEditor):
+// problem | research | designProcess | designSystem | testing | finalDesign | reflection
+export const projectSubsections = sqliteTable('project_subsections', {
+    id: text('id').primaryKey(),
+    projectId: text('project_id')
+        .notNull()
+        .references(() => projects.id, { onDelete: 'cascade' }),
+    sectionKey: text('section_key').notNull(),
+    heading: text('heading').notNull(),
+    body: text('body'),
+    order: integer('order').notNull().default(0),
+});

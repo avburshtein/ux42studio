@@ -42,6 +42,27 @@ function getImageUrl(r2Key: string): string {
     return `/r2/${r2Key}`;
 }
 
+// D-011: подразделы внутри секции — блоки «заголовок + RichText-текст».
+// С заголовком → карточка (как Goal/Target users), без → просто текст.
+function SubsectionBlocks({
+    items,
+}: {
+    items: Array<{ id: string; heading: string; body: string | null }>;
+}) {
+    if (items.length === 0) return null;
+    return (
+        <div className='flex flex-col gap-6'>
+            {items.map((s) =>
+                s.heading ? (
+                    <PortfolioCard key={s.id} title={s.heading} body={s.body ?? ''} />
+                ) : (
+                    <RichText key={s.id} text={s.body} />
+                ),
+            )}
+        </div>
+    );
+}
+
 // Ключи секций кейса (совпадают с SectionsVisibilityEditor) —
 // порядок массива = порядок секций на странице
 type CaseSectionKey =
@@ -143,7 +164,7 @@ export default async function ProjectPage({ params }: PageProps) {
     }
 
     // 3. Параллельная загрузка всех данных кейса
-    const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews, baCardsData] =
+    const [assets, personas, keyMetrics, comparisons, items, colorRolesData, reviews, baCardsData, subsectionsAll] =
         await Promise.all([
             db.query.projectAssets.findMany({
                 where: { projectId: project.id },
@@ -177,6 +198,11 @@ export default async function ProjectPage({ params }: PageProps) {
                 orderBy: { order: 'asc' },
             }),
             db.query.baCards.findMany({
+                where: { projectId: project.id },
+                orderBy: { order: 'asc' },
+            }),
+            // D-011: подразделы внутри секций кейса
+            db.query.projectSubsections.findMany({
                 where: { projectId: project.id },
                 orderBy: { order: 'asc' },
             }),
@@ -241,35 +267,53 @@ export default async function ProjectPage({ params }: PageProps) {
     const toolItems = items.filter((i) => i.type === 'tool');
     const nextStepItems = items.filter((i) => i.type === 'next_step');
 
+    // D-011: подразделы по ключу секции (order уже отсортирован в запросе)
+    const subsections = (key: string) =>
+        subsectionsAll.filter((s) => s.sectionKey === key);
+
     const showProblem = !!(
         project.problemStatement ||
         project.projectGoal ||
-        project.targetUsers
+        project.targetUsers ||
+        subsections('problem').length > 0
     );
     const showResearch = !!(
         project.researchMethodology ||
         keyMetrics.length > 0 ||
-        personas.length > 0
+        personas.length > 0 ||
+        project.userStory ||
+        subsections('research').length > 0
     );
     const showDesignProcess = !!(
-        project.designApproach || wireframeAssets.length > 0
+        project.designApproach ||
+        wireframeAssets.length > 0 ||
+        subsections('designProcess').length > 0
     );
     const showDesignSystem = !!(
         moodboardAssets.length > 0 ||
         colorRolesData.length > 0 ||
         project.displayFont ||
-        project.bodyFont
+        project.bodyFont ||
+        subsections('designSystem').length > 0
     );
     const showTesting =
-        comparisons.length > 0 || !!project.testingProcess?.trim();
+        comparisons.length > 0 ||
+        !!project.testingProcess?.trim() ||
+        subsections('testing').length > 0;
     const showFinalDesign = !!(
         finalGalleryAssets.length > 0 ||
         resultItems.length > 0 ||
         toolItems.length > 0 ||
         project.figmaPrototypeUrl ||
-        project.webPrototypeUrl
+        project.webPrototypeUrl ||
+        subsections('finalDesign').length > 0
     );
-    const showReflection = !!(project.keyTakeaway || nextStepItems.length > 0);
+    const showReflection = !!(
+        project.keyTakeaway ||
+        nextStepItems.length > 0 ||
+        reviews.length > 0 ||
+        subsections('reflection').length > 0
+    );
 
     // Видимость секций: авто-скрытие пустых секций + чекбоксы визарда
     // (projects.sectionsVisibility, ключ absent = показывать). Номера секций
@@ -401,6 +445,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             />
                                         )}
                                     </div>
+                                    <SubsectionBlocks
+                                        items={subsections('problem')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -447,6 +494,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             }
                                         />
                                     ))}
+                                    <SubsectionBlocks
+                                        items={subsections('research')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -477,6 +527,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             финальная веб-демка, а не lo-fi
                                             (фидбэк 2026-10-26) */}
                                     </div>
+                                    <SubsectionBlocks
+                                        items={subsections('designProcess')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -524,6 +577,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             bodyFontSpec={project.bodyFontSpec}
                                         />
                                     </div>
+                                    <SubsectionBlocks
+                                        items={subsections('designSystem')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -563,6 +619,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             />
                                         ))}
                                     </div>
+                                    <SubsectionBlocks
+                                        items={subsections('testing')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -716,6 +775,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             </div>
                                         )}
                                     </div>
+                                    <SubsectionBlocks
+                                        items={subsections('finalDesign')}
+                                    />
                                 </CaseSection>
                             )}
 
@@ -772,6 +834,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             </div>
                                         </div>
                                     )}
+                                    <SubsectionBlocks
+                                        items={subsections('reflection')}
+                                    />
                                 </CaseSection>
                             )}
                         </div>

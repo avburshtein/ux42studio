@@ -21,6 +21,7 @@ import {
     replaceProjectAssetsByType,
     getProjectAssetsByType,
 } from '@/lib/actions/projects';
+import SubsectionsEditor from '@/components/admin/SubsectionsEditor';
 
 const wireframeSchema = z.object({
     id: z.string().optional(),
@@ -352,6 +353,22 @@ export default function DesignPage({
                         </p>
                     )}
                 </div>
+
+                {/* D-011: подразделы секций Design Process / Design System */}
+                {projectId && (
+                    <div className='mt-12'>
+                        <SubsectionsEditor
+                            projectId={projectId}
+                            sectionKeys={[
+                                {
+                                    key: 'designProcess',
+                                    label: 'Design Process',
+                                },
+                                { key: 'designSystem', label: 'Design System' },
+                            ]}
+                        />
+                    </div>
+                )}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 

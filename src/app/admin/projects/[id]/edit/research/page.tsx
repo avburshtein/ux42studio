@@ -17,6 +17,7 @@ import {
     updateProjectResearch,
     getProjectResearch,
 } from '@/lib/actions/projects';
+import SubsectionsEditor from '@/components/admin/SubsectionsEditor';
 
 const personaSchema = z.object({
     id: z.string().optional(),
@@ -377,6 +378,18 @@ export default function ResearchPage({
                         </div>
                     ))}
                 </div>
+
+                {/* D-011: подразделы внутри секции User Research */}
+                {projectId && (
+                    <div className='mt-12'>
+                        <SubsectionsEditor
+                            projectId={projectId}
+                            sectionKeys={[
+                                { key: 'research', label: 'User Research' },
+                            ]}
+                        />
+                    </div>
+                )}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 

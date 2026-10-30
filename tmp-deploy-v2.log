@@ -1,0 +1,248 @@
+nohup: ignoring input
+
+> my-next-app@0.1.0 deploy
+> npm run build:cf && node scripts/build-cloudflare.mjs deploy
+
+
+> my-next-app@0.1.0 build:cf
+> node scripts/build-cloudflare.mjs build
+
+[ux42] Скрыты на время сборки (секреты не попадут в бандл): .env.local
+
+┌─────────────────────────────┐
+│ OpenNext — Cloudflare build │
+└─────────────────────────────┘
+
+WARN OpenNext is not fully compatible with Windows.
+WARN For optimal performance, it is recommended to use Windows Subsystem for Linux (WSL).
+WARN While OpenNext may function on Windows, it could encounter unpredictable failures during runtime.
+App directory: D:\Хранилище\Projects\ux42studio
+Next.js version : 16.1.5
+@opennextjs/cloudflare version: 1.17.1
+@opennextjs/aws version: 3.9.16
+
+┌─────────────────────────────────┐
+│ OpenNext — Building Next.js app │
+└─────────────────────────────────┘
+
+
+> my-next-app@0.1.0 build
+> next build --webpack
+
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+▲ Next.js 16.1.5 (webpack)
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+✓ Compiled successfully in 21.1s
+  Running TypeScript ...
+  Collecting page data using 21 workers ...
+  Generating static pages using 21 workers (0/46) ...
+  Generating static pages using 21 workers (11/46) 
+  Generating static pages using 21 workers (22/46) 
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+Using secrets defined in .dev.vars
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+  Generating static pages using 21 workers (34/46) 
+✓ Generating static pages using 21 workers (46/46) in 6.0s
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)                             Revalidate  Expire
+┌ ○ /                                           5m      1y
+├ ○ /_not-found
+├ ○ /admin
+├ ○ /admin/profile
+├ ○ /admin/profile/password
+├ ƒ /admin/projects/[id]/edit
+├ ƒ /admin/projects/[id]/edit/design
+├ ƒ /admin/projects/[id]/edit/gallery
+├ ƒ /admin/projects/[id]/edit/general
+├ ƒ /admin/projects/[id]/edit/problem
+├ ƒ /admin/projects/[id]/edit/research
+├ ƒ /admin/projects/[id]/edit/results
+├ ƒ /admin/projects/[id]/edit/review
+├ ƒ /admin/projects/[id]/edit/showcase
+├ ƒ /admin/projects/new
+├ ○ /admin/settings
+├ ƒ /api/admin/projects
+├ ƒ /api/auth/forgot-password
+├ ƒ /api/auth/init
+├ ƒ /api/auth/login
+├ ƒ /api/auth/register
+├ ƒ /api/auth/reset-password
+├ ƒ /api/health
+├ ƒ /api/session
+├ ƒ /api/upload
+├ ○ /forgot-password
+├ ○ /help
+├ ● /help/[slug]
+│ ├ /help/how-invites-work
+│ ├ /help/registering-your-account
+│ ├ /help/signing-in-and-sessions
+│ └ [+13 more paths]
+├ ○ /icon.png
+├ ○ /login
+├ ○ /manifest.webmanifest
+├ ○ /platform                                   5m      1y
+├ ○ /privacy
+├ ƒ /r2/[...key]
+├ ƒ /register
+├ ƒ /reset-password
+├ ○ /robots.txt
+├ ƒ /sitemap.xml
+├ ƒ /super-admin
+├ ƒ /super-admin/invites
+├ ƒ /super-admin/projects
+├ ƒ /super-admin/users
+├ ○ /terms
+├ ƒ /u/[slug]
+├ ƒ /u/[slug]/[projectSlug]
+└ ƒ /u/[slug]/[projectSlug]/short
+
+
+ƒ Proxy (Middleware)
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+
+
+┌──────────────────────────────┐
+│ OpenNext — Generating bundle │
+└──────────────────────────────┘
+
+Bundling middleware function...
+Bundling static assets...
+Bundling cache assets...
+Building server function: default...
+Applying code patches: 11.552s
+# copyPackageTemplateFiles
+[35m⚙️ Bundling the OpenNext server...
+[0m
+[35mWorker saved in `.open-next\worker.js` 🚀
+[0m
+OpenNext build complete.
+
+┌──────────────────────────────┐
+│ OpenNext — Cloudflare deploy │
+└──────────────────────────────┘
+
+WARN OpenNext is not fully compatible with Windows.
+WARN For optimal performance, it is recommended to use Windows Subsystem for Linux (WSL).
+WARN While OpenNext may function on Windows, it could encounter unpredictable failures during runtime.
+Using secrets defined in .dev.vars
+[33m▲ [43;33m[[43;30mWARNING[43;33m][0m [1m				You have defined bindings to the following internal Durable Objects:[0m
+
+  				- {"name":"NEXT_CACHE_DO_QUEUE","class_name":"DOQueueHandler"}
+  				These will not work in local development, but they should work in production.
+  
+  				If you want to develop these locally, you can define your DO in a separate Worker, with a separate configuration file.
+  				For detailed instructions, refer to the Durable Objects section here: [4mhttps://developers.cloudflare.com/workers/wrangler/api#supported-bindings[0m
+
+
+workerd/server/server.c++:1975: warning: A DurableObjectNamespace in the config referenced the class "DOQueueHandler", but no such Durable Object class is exported from the worker. Please make sure the class name matches, it is exported, and the class extends 'DurableObject'. Attempts to call to this Durable Object class will fail at runtime, but historically this was not a startup-time error. Future versions of workerd may make this a startup-time error.
+
+Populating R2 incremental cache...
+Successfully populated cache with 32 assets
+Tag cache does not need populating
+
+ ⛅️ wrangler 4.86.0 (update available 4.156.0)
+──────────────────────────────────────────────
+🌀 Building list of assets...
+✨ Read 178 files from the assets directory D:\Хранилище\Projects\ux42studio\.open-next\assets
+🌀 Starting asset upload...
+🌀 Found 5 new or modified static assets to upload. Proceeding with upload...
++ /BUILD_ID
++ /_next/static/chunks/app/admin/projects/[id]/edit/gallery/page-bfece27c8273b045.js
++ /_next/static/chunks/app/admin/projects/[id]/edit/layout-aefca3632c92511b.js
++ /_next/static/css/71e9f62ba7030403.css
++ /_next/static/chunks/app/admin/projects/[id]/edit/design/page-c5b689d9fca114f2.js
+Uploaded 2 of 5 assets
+Uploaded 3 of 5 assets
+Uploaded 5 of 5 assets
+✨ Success! Uploaded 5 files (105 already uploaded) (1.96 sec)
+
+Total Upload: 9031.90 KiB / gzip: 1685.83 KiB
+Worker Startup Time: 37 ms
+Your Worker has access to the following bindings:
+Binding                                                                  Resource                  
+env.NEXT_CACHE_DO_QUEUE (DOQueueHandler)                                 Durable Object            
+env.DB (ux42-portfolio-db)                                               D1 Database               
+env.MY_BUCKET (ux42-assets)                                              R2 Bucket                 
+env.NEXT_INC_CACHE_R2_BUCKET (ux42-assets)                               R2 Bucket                 
+env.WORKER_SELF_REFERENCE (ux42next)                                     Worker                    
+env.ASSETS                                                               Assets                    
+env.STUDIO_PROFILE_SLUG ("av-burshtein")                                 Environment Variable      
+env.EMAIL_FROM ("UX42 Studio <no-reply@ux42.studio>")                    Environment Variable      
+env.EMAIL_FROM_NAME ("UX42 Studio")                                      Environment Variable      
+env.APP_URL ("https://ux42.studio")                                      Environment Variable      
+
+Uploaded ux42next (23.72 sec)
+Deployed ux42next triggers (4.96 sec)
+  ux42.studio (custom domain)
+Current Version ID: f5fc6f70-ab81-4b9d-8071-1b2135d2c53b
+(node:19992) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(Use `node --trace-deprecation ...` to show where the warning was created)

@@ -8,6 +8,14 @@
 
 ---
 
+## D-011 · 2026-10-31 · Подразделы внутри секций кейса · ✅ Принято
+
+- **Контекст:** Дизайнеру не хватает полей внутри секций кейса — нужен контент, который не лезет ни в одно существующее поле: блоки «заголовок + несколько абзацев» (фидбэк 2026-10-30).
+- **Варианты:** (а) JSON-колонка на projects с картой подразделов; (б) отдельная таблица `project_subsections` с sectionKey; (в) захардкоженные дополнительные поля.
+- **Решение:** (б) — таблица `project_subsections` (id, projectId→cascade, sectionKey, heading, body, order; индекс project_id+section_key+order). Админ: `SubsectionsEditor` в 5 шагах визарда (Problem, Research, Design [designProcess/designSystem], Showcase [finalDesign/testing], Review [reflection]) — своя кнопка Save, порядок ↑/↓, селект секции при нескольких ключах. Сервер: `updateProjectSubsections` перезаписывает подразделы только указанных ключей (паттерн replaceProjectAssetsByType). Публичная страница: `SubsectionBlocks` в конце каждой секции — с заголовком → PortfolioCard, без → RichText; подразделы учитываются в авто-видимости секций.
+- **Почему:** отдельная таблица следует паттерну project-details (персоны/метрики/отзывы) и позволяет менять набор секций без миграций; перезапись по ключам не даёт шагам визарда затирать чужие подразделы; RichText-текст бесплатно даёт ссылки/списки/жирный (D-009/ссылки).
+- **Где:** `src/db/schema/project-details.ts`, `drizzle/20261031000000_add_project_subsections/`, `src/lib/actions/projects.ts`, `src/components/admin/SubsectionsEditor.tsx`, шаги `problem|research|design|showcase|review`, `src/app/(public)/u/[slug]/[projectSlug]/page.tsx`.
+
 ## D-010 · 2026-10-30 · Кастомная тема дизайнера на кейс-страницах · ✅ Принято
 
 - **Контекст:** Дизайнер настраивает цветовую тему своей главной страницы (раздел 06 Color Theme, seed → M3), но кейс-страницы остаются на дефолтных токенах платформы — визуальный разрыв при переходе главная → кейс.

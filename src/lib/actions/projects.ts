@@ -19,6 +19,7 @@ import {
     projectComparisons,
     projectReviews,
     projectItems,
+    projectSubsections,
     baCards,
 } from '@/db/schema/project-details';
 import { eq, and, inArray, asc, desc, sql } from 'drizzle-orm';
@@ -720,6 +721,70 @@ export async function getProjectAssetsByType(
             ),
         )
         .orderBy(asc(projectAssets.order));
+}
+
+// ---- Subsections (D-011): подразделы внутри секций кейса ----
+
+export async function getProjectSubsections(projectId: string) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+    return db
+        .select({
+            id: projectSubsections.id,
+            sectionKey: projectSubsections.sectionKey,
+            heading: projectSubsections.heading,
+            body: projectSubsections.body,
+            order: projectSubsections.order,
+        })
+        .from(projectSubsections)
+        .where(eq(projectSubsections.projectId, projectId))
+        .orderBy(asc(projectSubsections.order))
+        .all();
+}
+
+/**
+ * Заменяет подразделы только указанных секций (как replaceProjectAssetsByType
+ * для ассетов): шаг визарда управляет своими ключами и не затирает чужие.
+ * Пустые строки (без заголовка и текста) отфильтровываются.
+ */
+export async function updateProjectSubsections(
+    projectId: string,
+    keys: string[],
+    items: Array<{
+        id?: string;
+        sectionKey: string;
+        heading?: string;
+        body?: string;
+        order: number;
+    }>,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db.batch([
+        db.delete(projectSubsections).where(
+            and(
+                eq(projectSubsections.projectId, projectId),
+                inArray(projectSubsections.sectionKey, keys),
+            ),
+        ),
+        ...items
+            .filter((s) => (s.heading ?? '').trim() || (s.body ?? '').trim())
+            .map((s) =>
+                db.insert(projectSubsections).values({
+                    id: s.id || crypto.randomUUID(),
+                    projectId,
+                    sectionKey: s.sectionKey,
+                    heading: (s.heading ?? '').trim(),
+                    body: (s.body ?? '').trim() || null,
+                    order: s.order,
+                }),
+            ),
+    ]);
+
+    revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
+    revalidatePath('/', 'layout');
 }
 
 export async function getProjectGallery(projectId: string) {

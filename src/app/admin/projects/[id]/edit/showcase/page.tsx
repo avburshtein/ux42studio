@@ -17,6 +17,7 @@ import {
     updateProjectShowcase,
     getProjectShowcase,
 } from '@/lib/actions/projects';
+import SubsectionsEditor from '@/components/admin/SubsectionsEditor';
 
 const comparisonSchema = z.object({
     id: z.string().optional(),
@@ -338,6 +339,22 @@ export default function ShowcasePage({
                         </div>
                     ))}
                 </div>
+
+                {/* D-011: подразделы секций Final Design / Testing */}
+                {projectId && (
+                    <div className='mt-12'>
+                        <SubsectionsEditor
+                            projectId={projectId}
+                            sectionKeys={[
+                                { key: 'finalDesign', label: 'Final Design' },
+                                {
+                                    key: 'testing',
+                                    label: 'Testing & Iteration',
+                                },
+                            ]}
+                        />
+                    </div>
+                )}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
