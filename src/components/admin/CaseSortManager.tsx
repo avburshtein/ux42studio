@@ -36,6 +36,7 @@ import {
 } from '@/lib/actions/projects';
 import type { CaseSortMode } from '@/db/schema/profiles';
 import { cn } from '@/lib/utils';
+import { useAdminLang } from '@/components/admin/AdminLang';
 
 export type CaseProjectRow = {
     id: string;
@@ -57,28 +58,28 @@ interface CaseSortManagerProps {
     onRefresh?: () => void;
 }
 
-const SORT_OPTIONS: Array<{ value: CaseSortMode; label: string }> = [
-    { value: 'newest', label: 'Сначала новые' },
-    { value: 'oldest', label: 'Сначала старые' },
-    { value: 'alpha_asc', label: 'A → Z' },
-    { value: 'alpha_desc', label: 'Z → A' },
-    { value: 'manual', label: 'Вручную (drag & drop)' },
+const SORT_OPTIONS: Array<{ value: CaseSortMode; labelKey: string }> = [
+    { value: 'newest', labelKey: 'projects.sortNewest' },
+    { value: 'oldest', labelKey: 'projects.sortOldest' },
+    { value: 'alpha_asc', labelKey: 'projects.sortAlphaAsc' },
+    { value: 'alpha_desc', labelKey: 'projects.sortAlphaDesc' },
+    { value: 'manual', labelKey: 'projects.sortManual' },
 ];
 
 const STATUS_META: Record<
     CaseProjectRow['status'],
-    { label: string; className: string }
+    { labelKey: string; className: string }
 > = {
     published: {
-        label: 'Опубликован',
+        labelKey: 'projects.statusPublished',
         className: 'bg-primary-container text-on-primary-container',
     },
     draft: {
-        label: 'Черновик',
+        labelKey: 'projects.statusDraft',
         className: 'bg-surface-variant text-on-surface-variant',
     },
     archived: {
-        label: 'Архив',
+        labelKey: 'projects.statusArchived',
         className: 'bg-surface-variant text-on-surface-variant',
     },
 };
@@ -104,6 +105,7 @@ function RowContent({
     pending,
 }: RowActionsProps) {
     const meta = STATUS_META[row.status];
+    const { t } = useAdminLang();
     return (
         // Мобила: заголовок+badge и кнопки действий — двумя строками,
         // чтобы действия не уезжали за край (D-008). ≥sm — один ряд.
@@ -124,7 +126,7 @@ function RowContent({
                         meta.className,
                     )}
                 >
-                    {meta.label}
+                    {t(meta.labelKey)}
                 </span>
 
                 <span className='hidden w-14 shrink-0 text-right text-body-sm text-on-surface-variant sm:block'>
@@ -142,7 +144,7 @@ function RowContent({
                     disabled={pending}
                     className='text-error'
                 >
-                    Удалить
+                    {t('projects.delete')}
                 </Button>
                 {row.status === 'published' && (
                     <Button
@@ -150,7 +152,7 @@ function RowContent({
                         onClick={() => onSetStatus(row.id, 'unpublish')}
                         disabled={pending}
                     >
-                        Снять с&nbsp;публикации
+                        {t('projects.unpublish')}
                     </Button>
                 )}
                 {row.status === 'published' && (
@@ -159,7 +161,7 @@ function RowContent({
                         onClick={() => onSetStatus(row.id, 'archive')}
                         disabled={pending}
                     >
-                        В&nbsp;архив
+                        {t('projects.archive')}
                     </Button>
                 )}
                 {row.status === 'draft' && (
@@ -169,7 +171,7 @@ function RowContent({
                         disabled={pending}
                         className='text-primary'
                     >
-                        Опубликовать
+                        {t('projects.publish')}
                     </Button>
                 )}
                 {row.status === 'archived' && (
@@ -179,11 +181,11 @@ function RowContent({
                         disabled={pending}
                         className='text-primary'
                     >
-                        Восстановить
+                        {t('projects.unarchive')}
                     </Button>
                 )}
                 <Link href={`/u/${profileSlug}/${row.slug}`}>
-                    <Button variant='ghost'>На&nbsp;сайт</Button>
+                    <Button variant='ghost'>{t('projects.viewSite')}</Button>
                 </Link>
             </div>
         </div>
@@ -276,6 +278,7 @@ export default function CaseSortManager({
     manualRows,
     onRefresh,
 }: CaseSortManagerProps) {
+    const { t } = useAdminLang();
     const router = useRouter();
     const [mode, setMode] = useState<CaseSortMode>(initialMode);
     const [manual, setManual] = useState<CaseProjectRow[]>(manualRows);
@@ -382,7 +385,7 @@ export default function CaseSortManager({
                     htmlFor='case-sort-mode'
                     className='text-label-md text-on-surface-variant'
                 >
-                    Сортировка
+                    {t('projects.sortLabel')}
                 </label>
                 {/* Нативный select рисует шеврон с непредсказуемыми отступами —
                     убираем appearance и рисуем свой: зазоры симметричны —
@@ -400,7 +403,7 @@ export default function CaseSortManager({
                     >
                         {SORT_OPTIONS.map((opt) => (
                             <option key={opt.value} value={opt.value}>
-                                {opt.label}
+                                {t(opt.labelKey)}
                             </option>
                         ))}
                     </select>
@@ -415,7 +418,7 @@ export default function CaseSortManager({
                             className='h-4 w-4 animate-spin'
                             aria-hidden='true'
                         />
-                        Сохраняем…
+                        {t('common.saving')}
                     </span>
                 ) : saved ? (
                     <span
@@ -423,15 +426,14 @@ export default function CaseSortManager({
                         role='status'
                     >
                         <Check className='h-4 w-4' aria-hidden='true' />
-                        Сохранено
+                        {t('common.saved')}
                     </span>
                 ) : null}
             </div>
 
             {mode === 'manual' && (
                 <p className='mb-2 text-body-sm text-on-surface-variant'>
-                    Перетаскивайте строки за значок ⠿ — порядок сразу
-                    применится на сайте.
+                    {t('projects.manualHint')}
                 </p>
             )}
 

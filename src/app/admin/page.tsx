@@ -9,13 +9,14 @@ import PageTitle from '@/components/ui/PageTitle';
 import CaseSortManager, {
     type CaseProjectRow,
 } from '@/components/admin/CaseSortManager';
+import { useAdminLang } from '@/components/admin/AdminLang';
 import type { CaseSortMode } from '@/db/schema/profiles';
 
 const STATUS_TABS = [
-    { value: 'all', label: 'Все' },
-    { value: 'draft', label: 'Черновики' },
-    { value: 'published', label: 'Опубликованные' },
-    { value: 'archived', label: 'Архив' },
+    { value: 'all', labelKey: 'dashboard.tabAll' },
+    { value: 'draft', labelKey: 'dashboard.tabDrafts' },
+    { value: 'published', labelKey: 'dashboard.tabPublished' },
+    { value: 'archived', labelKey: 'dashboard.tabArchived' },
 ] as const;
 
 type StatusFilter = (typeof STATUS_TABS)[number]['value'];
@@ -57,6 +58,7 @@ interface DashboardData {
  */
 export default function AdminDashboardPage() {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [data, setData] = useState<DashboardData | null>(null);
     const [failed, setFailed] = useState(false);
     const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -164,16 +166,16 @@ export default function AdminDashboardPage() {
         <main className=''>
             <div className='mb-8 flex items-center justify-between'>
                 <div className=''>
-                    <PageTitle>Мои проекты</PageTitle>
+                    <PageTitle>{t('dashboard.title')}</PageTitle>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Управляйте своими кейсами
+                        {t('dashboard.subtitle')}
                     </p>
                 </div>
 
                 <div>
                     <Link href='/admin/projects/new'>
                         <Button className='whitespace-nowrap'>
-                            Создать проект
+                            {t('dashboard.createProject')}
                         </Button>
                     </Link>
                 </div>
@@ -191,7 +193,7 @@ export default function AdminDashboardPage() {
                                 : 'border-transparent text-on-surface-variant hover:text-on-surface'
                         }`}
                     >
-                        {tab.label}
+                        {t(tab.labelKey)}
                     </button>
                 ))}
             </div>
@@ -199,18 +201,16 @@ export default function AdminDashboardPage() {
             {data === null ? (
                 <Card className='flex flex-col items-center gap-4 py-16 text-center'>
                     <p className='text-body-lg text-on-surface-variant'>
-                        {failed
-                            ? 'Не удалось загрузить проекты. Попробуйте обновить страницу.'
-                            : 'Загружаем проекты…'}
+                        {failed ? t('dashboard.loadError') : t('dashboard.loading')}
                     </p>
                 </Card>
             ) : projectList.length === 0 ? (
                 <Card className='flex flex-col items-center gap-4 py-16 text-center'>
                     <p className='text-body-lg text-on-surface-variant'>
-                        Проектов в этой категории нет
+                        {t('dashboard.emptyFiltered')}
                     </p>
                     <Link href='/admin/projects/new'>
-                        <Button>Создать проект</Button>
+                        <Button>{t('dashboard.createProject')}</Button>
                     </Link>
                 </Card>
             ) : (

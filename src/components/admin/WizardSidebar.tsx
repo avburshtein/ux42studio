@@ -4,16 +4,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAdminLang } from '@/components/admin/AdminLang';
 
 const STEPS = [
-    { key: 'general', label: 'General (Meta)', path: 'general' },
-    { key: 'problem', label: 'Problem & Audience', path: 'problem' },
-    { key: 'research', label: 'Research', path: 'research' },
-    { key: 'design', label: 'Design', path: 'design' },
-    { key: 'gallery', label: 'Gallery', path: 'gallery' },
-    { key: 'showcase', label: 'Showcase', path: 'showcase' },
-    { key: 'results', label: 'Results', path: 'results' },
-    { key: 'review', label: 'Review & Publish', path: 'review' },
+    { key: 'general', path: 'general' },
+    { key: 'problem', path: 'problem' },
+    { key: 'research', path: 'research' },
+    { key: 'design', path: 'design' },
+    { key: 'gallery', path: 'gallery' },
+    { key: 'showcase', path: 'showcase' },
+    { key: 'results', path: 'results' },
+    { key: 'review', path: 'review' },
 ] as const;
 
 export function WizardSidebar({
@@ -28,6 +29,7 @@ export function WizardSidebar({
     projectSlug?: string;
 }) {
     const pathname = usePathname();
+    const { t } = useAdminLang();
     const dropdownRef = useRef<HTMLUListElement>(null);
     // Моб. dropdown-«фильтр» шагов (референс 2026-10-26: хедер + фильтр
     // разделов). Закрывается при переходе, тапе на раздел и тапе вне меню.
@@ -60,6 +62,7 @@ export function WizardSidebar({
 
     const stepHref = (path: string) =>
         `/admin/projects/${projectId}/edit/${path}`;
+    const stepLabel = (key: string) => t(`wizard.nav.${key}`);
     const activeStep = STEPS.find((s) => pathname === stepHref(s.path));
 
     return (
@@ -77,11 +80,13 @@ export function WizardSidebar({
                     type='button'
                     onClick={() => setOpen((v) => !v)}
                     aria-expanded={open}
-                    aria-label='Выбрать раздел кейса'
+                    aria-label={t('wizard.selectSection')}
                     className='flex w-full items-center justify-between gap-2 rounded-md border border-outline-variant bg-surface px-4 py-3 text-title-md text-on-surface'
                 >
                     <span className='truncate'>
-                        {activeStep?.label ?? projectTitle}
+                        {activeStep
+                            ? stepLabel(activeStep.key)
+                            : projectTitle}
                     </span>
                     <ChevronDown
                         className={`h-5 w-5 shrink-0 transition-transform ${
@@ -110,7 +115,7 @@ export function WizardSidebar({
                                                 : 'text-on-surface-variant'
                                         }`}
                                     >
-                                        {step.label}
+                                        {stepLabel(step.key)}
                                         {isActive && (
                                             <Check className='h-5 w-5 shrink-0 text-primary' />
                                         )}
@@ -127,7 +132,7 @@ export function WizardSidebar({
                                     className='flex items-center gap-2 px-4 py-3 text-body-lg text-primary'
                                 >
                                     <Eye className='h-5 w-5' />
-                                    Просмотр проекта
+                                    {t('wizard.viewProject')}
                                 </Link>
                             </li>
                         )}
@@ -157,7 +162,7 @@ export function WizardSidebar({
                                             : 'text-on-surface-variant hover:bg-surface-variant/50'
                                     }`}
                                 >
-                                    {step.label}
+                                    {stepLabel(step.key)}
                                 </Link>
                             </li>
                         );
@@ -180,7 +185,7 @@ export function WizardSidebar({
                         >
                             <Eye />{' '}
                             <span className='font-medium'>
-                                Просмотр проекта
+                                {t('wizard.viewProject')}
                             </span>
                         </Link>
                     </div>

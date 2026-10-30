@@ -6,6 +6,11 @@ import { useRouter, usePathname } from 'next/navigation';
 import { logout } from '@/lib/actions/auth';
 import { LogOut, Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/case/ThemeToggle';
+import {
+    AdminLangProvider,
+    AdminLangSwitch,
+    useAdminLang,
+} from '@/components/admin/AdminLang';
 
 /** Ответ GET /api/session (тот же эндпоинт, что использует AuthBar). */
 interface SessionResponse {
@@ -34,6 +39,19 @@ export default function AdminShell({
 }: {
     children: React.ReactNode;
 }) {
+    return (
+        <AdminLangProvider>
+            <AdminShellInner>{children}</AdminShellInner>
+        </AdminLangProvider>
+    );
+}
+
+function AdminShellInner({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    const { t } = useAdminLang();
     const router = useRouter();
     const [session, setSession] = useState<{
         role: string;
@@ -71,15 +89,15 @@ export default function AdminShell({
     // Глобальная навигация: одна коллекция для десктоп-навигации и drawer
     const navLinks: Array<{ href: string; label: string }> = [
         ...(isSuperAdmin
-            ? [{ href: '/super-admin', label: 'Суперадминка' }]
+            ? [{ href: '/super-admin', label: t('nav.superAdmin') }]
             : []),
-        { href: '/admin', label: 'Ред. проекты' },
-        { href: '/admin/profile', label: 'Редактировать страницу сайта' },
-        { href: '/admin/settings', label: 'Настройки профиля' },
+        { href: '/admin', label: t('nav.projects') },
+        { href: '/admin/profile', label: t('nav.profilePage') },
+        { href: '/admin/settings', label: t('nav.settings') },
         ...(profileSlug
-            ? [{ href: `/u/${profileSlug}`, label: 'Мой сайт' }]
+            ? [{ href: `/u/${profileSlug}`, label: t('nav.mySite') }]
             : []),
-        { href: '/help', label: 'Справка' },
+        { href: '/help', label: t('nav.help') },
     ];
 
     // Drawer закрывается при переходе, Escape и блокирует скролл фона
@@ -114,7 +132,7 @@ export default function AdminShell({
                             <button
                                 type='button'
                                 onClick={() => setMenuOpen(true)}
-                                aria-label='Открыть меню'
+                                aria-label={t('nav.openMenu')}
                                 aria-expanded={menuOpen}
                                 className='-ml-2 rounded-md p-2 text-on-surface hover:bg-surface-variant lg:hidden'
                             >
@@ -141,6 +159,7 @@ export default function AdminShell({
                                 Размер 48×48 — по спеке (§74) и WCAG 2.5.5
                                 Target Size (AAA, 44px min); Material 3 = 48 */}
                             <ThemeToggle />
+                            <AdminLangSwitch />
                             {/* Выход на мобиле — в drawer (кнопка узкая) */}
                             <form action={logout} className='hidden lg:block'>
                                 <button
@@ -148,7 +167,7 @@ export default function AdminShell({
                                     className='inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-label-md text-on-surface-variant hover:bg-surface-variant hover:text-on-surface transition-colors'
                                 >
                                     <LogOut className='h-4 w-4' />
-                                    Выйти
+                                    {t('nav.signOut')}
                                 </button>
                             </form>
                         </div>
@@ -162,7 +181,7 @@ export default function AdminShell({
                         className='fixed inset-0 z-50 lg:hidden'
                         role='dialog'
                         aria-modal='true'
-                        aria-label='Меню админки'
+                        aria-label={t('nav.adminMenu')}
                     >
                         <div
                             className='absolute inset-0 bg-black/40'
@@ -176,7 +195,7 @@ export default function AdminShell({
                                 <button
                                     type='button'
                                     onClick={() => setMenuOpen(false)}
-                                    aria-label='Закрыть меню'
+                                    aria-label={t('nav.closeMenu')}
                                     className='rounded-md p-2 text-on-surface hover:bg-surface-variant'
                                 >
                                     <X className='h-6 w-6' />
@@ -207,7 +226,7 @@ export default function AdminShell({
                                     className='flex w-full items-center gap-2 rounded-md px-3 py-3 text-body-lg text-on-surface-variant hover:bg-surface-variant hover:text-on-surface'
                                 >
                                     <LogOut className='h-4 w-4' />
-                                    Выйти
+                                    {t('nav.signOut')}
                                 </button>
                             </form>
                         </div>

@@ -1,0 +1,80 @@
+// Словарь интерфейса админки — английский (D-012). Типизирован структурой
+// ru.ts: TypeScript требует те же ключи — словари не разъедутся.
+import type { Translations } from './ru';
+
+const en: Translations = {
+    common: {
+        save: 'Save',
+        saving: 'Saving…',
+        saved: 'Saved ✓',
+        cancel: 'Cancel',
+        remove: 'Remove',
+        add: 'Add',
+        back: '← Back',
+        loading: 'Loading…',
+        saveFailed: 'Save failed',
+        required: 'Required',
+        reset: 'Reset',
+    },
+    nav: {
+        superAdmin: 'Super admin',
+        projects: 'Edit projects',
+        profilePage: 'Edit site page',
+        settings: 'Profile settings',
+        mySite: 'My site',
+        help: 'Help',
+        signOut: 'Sign out',
+        openMenu: 'Open menu',
+        closeMenu: 'Close menu',
+        adminMenu: 'Admin menu',
+        langLabel: 'Interface language',
+    },
+    dashboard: {
+        title: 'My projects',
+        subtitle: 'Manage your cases',
+        createProject: 'Create project',
+        tabAll: 'All',
+        tabDrafts: 'Drafts',
+        tabPublished: 'Published',
+        tabArchived: 'Archived',
+        loading: 'Loading projects…',
+        loadError: 'Failed to load projects. Try refreshing the page.',
+        emptyFiltered: 'No projects in this category',
+    },
+    projects: {
+        statusPublished: 'Published',
+        statusDraft: 'Draft',
+        statusArchived: 'Archived',
+        delete: 'Delete',
+        unpublish: 'Unpublish',
+        archive: 'Archive',
+        publish: 'Publish',
+        unarchive: 'Restore',
+        viewSite: 'View site',
+        sortLabel: 'Sorting',
+        sortNewest: 'Newest first',
+        sortOldest: 'Oldest first',
+        sortAlphaAsc: 'A → Z',
+        sortAlphaDesc: 'Z → A',
+        sortManual: 'Manual (drag & drop)',
+        manualHint:
+            'Drag rows by the ⠿ handle — the order applies to the site instantly.',
+    },
+    wizard: {
+        nav: {
+            general: 'General (Meta)',
+            problem: 'Problem & Audience',
+            research: 'Research',
+            design: 'Design',
+            gallery: 'Gallery',
+            showcase: 'Showcase',
+            results: 'Results',
+            review: 'Review & Publish',
+        },
+        selectSection: 'Select case section',
+        viewProject: 'View project',
+        saveNext: 'Save & Next →',
+    },
+};
+
+export default en;

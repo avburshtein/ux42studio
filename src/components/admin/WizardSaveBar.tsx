@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { useAdminLang } from '@/components/admin/AdminLang';
 
 /**
  * Флаг «Saved ✓» для шагов визарда кейса: markSaved() включает индикатор,
@@ -45,10 +46,11 @@ export default function WizardSaveBar({
     saving,
     saved,
     onSave,
-    nextLabel = 'Save & Next →',
+    nextLabel,
     nextHidden = false,
     saveVariant = 'outline',
 }: WizardSaveBarProps) {
+    const { t } = useAdminLang();
     return (
         <div className='flex items-center gap-3'>
             {saved && !saving && (
@@ -56,7 +58,7 @@ export default function WizardSaveBar({
                     className='mr-auto text-body-sm text-primary'
                     role='status'
                 >
-                    Saved ✓
+                    {t('common.saved')}
                 </span>
             )}
             <Button
@@ -65,11 +67,11 @@ export default function WizardSaveBar({
                 onClick={onSave}
                 disabled={saving}
             >
-                {saving ? 'Saving...' : 'Save'}
+                {saving ? t('common.saving') : t('common.save')}
             </Button>
             {!nextHidden && (
                 <Button type='submit' disabled={saving}>
-                    {saving ? 'Saving...' : nextLabel}
+                    {saving ? t('common.saving') : nextLabel ?? t('wizard.saveNext')}
                 </Button>
             )}
         </div>
