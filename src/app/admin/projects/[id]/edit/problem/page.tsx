@@ -129,6 +129,10 @@ export default function ProblemPage({
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={5}
                     />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Формат: перенос строки — новый абзац, [текст](ссылка)
+                        — ссылка, **жирный**, *курсив*, - элемент списка.
+                    </p>
                 </div>
 
                 <div>

@@ -30,6 +30,7 @@ import { TestimonialCard } from '@/components/case/TestimonialCard';
 import { NextProjectShowcase } from '@/components/case/NextProjectShowcase';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import AuthBar from '@/components/AuthBar';
+import { generateThemeCss } from '@/lib/theme';
 
 export const revalidate = 3600;
 
@@ -103,6 +104,9 @@ export default async function ProjectPage({ params }: PageProps) {
             slug: true,
             fullName: true,
             avatarFileId: true,
+            // D-010: распространение кастомной темы дизайнера на кейс-страницы
+            mainPageContent: true,
+            applyThemeToChildPages: true,
         },
     });
     if (!profile) notFound();
@@ -310,8 +314,21 @@ export default async function ProjectPage({ params }: PageProps) {
           }
         : null;
 
+    // D-010: распространение кастомной темы дизайнера. Чекбокс в
+    // /admin/profile включает правило; тема та же, что на главной
+    // дизайнера (mainPageContent.theme.seedColor → M3-схема). Без
+    // галочки — дефолтные токены globals.css.
+    const mpc = profile.mainPageContent;
+    const themeCss =
+        profile.applyThemeToChildPages && mpc?.theme?.useCustomTheme
+            ? generateThemeCss(mpc.theme.seedColor)
+            : '';
+
     return (
         <div className='min-h-screen w-full bg-surface-container-low'>
+            {themeCss && (
+                <style dangerouslySetInnerHTML={{ __html: themeCss }} />
+            )}
             <AuthBar projectId={project?.id} profileUserId={profile?.userId} />
 
             {/* Превью черновика: видит только владелец (страница не отдаёт
@@ -395,6 +412,12 @@ export default async function ProjectPage({ params }: PageProps) {
                                     title={project.researchTitle ?? 'What the data revealed'}
                                     description={project.researchMethodology}
                                 >
+                                    {project.userStory && (
+                                        <PortfolioCard
+                                            title='User story'
+                                            body={project.userStory}
+                                        />
+                                    )}
                                     {keyMetrics.length > 0 && (
                                         <div className='flex flex-col gap-6 md:flex-row'>
                                             {keyMetrics.map((metric) => (
@@ -424,12 +447,6 @@ export default async function ProjectPage({ params }: PageProps) {
                                             }
                                         />
                                     ))}
-                                    {project.userStory && (
-                                        <PortfolioCard
-                                            title='User story'
-                                            body={project.userStory}
-                                        />
-                                    )}
                                 </CaseSection>
                             )}
 

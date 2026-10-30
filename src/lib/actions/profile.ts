@@ -60,6 +60,8 @@ export type ProfileData = {
     coverFileId: string | null;
     ogImageFileId: string | null;
     faviconFileId: string | null;
+    // Распространять кастомную тему на все кейс-страницы (D-010)
+    applyThemeToChildPages: number;
     socialLinks: Array<{
         id: string;
         platform: string;
@@ -96,6 +98,7 @@ export async function getMyProfile(): Promise<ProfileData | null> {
         coverFileId: profile.coverFileId,
         ogImageFileId: profile.ogImageFileId,
         faviconFileId: profile.faviconFileId,
+        applyThemeToChildPages: profile.applyThemeToChildPages,
         socialLinks: profile.socialLinks.map((link) => ({
             id: link.id,
             platform: link.platform,
@@ -506,4 +509,34 @@ export async function updateSocialLinkOrder(
 
     revalidatePath('/admin/profile');
     revalidatePath('/admin/settings');
+}
+
+/**
+ * Включает/выключает распространение кастомной темы (цветовых ролей
+ * проекта) на все кейс-страницы дизайнера. opt-in: по умолчанию выкл.
+ */
+export async function updateProfileThemeSettings(
+    profileId: string,
+    applyThemeToChildPages: boolean,
+) {
+    const headersList = await headers();
+    const userId = headersList.get('x-user-id');
+    if (!userId) return { error: 'Не авторизован' };
+
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    await db
+        .update(profiles)
+        .set({
+            applyThemeToChildPages: applyThemeToChildPages ? 1 : 0,
+            updatedAt: Math.floor(Date.now() / 1000),
+        })
+        .where(eq(profiles.id, profileId));
+
+    revalidatePath('/admin/profile');
+    revalidatePath('/admin/settings');
+    revalidatePath('/u/[slug]', 'page');
+
+    return { ok: true };
 }

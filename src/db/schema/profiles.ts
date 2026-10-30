@@ -37,6 +37,9 @@ export const profiles = sqliteTable('profiles', {
   isPublic: integer('is_public').notNull().default(1),
   createdAt: integer('created_at').notNull().default(sql`(unixepoch())`),
   updatedAt: integer('updated_at').notNull().default(sql`(unixepoch())`),
+  // Распространять ли кастомную тему (цветовые роли) проекта на все
+  // кейс-страницы дизайнера. 0 = дефолтные токены, 1 = применять тему
+  applyThemeToChildPages: integer('apply_theme_to_child_pages').notNull().default(0),
 });
 
 export const socialLinks = sqliteTable('social_links', {

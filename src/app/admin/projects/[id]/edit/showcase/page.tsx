@@ -186,6 +186,10 @@ export default function ShowcasePage({
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        Формат: [текст](ссылка) — ссылка, **жирный**,
+                        *курсив*, переносы — новые абзацы.
+                    </p>
                 </div>
 
                 {/* Testing & Iteration — секция 05 публичного кейса. Видна,
@@ -201,7 +205,8 @@ export default function ShowcasePage({
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
                         Необязательно. Переносы строк сохраняются; строки с
-                        «- » становятся списком; **жирный**, *курсив*.
+                        «- » становятся списком; [текст](ссылка) — ссылка;
+                        **жирный**, *курсив*.
                     </p>
                 </div>
 
