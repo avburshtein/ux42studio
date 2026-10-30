@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -36,7 +38,7 @@ const formSchema = z.object({
     location: z.string().optional().or(z.literal('')),
     website: z
         .string()
-        .url('Полный адрес, например https://ux42.studio')
+        .url('profile.urlZodMsg')
         .optional()
         .or(z.literal('')),
     ogImageFileId: z.string().optional().or(z.literal('')),
@@ -67,13 +69,14 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number]['id'];
 
 export default function ProfilePage() {
+    const { t } = useAdminLang();
     const router = useRouter();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [profileId, setProfileId] = useState<string | null>(null);
     // Slug живёт в настройках (/admin/settings), но нужен здесь для ссылки
-    // «Просмотр страницы» в сайдбаре.
+    // «{t('profile.viewPage')}» в сайдбаре.
     const [profileSlug, setProfileSlug] = useState('');
     // D-010: чекбокс «тема на кейсах» переехал в раздел 06 (MainPageContentEditor)
     const [applyThemeToChildPages, setApplyThemeToChildPages] =
@@ -169,7 +172,7 @@ export default function ProfilePage() {
         try {
             const id = profileId ?? (await getOrCreateProfileId());
             if (!id) {
-                setError('Профиль не найден');
+                setError(t('profile.notFound'));
                 return;
             }
             await updateProfile(id, {
@@ -194,11 +197,9 @@ export default function ProfilePage() {
             {/* Тот же зазор между шапкой и содержимым, что в настройках
                 профиля (mb-10) — раньше шапка стояла встык с формой. */}
             <header className='mb-10'>
-                <PageTitle className='mb-2'>
-                    Редактировать страницу сайта
-                </PageTitle>
+                <PageTitle className='mb-2'>{t('profile.title')}</PageTitle>
                 <p className='text-body-sm text-on-surface-variant'>
-                    Контент публичной страницы: обложка, блоки и оформление
+                    {t('profile.subtitle')}
                 </p>
             </header>
 
@@ -218,7 +219,7 @@ export default function ProfilePage() {
                                                 : 'text-on-surface-variant hover:bg-surface-variant/50'
                                         }`}
                                     >
-                                        {s.label}
+                                        {s.id === 'seo' ? t('profile.seo') : s.label}
                                     </button>
                                 </li>
                             ))}
@@ -235,7 +236,7 @@ export default function ProfilePage() {
                                 >
                                     <Eye />{' '}
                                     <span className='font-medium'>
-                                        Просмотр страницы
+                                        {t('profile.viewPage')}
                                     </span>
                                 </Link>
                             </div>
@@ -247,22 +248,21 @@ export default function ProfilePage() {
                 <div className={section === 'seo' ? '' : 'hidden'}>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Card className='p-6'>
-                            <h2 className='text-title-md text-on-surface'>
-                                Брендинг и SEO
-                            </h2>
+                            <h2 className='text-title-md text-on-surface'>{t("profile.seo")}</h2>
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Всё, что описывает вашу публичную страницу:
-                                тексты, ссылки и превью. Адрес страницы — отдельная
-                                карточка ниже. Имя владельца
-                                и email — в «Настройках профиля».
+                                {t('profile.seoDesc')}
                             </p>
 
                             <div className='mt-6 grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2'>
                                 <Field
                                     id='headline'
-                                    label='Заголовок'
-                                    error={errors.headline?.message}
-                                    hint='Например: Product Designer'
+                                    label={t('profile.labelHeading')}
+                                    error={
+                                        errors.headline?.message
+                                            ? t(errors.headline.message)
+                                            : undefined
+                                    }
+                                    hint={t('profile.hintHeading')}
                                 >
                                     <Input
                                         id='headline'
@@ -273,9 +273,13 @@ export default function ProfilePage() {
 
                                 <Field
                                     id='location'
-                                    label='Город'
-                                    error={errors.location?.message}
-                                    hint='Можно указать страну или «удалённо»'
+                                    label={t('profile.labelCity')}
+                                    error={
+                                        errors.location?.message
+                                            ? t(errors.location.message)
+                                            : undefined
+                                    }
+                                    hint={t('profile.hintCity')}
                                 >
                                     <Input
                                         id='location'
@@ -286,8 +290,12 @@ export default function ProfilePage() {
 
                                 <Field
                                     id='website'
-                                    label='Личный сайт'
-                                    error={errors.website?.message}
+                                    label={t('profile.labelSite')}
+                                    error={
+                                        errors.website?.message
+                                            ? t(errors.website.message)
+                                            : undefined
+                                    }
                                 >
                                     <Input
                                         id='website'
@@ -300,9 +308,13 @@ export default function ProfilePage() {
 
                                 <Field
                                     id='bio'
-                                    label='О себе'
-                                    error={errors.bio?.message}
-                                    hint='Пустая строка между абзацами = новый абзац'
+                                    label={t('profile.labelBio')}
+                                    error={
+                                        errors.bio?.message
+                                            ? t(errors.bio.message)
+                                            : undefined
+                                    }
+                                    hint={t('profile.hintBio')}
                                     className='md:col-span-2'
                                 >
                                     <Textarea
@@ -317,7 +329,7 @@ export default function ProfilePage() {
                             {/* Ссылка профиля монтируется после загрузки
                                 (решение (26)) и сохраняется сама. */}
                             <div className='mt-2 border-t border-outline-variant pt-6'>
-                                <Label>Ссылки</Label>
+                                <Label>{t('profile.links')}</Label>
                                 {profileId && profileLoaded ? (
                                     <div className='mt-3'>
                                         <SocialLinksEditor
@@ -327,22 +339,21 @@ export default function ProfilePage() {
                                     </div>
                                 ) : (
                                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                        Загрузка…
+                                        {t('profile.loading')}
                                     </p>
                                 )}
                             </div>
 
                             <h3 className='mt-8 text-title-sm text-on-surface'>
-                                Превью и иконка
+                                {t('profile.previewSection')}
                             </h3>
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Как ссылка выглядит в соцсетях и мессенджерах
-                                и как открывается в браузере.
+                                {t('profile.previewDesc')}
                             </p>
 
                             <div className='mt-6 grid grid-cols-1 gap-6 md:grid-cols-2'>
                                 <div>
-                                    <Label>OG-обложка (1200×630)</Label>
+                                    <Label>{t('profile.ogLabel')}</Label>
                                     <ImageUploaderField
                                         value={
                                             watch('ogImageFileId') || null
@@ -357,11 +368,11 @@ export default function ProfilePage() {
                                         cropRatio={1200 / 630}
                                     />
                                     <p className='mt-1 min-h-[1.5rem] text-body-sm text-on-surface-variant'>
-                                        Превью ссылки в соцсетях.
+                                        {t('profile.ogHint')}
                                     </p>
                                 </div>
                                 <div>
-                                    <Label>Фавикон (квадрат)</Label>
+                                    <Label>{t('profile.faviconLabel')}</Label>
                                     <ImageUploaderField
                                         value={
                                             watch('faviconFileId') || null
@@ -376,7 +387,7 @@ export default function ProfilePage() {
                                         cropRatio={1}
                                     />
                                     <p className='mt-1 min-h-[1.5rem] text-body-sm text-on-surface-variant'>
-                                        Иконка во вкладке браузера.
+                                        {t('profile.faviconHint')}
                                     </p>
                                 </div>
                             </div>
@@ -400,13 +411,13 @@ export default function ProfilePage() {
                                     role='status'
                                     className='text-body-sm text-primary'
                                 >
-                                    {success ? 'Сохранено' : ''}
+                                    {success ? t('common.saved') : ''}
                                 </p>
                                 <Button
                                     type='submit'
                                     disabled={saving || !profileLoaded}
                                 >
-                                    {saving ? 'Сохраняем…' : 'Сохранить'}
+                                    {saving ? t('common.saving') : t('common.save')}
                                 </Button>
                             </div>
                         </Card>

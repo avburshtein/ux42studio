@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -15,7 +17,7 @@ import {
 } from '@/lib/actions/profile';
 
 const formSchema = z.object({
-    fullName: z.string().min(1, 'Укажите имя — оно будет заголовком страницы'),
+    fullName: z.string().min(1, 'nameForm.zod'),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -29,6 +31,7 @@ type FormData = z.infer<typeof formSchema>;
  * остаётся в настройках аккаунта.
  */
 export default function AccountNameForm() {
+    const { t } = useAdminLang();
     const [profileId, setProfileId] = useState<string | null>(null);
     const [loaded, setLoaded] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -67,13 +70,13 @@ export default function AccountNameForm() {
         try {
             const id = profileId ?? (await getOrCreateProfileId());
             if (!id) {
-                setError('Профиль не найден');
+                setError(t('nameForm.notFound'));
                 return;
             }
             await updateProfile(id, { fullName: data.fullName });
             setSaved(true);
         } catch (e) {
-            setError(e instanceof Error ? e.message : 'Не удалось сохранить');
+            setError(e instanceof Error ? e.message : t('common.saveFailed'));
         } finally {
             setSaving(false);
         }
@@ -81,18 +84,21 @@ export default function AccountNameForm() {
 
     return (
         <Card className='p-6'>
-            <h2 className='text-title-md text-on-surface'>Имя и фамилия</h2>
+            <h2 className='text-title-md text-on-surface'>{t('nameForm.title')}</h2>
             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                Заголовок вашей страницы. Остальные поля профиля — в разделе
-                «Редактировать страницу сайта» → «Брендинг и SEO».
+                {t('nameForm.desc')}
             </p>
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate className='mt-6'>
                 <Field
                     id='fullName'
-                    label='Имя и фамилия *'
-                    error={errors.fullName?.message}
-                    hint='Например: Иван Петров'
+                    label={t('nameForm.label')}
+                    error={
+                        errors.fullName?.message
+                            ? t(errors.fullName.message)
+                            : undefined
+                    }
+                    hint={t('nameForm.hint')}
                     className='max-w-sm'
                 >
                     <Input
@@ -112,10 +118,10 @@ export default function AccountNameForm() {
                 {/* Панель сохранения по образцу WizardSaveBar (§3.6). */}
                 <div className='mt-2 flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant pt-4'>
                     <p role='status' className='text-body-sm text-primary'>
-                        {saved ? 'Сохранено' : ''}
+                        {saved ? t('common.saved') : ''}
                     </p>
                     <Button type='submit' disabled={saving || !loaded}>
-                        {saving ? 'Сохраняем…' : 'Сохранить'}
+                        {saving ? t('common.saving') : t('common.save')}
                     </Button>
                 </div>
             </form>

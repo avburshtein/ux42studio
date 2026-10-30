@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -75,6 +77,7 @@ export default function GeneralPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -446,8 +449,7 @@ export default function GeneralPage({
                         placeholder='https://www.figma.com/proto/…'
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Показывается на кейсе кнопкой «View prototype in
-                        Figma» в секции Final Design
+                        {t('wizard.figmaProtoHint')}
                     </p>
                 </div>
 
@@ -460,8 +462,7 @@ export default function GeneralPage({
                         placeholder='https://prototype.example.com'
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Веб-демка прототипа (не Figma): кнопка «View Web
-                        prototype» в секции Final Design
+                        {t('wizard.webProtoHint')}
                     </p>
                 </div>
 

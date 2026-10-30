@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertTriangle, Trash2 } from 'lucide-react';
@@ -9,11 +11,11 @@ import { Label } from '@/components/ui/Label';
 import { deleteMyAccount } from '@/lib/actions/account';
 
 /**
- * «Удаление профиля» (раздел настроек /admin/settings): удаление учётной
+ * «{t('delAcc.title')}» (раздел настроек /admin/settings): удаление учётной
  * записи. Существует по требованию GDPR Art. 17 — субъект данных должен
  * иметь реальный способ реализовать право на удаление.
  *
- * Живёт в разделе «Удаление профиля» настроек (/admin/settings). Компонент
+ * Живёт в разделе «{t('delAcc.title')}» настроек (/admin/settings). Компонент
  * рисует только содержимое — поверхность (Card с error-рамкой) задаёт
  * страница, поэтому вложенного `<main>`/`FormBox` здесь больше нет.
  *
@@ -22,13 +24,12 @@ import { deleteMyAccount } from '@/lib/actions/account';
  * вводом email, а не просто кнопка.
  */
 
-/** Ошибки серверного экшена на русский: админка — RU (§6.1 дизайн-системы). */
+/** Коды ошибок серверного экшена → ключи словаря (D-012: двуязычность). */
 const ERROR_TEXT: Record<string, string> = {
-    'Not authenticated': 'Сессия истекла — войдите заново',
-    'User not found': 'Аккаунт не найден',
-    'Email does not match this account':
-        'Email не совпадает с адресом этого аккаунта',
-    'Server error': 'Не удалось удалить аккаунт',
+    'Not authenticated': 'delAcc.errAuth',
+    'User not found': 'delAcc.errUser',
+    'Email does not match this account': 'delAcc.errEmail',
+    'Server error': 'delAcc.errServer',
 };
 
 export default function DeleteAccountSection({
@@ -36,6 +37,7 @@ export default function DeleteAccountSection({
 }: {
     accountEmail: string;
 }) {
+    const { t } = useAdminLang();
     const router = useRouter();
     const [open, setOpen] = useState(false);
     const [confirm, setConfirm] = useState('');
@@ -53,8 +55,10 @@ export default function DeleteAccountSection({
             const res = await deleteMyAccount(confirm);
             if (res.error) {
                 setError(
-                    ERROR_TEXT[res.error] ??
-                        'Не удалось удалить аккаунт. Попробуйте позже или напишите на privacy@ux42.studio.',
+                    t(
+                        ERROR_TEXT[res.error] ??
+                            'delAcc.errGeneric',
+                    ),
                 );
                 setBusy(false);
                 return;
@@ -63,9 +67,7 @@ export default function DeleteAccountSection({
             router.push('/');
             router.refresh();
         } catch {
-            setError(
-                'Не удалось удалить аккаунт. Попробуйте позже или напишите на privacy@ux42.studio.',
-            );
+            setError(t('delAcc.errGeneric'));
             setBusy(false);
         }
     }
@@ -80,17 +82,13 @@ export default function DeleteAccountSection({
                 />
                 <div>
                     <h2 className='text-title-md text-on-surface'>
-                        Удаление профиля
+                        {t('delAcc.title')}
                     </h2>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Операция необратима. Будут стёрты: учётная запись,
-                        публичный профиль, все кейсы и все загруженные
-                        изображения. Восстановить их будет невозможно.
+                        {t('delAcc.desc')}
                     </p>
                     <p className='mt-2 text-body-sm text-on-surface-variant'>
-                        Если хотите просто скрыть портфолио, не удаляйте
-                        профиль — переключатель «Публикация сайта» в разделе
-                        «Аккаунт» настроек профиля.
+                        {t('delAcc.altHint')}
                     </p>
                 </div>
             </div>
@@ -110,14 +108,14 @@ export default function DeleteAccountSection({
                         onClick={() => setOpen(true)}
                     >
                         <Trash2 className='h-4 w-4' aria-hidden='true' />
-                        Удалить профиль
+                        {t('delAcc.trigger')}
                     </Button>
                 </div>
             ) : (
                 <div className='mt-6 border-t border-outline-variant pt-6'>
                     <div className='max-w-sm'>
                         <Label htmlFor='confirm-email'>
-                            Для подтверждения введите email аккаунта
+                            {t('delAcc.confirmLabel')}
                         </Label>
                         <Input
                             id='confirm-email'
@@ -146,7 +144,7 @@ export default function DeleteAccountSection({
                             disabled={!matches || busy}
                         >
                             <Trash2 className='h-4 w-4' aria-hidden='true' />
-                            {busy ? 'Удаляем…' : 'Удалить навсегда'}
+                            {busy ? t('delAcc.deleting') : t('delAcc.confirmBtn')}
                         </Button>
                         <Button
                             type='button'
@@ -158,7 +156,7 @@ export default function DeleteAccountSection({
                             }}
                             disabled={busy}
                         >
-                            Отмена
+                            {t('common.cancel')}
                         </Button>
                     </div>
                 </div>

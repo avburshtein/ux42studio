@@ -1,3 +1,4 @@
+import { getServerLang, serverT } from '@/lib/i18n/server';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
@@ -12,6 +13,7 @@ import InviteCreateForm from '@/components/InviteCreateForm';
 import { revokeInvite } from '@/lib/actions/admin';
 
 export default async function SuperAdminInvitesPage() {
+    const t = serverT(await getServerLang());
     const headersList = await headers();
     const userId = headersList.get('x-user-id');
     if (!userId) redirect('/login');
@@ -38,11 +40,11 @@ export default async function SuperAdminInvitesPage() {
 
     return (
         <main className=''>
-            <PageTitle>Генерация и менеджмент инвайтов</PageTitle>
+            <PageTitle>{t('sa.invitesTitle')}</PageTitle>
 
             <div className='mb-8'>
                 <Title className='mb-4' variant='headline-sm'>
-                    Создать инвайт
+                    {t('sa.createInvite')}
                 </Title>
                 <InviteCreateForm createdByUserId={userId} />
             </div>
@@ -151,7 +153,7 @@ export default async function SuperAdminInvitesPage() {
                                     colSpan={7}
                                     className='px-4 py-6 text-center text-body-sm text-on-surface-variant'
                                 >
-                                    Нет инвайтов
+                                    {t('sa.noInvites')}
                                 </td>
                             </tr>
                         )}

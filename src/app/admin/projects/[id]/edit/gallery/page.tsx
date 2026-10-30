@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -146,6 +148,7 @@ export default function GalleryPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();

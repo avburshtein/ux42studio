@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,20 +13,21 @@ import { changePassword } from '@/lib/actions/auth';
 
 const formSchema = z
     .object({
-        currentPassword: z.string().min(1, 'Введите текущий пароль'),
+        currentPassword: z.string().min(1, 'changePw.zodCurrent'),
         newPassword: z
             .string()
-            .min(6, 'Новый пароль должен быть не менее 6 символов'),
-        confirmPassword: z.string().min(1, 'Подтвердите новый пароль'),
+            .min(6, 'changePw.zodNew'),
+        confirmPassword: z.string().min(1, 'changePw.zodConfirm'),
     })
     .refine((data) => data.newPassword === data.confirmPassword, {
-        message: 'Пароли не совпадают',
+        message: 'changePw.mismatch',
         path: ['confirmPassword'],
     });
 
 type FormData = z.infer<typeof formSchema>;
 
 export default function ChangePasswordForm() {
+    const { t } = useAdminLang();
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
@@ -56,10 +59,10 @@ export default function ChangePasswordForm() {
                 setSuccess(true);
                 reset();
             } else {
-                setError(result.error ?? 'Ошибка смены пароля');
+                setError(result.error ?? t('changePw.fail'));
             }
         } catch {
-            setError('Сетевая ошибка');
+            setError(t('changePw.network'));
         } finally {
             setSaving(false);
         }
@@ -68,7 +71,7 @@ export default function ChangePasswordForm() {
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
             <div>
-                <Label htmlFor='currentPassword'>Текущий пароль</Label>
+                <Label htmlFor='currentPassword'>{t('changePw.current')}</Label>
                 <PasswordInput
                     id='currentPassword'
                     autoComplete='current-password'
@@ -76,13 +79,13 @@ export default function ChangePasswordForm() {
                 />
                 {errors.currentPassword && (
                     <p className='mt-1 text-body-sm text-error'>
-                        {errors.currentPassword.message}
+                        {errors.currentPassword.message && t(errors.currentPassword.message)}
                     </p>
                 )}
             </div>
 
             <div>
-                <Label htmlFor='newPassword'>Новый пароль</Label>
+                <Label htmlFor='newPassword'>{t('changePw.new')}</Label>
                 <PasswordInput
                     id='newPassword'
                     autoComplete='new-password'
@@ -90,13 +93,13 @@ export default function ChangePasswordForm() {
                 />
                 {errors.newPassword && (
                     <p className='mt-1 text-body-sm text-error'>
-                        {errors.newPassword.message}
+                        {errors.newPassword.message && t(errors.newPassword.message)}
                     </p>
                 )}
             </div>
 
             <div>
-                <Label htmlFor='confirmPassword'>Подтверждение пароля</Label>
+                <Label htmlFor='confirmPassword'>{t('changePw.confirm')}</Label>
                 <PasswordInput
                     id='confirmPassword'
                     autoComplete='new-password'
@@ -104,7 +107,7 @@ export default function ChangePasswordForm() {
                 />
                 {errors.confirmPassword && (
                     <p className='mt-1 text-body-sm text-error'>
-                        {errors.confirmPassword.message}
+                        {errors.confirmPassword.message && t(errors.confirmPassword.message)}
                     </p>
                 )}
             </div>
@@ -112,13 +115,13 @@ export default function ChangePasswordForm() {
             {error && <p className='text-body-sm text-error'>{error}</p>}
             {success && (
                 <p className='text-body-sm text-primary'>
-                    Пароль успешно изменён!
+                    {t('changePw.success')}
                 </p>
             )}
 
             <div className='flex justify-end'>
                 <Button type='submit' disabled={saving}>
-                    {saving ? 'Сохранение...' : 'Сменить пароль'}
+                    {saving ? t('changePw.saving') : t('changePw.submit')}
                 </Button>
             </div>
         </form>

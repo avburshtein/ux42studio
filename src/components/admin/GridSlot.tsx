@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import React, { useCallback, useRef, useState } from 'react';
 import { useDroppable, useDraggable } from '@dnd-kit/core';
 import { useDropzone } from 'react-dropzone';
@@ -69,6 +71,7 @@ export default function GridSlot({
     pannable,
     onPositionChange,
 }: GridSlotProps) {
+    const { t } = useAdminLang();
     const hiddenInputRef = useRef<HTMLInputElement>(null);
 
     // ---- Режим «двигать фото» (фокус-точка) ----
@@ -286,13 +289,13 @@ export default function GridSlot({
             {isFileOver && (
                 <div className='absolute inset-0 z-20 flex items-center justify-center bg-blue-500/80 text-white font-medium'>
                     <Upload className='h-6 w-6 mr-2' />
-                    Бросайте фото сюда
+                    {t('grid.dropHere')}
                 </div>
             )}
 
             {isDndOver && !isFileOver && (
                 <div className='absolute inset-0 z-20 flex items-center justify-center bg-green-500/80 text-white font-medium pointer-events-none'>
-                    Поместить сюда
+                    {t('grid.dropTo')}
                 </div>
             )}
 
@@ -326,7 +329,7 @@ export default function GridSlot({
                     <img
                         ref={imgRef}
                         src={image.url}
-                        alt={`Фото в слоте ${slotIndex}`}
+                        alt={t('grid.photoAlt', { n: slotIndex })}
                         className='w-full h-full object-cover pointer-events-none select-none rounded-lg'
                         style={{
                             objectPosition: `${displayedPos.x}% ${displayedPos.y}%`,
@@ -340,7 +343,7 @@ export default function GridSlot({
                                 type='button'
                                 onClick={handleReplaceClick}
                                 className='absolute top-2 right-2 opacity-0 group-hover:opacity-100 bg-white/90 hover:bg-white p-1.5 rounded shadow-sm transition-opacity z-30 cursor-pointer'
-                                aria-label='Заменить фото'
+                                aria-label={t('grid.replaceAria')}
                             >
                                 <RefreshCw className='h-4 w-4 text-slate-700' />
                             </button>
@@ -353,8 +356,8 @@ export default function GridSlot({
                                         setPanMode(true);
                                     }}
                                     className='absolute top-2 right-11 opacity-0 group-hover:opacity-100 bg-white/90 hover:bg-white p-1.5 rounded shadow-sm transition-opacity z-30 cursor-pointer'
-                                    aria-label='Двигать фото внутри слота'
-                                    title='Двигать фото внутри слота'
+                                    aria-label={t('grid.panAria')}
+                                    title={t('grid.panAria')}
                                 >
                                     <Move className='h-4 w-4 text-slate-700' />
                                 </button>
@@ -370,7 +373,7 @@ export default function GridSlot({
                                 {...attributes}
                                 {...listeners}
                                 className='absolute top-2 left-2 flex h-7 w-7 touch-none cursor-grab items-center justify-center rounded bg-white/90 p-1 shadow-sm z-30 active:cursor-grabbing'
-                                aria-label='Переместить фото в другой слот'
+                                aria-label={t('grid.moveAria')}
                             >
                                 <GripVertical className='h-4 w-4 text-slate-500' />
                             </button>
@@ -379,16 +382,16 @@ export default function GridSlot({
 
                     {panMode && (
                         <div className='absolute inset-x-2 bottom-2 z-30 flex items-center justify-center rounded bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-700 pointer-events-none'>
-                            Двигайте фото — отпустите, чтобы зафиксировать
+                            {t('grid.panning')}
                         </div>
                     )}
                 </div>
             ) : (
                 <div className='flex flex-col items-center justify-center w-full h-full text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-variant)]/30 cursor-pointer transition-colors p-2'>
                     <Upload className='h-6 w-6 mb-1 opacity-60' />
-                    <span className='text-sm font-medium'>Пустой слот</span>
+                    <span className='text-sm font-medium'>{t('grid.emptySlot')}</span>
                     <span className='text-xs opacity-70 mt-0.5'>
-                        Нажмите или перетащите файл
+                        {t('grid.emptyHint')}
                     </span>
                 </div>
             )}

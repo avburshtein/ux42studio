@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -28,6 +30,7 @@ export default function PublicationToggle({
     profileId,
     initialIsPublic,
 }: PublicationToggleProps) {
+    const { t } = useAdminLang();
     const [isPublic, setIsPublic] = useState(initialIsPublic);
     const [pending, setPending] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -43,7 +46,7 @@ export default function PublicationToggle({
             }
             setIsPublic(checked);
         } catch {
-            setError('Не удалось изменить видимость');
+            setError(t('pubToggle.fail'));
         } finally {
             setPending(false);
         }
@@ -65,15 +68,15 @@ export default function PublicationToggle({
                 )}
                 <div className='min-w-0 flex-1'>
                     <h2 className='text-title-md text-on-surface'>
-                        Публикация сайта
+                        {t('pubToggle.title')}
                     </h2>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Определяет, видна ли ваша страница
+                        {t('pubToggle.descPrefix')}
                         <span className='font-mono text-body-sm'>
                             {' '}
                             /u/{'{slug}'}
                         </span>{' '}
-                        посетителям.
+                        {t('pubToggle.descSuffix')}
                     </p>
 
                     {/* Статус словами — не только цветом и положением
@@ -84,8 +87,8 @@ export default function PublicationToggle({
                             className='text-body-sm text-on-surface'
                         >
                             {isPublic
-                                ? 'Сайт опубликован и виден всем.'
-                                : 'Сайт скрыт: виден только вам, пока вы вошли в аккаунт.'}
+                                ? t('pubToggle.on')
+                                : t('pubToggle.off')}
                         </p>
 
                         <div className='flex items-center gap-3'>
@@ -95,8 +98,8 @@ export default function PublicationToggle({
                                 disabled={pending}
                                 aria-label={
                                     isPublic
-                                        ? 'Скрыть сайт'
-                                        : 'Опубликовать сайт'
+                                        ? t('pubToggle.actionHide')
+                                        : t('pubToggle.actionPublish')
                                 }
                             />
                             <Button
@@ -107,10 +110,10 @@ export default function PublicationToggle({
                                 onClick={() => toggle(!isPublic)}
                             >
                                 {pending
-                                    ? 'Применяем…'
+                                    ? t('pubToggle.applying')
                                     : isPublic
-                                      ? 'Скрыть сайт'
-                                      : 'Опубликовать'}
+                                      ? t('pubToggle.actionHide')
+                                      : t('pubToggle.actionPublish')}
                             </Button>
                         </div>
                     </div>
@@ -122,9 +125,7 @@ export default function PublicationToggle({
                     )}
 
                     <p className='mt-3 text-body-sm text-on-surface-variant'>
-                        Кейсы и настройки при этом не трогаются: включение
-                        возвращает всё как было. Скрытый сайт по-прежнему
-                        открывается у вас в браузере, пока вы авторизованы.
+                        {t('pubToggle.footer')}
                     </p>
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import { getServerLang, serverT } from '@/lib/i18n/server';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
@@ -15,6 +16,7 @@ export default async function SuperAdminUsersPage({
 }: {
     searchParams: Promise<{ q?: string }>;
 }) {
+    const t = serverT(await getServerLang());
     const headersList = await headers();
     const userId = headersList.get('x-user-id');
     if (!userId) redirect('/login');
@@ -32,7 +34,7 @@ export default async function SuperAdminUsersPage({
 
     return (
         <main className=''>
-            <PageTitle>Управление пользователями</PageTitle>
+            <PageTitle>{t('sa.usersTitle')}</PageTitle>
 
             <form
                 method='GET'
@@ -43,10 +45,10 @@ export default async function SuperAdminUsersPage({
                     type='search'
                     name='q'
                     defaultValue={q ?? ''}
-                    placeholder='Поиск по email...'
+                    placeholder={t('sa.searchPh')}
                 />
                 <Button type='submit' variant='outline'>
-                    Найти
+                    {t('sa.search')}
                 </Button>
             </form>
 
@@ -174,7 +176,7 @@ export default async function SuperAdminUsersPage({
                                                 variant='ghost'
                                                 type='submit'
                                                 className='text-error'
-                                                title={`Удалить ${u.email} вместе с профилем, кейсами и файлами`}
+                                                title={t('sa.deleteTitle', { email: u.email })}
                                             >
                                                 Delete
                                             </Button>
@@ -189,7 +191,7 @@ export default async function SuperAdminUsersPage({
                                     colSpan={5}
                                     className='px-4 py-6 text-center text-body-sm text-on-surface-variant'
                                 >
-                                    Нет пользователей
+                                    {t('sa.noUsers')}
                                 </td>
                             </tr>
                         )}

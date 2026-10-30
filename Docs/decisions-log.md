@@ -18,7 +18,7 @@
 
 **Ограничения, принятые осознанно:** SSR всегда рендерит 'ru', cookie применяется после гидрации — англоязычный пользователь видит ~100 мс русского chrome (зеркало mounted-паттерна ThemeToggle). Модульные константы (STEPS, STATUS_META, SORT_OPTIONS) хранят ключи, а не строки — строки резолвятся в рендере.
 
-**Статус этапов:** ✅ этап 1 — хедер/drawer, дашборд, CaseSortManager, фильтр шагов, WizardSaveBar. ⏳ этап 2 — формы шагов визарда (problem/research/design/gallery/showcase/results/review), ColorRolePicker, SubsectionsEditor, SectionsVisibilityEditor, профиль/настройки, super-admin. Новые строки в этап 2 добавлять только через словарь.
+**Статус этапов:** ✅ этап 1 — хедер/drawer, дашборд, CaseSortManager, фильтр шагов, WizardSaveBar. ✅ этап 2 — формы всех шагов визарда, ColorRolePicker, SubsectionsEditor (+SubsectionRow), AdminGridEditor/GridSlot, профиль, настройки (AccountNameForm, ChangePasswordForm, DeleteAccountSection, PublicationToggle, ProfileSlugForm), супер-админка (server t через `src/lib/i18n/server.ts` + `getServerLang()` по cookie), InviteCreateForm, zod-сообщения → ключи словаря (рендер через t, неизвестные тексты проходят насквозь). Новые строки — только через словарь. Оговорки: табы профиля — label в данных, seo переводится в рендере; комментарии в коде остаются RU.
 
 ## D-011 · 2026-10-31 · Подразделы внутри секций кейса · ✅ Принято
 

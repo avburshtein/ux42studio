@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -33,6 +35,7 @@ export default function ProblemPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -107,14 +110,13 @@ export default function ProblemPage({
                 Problem & Audience
             </Title>
             <p className='mb-4 text-body-sm text-on-surface-variant'>
-                Форматирование: переносы строк сохраняются, строка с «- » —
-                элемент списка с зелёным маркером, **жирный**, *курсив*.
+                {t('wizard.problemFmtHint')}
             </p>
             <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
                 {/* Кастомный заголовок секции (D-009): пусто → дефолт «The challenge» */}
                 <div>
                     <Label htmlFor='problemTitle'>
-                        Заголовок секции (необязательно)
+                        {t('wizard.sectionTitleOpt')}
                     </Label>
                     <input
                         id='problemTitle'
@@ -134,8 +136,7 @@ export default function ProblemPage({
                         rows={5}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Формат: перенос строки — новый абзац, [текст](ссылка)
-                        — ссылка, **жирный**, *курсив*, - элемент списка.
+                        {t('wizard.fmtHint')}
                     </p>
                 </div>
 

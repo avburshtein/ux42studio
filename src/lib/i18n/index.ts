@@ -40,9 +40,13 @@ export function translate(
 ): string {
     let value = lookup(dicts[lang], key);
     if (value === undefined) {
-        if (process.env.NODE_ENV === 'development') return `⟨${key}⟩`;
-        value =
-            lookup(dicts[lang === 'ru' ? 'en' : 'ru'], key) ?? `⟨${key}⟩`;
+        value = lookup(dicts[lang === 'ru' ? 'en' : 'ru'], key);
+        if (value === undefined) {
+            // Незнакомый ключ: в dev видно ⟨key⟩, в проде возвращаем сам
+            // ключ (важно для t(zodMessage) — текст-не-ключ проходит насквозь).
+            value =
+                process.env.NODE_ENV === 'development' ? `⟨${key}⟩` : key;
+        }
     }
     if (params) {
         for (const [k, v] of Object.entries(params)) {

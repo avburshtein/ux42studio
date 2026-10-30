@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -48,6 +50,7 @@ export default function ShowcasePage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -156,7 +159,7 @@ export default function ShowcasePage({
                 <div className='grid gap-4 sm:grid-cols-2'>
                     <div>
                         <Label htmlFor='finalDesignTitle'>
-                            Заголовок «Final Design» (необязательно)
+                            {t('wizard.sectionTitleFinal')}
                         </Label>
                         <input
                             id='finalDesignTitle'
@@ -167,7 +170,7 @@ export default function ShowcasePage({
                     </div>
                     <div>
                         <Label htmlFor='testingTitle'>
-                            Заголовок «Testing & Iteration» (необязательно)
+                            {t('wizard.sectionTitleTesting')}
                         </Label>
                         <input
                             id='testingTitle'
@@ -188,8 +191,7 @@ export default function ShowcasePage({
                         rows={4}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Формат: [текст](ссылка) — ссылка, **жирный**,
-                        *курсив*, переносы — новые абзацы.
+                        {t('wizard.fmtHintShort')}
                     </p>
                 </div>
 
@@ -205,8 +207,7 @@ export default function ShowcasePage({
                         rows={4}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Необязательно. Переносы строк сохраняются; строки с
-                        «- » становятся списком; [текст](ссылка) — ссылка;
+                        {t('wizard.testingHint')}
                         **жирный**, *курсив*.
                     </p>
                 </div>

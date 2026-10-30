@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -44,6 +46,7 @@ export default function ResultsPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -173,7 +176,7 @@ export default function ResultsPage({
                             <div className='flex-1'>
                                 <textarea
                                     {...register(`results.${index}.content`)}
-                                    placeholder='Result description — переносы сохраняются, «- » — список'
+                                    placeholder={t('wizard.resultDescPh')}
                                     className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                     rows={2}
                                 />
@@ -304,7 +307,7 @@ export default function ResultsPage({
                             <div>
                                 <textarea
                                     {...register(`baCards.${index}.beforeText`)}
-                                    placeholder='Before text — переносы сохраняются, «- » — список'
+                                    placeholder={t('wizard.beforePh')}
                                     className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                     rows={3}
                                 />
@@ -317,7 +320,7 @@ export default function ResultsPage({
                             <div>
                                 <textarea
                                     {...register(`baCards.${index}.afterText`)}
-                                    placeholder='After text — переносы сохраняются, «- » — список'
+                                    placeholder={t('wizard.afterPh')}
                                     className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                                     rows={3}
                                 />

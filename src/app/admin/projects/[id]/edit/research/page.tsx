@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -50,6 +52,7 @@ export default function ResearchPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -160,7 +163,7 @@ export default function ResearchPage({
                     {/* Кастомный заголовок секции (D-009): пусто → дефолт «What the data revealed» */}
                     <div>
                         <Label htmlFor='researchTitle'>
-                            Заголовок секции (необязательно)
+                            {t('wizard.sectionTitleOpt')}
                         </Label>
                         <input
                             id='researchTitle'
@@ -182,9 +185,7 @@ export default function ResearchPage({
                             rows={4}
                         />
                         <p className='mt-1 text-body-sm text-on-surface-variant'>
-                            Переносы сохраняются; «- » — список с зелёным
-                            маркером; [текст](ссылка) — ссылка; **жирный**,
-                            *курсив*.
+                            {t('wizard.listHint')}
                         </p>
                     </div>
 
@@ -198,8 +199,7 @@ export default function ResearchPage({
                             rows={4}
                         />
                         <p className='mt-1 text-body-sm text-on-surface-variant'>
-                            Формат: [текст](ссылка) — ссылка, **жирный**,
-                            *курсив*, переносы — новые абзацы.
+                            {t('wizard.fmtHintShort')}
                         </p>
                     </div>
                 </div>

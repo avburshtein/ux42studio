@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { ArrowDown, ArrowUp, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -44,6 +46,7 @@ export default function SubsectionsEditor({
     projectId,
     sectionKeys,
 }: SubsectionsEditorProps) {
+    const { t } = useAdminLang();
     const keys = sectionKeys.map((s) => s.key);
     const [items, setItems] = useState<SubsectionDraft[]>([]);
     const [loaded, setLoaded] = useState(false);
@@ -132,24 +135,22 @@ export default function SubsectionsEditor({
     return (
         <div>
             <div className='mb-3 flex items-center justify-between'>
-                <Title variant='headline-md'>Подразделы</Title>
+                <Title variant='headline-md'>{t('sub.title')}</Title>
                 <Button type='button' variant='ghost' onClick={add}>
                     <Plus className='mr-1 h-4 w-4' /> Add
                 </Button>
             </div>
             <p className='mb-4 text-body-sm text-on-surface-variant'>
-                Дополнительные блоки «заголовок + текст» внутри этой секции
-                на странице кейса — для контента, которому не находится
-                подходящего поля.
+                {t('sub.desc')}
             </p>
 
             {!loaded ? (
                 <p className='text-body-sm text-on-surface-variant'>
-                    Загрузка…
+                    {t('sub.loading')}
                 </p>
             ) : items.length === 0 ? (
                 <p className='text-body-sm text-on-surface-variant'>
-                    Подразделов пока нет.
+                    {t('sub.empty')}
                 </p>
             ) : (
                 <div className='space-y-4'>
@@ -177,14 +178,14 @@ export default function SubsectionsEditor({
                         className='text-body-sm text-primary'
                         aria-live='polite'
                     >
-                        {saved ? 'Сохранено' : ''}
+                        {saved ? t('sub.saved') : ''}
                     </p>
                     <Button
                         type='button'
                         onClick={save}
                         disabled={saving || !loaded}
                     >
-                        {saving ? 'Сохраняем…' : 'Сохранить подразделы'}
+                        {saving ? t('sub.saving') : t('sub.saveBtn')}
                     </Button>
                 </div>
             )}
@@ -212,11 +213,12 @@ function SubsectionRow({
     onRemove: (index: number) => void;
     onUpdate: (index: number, patch: Partial<SubsectionDraft>) => void;
 }) {
+    const { t } = useAdminLang();
     return (
         <div className='rounded-md border border-outline-variant bg-surface-container-high p-4'>
             <div className='mb-3 flex items-center justify-between'>
                 <span className='text-title-lg text-on-surface'>
-                    Подраздел {index + 1}
+                    {t('sub.item', { n: index + 1 })}
                 </span>
                 <div className='flex items-center gap-1'>
                     <Button
@@ -250,7 +252,7 @@ function SubsectionRow({
 
             {sectionKeys.length > 1 && (
                 <div className='mb-3'>
-                    <Label>Секция на странице кейса</Label>
+                    <Label>{t('sub.sectionOnPage')}</Label>
                     <Select
                         value={item.sectionKey}
                         onValueChange={(v) =>
@@ -272,28 +274,27 @@ function SubsectionRow({
             )}
 
             <div className='mb-3'>
-                <Label>Заголовок (необязательно)</Label>
+                <Label>{t('sub.headingOpt')}</Label>
                 <Input
                     value={item.heading}
                     onChange={(e) =>
                         onUpdate(index, { heading: e.target.value })
                     }
-                    placeholder='Например: Market context'
+                    placeholder={t('sub.headingPh')}
                 />
             </div>
 
             <div>
-                <Label>Текст</Label>
+                <Label>{t('sub.body')}</Label>
                 <textarea
                     rows={4}
                     className={textareaClass}
                     value={item.body}
                     onChange={(e) => onUpdate(index, { body: e.target.value })}
-                    placeholder='Несколько абзацев текста…'
+                    placeholder={t('sub.bodyPh')}
                 />
                 <p className='mt-1 text-body-sm text-on-surface-variant'>
-                    Формат: перенос строки — новый абзац, [текст](ссылка) —
-                    ссылка, **жирный**, *курсив*, - элемент списка.
+                    {t('wizard.fmtHint')}
                 </p>
             </div>
         </div>

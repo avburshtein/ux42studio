@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import React, { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { GripVertical, Plus, Trash2, Pencil } from 'lucide-react';
@@ -58,6 +60,7 @@ const EMPTY_FORM: NewRoleForm = {
 };
 
 export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
+    const { t } = useAdminLang();
     const [roles, setRoles] = useState<ColorRole[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -131,7 +134,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
 
     const handleSubmit = async () => {
         if (!form.name1.trim()) {
-            setError('Введите основной цвет');
+            setError(t('cp.enterColor'));
             return;
         }
         // Дополнительный цвет необязателен: без него роль сохраняется как
@@ -173,7 +176,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
             await loadRoles();
         } catch (err) {
             setError(
-                err instanceof Error ? err.message : 'Не удалось сохранить',
+                err instanceof Error ? err.message : t('cp.saveFailed'),
             );
         } finally {
             setSaving(false);
@@ -185,7 +188,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
             await deleteColorRole(roleId);
             await loadRoles();
         } catch {
-            setError('Не удалось удалить роль');
+            setError(t('cp.deleteFailed'));
         }
     };
 
@@ -210,7 +213,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                 roles.map((r) => r.id),
             );
         } catch {
-            setError('Не удалось сохранить порядок');
+            setError(t('cp.orderFailed'));
         }
     };
 
@@ -231,7 +234,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
         <div className='space-y-3'>
             {roles.length === 0 && !showForm ? (
                 <p className='text-body-sm text-[var(--md-sys-color-on-surface-variant)]'>
-                    Цветовых ролей пока нет. Добавьте первую роль.
+                    {t('cp.empty')}
                 </p>
             ) : (
                 <div className='space-y-1' role='list' aria-label='Color roles'>
@@ -303,7 +306,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='button'
                                 onClick={() => openEdit(role)}
                                 className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
-                                aria-label={`Редактировать роль ${role.name1}`}
+                                aria-label={t('cp.editRoleAria', { name: role.name1 })}
                             >
                                 <Pencil className='h-4 w-4' />
                             </button>
@@ -311,7 +314,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 type='button'
                                 onClick={() => handleDelete(role.id)}
                                 className='p-1 rounded text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-error)] hover:bg-[var(--md-sys-color-surface-variant)] transition-colors'
-                                aria-label={`Удалить роль ${role.name1}`}
+                                aria-label={t('cp.deleteRoleAria', { name: role.name1 })}
                             >
                                 <Trash2 className='h-4 w-4' />
                             </button>
@@ -325,9 +328,9 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                     <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5'>
                         <div className=''>
                             <Title tag='div' variant='title-lg'>
-                                {editingId ? 'Редактирование' : 'Создание'}
+                                {editingId ? t('cp.editing') : t('cp.creating')}
                                 <br />
-                                <span>роли</span>
+                                <span>{t('cp.roleWord')}</span>
                             </Title>
                         </div>
                         {/* Инпуты прижаты к низу ячейки (mt-auto): метки могут
@@ -338,7 +341,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 htmlFor='roleName'
                                 className='font-medium text-md pl-2'
                             >
-                                Основной цвет
+                                {t('cp.primary')}
                             </Label>
                             <Input
                                 id='roleName'
@@ -347,7 +350,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 onChange={(e) =>
                                     setForm({ ...form, name1: e.target.value })
                                 }
-                                placeholder='Например: Primary'
+                                placeholder={t('cp.primaryPh')}
                             />
                         </div>
                         <div className='flex flex-col'>
@@ -355,9 +358,9 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 htmlFor='roleName2'
                                 className='font-medium text-md pl-2'
                             >
-                                Дополнительный цвет{' '}
+                                {t('cp.secondary')}{' '}
                                 <span className='whitespace-nowrap text-label-sm font-normal text-on-surface-variant'>
-                                    (необязательно)
+                                    {t('cp.optional')}
                                 </span>
                             </Label>
                             <Input
@@ -367,16 +370,16 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 onChange={(e) =>
                                     setForm({ ...form, name2: e.target.value })
                                 }
-                                placeholder='Например: onPrimary — пусто = одиночный цвет'
+                                placeholder={t('cp.secondaryPh')}
                             />
                         </div>
-                        <div className=''>Контраст</div>
+                        <div className=''>{t("cp.contrast")}</div>
                     </div>
 
                     <hr />
 
                     <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5 items-center'>
-                        <div className=''>Светлый</div>
+                        <div className=''>{t("cp.light")}</div>
                         <div>
                             <div className='flex items-center gap-2'>
                                 {/* Квадрат-пипетка виден только при заданном
@@ -450,7 +453,7 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                     <hr />
 
                     <div className='grid grid-cols-1 gap-3 sm:grid-cols-4 sm:gap-5 items-center'>
-                        <div className=''>Темный </div>
+                        <div className=''>{t("cp.dark")} </div>
                         <div>
                             <div className='flex items-center gap-2'>
                                 {form.darkColor1 && (
@@ -531,10 +534,10 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                             onClick={handleSubmit}
                         >
                             {saving
-                                ? 'Сохранение...'
+                                ? t('common.saving')
                                 : editingId
-                                  ? 'Сохранить'
-                                  : 'Добавить роль'}
+                                  ? t('cp.saveBtn')
+                                  : t('cp.addRole')}
                         </Button>
                         <Button
                             type='button'
@@ -546,14 +549,14 @@ export default function ColorRolePicker({ projectId }: ColorRolePickerProps) {
                                 setForm(EMPTY_FORM);
                             }}
                         >
-                            Отмена
+                            {t('common.cancel')}
                         </Button>
                     </div>
                 </div>
             ) : (
                 <Button type='button' variant='outline' onClick={openCreate}>
                     <Plus className='h-4 w-4 mr-1' />
-                    Добавить роль
+                    {t('cp.addRole')}
                 </Button>
             )}
         </div>

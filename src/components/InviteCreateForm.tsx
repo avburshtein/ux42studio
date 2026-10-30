@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { MailCheck, MailWarning, TriangleAlert } from 'lucide-react';
@@ -29,6 +31,7 @@ export default function InviteCreateForm({
 }: {
     createdByUserId: string;
 }) {
+    const { t } = useAdminLang();
     const [email, setEmail] = useState('');
     const [expiresAt, setExpiresAt] = useState('');
     const [saving, setSaving] = useState(false);
@@ -69,7 +72,7 @@ export default function InviteCreateForm({
             setError(
                 err instanceof Error
                     ? err.message
-                    : 'Не удалось создать инвайт',
+                    : t('inviteForm.fail'),
             );
         } finally {
             setSaving(false);
@@ -81,7 +84,7 @@ export default function InviteCreateForm({
             <form onSubmit={onSubmit} className='flex flex-wrap items-end gap-4'>
                 <div className='flex min-w-64 flex-col gap-1'>
                     <Label htmlFor='invite-email'>
-                        Email — на него придёт письмо с кодом
+                        {t('inviteForm.emailLabel')}
                     </Label>
                     <Input
                         id='invite-email'
@@ -95,7 +98,7 @@ export default function InviteCreateForm({
                 </div>
                 <div className='flex flex-col gap-1'>
                     <Label htmlFor='invite-expires'>
-                        Действует до (опционально)
+                        {t('inviteForm.expiresLabel')}
                     </Label>
                     <Input
                         id='invite-expires'
@@ -106,7 +109,7 @@ export default function InviteCreateForm({
                     />
                 </div>
                 <Button type='submit' disabled={saving} aria-busy={saving}>
-                    {saving ? 'Создаём...' : 'Создать инвайт'}
+                    {saving ? t('inviteForm.saving') : t('inviteForm.submit')}
                 </Button>
             </form>
 
@@ -120,7 +123,7 @@ export default function InviteCreateForm({
                 <div className='space-y-3 rounded-lg border border-outline-variant bg-surface-container-low p-4'>
                     <div className='flex flex-wrap items-center gap-3'>
                         <span className='text-title-sm text-on-surface'>
-                            Инвайт создан. Код:
+                            {t('inviteForm.created')}
                         </span>
                         <CodeChip value={created.code} />
                         <a
@@ -129,7 +132,7 @@ export default function InviteCreateForm({
                             rel='noopener noreferrer'
                             className='text-body-sm text-primary underline decoration-1 underline-offset-2 hover:opacity-80'
                         >
-                            Открыть страницу регистрации
+                            {t('inviteForm.openRegister')}
                         </a>
                     </div>
 
@@ -139,9 +142,9 @@ export default function InviteCreateForm({
                         <p className='flex items-start gap-2 text-body-sm text-primary'>
                             <MailCheck className='mt-0.5 h-4 w-4 shrink-0' />
                             <span>
-                                Письмо с инструкцией по регистрации отправлено
-                                на {created.email}. Если его нет во «Входящих» —
-                                проверьте «Спам».
+                                {t('inviteForm.mailSent', {
+                                    email: created.email ?? '',
+                                })}
                             </span>
                         </p>
                     )}
@@ -150,9 +153,9 @@ export default function InviteCreateForm({
                         <p className='flex items-start gap-2 text-body-sm text-error'>
                             <TriangleAlert className='mt-0.5 h-4 w-4 shrink-0' />
                             <span>
-                                Письмо отправить не удалось (
-                                {created.mail.error}). Скопируйте код выше и
-                                отправьте его человеку вручную.
+                                {t('inviteForm.mailFail', {
+                                    error: created.mail.error ?? '—',
+                                })}
                             </span>
                         </p>
                     )}
@@ -162,9 +165,7 @@ export default function InviteCreateForm({
                         <p className='flex items-start gap-2 text-body-sm text-on-surface-variant'>
                             <MailWarning className='mt-0.5 h-4 w-4 shrink-0' />
                             <span>
-                                Отправка писем не настроена, письмо не ушло.
-                                Скопируйте код выше и отправьте его вручную.
-                                Настройка — в Docs/EMAIL.md.
+                                {t('inviteForm.mailUnconfigured')}
                             </span>
                         </p>
                     )}
@@ -176,7 +177,7 @@ export default function InviteCreateForm({
                             size='sm'
                             onClick={() => setCreated(null)}
                         >
-                            Создать ещё
+                            {t('inviteForm.createAnother')}
                         </Button>
                     </div>
                 </div>

@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
 import PageTitle from '@/components/ui/PageTitle';
@@ -17,9 +19,9 @@ import {
 
 // Разделы настроек. Порядок = от «кто я» к необратимым действиям.
 const SECTIONS = [
-    { id: 'account', label: 'Аккаунт' },
-    { id: 'security', label: 'Безопасность' },
-    { id: 'danger', label: 'Удаление профиля' },
+    { id: 'account', label: 'settings.tabAccount' },
+    { id: 'security', label: 'settings.tabSecurity' },
+    { id: 'danger', label: 'settings.tabDanger' },
 ] as const;
 
 type SectionId = (typeof SECTIONS)[number]['id'];
@@ -36,6 +38,7 @@ type SectionId = (typeof SECTIONS)[number]['id'];
  * справа содержимое) — два экрана выглядят одинаково, переход предсказуем.
  */
 export default function SettingsPage() {
+    const { t } = useAdminLang();
     const [section, setSection] = useState<SectionId>('account');
     const [accountEmail, setAccountEmail] = useState('');
     const [publication, setPublication] = useState<{
@@ -57,9 +60,9 @@ export default function SettingsPage() {
             {/* Шапка страницы. Отступ снизу `mb-10` (40px) — раньше шапка и
                 первый раздел стояли встык, без зазора. */}
             <header className='mb-10'>
-                <PageTitle className='mb-2'>Настройки профиля</PageTitle>
+                <PageTitle className='mb-2'>{t('settings.title')}</PageTitle>
                 <p className='text-body-sm text-on-surface-variant'>
-                    Личные данные, доступ и управление аккаунтом
+                    {t('settings.subtitle')}
                 </p>
             </header>
 
@@ -86,7 +89,7 @@ export default function SettingsPage() {
                                                 : 'text-on-surface-variant hover:bg-surface-variant/50'
                                         }`}
                                     >
-                                        {s.label}
+                                        {t(s.label)}
                                     </button>
                                 </li>
                             ))}
@@ -102,11 +105,10 @@ export default function SettingsPage() {
                                 другом разделе. */}
                             <Card className='p-6'>
                                 <h2 className='text-title-md text-on-surface'>
-                                    Вход в аккаунт
+                                    {t('settings.emailSection')}
                                 </h2>
                                 <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                    Этот email используется для входа и для
-                                    системных писем платформы.
+                                    {t('settings.emailDesc')}
                                 </p>
                                 <div className='mt-6 max-w-sm'>
                                     <Label htmlFor='account-email'>
@@ -126,8 +128,7 @@ export default function SettingsPage() {
                                         />
                                     </div>
                                     <p className='mt-1 min-h-[1.5rem] text-body-sm text-on-surface-variant'>
-                                        Email нельзя изменить в панели — он
-                                        привязан к учётной записи.
+                                        {t('settings.emailLocked')}
                                     </p>
                                 </div>
                             </Card>
@@ -148,15 +149,9 @@ export default function SettingsPage() {
 
                     {section === 'security' && (
                         <Card className='p-6'>
-                            <h2 className='text-title-md text-on-surface'>
-                                Пароль
-                            </h2>
+                            <h2 className='text-title-md text-on-surface'>{t("settings.passwordSection")}</h2>
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                При регистрации пароль сгенерировала система —
-                                вы видели его один раз на экране. Замените
-                                его своим: так его проще запомнить и
-                                сложнее подобрать. Сессия хранится 7 дней,
-                                после чего нужно войти заново.
+                                {t('settings.passwordDesc')}
                             </p>
                             <div className='mt-6 max-w-sm'>
                                 <ChangePasswordForm />
@@ -177,7 +172,7 @@ export default function SettingsPage() {
                             </Card>
                         ) : (
                             <p className='text-body-sm text-on-surface-variant'>
-                                Загрузка…
+                                {t('settings.loading')}
                             </p>
                         ))}
                 </div>

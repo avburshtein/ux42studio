@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useFieldArray } from 'react-hook-form';
@@ -54,6 +56,7 @@ export default function DesignPage({
     params: Promise<{ id: string }>;
 }) {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [projectId, setProjectId] = useState<string>('');
     const [saving, setSaving] = useState(false);
     const [saved, markSaved] = useSavedFlag();
@@ -178,7 +181,7 @@ export default function DesignPage({
                 <div className='grid gap-4 sm:grid-cols-2'>
                     <div>
                         <Label htmlFor='designProcessTitle'>
-                            Заголовок «Design Process» (необязательно)
+                            {t('wizard.sectionTitleDesignProcess')}
                         </Label>
                         <input
                             id='designProcessTitle'
@@ -189,7 +192,7 @@ export default function DesignPage({
                     </div>
                     <div>
                         <Label htmlFor='designSystemTitle'>
-                            Заголовок «Design System» (необязательно)
+                            {t('wizard.sectionTitleDesignSystem')}
                         </Label>
                         <input
                             id='designSystemTitle'
@@ -210,8 +213,7 @@ export default function DesignPage({
                         rows={4}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Переносы сохраняются; «- » — список с зелёным маркером;
-                        **жирный**, *курсив*.
+                        {t('wizard.listHint')}
                     </p>
                 </div>
 
@@ -226,16 +228,15 @@ export default function DesignPage({
 
                 <div>
                     <Label htmlFor='displayFontSpec'>
-                        Display Font — характеристики
+                        {t('wizard.fontSpecLabelD')}
                     </Label>
                     <Input
                         id='displayFontSpec'
                         {...register('displayFontSpec')}
-                        placeholder='Например: Bold 64/72, Black для заголовков, Italic для акцентов'
+                        placeholder={t('wizard.fontSpecPhD')}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Необязательно: вес, размеры, начертания — если не
-                        следуете стандартам Material.
+                        {t('wizard.fontSpecHintD')}
                     </p>
                 </div>
 
@@ -250,12 +251,12 @@ export default function DesignPage({
 
                 <div>
                     <Label htmlFor='bodyFontSpec'>
-                        Body Font — характеристики
+                        {t('wizard.fontSpecLabelB')}
                     </Label>
                     <Input
                         id='bodyFontSpec'
                         {...register('bodyFontSpec')}
-                        placeholder='Например: Regular 16/24, Medium для выделений'
+                        placeholder={t('wizard.fontSpecPhB')}
                     />
                 </div>
 
@@ -269,8 +270,7 @@ export default function DesignPage({
                         rows={4}
                     />
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        Формат: [текст](ссылка) — ссылка, **жирный**,
-                        *курсив*, переносы — новые абзацы.
+                        {t('wizard.fmtHintShort')}
                     </p>
                 </div>
 
@@ -307,7 +307,7 @@ export default function DesignPage({
                                             {...register(
                                                 `wireframe.${index}.caption`,
                                             )}
-                                            placeholder='Подпись к эскизу'
+                                            placeholder={t('wizard.captionPh')}
                                         />
                                     </div>
                                     <Button
@@ -349,7 +349,7 @@ export default function DesignPage({
                         <ColorRolePicker projectId={projectId} />
                     ) : (
                         <p className='text-body-sm text-on-surface-variant'>
-                            Загрузка...
+                            {t('wizard.loading')}
                         </p>
                     )}
                 </div>

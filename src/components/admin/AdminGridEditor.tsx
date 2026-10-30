@@ -1,5 +1,7 @@
 'use client';
 
+import { useAdminLang } from '@/components/admin/AdminLang';
+
 import React, { useState, useCallback, useEffect } from 'react';
 import {
     DndContext,
@@ -39,6 +41,7 @@ export default function AdminGridEditor({
     pannable,
     onPositionChange,
 }: AdminGridEditorProps) {
+    const { t } = useAdminLang();
     // Если presetId невалиден (например, null из БД), используем первый доступный пресет
     const presetId =
         rawPresetId && GRID_PRESETS[rawPresetId]
@@ -182,7 +185,7 @@ export default function AdminGridEditor({
     if (!GRID_PRESETS[presetId]) {
         return (
             <div className='p-8 text-center text-[var(--md-sys-color-error)]'>
-                Не найден ни один пресет сетки.
+                {t('grid.noPreset')}
             </div>
         );
     }
@@ -195,20 +198,20 @@ export default function AdminGridEditor({
                 зависит от числа пресетов. Клик-вне закрывает overlay. */}
             <div className='space-y-3'>
                 <h3 className='text-lg font-semibold text-[var(--md-sys-color-on-surface)]'>
-                    Выберите шаблон сетки
+                    {t('grid.choosePreset')}
                 </h3>
                 <div className='relative sm:max-w-sm'>
                     <button
                         type='button'
                         onClick={() => setPresetOpen((v) => !v)}
                         aria-expanded={presetOpen}
-                        aria-label='Выбрать шаблон сетки мудборда'
+                        aria-label={t('grid.choosePresetAria')}
                         className='flex w-full items-center justify-between gap-2 rounded-md border border-outline-variant bg-surface px-4 py-3 text-title-md text-on-surface'
                     >
                         <span className='truncate'>
                             {preset.name}{' '}
                             <span className='text-body-sm text-on-surface-variant'>
-                                ({preset.slots} фото)
+                                ({t('grid.photos', { n: preset.slots })})
                             </span>
                         </span>
                         <ChevronDown
@@ -246,7 +249,7 @@ export default function AdminGridEditor({
                                                 <Check className='h-5 w-5 shrink-0 text-primary' />
                                             ) : (
                                                 <span className='shrink-0 text-body-sm text-on-surface-variant'>
-                                                    {p.slots} фото
+                                                    {t('grid.photos', { n: p.slots })}
                                                 </span>
                                             )}
                                         </button>
@@ -269,7 +272,7 @@ export default function AdminGridEditor({
                     живёт в горизонтальной ленте (min-w) с подсказкой; dnd
                     внутри ленты работает. ≥md — сетка как была (D-008). */}
                 <p className='text-body-sm text-on-surface-variant md:hidden'>
-                    Прокрутите вбок, чтобы увидеть все слоты →
+                    {t('grid.scrollHint')}
                 </p>
                 <div className='overflow-x-auto pb-2 md:overflow-visible'>
                     <div className='grid min-w-[760px] grid-cols-8 gap-3 auto-rows-[140px] md:min-w-0 md:auto-rows-[160px]'>
