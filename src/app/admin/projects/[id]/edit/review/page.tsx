@@ -116,7 +116,7 @@ export default function ReviewPage({
                     })),
                     nextSteps: r?.nextSteps ?? [],
                     publish: false,
-                });
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

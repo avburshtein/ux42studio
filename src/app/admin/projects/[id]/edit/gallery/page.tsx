@@ -253,7 +253,7 @@ export default function GalleryPage({
                 reset({
                     moodboard: byType('moodboard'),
                     final_gallery: byType('final_gallery'),
-                } satisfies DefaultValues);
+                } satisfies DefaultValues, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

@@ -60,7 +60,10 @@ export default function ProblemPage({
                     projectGoal: p?.projectGoal ?? '',
                     targetUsers: p?.targetUsers ?? '',
                     problemTitle: p?.problemTitle ?? '',
-                });
+                    // keepDirtyValues: не затирать поля, которые пользователь
+                    // уже начал править до загрузки (фикс «прыжка» курсора
+                    // при выделении — фидбэк 2026-10-30)
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

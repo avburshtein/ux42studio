@@ -97,7 +97,7 @@ export default function ShowcasePage({
                         beforeText: c.beforeText ?? '',
                         afterText: c.afterText ?? '',
                     })),
-                });
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

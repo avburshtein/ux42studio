@@ -62,7 +62,7 @@ export default function DesignPage({
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    const { register, handleSubmit, control, setValue, watch } =
+    const { register, handleSubmit, control, reset, setValue, watch } =
         useForm<FormData>({
             resolver: zodResolver(formSchema),
             defaultValues: {
@@ -86,37 +86,36 @@ export default function DesignPage({
 
     useEffect(() => {
         if (!projectId) return;
-        getProjectDesign(projectId)
-            .then((d) => {
-                setValue('visualDirection', d?.visualDirection ?? '');
-                setValue('displayFont', d?.displayFont ?? '');
-                setValue('displayFontSpec', d?.displayFontSpec ?? '');
-                setValue('bodyFont', d?.bodyFont ?? '');
-                setValue('bodyFontSpec', d?.bodyFontSpec ?? '');
-                setValue('designApproach', d?.designApproach ?? '');
-                setValue(
-                    'designProcessTitle',
-                    d?.designProcessTitle ?? '',
+        // Один reset на оба источника (скаляры + wireframe-ассеты),
+        // keepDirtyValues: не затирать поля, которые пользователь уже начал
+        // править до загрузки (фикс «прыжка» курсора — фидбэк 2026-10-30)
+        Promise.all([
+            getProjectDesign(projectId),
+            getProjectAssetsByType(projectId, 'wireframe'),
+        ])
+            .then(([d, wireframeRows]) => {
+                reset(
+                    {
+                        visualDirection: d?.visualDirection ?? '',
+                        displayFont: d?.displayFont ?? '',
+                        displayFontSpec: d?.displayFontSpec ?? '',
+                        bodyFont: d?.bodyFont ?? '',
+                        bodyFontSpec: d?.bodyFontSpec ?? '',
+                        designApproach: d?.designApproach ?? '',
+                        designProcessTitle: d?.designProcessTitle ?? '',
+                        designSystemTitle: d?.designSystemTitle ?? '',
+                        wireframe: (wireframeRows ?? []).map((r, i) => ({
+                            id: r.id,
+                            fileId: r.fileId ?? '',
+                            caption: r.caption ?? '',
+                            order: r.order ?? i,
+                        })),
+                    },
+                    { keepDirtyValues: true },
                 );
-                setValue('designSystemTitle', d?.designSystemTitle ?? '');
             })
             .catch(() => {});
-    }, [projectId, setValue]);
-
-    useEffect(() => {
-        if (!projectId) return;
-        getProjectAssetsByType(projectId, 'wireframe').then((rows) => {
-            setValue(
-                'wireframe',
-                (rows ?? []).map((r, i) => ({
-                    id: r.id,
-                    fileId: r.fileId ?? '',
-                    caption: r.caption ?? '',
-                    order: r.order ?? i,
-                })),
-            );
-        });
-    }, [projectId, setValue]);
+    }, [projectId, reset]);
 
     const submitData = async (data: FormData): Promise<boolean> => {
         if (!projectId) return false;

@@ -94,7 +94,7 @@ export default function ResultsPage({
                     results: s?.results ?? [],
                     tools: s?.tools ?? [],
                     baCards: s?.baCards ?? [],
-                });
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

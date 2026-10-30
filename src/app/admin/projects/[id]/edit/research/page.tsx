@@ -102,7 +102,7 @@ export default function ResearchPage({
                         avatarFileId: p.avatarFileId ?? undefined,
                     })),
                     keyMetrics: r?.keyMetrics ?? [],
-                });
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);

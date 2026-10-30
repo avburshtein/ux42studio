@@ -141,7 +141,7 @@ export default function GeneralPage({
                     figmaPrototypeUrl: meta.figmaPrototypeUrl ?? '',
                     webPrototypeUrl: meta.webPrototypeUrl ?? '',
                     categoryIds: meta.categoryIds ?? [],
-                });
+                }, { keepDirtyValues: true });
             })
             .catch(() => {});
     }, [projectId, reset]);
