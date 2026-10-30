@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -28,12 +28,35 @@ export function WizardSidebar({
     projectSlug?: string;
 }) {
     const pathname = usePathname();
+    const dropdownRef = useRef<HTMLUListElement>(null);
     // Моб. dropdown-«фильтр» шагов (референс 2026-10-26: хедер + фильтр
-    // разделов). Закрывается при переходе.
+    // разделов). Закрывается при переходе, тапе на раздел и тапе вне меню.
     const [open, setOpen] = useState(false);
+
+    // Закрытьdropdown при тапе/клике вне меню
+    const handleClickOutside = useCallback(
+        (event: MouseEvent | TouchEvent) => {
+            if (!open || !dropdownRef.current) return;
+            if (!dropdownRef.current.contains(event.target as Node)) {
+                setOpen(false);
+            }
+        },
+        [open],
+    );
+
     useEffect(() => {
         setOpen(false);
     }, [pathname]);
+
+    useEffect(() => {
+        if (!open) return;
+        document.addEventListener('mousedown', handleClickOutside);
+        document.addEventListener('touchstart', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+            document.removeEventListener('touchstart', handleClickOutside);
+        };
+    }, [open, handleClickOutside]);
 
     const stepHref = (path: string) =>
         `/admin/projects/${projectId}/edit/${path}`;
@@ -67,7 +90,10 @@ export function WizardSidebar({
                     />
                 </button>
                 {open && (
-                    <ul className='mt-1 overflow-hidden rounded-md border border-outline-variant bg-surface'>
+                    <ul
+                        ref={dropdownRef}
+                        className='mt-1 overflow-hidden rounded-md border border-outline-variant bg-surface'
+                    >
                         {STEPS.map((step) => {
                             const isActive = pathname === stepHref(step.path);
                             return (
@@ -77,6 +103,7 @@ export function WizardSidebar({
                                 >
                                     <Link
                                         href={stepHref(step.path)}
+                                        onClick={() => setOpen(false)}
                                         className={`flex items-center justify-between gap-2 px-4 py-3 text-body-lg ${
                                             isActive
                                                 ? 'font-medium text-on-surface'

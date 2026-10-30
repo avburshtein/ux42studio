@@ -23,27 +23,71 @@ interface RichTextProps {
     className?: string;
 }
 
-/** Инлайн-разметка: **жирный**, *курсив* и переносы строк (→ <br>). */
+/**
+ * Инлайн-разметка: **жирный**, *курсив*, [ссылка](url), bare URL и переносы
+ * строк (→ <br>).
+ */
 function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
-    const lines = text.split('\n');
-    return lines.flatMap((line, i) => {
-        const parts = line.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, j) => {
-            if (part.startsWith('**') && part.endsWith('**') && part.length > 4) {
+    const LINK_RE = /(\[[^\]]+\]\([^)]+\))/g;
+    const URL_RE = /(https?:\/\/[^\s<>"')]+)/g;
+    const BI_RE = /(\*\*[^*]+\*\*|\*[^*]+\*)/g;
+
+    const tokenize = (part: string, prefix: string): React.ReactNode[] => {
+        // Ссылка вида [текст](url)
+        const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+        if (linkMatch) {
+            return [
+                <a
+                    key={`${prefix}-link`}
+                    href={linkMatch[2]}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-primary underline underline-offset-4 hover:opacity-80'
+                >
+                    {renderInline(linkMatch[1], `${prefix}-lt`)}
+                </a>,
+            ];
+        }
+        // Bare URL
+        const urlMatch = part.match(/^https?:\/\/[^\s<>"')]+$/);
+        if (urlMatch) {
+            return [
+                <a
+                    key={`${prefix}-url`}
+                    href={part}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-primary underline underline-offset-4 hover:opacity-80'
+                >
+                    {part}
+                </a>,
+            ];
+        }
+        // Жирый / курсив / обычный текст
+        return part.split(BI_RE).map((pp, m) => {
+            if (pp.startsWith('**') && pp.endsWith('**') && pp.length > 4) {
                 return (
-                    <strong key={`${keyPrefix}-${i}-${j}`} className='font-semibold text-on-surface'>
-                        {part.slice(2, -2)}
+                    <strong key={`${prefix}-b-${m}`} className='font-semibold text-on-surface'>
+                        {pp.slice(2, -2)}
                     </strong>
                 );
             }
-            if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+            if (pp.startsWith('*') && pp.endsWith('*') && pp.length > 2) {
                 return (
-                    <em key={`${keyPrefix}-${i}-${j}`} className='italic'>
-                        {part.slice(1, -1)}
+                    <em key={`${prefix}-i-${m}`} className='italic'>
+                        {pp.slice(1, -1)}
                     </em>
                 );
             }
-            return <React.Fragment key={`${keyPrefix}-${i}-${j}`}>{part}</React.Fragment>;
+            return <React.Fragment key={`${prefix}-t-${m}`}>{pp}</React.Fragment>;
         });
+    };
+
+    const lines = text.split('\n');
+    return lines.flatMap((line, i) => {
+        const parts = line.split(LINK_RE).flatMap((part, j) =>
+            tokenize(part, `${keyPrefix}-${i}-${j}`),
+        );
         return i === 0 ? parts : [<br key={`${keyPrefix}-br-${i}`} />, ...parts];
     });
 }

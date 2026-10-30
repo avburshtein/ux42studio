@@ -424,6 +424,12 @@ export default async function ProjectPage({ params }: PageProps) {
                                             }
                                         />
                                     ))}
+                                    {project.userStory && (
+                                        <PortfolioCard
+                                            title='User story'
+                                            body={project.userStory}
+                                        />
+                                    )}
                                 </CaseSection>
                             )}
 

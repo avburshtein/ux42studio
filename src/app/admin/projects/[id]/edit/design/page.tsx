@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
@@ -12,8 +12,22 @@ import WizardSaveBar, {
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import Title from '@/components/ui/Title';
+import ImageUploaderField from '@/components/ImageUploaderField';
 import ColorRolePicker from '@/components/ColorRolePicker';
-import { updateProjectDesign, getProjectDesign } from '@/lib/actions/projects';
+import { cn } from '@/lib/utils';
+import {
+    updateProjectDesign,
+    getProjectDesign,
+    replaceProjectAssetsByType,
+    getProjectAssetsByType,
+} from '@/lib/actions/projects';
+
+const wireframeSchema = z.object({
+    id: z.string().optional(),
+    fileId: z.string().optional().or(z.literal('')),
+    caption: z.string().optional().or(z.literal('')),
+    order: z.number().int(),
+});
 
 const formSchema = z.object({
     visualDirection: z.string().optional().or(z.literal('')),
@@ -25,6 +39,10 @@ const formSchema = z.object({
     // Кастомные заголовки секций на кейс-странице (D-009)
     designProcessTitle: z.string().optional().or(z.literal('')),
     designSystemTitle: z.string().optional().or(z.literal('')),
+    // Wireframe-ассеты — хранятся в projectAssets (тип 'wireframe'),
+    // редактируются здесь, чтобы секция «Design Process» на кейс-странице
+    // показывала подход + эскизы вместе.
+    wireframe: z.array(wireframeSchema),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -44,19 +62,27 @@ export default function DesignPage({
         params.then((p) => setProjectId(p.id));
     }, [params]);
 
-    const { register, handleSubmit, setValue } = useForm<FormData>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            visualDirection: '',
-            displayFont: '',
-            displayFontSpec: '',
-            bodyFont: '',
-            bodyFontSpec: '',
-            designApproach: '',
-            designProcessTitle: '',
-            designSystemTitle: '',
-        },
-    });
+    const { register, handleSubmit, control, setValue, watch } =
+        useForm<FormData>({
+            resolver: zodResolver(formSchema),
+            defaultValues: {
+                visualDirection: '',
+                displayFont: '',
+                displayFontSpec: '',
+                bodyFont: '',
+                bodyFontSpec: '',
+                designApproach: '',
+                designProcessTitle: '',
+                designSystemTitle: '',
+                wireframe: [],
+            },
+        });
+
+    const {
+        fields: wireframeFields,
+        append: appendWireframe,
+        remove: removeWireframe,
+    } = useFieldArray({ control, name: 'wireframe' });
 
     useEffect(() => {
         if (!projectId) return;
@@ -77,6 +103,21 @@ export default function DesignPage({
             .catch(() => {});
     }, [projectId, setValue]);
 
+    useEffect(() => {
+        if (!projectId) return;
+        getProjectAssetsByType(projectId, 'wireframe').then((rows) => {
+            setValue(
+                'wireframe',
+                (rows ?? []).map((r, i) => ({
+                    id: r.id,
+                    fileId: r.fileId ?? '',
+                    caption: r.caption ?? '',
+                    order: r.order ?? i,
+                })),
+            );
+        });
+    }, [projectId, setValue]);
+
     const submitData = async (data: FormData): Promise<boolean> => {
         if (!projectId) return false;
         setSaving(true);
@@ -92,6 +133,19 @@ export default function DesignPage({
                 designProcessTitle: data.designProcessTitle || undefined,
                 designSystemTitle: data.designSystemTitle || undefined,
             });
+            // Wireframe-ассеты хранятся отдельно (projectAssets, тип 'wireframe')
+            await replaceProjectAssetsByType(
+                projectId,
+                'wireframe',
+                data.wireframe
+                    .filter((a) => a.fileId)
+                    .map((a, i) => ({
+                        id: a.id,
+                        fileId: a.fileId!,
+                        caption: a.caption,
+                        order: i,
+                    })),
+            );
             return true;
         } catch (e) {
             setError(e instanceof Error ? e.message : 'Save failed');
@@ -214,6 +268,75 @@ export default function DesignPage({
                         className='w-full rounded-md border border-outline-variant bg-surface px-3 py-2 text-body-sm text-on-surface focus:border-transparent focus:outline-2 focus:outline-primary focus:outline-offset-[-2px]'
                         rows={4}
                     />
+                </div>
+
+                {/* Wireframe — часть секции «Design Process» на кейс-странице:
+                    эскизы идут вместе с описанием подхода. */}
+                <div className='mt-8'>
+                    <Title variant='headline-md'>Wireframe</Title>
+                    {wireframeFields.length > 0 ? (
+                        <div className='mt-3 space-y-3'>
+                            {wireframeFields.map((field, index) => (
+                                <div
+                                    key={field.id}
+                                    className='flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 border rounded-lg p-3'
+                                >
+                                    <div className='min-w-0 flex-1'>
+                                        <ImageUploaderField
+                                            compact
+                                            value={
+                                                watch(
+                                                    `wireframe.${index}.fileId`,
+                                                ) || null
+                                            }
+                                            onChange={(fileId) =>
+                                                setValue(
+                                                    `wireframe.${index}.fileId`,
+                                                    fileId ?? '',
+                                                )
+                                            }
+                                            aspectRatio={4 / 3}
+                                        />
+                                    </div>
+                                    <div className='min-w-0 flex-1'>
+                                        <Input
+                                            {...register(
+                                                `wireframe.${index}.caption`,
+                                            )}
+                                            placeholder='Подпись к эскизу'
+                                        />
+                                    </div>
+                                    <Button
+                                        type='button'
+                                        variant='ghost'
+                                        className='shrink-0 self-start p-0 text-error sm:self-center'
+                                        onClick={() => removeWireframe(index)}
+                                    >
+                                        Remove
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className='mt-1 text-body-sm text-on-surface-variant'>
+                            Wireframes not added yet.
+                        </p>
+                    )}
+                    <div className='mt-3'>
+                        <Button
+                            type='button'
+                            variant='outline'
+                            onClick={() =>
+                                appendWireframe({
+                                    fileId: '',
+                                    caption: '',
+                                    order: wireframeFields.length,
+                                })
+                            }
+                        >
+                            Add wireframe
+                        </Button>
+                    </div>
                 </div>
 
                 <div className='mt-12'>

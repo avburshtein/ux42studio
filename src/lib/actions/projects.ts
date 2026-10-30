@@ -543,24 +543,46 @@ export async function updateProjectGallery(
         }>;
         moodboardPresetId?: string | null;
         galleryLayout?: GalleryLayout | null;
+        // Какие типы ассетов перезаписывать (по умолчанию все). Нужно, чтобы
+        // Gallery не затрагивала wireframe-ассеты (теперь живут в разделе
+        // Design), а Design не затрагивала moodboard / final_gallery.
+        assetTypes?: Array<'moodboard' | 'wireframe' | 'final_gallery'>;
     },
 ) {
     const { env } = await getCloudflareContext();
     const db = getDb(env.DB);
+    const assetTypes = data.assetTypes ?? [
+        'moodboard',
+        'wireframe',
+        'final_gallery',
+    ];
 
-    // Собираем старые fileId ассетов до перезаписи
+    // Собираем старые fileId ассетов только управляемых типов
     const oldAssets = await db
-        .select({ fileId: projectAssets.fileId })
+        .select({
+            fileId: projectAssets.fileId,
+            assetType: projectAssets.assetType,
+        })
         .from(projectAssets)
-        .where(eq(projectAssets.projectId, projectId))
+        .where(
+            and(
+                eq(projectAssets.projectId, projectId),
+                inArray(projectAssets.assetType, assetTypes),
+            ),
+        )
         .all();
 
     const oldFileIds = new Set<string>();
     for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
 
     await db.batch([
-        // Replace assets
-        db.delete(projectAssets).where(eq(projectAssets.projectId, projectId)),
+        // Replace assets только управляемых типов
+        db.delete(projectAssets).where(
+            and(
+                eq(projectAssets.projectId, projectId),
+                inArray(projectAssets.assetType, assetTypes),
+            ),
+        ),
         ...(data.assets || []).map((a) =>
             db.insert(projectAssets).values({
                 id: a.id || crypto.randomUUID(),
@@ -605,6 +627,99 @@ export async function updateProjectGallery(
     await revalidateCaseData(projectId);
     // Публичная страница кейса кэшируется (revalidate = 3600) — сбрасываем
     revalidatePath('/', 'layout');
+}
+
+/**
+ * Заменяет ассеты проекта только одного типа (moodboard / wireframe /
+ * final_gallery), не затрагивая остальные — нужно, чтобы раздел «Design»
+ * управлял wireframe-ассетами, а Gallery — moodboard и final_gallery.
+ */
+export async function replaceProjectAssetsByType(
+    projectId: string,
+    assetType: 'moodboard' | 'wireframe' | 'final_gallery',
+    assets: Array<{
+        id?: string;
+        fileId: string;
+        caption?: string;
+        order: number;
+        posX?: number;
+        posY?: number;
+    }>,
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+
+    const oldAssets = await db
+        .select({ fileId: projectAssets.fileId })
+        .from(projectAssets)
+        .where(
+            and(
+                eq(projectAssets.projectId, projectId),
+                eq(projectAssets.assetType, assetType),
+            ),
+        )
+        .all();
+
+    const oldFileIds = new Set<string>();
+    for (const row of oldAssets) if (row.fileId) oldFileIds.add(row.fileId);
+
+    await db.batch([
+        db.delete(projectAssets).where(
+            and(
+                eq(projectAssets.projectId, projectId),
+                eq(projectAssets.assetType, assetType),
+            ),
+        ),
+        ...assets.map((a) =>
+            db.insert(projectAssets).values({
+                id: a.id || crypto.randomUUID(),
+                projectId,
+                fileId: a.fileId,
+                assetType,
+                caption: a.caption,
+                order: a.order,
+                posX: a.posX ?? 50,
+                posY: a.posY ?? 50,
+            }),
+        ),
+    ]);
+
+    const newFileIds = new Set<string>();
+    for (const a of assets) if (a.fileId) newFileIds.add(a.fileId);
+    const staleFileIds = [...oldFileIds].filter((id) => !newFileIds.has(id));
+    if (staleFileIds.length > 0) {
+        await deleteFilesByIds(staleFileIds);
+    }
+
+    revalidatePath(`/admin/projects/${projectId}`);
+    await revalidateCaseData(projectId);
+    revalidatePath('/', 'layout');
+}
+
+export async function getProjectAssetsByType(
+    projectId: string,
+    assetType: 'moodboard' | 'wireframe' | 'final_gallery',
+) {
+    const { env } = await getCloudflareContext();
+    const db = getDb(env.DB);
+    return db
+        .select({
+            id: projectAssets.id,
+            fileId: projectAssets.fileId,
+            assetType: projectAssets.assetType,
+            caption: projectAssets.caption,
+            order: projectAssets.order,
+            posX: projectAssets.posX,
+            posY: projectAssets.posY,
+        })
+        .from(projectAssets)
+        .where(
+            and(
+                eq(projectAssets.projectId, projectId),
+                eq(projectAssets.assetType, assetType),
+            ),
+        )
+        .orderBy(asc(projectAssets.order));
 }
 
 export async function getProjectGallery(projectId: string) {

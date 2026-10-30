@@ -23,6 +23,8 @@ import { cn } from '@/lib/utils';
 import {
     updateProjectGallery,
     getProjectGallery,
+    replaceProjectAssetsByType,
+    getProjectAssetsByType,
     getFileR2Key,
 } from '@/lib/actions/projects';
 import {
@@ -41,7 +43,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical } from 'lucide-react';
 
-const ASSET_TYPES = ['moodboard', 'wireframe', 'final_gallery'] as const;
+const ASSET_TYPES = ['moodboard', 'final_gallery'] as const;
 
 const assetSchema = z.object({
     id: z.string().optional(),
@@ -53,7 +55,6 @@ const assetSchema = z.object({
 
 const formSchema = z.object({
     moodboard: z.array(assetSchema),
-    wireframe: z.array(assetSchema),
     final_gallery: z.array(assetSchema),
 });
 
@@ -66,7 +67,6 @@ const SECTIONS: Array<{
     placeholder: string;
 }> = [
     { key: 'moodboard', label: 'Moodboard', placeholder: 'Moodboard asset' },
-    { key: 'wireframe', label: 'Wireframe', placeholder: 'Wireframe asset' },
     {
         key: 'final_gallery',
         label: 'Final gallery',
@@ -76,7 +76,6 @@ const SECTIONS: Array<{
 
 type DefaultValues = {
     moodboard: AssetDraft[];
-    wireframe: AssetDraft[];
     final_gallery: AssetDraft[];
 };
 
@@ -178,13 +177,11 @@ export default function GalleryPage({
         resolver: zodResolver(formSchema),
         defaultValues: {
             moodboard: [],
-            wireframe: [],
             final_gallery: [],
         },
     });
 
     const moodboard = useFieldArray({ control, name: 'moodboard' });
-    const wireframe = useFieldArray({ control, name: 'wireframe' });
     const finalGallery = useFieldArray({ control, name: 'final_gallery' });
 
     const fieldArrays: Record<
@@ -192,7 +189,6 @@ export default function GalleryPage({
         UseFieldArrayReturn<FormData, AssetType>
     > = {
         moodboard,
-        wireframe,
         final_gallery: finalGallery,
     };
 
@@ -256,7 +252,6 @@ export default function GalleryPage({
 
                 reset({
                     moodboard: byType('moodboard'),
-                    wireframe: byType('wireframe'),
                     final_gallery: byType('final_gallery'),
                 } satisfies DefaultValues);
             })
@@ -286,10 +281,6 @@ export default function GalleryPage({
 
             const assets = [
                 ...moodboardAssetsFromGrid,
-                ...data.wireframe.map((a) => ({
-                    ...a,
-                    assetType: 'wireframe' as const,
-                })),
                 ...data.final_gallery.map((a) => ({
                     ...a,
                     assetType: 'final_gallery' as const,
@@ -304,6 +295,7 @@ export default function GalleryPage({
                 assets,
                 moodboardPresetId,
                 galleryLayout,
+                assetTypes: ['moodboard', 'final_gallery'],
             });
             return true;
         } catch (e) {
@@ -490,9 +482,6 @@ export default function GalleryPage({
                     />
                 </div>
 
-                {/* Wireframe */}
-                {renderSection(SECTIONS[1])}
-
                 {/* Final Gallery Layout — решение (51): editorial /
                     masonry / stack; пикер рядом с загрузкой фото */}
                 <div className='flex flex-col gap-3'>
@@ -531,7 +520,7 @@ export default function GalleryPage({
                 </div>
 
                 {/* Final Gallery */}
-                {renderSection(SECTIONS[2])}
+                {renderSection(SECTIONS[1])}
 
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
