@@ -139,6 +139,18 @@ const ru = {
         panning: 'Двигайте фото — отпустите, чтобы зафиксировать',
         emptySlot: 'Пустой слот',
         emptyHint: 'Нажмите или перетащите файл',
+        presets: {
+            heroLeft: 'Акцент слева',
+            heroRight: 'Акцент справа',
+            panoramic: 'Панорама и миниатюры',
+            bigCenter: 'Крупный центр',
+            mosaic: 'Мозаика',
+            triptych: 'Триптих',
+            window: 'Окно',
+            staircase: 'Лесенка',
+            uniform: 'Равномерная (6)',
+            masonry: 'Masonry',
+        },
     },
     profile: {
         notFound: 'Профиль не найден',

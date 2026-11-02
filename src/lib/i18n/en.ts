@@ -138,6 +138,18 @@ const en: Translations = {
         panning: 'Move the photo — release to fix position',
         emptySlot: 'Empty slot',
         emptyHint: 'Click or drag a file',
+        presets: {
+            heroLeft: 'Accent left',
+            heroRight: 'Accent right',
+            panoramic: 'Panorama + thumbnails',
+            bigCenter: 'Big center',
+            mosaic: 'Mosaic',
+            triptych: 'Triptych',
+            window: 'Window',
+            staircase: 'Staircase',
+            uniform: 'Uniform (6)',
+            masonry: 'Masonry',
+        },
     },
     profile: {
         notFound: 'Profile not found',

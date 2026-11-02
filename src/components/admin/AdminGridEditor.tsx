@@ -14,6 +14,12 @@ import {
     useSensors,
 } from '@dnd-kit/core';
 import { GRID_PRESETS, type GridPreset } from '@/lib/grid-presets.config';
+
+/** Имя пресета в UI берём из словаря по id (grid.presets.*), а не из
+ *  name в конфиге: конфиг — данные (D-012: строки данных не переводим,
+ *  словарные ключи — в рендере). camelCase: 'hero-left' → 'heroLeft'. */
+const presetNameKey = (id: string) =>
+    `grid.presets.${id.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase())}`;
 import { Check, ChevronDown } from 'lucide-react';
 import GridSlot, { type GridImage } from './GridSlot';
 
@@ -209,7 +215,7 @@ export default function AdminGridEditor({
                         className='flex w-full items-center justify-between gap-2 rounded-md border border-outline-variant bg-surface px-4 py-3 text-title-md text-on-surface'
                     >
                         <span className='truncate'>
-                            {preset.name}{' '}
+                            {t(presetNameKey(presetId))}{' '}
                             <span className='text-body-sm text-on-surface-variant'>
                                 ({t('grid.photos', { n: preset.slots })})
                             </span>
@@ -244,7 +250,7 @@ export default function AdminGridEditor({
                                                     : 'text-on-surface-variant hover:bg-surface-variant'
                                             }`}
                                         >
-                                            {p.name}
+                                            {t(presetNameKey(id))}
                                             {id === presetId ? (
                                                 <Check className='h-5 w-5 shrink-0 text-primary' />
                                             ) : (
