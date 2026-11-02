@@ -287,6 +287,8 @@ export default async function ProfilePage({ params }: PageProps) {
         mpc.about.paragraph1,
         mpc.about.paragraph2,
         mpc.about.paragraph3,
+        mpc.about.paragraph4,
+        mpc.about.paragraph5,
     ].filter((p) => p.length > 0);
 
     // Process image — fileId → /r2/ URL
@@ -344,6 +346,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     key={project.id}
                     title={project.title}
                     tag={catName}
+                    statusBadge={project.statusBadge ?? undefined}
                     imageUrl={
                         project.coverFile
                             ? getImageUrl(project.coverFile.r2Key)
@@ -414,6 +417,10 @@ export default async function ProfilePage({ params }: PageProps) {
                     secondaryCtaLabel={mpc.hero.ctaSecondaryLabel}
                     secondaryCtaHref={mpc.hero.ctaSecondaryUrl || '#contact'}
                     secondaryCtaVariant={mpc.hero.ctaSecondaryVariant}
+                    tertiaryCtaLabel={mpc.hero.ctaTertiaryLabel || undefined}
+                    tertiaryCtaHref={mpc.hero.ctaTertiaryUrl || undefined}
+                    tertiaryCtaVariant={mpc.hero.ctaTertiaryVariant}
+                    facts={mpc.hero.facts.length > 0 ? mpc.hero.facts : undefined}
                     secondaryCtaDialog={
                         (mpc.hero.ctaSecondaryUrl || '#contact') === '#contact'
                             ? {
@@ -480,8 +487,8 @@ export default async function ProfilePage({ params }: PageProps) {
                             <SkillsSection
                                 skillsLabel={mpc.expertise.skillsLabel}
                                 expertiseTags={mpc.expertise.skills}
-                                toolsLabel={mpc.expertise.toolsLabel}
-                                toolTags={mpc.expertise.tools}
+                                toolGroups={mpc.expertise.toolGroups}
+                                stackNote={mpc.expertise.stackNote || undefined}
                                 processLabel={mpc.expertise.processLabel}
                                 processSteps={mpc.expertise.processSteps.map((step, i) => ({
                                     number: String(i + 1).padStart(2, '0'),

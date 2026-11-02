@@ -35,6 +35,8 @@ export async function updateProjectMeta(
         slug?: string;
         title?: string;
         teaser?: string;
+        /** D-013: метка статуса карточки («Live product», «Concept») */
+        statusBadge?: string;
         client?: string;
         year?: number;
         duration?: string;
@@ -1341,6 +1343,7 @@ export async function getProjectMeta(projectId: string) {
             title: projects.title,
             slug: projects.slug,
             teaser: projects.teaser,
+            statusBadge: projects.statusBadge,
             client: projects.client,
             year: projects.year,
             duration: projects.duration,

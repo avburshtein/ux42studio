@@ -15,6 +15,12 @@ interface HeroSectionProps {
   secondaryCtaLabel?: string;
   secondaryCtaHref?: string;
   secondaryCtaVariant?: ButtonVariant;
+  /** Третья кнопка (например, Download CV) — рендерится, если заданы label и href. */
+  tertiaryCtaLabel?: string;
+  tertiaryCtaHref?: string;
+  tertiaryCtaVariant?: ButtonVariant;
+  /** Полоса фактов под кнопками («первый экран CV», D-013). */
+  facts?: string[];
   /** Открыть форму обратной связи вместо ссылки (кнопки на #contact). */
   secondaryCtaDialog?: {
     source: string;
@@ -51,6 +57,9 @@ export function HeroSection({
   primaryCtaVariant = 'primary',
   secondaryCtaLabel, secondaryCtaHref,
   secondaryCtaVariant = 'secondary',
+  tertiaryCtaLabel, tertiaryCtaHref,
+  tertiaryCtaVariant = 'ghost',
+  facts,
   secondaryCtaDialog,
   avatarUrl, coverUrl, displayName,
   floatingElements = true,
@@ -125,7 +134,29 @@ export function HeroSection({
               </CtaButton>
             )
           )}
+
+          {tertiaryCtaLabel && tertiaryCtaHref && (
+            <CtaButton href={tertiaryCtaHref} variant={tertiaryCtaVariant}>
+              {tertiaryCtaLabel}
+            </CtaButton>
+          )}
         </div>
+
+        {facts && facts.length > 0 && (
+          /* Полоса фактов («первый экран CV», D-013): короткие пункты
+              с маркером-точкой — сканируются, не выглядят абзацем. */
+          <ul className="flex flex-col gap-2 lg:flex-row lg:flex-wrap lg:gap-x-8">
+            {facts.map((fact) => (
+              <li key={fact} className="flex items-center gap-2 text-body-md text-on-surface-variant">
+                <span
+                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary"
+                  aria-hidden="true"
+                />
+                {fact}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </section>
   );

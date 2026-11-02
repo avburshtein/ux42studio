@@ -27,6 +27,9 @@ export const projects = sqliteTable(
         slug: text('slug').notNull(), // /u/[user-slug]/[project-slug][cite: 1]
         title: text('title').notNull(), //[cite: 1]
         teaser: text('teaser'), //[cite: 1]
+        // D-013: честная метка статуса карточки («Live product», «Concept») —
+        // рендерится на личной странице рядом с заголовком
+        statusBadge: text('status_badge'),
         client: text('client'), //[cite: 1]
         year: integer('year'), //[cite: 1]
         duration: text('duration'), //[cite: 1]

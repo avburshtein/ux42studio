@@ -1,4 +1,5 @@
 import { TagBadge } from '../case/TagBadge';
+import type { ToolGroup } from '@/lib/mainPageContent';
 
 interface ProcessStep {
   number: string;    // "01", "02", etc.
@@ -9,8 +10,10 @@ interface ProcessStep {
 interface SkillsSectionProps {
   skillsLabel?: string;
   expertiseTags: string[];
-  toolsLabel?: string;
-  toolTags: string[];
+  /** Группы Tools (D-013): подзаголовок + чипы, вместо плоского списка. */
+  toolGroups: ToolGroup[];
+  /** Строка «Project stack» — честная пометка, с чем работали. */
+  stackNote?: string;
   processLabel?: string;
   processSteps: ProcessStep[];
 }
@@ -22,9 +25,10 @@ interface SkillsSectionProps {
  * Лейблы секций редактируются в админке (/admin/profile → Main Page Content).
  */
 export function SkillsSection({
-  skillsLabel, expertiseTags, toolsLabel, toolTags, processLabel, processSteps,
+  skillsLabel, expertiseTags, toolGroups, stackNote, processLabel, processSteps,
 }: SkillsSectionProps) {
-  if (expertiseTags.length === 0 && toolTags.length === 0 && processSteps.length === 0) return null;
+  const hasTools = toolGroups.some((g) => g.items.length > 0);
+  if (expertiseTags.length === 0 && !hasTools && processSteps.length === 0) return null;
 
   return (
     <section className="bg-surface-container-lowest py-12 md:py-24">
@@ -40,13 +44,32 @@ export function SkillsSection({
               </div>
             )}
 
-            {toolTags.length > 0 && (
+            {hasTools && (
               <div className="flex flex-col gap-8">
-                <h3 className="text-title-sm font-medium text-on-surface-variant">{toolsLabel ?? 'Tools'}</h3>
-                <div className="flex flex-wrap gap-3">
-                  {toolTags.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
-                </div>
+                {toolGroups.map(
+                  (group) =>
+                    group.items.length > 0 && (
+                      <div key={group.label} className="flex flex-col gap-4">
+                        {group.label && (
+                          <h4 className="text-label-lg font-semibold text-on-surface-variant">
+                            {group.label}
+                          </h4>
+                        )}
+                        <div className="flex flex-wrap gap-3">
+                          {group.items.map((tag) => <TagBadge key={tag} label={tag} variant="outlined" size="lg" />)}
+                        </div>
+                      </div>
+                    ),
+                )}
               </div>
+            )}
+
+            {stackNote && (
+              /* «Project stack» (D-013): честная пометка — с чем работали,
+                  без заявки этих технологий как навыка. */
+              <p className="text-body-md font-normal text-on-surface-variant">
+                {stackNote}
+              </p>
             )}
           </div>
 

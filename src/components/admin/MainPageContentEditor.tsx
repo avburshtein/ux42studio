@@ -27,6 +27,7 @@ import type {
     ButtonVariant,
     MainPageContent,
     ProcessStep,
+    ToolGroup,
 } from '@/lib/mainPageContent';
 
 type Props = {
@@ -98,6 +99,69 @@ function TagList({
                 />
                 <Button type='button' variant='outline' size='sm' onClick={add}>
                     <Plus className='mr-1 h-4 w-4' /> Add
+                </Button>
+            </div>
+        </div>
+    );
+}
+
+/** Редактор групп Tools (D-013): подзаголовок группы + чипы.
+ *  Группы можно добавлять/удалять; каждая — как TagList. */
+function ToolGroupsEditor({
+    label,
+    groups,
+    onChange,
+}: {
+    label: string;
+    groups: ToolGroup[];
+    onChange: (groups: ToolGroup[]) => void;
+}) {
+    const update = (i: number, patch: Partial<ToolGroup>) => {
+        onChange(groups.map((g, j) => (j === i ? { ...g, ...patch } : g)));
+    };
+
+    return (
+        <div className='flex flex-col gap-4'>
+            <Label>{label}</Label>
+            {groups.map((group, i) => (
+                <div
+                    key={i}
+                    className='flex flex-col gap-3 rounded-md border border-outline-variant p-4'
+                >
+                    <div className='flex items-end gap-2'>
+                        <div className='flex-1'>
+                            <Label htmlFor={`mp-tg-l-${i}`}>Group label</Label>
+                            <Input
+                                id={`mp-tg-l-${i}`}
+                                value={group.label}
+                                onChange={(e) => update(i, { label: e.target.value })}
+                            />
+                        </div>
+                        <Button
+                            type='button'
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => onChange(groups.filter((_, j) => j !== i))}
+                            aria-label={`Remove group ${group.label}`}
+                        >
+                            <Trash2 className='h-4 w-4' />
+                        </Button>
+                    </div>
+                    <TagList
+                        label='Tags'
+                        tags={group.items}
+                        onChange={(items) => update(i, { items })}
+                    />
+                </div>
+            ))}
+            <div>
+                <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => onChange([...groups, { label: '', items: [] }])}
+                >
+                    <Plus className='mr-1 h-4 w-4' /> Add group
                 </Button>
             </div>
         </div>
@@ -455,7 +519,38 @@ export default function MainPageContentEditor({
                                 onChange={(e) => set('hero', { ctaSecondaryUrl: e.target.value })}
                             />
                         </div>
+                        <VariantSelect
+                            id='mp-htv'
+                            label='CTA tertiary (e.g. Download CV) — button style'
+                            value={content.hero.ctaTertiaryVariant}
+                            onChange={(v) => set('hero', { ctaTertiaryVariant: v })}
+                        />
+                        <div />
+                        <div>
+                            <Label htmlFor='mp-htl'>CTA tertiary — label</Label>
+                            <Input
+                                id='mp-htl'
+                                placeholder='Download CV'
+                                value={content.hero.ctaTertiaryLabel}
+                                onChange={(e) => set('hero', { ctaTertiaryLabel: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <Label htmlFor='mp-htu'>CTA tertiary — link (PDF URL)</Label>
+                            <Input
+                                id='mp-htu'
+                                placeholder='https://…/cv.pdf'
+                                value={content.hero.ctaTertiaryUrl}
+                                onChange={(e) => set('hero', { ctaTertiaryUrl: e.target.value })}
+                            />
+                        </div>
                     </div>
+                    {/* Полоса фактов под кнопками («первый экран CV», D-013) */}
+                    <TagList
+                        label='Hero facts (short, one line each — e.g. certificates, stack, results)'
+                        tags={content.hero.facts}
+                        onChange={(facts) => set('hero', { facts })}
+                    />
                 </Section>
                 ))}
 
@@ -553,6 +648,26 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
+                        <Label htmlFor='mp-ap4'>Paragraph 4</Label>
+                        <textarea
+                            id='mp-ap4'
+                            rows={3}
+                            className={textareaClass}
+                            value={content.about.paragraph4}
+                            onChange={(e) => set('about', { paragraph4: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor='mp-ap5'>Paragraph 5</Label>
+                        <textarea
+                            id='mp-ap5'
+                            rows={3}
+                            className={textareaClass}
+                            value={content.about.paragraph5}
+                            onChange={(e) => set('about', { paragraph5: e.target.value })}
+                        />
+                    </div>
+                    <div>
                         <Label>Process image</Label>
                         <ImageUploaderField
                             value={content.about.processImageFileId}
@@ -581,25 +696,25 @@ export default function MainPageContentEditor({
                                 onChange={(e) => set('expertise', { skillsLabel: e.target.value })}
                             />
                         </div>
-                        <div>
-                            <Label htmlFor='mp-etl'>Tools label</Label>
-                            <Input
-                                id='mp-etl'
-                                value={content.expertise.toolsLabel}
-                                onChange={(e) => set('expertise', { toolsLabel: e.target.value })}
-                            />
-                        </div>
                     </div>
                     <TagList
                         label='Skills tags'
                         tags={content.expertise.skills}
                         onChange={(skills) => set('expertise', { skills })}
                     />
-                    <TagList
-                        label='Tools tags'
-                        tags={content.expertise.tools}
-                        onChange={(tools) => set('expertise', { tools })}
+                    <ToolGroupsEditor
+                        label='Tools groups (label + tags — e.g. Design / AI-assisted workflow / Code)'
+                        groups={content.expertise.toolGroups}
+                        onChange={(toolGroups) => set('expertise', { toolGroups })}
                     />
+                    <div>
+                        <Label htmlFor='mp-esn'>Project stack note (honest line, e.g. “Worked with, together with AI agents: …”)</Label>
+                        <Input
+                            id='mp-esn'
+                            value={content.expertise.stackNote}
+                            onChange={(e) => set('expertise', { stackNote: e.target.value })}
+                        />
+                    </div>
                     <div>
                         <Label htmlFor='mp-epl'>Process label</Label>
                         <Input

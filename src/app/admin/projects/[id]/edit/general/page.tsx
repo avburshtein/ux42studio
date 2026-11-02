@@ -49,6 +49,12 @@ const formSchema = z.object({
         )
         .optional()
         .or(z.literal('')),
+    // D-013: честная метка статуса карточки («Live product», «Concept»)
+    statusBadge: z
+        .string()
+        .max(40, 'Max 40 characters')
+        .optional()
+        .or(z.literal('')),
     client: z.string().optional().or(z.literal('')),
     year: z.any().optional(),
     duration: z.string().optional().or(z.literal('')),
@@ -110,6 +116,7 @@ export default function GeneralPage({
             title: '',
             slug: '',
             teaser: '',
+            statusBadge: '',
             client: '',
             year: '',
             duration: '',
@@ -133,6 +140,7 @@ export default function GeneralPage({
                     title: meta.title ?? '',
                     slug: meta.slug ?? '',
                     teaser: meta.teaser ?? '',
+                    statusBadge: meta.statusBadge ?? '',
                     client: meta.client ?? '',
                     year: meta.year ? String(meta.year) : '',
                     duration: meta.duration ?? '',
@@ -192,6 +200,7 @@ export default function GeneralPage({
             await updateProjectMeta(projectId, {
                 ...data,
                 teaser: data.teaser || undefined,
+                statusBadge: data.statusBadge || undefined,
                 client: data.client || undefined,
                 year: data.year ? parseInt(data.year, 10) : undefined,
                 duration: data.duration || undefined,
@@ -307,6 +316,23 @@ export default function GeneralPage({
                     {errors.teaser && (
                         <p className='mt-1 text-body-sm text-error'>
                             {errors.teaser.message}
+                        </p>
+                    )}
+                </div>
+
+                {/* D-013: честная метка статуса — рендерится на личной
+                    странице рядом с заголовком карточки */}
+                <div>
+                    <Label htmlFor='statusBadge'>Status badge (optional)</Label>
+                    <Input
+                        id='statusBadge'
+                        {...register('statusBadge')}
+                        placeholder='Live product / Concept / Experimental…'
+                        maxLength={40}
+                    />
+                    {errors.statusBadge && (
+                        <p className='mt-1 text-body-sm text-error'>
+                            {errors.statusBadge.message}
                         </p>
                     )}
                 </div>

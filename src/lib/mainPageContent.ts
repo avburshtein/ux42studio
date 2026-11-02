@@ -33,6 +33,12 @@ export type HeroContent = {
   ctaSecondaryLabel: string;
   ctaSecondaryUrl: string;
   ctaSecondaryVariant: ButtonVariant;
+  /** hero_cta_tertiary — третья кнопка (например, Download CV). Без URL не рендерится. */
+  ctaTertiaryLabel: string;
+  ctaTertiaryUrl: string;
+  ctaTertiaryVariant: ButtonVariant;
+  /** Полоса фактов под кнопками («первый экран CV»): короткие строки-пункты. */
+  facts: string[];
 };
 
 export type PortfolioContent = {
@@ -51,12 +57,20 @@ export type AboutContent = {
   visible: boolean;
   /** about_heading */
   heading: string;
-  /** about_paragraph_1..3 */
+  /** about_paragraph_1..5 */
   paragraph1: string;
   paragraph2: string;
   paragraph3: string;
+  paragraph4: string;
+  paragraph5: string;
   /** about_process_image — fileId из R2 (files.id) */
   processImageFileId: string | null;
+};
+
+/** Группа инструментов (Tools): подзаголовок + чипы. */
+export type ToolGroup = {
+  label: string;
+  items: string[];
 };
 
 export type ExpertiseContent = {
@@ -65,10 +79,11 @@ export type ExpertiseContent = {
   skillsLabel: string;
   /** expertise_skills */
   skills: string[];
-  /** expertise_tools_label */
-  toolsLabel: string;
-  /** expertise_tools */
-  tools: string[];
+  /** Группы Tools: Design / AI-assisted workflow / Code и т.п.
+   *  (бывший плоский tools[] мигрируется в одну группу при нормализации). */
+  toolGroups: ToolGroup[];
+  /** Строка «Project stack» — честная пометка, с чем работали (не навык). */
+  stackNote: string;
   /** expertise_process_label */
   processLabel: string;
   /** expertise_process_steps — этапы работы: заголовок + описание */
@@ -152,6 +167,10 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     ctaSecondaryLabel: 'Get in touch',
     ctaSecondaryUrl: '#contact',
     ctaSecondaryVariant: 'secondary',
+    ctaTertiaryLabel: '',
+    ctaTertiaryUrl: '',
+    ctaTertiaryVariant: 'ghost',
+    facts: [],
   },
   portfolio: {
     visible: true,
@@ -167,6 +186,8 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     paragraph1: '',
     paragraph2: '',
     paragraph3: '',
+    paragraph4: '',
+    paragraph5: '',
     processImageFileId: null,
   },
   expertise: {
@@ -184,18 +205,13 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
       'Design Engineering',
       'Design-to-code workflow',
     ],
-    toolsLabel: 'Tools',
-    tools: [
-      'Figma',
-      'FigJam',
-      'Maze',
-      'Protopie',
-      'Webflow',
-      'Adobe Firefly',
-      'Cursor',
-      'VS Code',
-      'Github',
+    toolGroups: [
+      { label: 'Design', items: ['Figma', 'Protopie', 'Photoshop', 'Illustrator', 'After Effects', 'Blender'] },
+      { label: 'AI-assisted workflow', items: ['Figma Make', 'Google Stitch', 'Relume', 'Google AI Studio', 'Cursor', 'NotebookLM'] },
+      { label: 'Code', items: ['VS Code', 'Git/GitHub', 'AI-assisted development'] },
     ],
+    stackNote:
+      'Worked with, together with AI agents: Next.js, React, TypeScript, Tailwind CSS, Cloudflare',
     processLabel: 'My process',
     processSteps: [
       {
@@ -277,6 +293,34 @@ const steps = (v: unknown, fallback: ProcessStep[]): ProcessStep[] =>
       }))
     : fallback;
 
+/** Группы Tools: новый формат [{label, items}]; legacy-плоский tools[]
+ *  (до D-013) мигрируется в одну группу с прежним toolsLabel. */
+const toolGroups = (
+  src: DeepPartial<ExpertiseContent> | undefined,
+  fallback: ToolGroup[],
+): ToolGroup[] => {
+  if (Array.isArray(src?.toolGroups)) {
+    const parsed = src.toolGroups
+      .map((g) => ({
+        label: str((g as ToolGroup | undefined)?.label, ''),
+        items: strArr((g as ToolGroup | undefined)?.items, []),
+      }))
+      .filter((g) => g.label.length > 0 || g.items.length > 0);
+    return parsed.length > 0 ? parsed : fallback;
+  }
+  // Legacy: плоский список tools + общий toolsLabel
+  const legacyTools = strArr(src?.['tools' as keyof typeof src] as unknown, []);
+  if (legacyTools.length > 0) {
+    return [
+      {
+        label: str(src?.['toolsLabel' as keyof typeof src] as unknown, 'Tools'),
+        items: legacyTools,
+      },
+    ];
+  }
+  return fallback;
+};
+
 const SHAPES = ['default', 'circle', 'square', 'triangle'] as const;
 const bgMode = (v: unknown): ThemeBackgroundMode =>
   v === 'seed-tint' || v === 'solid' ? v : 'default';
@@ -327,6 +371,10 @@ export function normalizeMainPageContent(
       ctaSecondaryLabel: str(src.hero?.ctaSecondaryLabel, d.hero.ctaSecondaryLabel),
       ctaSecondaryUrl: str(src.hero?.ctaSecondaryUrl, d.hero.ctaSecondaryUrl),
       ctaSecondaryVariant: variant(src.hero?.ctaSecondaryVariant, d.hero.ctaSecondaryVariant),
+      ctaTertiaryLabel: str(src.hero?.ctaTertiaryLabel, d.hero.ctaTertiaryLabel),
+      ctaTertiaryUrl: str(src.hero?.ctaTertiaryUrl, d.hero.ctaTertiaryUrl),
+      ctaTertiaryVariant: variant(src.hero?.ctaTertiaryVariant, d.hero.ctaTertiaryVariant),
+      facts: strArr(src.hero?.facts, d.hero.facts),
     },
     portfolio: {
       visible: bool(src.portfolio?.visible),
@@ -342,6 +390,8 @@ export function normalizeMainPageContent(
       paragraph1: hasParagraphs ? paragraphs[0] : (bioParagraphs[0] ?? ''),
       paragraph2: hasParagraphs ? paragraphs[1] : (bioParagraphs[1] ?? ''),
       paragraph3: hasParagraphs ? paragraphs[2] : (bioParagraphs[2] ?? ''),
+      paragraph4: str(src.about?.paragraph4, ''),
+      paragraph5: str(src.about?.paragraph5, ''),
       processImageFileId: strOrNull(
         src.about?.processImageFileId,
         d.about.processImageFileId,
@@ -351,8 +401,8 @@ export function normalizeMainPageContent(
       visible: bool(src.expertise?.visible),
       skillsLabel: str(src.expertise?.skillsLabel, d.expertise.skillsLabel),
       skills: strArr(src.expertise?.skills, d.expertise.skills),
-      toolsLabel: str(src.expertise?.toolsLabel, d.expertise.toolsLabel),
-      tools: strArr(src.expertise?.tools, d.expertise.tools),
+      toolGroups: toolGroups(src.expertise, d.expertise.toolGroups),
+      stackNote: str(src.expertise?.stackNote, d.expertise.stackNote),
       processLabel: str(src.expertise?.processLabel, d.expertise.processLabel),
       processSteps: steps(src.expertise?.processSteps, d.expertise.processSteps),
       proBonoVisible: bool(src.expertise?.proBonoVisible, false),

@@ -8,6 +8,23 @@
 
 ---
 
+## D-014 · 2026-11-02 · Контент личной страницы: факты, третья CTA, группы Tools, бейджи статуса, абзацы 4–5 · ✅ Принято
+
+**Контекст.** Ревью копии личной страницы (фидбэк внешнего ревьюера): Hero не открывает рекрутера фактами (сертификат, стек, результаты); нет кнопки CV; плоский список Tools смешивает категории и заявляет незнания; карточкам Work не хватает честных меток статуса; About жёстко на 3 абзаца.
+
+**Варианты:** (1) зашивать факты/группы в код — быстро, но не редактируемо из админки; (2) расширить модель mpc (JSON — без миграции) + одна миграция для `projects.status_badge`.
+
+**Решение.** Вариант (2):
+- `hero.facts: string[]` — полоса фактов под кнопками (маркер-точка, сканируемая строка «первого экрана CV»);
+- `hero.ctaTertiary*` — третья кнопка (Download CV) с произвольным URL, без URL не рендерится (позже можно подставить сервис резюме на том же домене);
+- `expertise.toolGroups: [{label, items}]` + `expertise.stackNote` — группы Tools (Design / AI-assisted workflow / Code) и честная строка «Project stack» (не навык, а среда работы); legacy-плоский `tools[]` мигрируется при нормализации в одну группу;
+- `about.paragraph4/paragraph5` — модель на 5 абзацев;
+- `projects.status_badge` (nullable) — метка карточки («Live product» / «Concept»), pill рядом с категорией; поле в шаге General.
+
+**Почему.** Всё копирайтинг-движение остаётся в админке (устойчивость платформы: редактор контента, не код). Fallback-миграция legacy `tools` в normalize сохраняет старые данные без ручных правок JSON. «Project stack» отдельной строкой, а не чипами — визуально отделён от навыков (требование честности позиционирования).
+
+**Где в коде:** `src/lib/mainPageContent.ts` (модель + normalize + дефолты), `MainPageContentEditor.tsx` (TagList фактов, ToolGroupsEditor, третья CTA, абзацы 4–5, stack note), `HeroSection.tsx` (facts + tertiary CTA), `SkillsSection.tsx` (toolGroups + stackNote), `PortfolioCard.tsx` + шаг General (`statusBadge`), миграция `drizzle/20261101000001_add_project_status_badge`.
+
 ## D-013 · 2026-10-31 · SEO-поля профиля: jobTitle + metaDescription · ✅ Принято
 
 **Контекст.** `<title>` личной страницы собирался шаблоном layout «Имя — UX42 Studio», а meta description дублировал headline (слоган «I design for the moment…»). По запросам вида «UX/UI designer Spain» страница хуже находится: в сниппете нет ни профессии, ни города. Фидбэк внешнего ревьюера.

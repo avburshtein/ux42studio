@@ -8,6 +8,8 @@ interface PortfolioCardProps {
   tag: string;
   imageUrl: string;
   href: string;
+  /** D-013: честная метка статуса («Live product», «Concept») — рядом с заголовком. */
+  statusBadge?: string;
   overlayTags?: string[];
   className?: string;
 }
@@ -22,7 +24,7 @@ interface PortfolioCardProps {
  *   подпись на градиенте убрана (фидбэк) — остаются только теги со slide-up.
  */
 export function PortfolioCard({
-  title, tag, imageUrl, href, overlayTags, className,
+  title, tag, imageUrl, href, statusBadge, overlayTags, className,
 }: PortfolioCardProps) {
   return (
     <Link
@@ -69,8 +71,17 @@ export function PortfolioCard({
         <h3 className="font-display m-0 truncate text-[18px] font-medium leading-[26px] tracking-[-0.18px] text-on-surface-variant sm:text-[22px] sm:leading-[30px] sm:tracking-[-0.22px]">
           {title}
         </h3>
-        <span className="truncate text-[16px] leading-[24px] text-primary">
-          {tag}
+        {/* Метка статуса (D-013): pill-бейдж в той же строке, что категория —
+            «UX42 Platform · Live product», честная пометка без скрытия. */}
+        <span className="flex items-center gap-2 truncate">
+          <span className="truncate text-[16px] leading-[24px] text-primary">
+            {tag}
+          </span>
+          {statusBadge && (
+            <span className="shrink-0 rounded-full border border-outline-variant bg-surface-container-low px-2.5 py-0.5 text-[12px] font-medium leading-[16px] text-on-surface-variant">
+              {statusBadge}
+            </span>
+          )}
         </span>
       </div>
     </Link>
