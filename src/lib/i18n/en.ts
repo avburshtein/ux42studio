@@ -161,6 +161,12 @@ const en: Translations = {
             'Everything that describes your public page: texts, links and previews. Page address is a separate card below. Owner name and email are in "Profile settings".',
         labelHeading: 'Heading',
         hintHeading: 'E.g. Product Designer',
+        labelJobTitle: 'Job title (for the browser tab title)',
+        hintJobTitle:
+            'E.g. UX/UI Designer & Design Engineer — appears in the page title',
+        labelMetaDesc: 'Search engine description',
+        hintMetaDesc:
+            '1–2 sentences about you and your case studies. Falls back to the headline (slogan) if empty.',
         labelCity: 'City',
         hintCity: 'Country or "remote" are fine',
         labelSite: 'Personal website',

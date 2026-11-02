@@ -52,6 +52,8 @@ export type ProfileData = {
     id: string;
     fullName: string;
     headline: string | null;
+    jobTitle: string | null;
+    metaDescription: string | null;
     bio: string | null;
     location: string | null;
     website: string | null;
@@ -90,6 +92,8 @@ export async function getMyProfile(): Promise<ProfileData | null> {
         id: profile.id,
         fullName: profile.fullName,
         headline: profile.headline,
+        jobTitle: profile.jobTitle,
+        metaDescription: profile.metaDescription,
         bio: profile.bio,
         location: profile.location,
         website: profile.website,
@@ -200,6 +204,9 @@ export async function updateProfile(
         // уникальный индекс или главную (STUDIO_PROFILE_SLUG).
         fullName?: string;
         headline?: string;
+        /** D-013: должность для <title> и описание для поисковиков */
+        jobTitle?: string;
+        metaDescription?: string;
         bio?: string;
         // null = явное удаление (снимаем ссылку и чистим R2)
         avatarFileId?: string | null;

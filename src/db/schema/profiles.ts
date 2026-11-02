@@ -22,6 +22,10 @@ export const profiles = sqliteTable('profiles', {
   slug: text('slug').notNull().unique(), // /u/[user-slug]
   fullName: text('full_name').notNull(),
   headline: text('headline'),
+  // D-013: должность для <title> страницы («UX/UI Designer & Design Engineer»)
+  jobTitle: text('job_title'),
+  // D-013: описание для поисковиков — отдельно от headline (там слоган)
+  metaDescription: text('meta_description'),
   bio: text('bio'),
   avatarFileId: text('avatar_file_id').references(() => files.id),
   coverFileId: text('cover_file_id').references(() => files.id),

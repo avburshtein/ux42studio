@@ -84,8 +84,8 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
                     // 10.90:1 в тёмной) — минимально проходимое значение;
                     // «спрятанность» сохранена размером, а не прозрачностью.
                     className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:bg-surface-variant hover:text-primary'
-                    title='Войти'
-                    aria-label='Войти'
+                    title='Log in'
+                    aria-label='Log in'
                 >
                     <LogIn className='w-4 h-4' aria-hidden />
                 </Link>

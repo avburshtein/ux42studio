@@ -58,7 +58,12 @@ export async function generateMetadata({
     const db = getDb(env.DB);
     const p = await db.query.profiles.findFirst({
         where: { slug },
-        columns: { fullName: true, headline: true },
+        columns: {
+            fullName: true,
+            headline: true,
+            jobTitle: true,
+            metaDescription: true,
+        },
         with: { ogFile: true, faviconFile: true },
     });
     if (!p) return { title: 'UX42 Studio' };
@@ -79,17 +84,29 @@ export async function generateMetadata({
               },
           ];
 
-    // title без суффикса: layout применяет template '%s — UX42 Studio'.
+    // D-013: если задана должность (jobTitle) — title абсолютный
+    // «Имя — Должность» (обходит template layout «— UX42 Studio»),
+    // иначе прежний шаблон. Description: meta_description, fallback —
+    // headline (слоган), затем дефолт.
+    const pageTitle = p.jobTitle
+        ? { absolute: `${p.fullName} — ${p.jobTitle}` }
+        : p.fullName;
+    const ogTitle = p.jobTitle
+        ? `${p.fullName} — ${p.jobTitle}`
+        : `${p.fullName} — UX42 Studio`;
+    const description =
+        p.metaDescription ?? p.headline ?? `Portfolio of ${p.fullName}`;
+
     // icons через условный spread, а не `icons: undefined` — явный ключ
     // undefined при мерже метаданных затирает иконки root layout
     // (фидбэк 2026-10-26: на /u/* пропадал зелёный фавикон).
     return {
-        title: p.fullName,
-        description: p.headline ?? `Portfolio of ${p.fullName}`,
+        title: pageTitle,
+        description,
         ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
         openGraph: {
-            title: `${p.fullName} — UX42 Studio`,
-            description: p.headline ?? `Portfolio of ${p.fullName}`,
+            title: ogTitle,
+            description,
             type: 'profile',
             url: `/u/${slug}`,
             siteName: 'UX42.studio',
@@ -97,8 +114,8 @@ export async function generateMetadata({
         },
         twitter: {
             card: 'summary_large_image',
-            title: `${p.fullName} — UX42 Studio`,
-            description: p.headline ?? `Portfolio of ${p.fullName}`,
+            title: ogTitle,
+            description,
             images: ogImages.map((image) => image.url),
         },
     };
@@ -423,7 +440,10 @@ export default async function ProfilePage({ params }: PageProps) {
                             </div>
                             {/* PortfolioGallerySection: передаются все категории
                                 дизайнера — раньше обрезалось до 3 (+All = 4 кнопки)
-                                и новые категории «пропадали» (решение (28)) */}
+                                и новые категории «пропадали» (решение (28)).
+                                Фильтры скрыты, пока карточек < 4 или категория
+                                одна — с двумя проектами «All / …» бесполезны
+                                (фидбэк 2026-10-31) */}
                             <PortfolioGallerySection
                                 title={mpc.portfolio.title}
                                 subtitle={mpc.portfolio.subtitle || undefined}
@@ -433,7 +453,8 @@ export default async function ProfilePage({ params }: PageProps) {
                                 viewAllHref={mpc.portfolio.ctaUrl || undefined}
                                 viewAllVariant={mpc.portfolio.ctaVariant}
                                 filters={
-                                    categoryFilters.length > 0
+                                    categoryFilters.length >= 2 &&
+                                    galleryItems.length >= 4
                                         ? categoryFilters
                                         : undefined
                                 }

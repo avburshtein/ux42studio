@@ -34,6 +34,9 @@ import { DEFAULT_MAIN_PAGE_CONTENT, type MainPageContent } from '@/lib/mainPageC
 // (раздел «Настройки профиля»).
 const formSchema = z.object({
     headline: z.string().optional().or(z.literal('')),
+    // D-013: должность для <title> и описание для поисковиков
+    jobTitle: z.string().optional().or(z.literal('')),
+    metaDescription: z.string().optional().or(z.literal('')),
     bio: z.string().optional().or(z.literal('')),
     location: z.string().optional().or(z.literal('')),
     website: z
@@ -109,6 +112,8 @@ export default function ProfilePage() {
         resolver: zodResolver(formSchema),
         defaultValues: {
             headline: '',
+            jobTitle: '',
+            metaDescription: '',
             bio: '',
             location: '',
             website: '',
@@ -128,6 +133,8 @@ export default function ProfilePage() {
                 if (profile) {
                     reset({
                         headline: profile.headline ?? '',
+                        jobTitle: profile.jobTitle ?? '',
+                        metaDescription: profile.metaDescription ?? '',
                         bio: profile.bio ?? '',
                         location: profile.location ?? '',
                         website: profile.website ?? '',
@@ -177,6 +184,8 @@ export default function ProfilePage() {
             }
             await updateProfile(id, {
                 headline: data.headline || undefined,
+                jobTitle: data.jobTitle || undefined,
+                metaDescription: data.metaDescription || undefined,
                 bio: data.bio || undefined,
                 location: data.location || undefined,
                 website: data.website || undefined,
@@ -271,6 +280,24 @@ export default function ProfilePage() {
                                     />
                                 </Field>
 
+                                {/* D-013: должность для <title> страницы */}
+                                <Field
+                                    id='jobTitle'
+                                    label={t('profile.labelJobTitle')}
+                                    error={
+                                        errors.jobTitle?.message
+                                            ? t(errors.jobTitle.message)
+                                            : undefined
+                                    }
+                                    hint={t('profile.hintJobTitle')}
+                                >
+                                    <Input
+                                        id='jobTitle'
+                                        disabled={!profileLoaded}
+                                        {...register('jobTitle')}
+                                    />
+                                </Field>
+
                                 <Field
                                     id='location'
                                     label={t('profile.labelCity')}
@@ -322,6 +349,26 @@ export default function ProfilePage() {
                                         rows={5}
                                         disabled={!profileLoaded}
                                         {...register('bio')}
+                                    />
+                                </Field>
+
+                                {/* D-013: описание для поисковиков */}
+                                <Field
+                                    id='metaDescription'
+                                    label={t('profile.labelMetaDesc')}
+                                    error={
+                                        errors.metaDescription?.message
+                                            ? t(errors.metaDescription.message)
+                                            : undefined
+                                    }
+                                    hint={t('profile.hintMetaDesc')}
+                                    className='md:col-span-2'
+                                >
+                                    <Textarea
+                                        id='metaDescription'
+                                        rows={2}
+                                        disabled={!profileLoaded}
+                                        {...register('metaDescription')}
                                     />
                                 </Field>
                             </div>

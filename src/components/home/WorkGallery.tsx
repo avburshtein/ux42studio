@@ -86,7 +86,9 @@ export default function WorkGallery({ cards, categories }: WorkGalleryProps) {
 
     return (
         <>
-            {categories.length > 0 && (
+            {/* Фильтры скрыты, пока карточек < 4 или категория одна
+                (фидбэк 2026-10-31: с двумя проектами «All / …» бесполезны) */}
+            {categories.length > 1 && cards.length >= 4 && (
                 <div className='hidden flex-wrap justify-center gap-3 md:flex'>
                     <button
                         type='button'
