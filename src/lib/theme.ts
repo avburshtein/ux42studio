@@ -15,6 +15,31 @@ export function isValidSeed(value: string): boolean {
 }
 
 /**
+ * Смесь двух hex в sRGB: `ratio` — доля первого цвета (0..1).
+ * Нужна, чтобы посчитать цвет фона «акцентный тон» в JS — так же, как
+ * это делает CSS `color-mix` в page.tsx.
+ */
+export function mixHex(a: string, b: string, ratio: number): string {
+    const parse = (hex: string): [number, number, number] | null => {
+        const m = /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.exec(hex.trim());
+        if (!m) return null;
+        const h =
+            m[1].length === 3
+                ? m[1].split('').map((c) => c + c).join('')
+                : m[1];
+        const n = parseInt(h, 16);
+        return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+    };
+    const ca = parse(a);
+    const cb = parse(b);
+    if (!ca || !cb) return a;
+    const ch = (v: number) =>
+        Math.max(0, Math.min(255, Math.round(v)));
+    const out = ca.map((v, i) => ch(v * ratio + cb[i] * (1 - ratio)));
+    return '#' + out.map((v) => v.toString(16).padStart(2, '0')).join('');
+}
+
+/**
  * Смесь hex → чёрный (t = доля чёрного, 0..1). Для dark-вариантов
  * solid-цветов (хедер/фон), чтобы они не слепили в тёмной теме.
  */
@@ -28,6 +53,52 @@ export function mixWithBlack(hex: string, t: number): string {
   const ch = (v: number) => Math.round((1 - t) * v);
   const r = ch((n >> 16) & 255), g = ch((n >> 8) & 255), b = ch(n & 255);
   return '#' + ((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1);
+}
+
+/**
+ * Поверхности, выведенные из цвета фона страницы.
+ *
+ * Если фон насыщенный, а карточки и теги остаются белыми (surface-* из
+ * темы), они выглядят «белыми пятнами» на странице, тени теряют смысл
+ * (фидбэк 2026-11-03). Поэтому при кастомном фоне вся семейство
+ * surface-container-* считается от него самого: чуть светлее фона в
+ * светлой теме и чуть светлее — в тёмной.
+ *
+ * Возвращает готовые CSS-блоки. Важно: блок тёмной темы должен иметь ту
+ * же специфичность, что и в теме Chroma42 (`:root`, `[data-theme=dark]`,
+ * `@media (prefers-color-scheme: dark)` + `:root:not([data-theme=light])`),
+ * иначе медиа-фолбэк темы перебьёт его по специфичности.
+ */
+const SURFACE_TOKENS: { token: string; light: number; dark: number }[] = [
+    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 4 },
+    { token: '--md-sys-color-surface-container-low', light: 30, dark: 7 },
+    { token: '--md-sys-color-surface-container', light: 40, dark: 10 },
+    { token: '--md-sys-color-surface-container-high', light: 50, dark: 13 },
+    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 16 },
+];
+
+export function surfaceTokensFrom(
+    lightBg: string,
+    darkBg: string = lightBg,
+): string[] {
+    // Светлая тема: поверхность — фон, подмешанный с белым (18% → 60%:
+    // чем выше уровень, тем насыщеннее). Тёмная: в фон добавляется белый
+    // (4% → 16%), чтобы карточки были чуть светлее фона, как в M3.
+    const decls = (bg: string, dark: boolean) =>
+        SURFACE_TOKENS.map(({ token, light, dark: d }) =>
+            dark
+                ? `${token}: color-mix(in srgb, #ffffff ${d}%, ${bg});`
+                : `${token}: color-mix(in srgb, ${bg} ${light}%, #ffffff);`,
+        ).join('');
+
+    const light = decls(lightBg, false);
+    const dark = decls(darkBg, true);
+
+    return [
+        `:root{${light}}`,
+        `[data-theme=dark]{${dark}}`,
+        `@media (prefers-color-scheme: dark){:root:not([data-theme=light]){${dark}}}`,
+    ];
 }
 
 /**

@@ -1,8 +1,8 @@
 'use client';
 
+import { AdminSection } from '@/components/admin/AdminSection';
 import { useEffect, useState } from 'react';
 import { Checkbox } from '@/components/ui/Checkbox';
-import { Card } from '@/components/ui/Card';
 import { Label } from '@/components/ui/Label';
 import {
     getProjectSectionsVisibility,
@@ -98,17 +98,11 @@ export default function SectionsVisibilityEditor({
     };
 
     return (
-        <Card className='mb-8 p-6'>
-            <div className='mb-4 flex flex-col gap-1.5'>
-                <h2 className='text-title-lg text-on-surface'>
-                    Sections on the case page
-                </h2>
-                <p className='text-body-sm text-on-surface-variant'>
-                    A section with no data is hidden on the live page
-                    automatically. Uncheck a section to hide it even when
-                    filled. Sections are numbered in order of the ones shown.
-                </p>
-            </div>
+        <AdminSection
+            className='mb-8'
+            title='Sections on the case page'
+            description='A section with no data is hidden on the live page automatically. Uncheck a section to hide it even when filled. Sections are numbered in order of the ones shown.'
+        >
             <div className='flex flex-col gap-4'>
                 {CASE_SECTIONS.map((section) => (
                     <div
@@ -137,6 +131,6 @@ export default function SectionsVisibilityEditor({
                     </div>
                 ))}
             </div>
-        </Card>
+        </AdminSection>
     );
 }

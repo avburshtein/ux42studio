@@ -23,7 +23,7 @@ import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import AuthBar from '@/components/AuthBar';
 import { EyeOff } from 'lucide-react';
-import { contrastOn, mixWithBlack } from '@/lib/theme';
+import { contrastOn, mixWithBlack, surfaceTokensFrom } from '@/lib/theme';
 import { buildThemeCss } from '@/lib/theme-engine';
 import { sql } from 'drizzle-orm';
 import type { CaseSortMode } from '@/db/schema/profiles';
@@ -230,12 +230,20 @@ export default async function ProfilePage({ params }: PageProps) {
         if (bgMode === 'seed-tint') {
             const tint =
                 'color-mix(in srgb, var(--md-sys-color-primary) 8%, var(--md-sys-color-surface-container-low))';
-            customVars.push(`:root{--mp-page-bg:${tint}}`, `[data-theme=dark]{--mp-page-bg:${tint}}`);
+            customVars.push(
+                `:root{--mp-page-bg:${tint}}`,
+                `[data-theme=dark]{--mp-page-bg:${tint}}`,
+                // Поверхности выводим из фона (см. surfaceTokensFrom).
+                ...surfaceTokensFrom(tint),
+            );
         } else if (bgMode === 'solid' && mpc.theme.background.color) {
             const c = mpc.theme.background.color;
+            const darkBg = mixWithBlack(c, 0.45);
             customVars.push(
                 `:root{--mp-page-bg:${c}}`,
-                `[data-theme=dark]{--mp-page-bg:${mixWithBlack(c, 0.45)}}`,
+                `[data-theme=dark]{--mp-page-bg:${darkBg}}`,
+                // Поверхности выводим из фона (см. surfaceTokensFrom).
+                ...surfaceTokensFrom(c, darkBg),
             );
         }
     }

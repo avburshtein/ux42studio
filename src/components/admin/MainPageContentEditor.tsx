@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Plus, Trash2 } from 'lucide-react';
 import { useAdminLang } from '@/components/admin/AdminLang';
+import { AdminSection } from '@/components/admin/AdminSection';
 import {
     saveMainPageContent,
     updateProfile,
@@ -21,7 +22,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/Select';
-import { isValidSeed, PRESET_SEEDS } from '@/lib/theme';
+import { isValidSeed, mixHex, mixWithBlack, PRESET_SEEDS } from '@/lib/theme';
 import { generateChromaThemeCss } from '@/lib/chroma42';
 import { buildThemeChecks, checksPassed } from '@/lib/theme-checks';
 import type {
@@ -295,21 +296,15 @@ function Section({
     children: React.ReactNode;
 }) {
     const { t } = useAdminLang();
-    // Рамка ведётся плотно вокруг содержимого: маленький отступ и
-    // заголовок ВНУТРИ рамки. Раньше заголовок лежал на верхней линии
-    // (legend), из-за чего между ним и содержимым оставалась пустая
-    // полоса, а рамка выглядела «далеко от текста» (фидбэк 2026-11-03).
+    // Рамка ведётся плотно вокруг содержимого, заголовок — ВНУТРИ рамки.
+    // Раньше заголовок лежал на верхней линии (legend), из-за чего между
+    // ним и содержимым оставалась пустая полоса, а рамка выглядела «далеко
+    // от текста» (фидбэк 2026-11-03).
     return (
-        <section
-            role='group'
-            aria-label={title}
-            className='rounded-lg border border-outline-variant p-3'
-        >
-            <div className='mb-3 flex flex-wrap items-center gap-3'>
-                <h3 className='text-title-sm font-semibold text-on-surface'>
-                    {title}
-                </h3>
-                {onVisibleChange && (
+        <AdminSection
+            title={title}
+            actions={
+                onVisibleChange ? (
                     <label className='flex cursor-pointer items-center gap-1.5 text-body-sm text-on-surface-variant'>
                         <input
                             type='checkbox'
@@ -319,10 +314,11 @@ function Section({
                         />
                         {t('mpc.showOnPage')}
                     </label>
-                )}
-            </div>
+                ) : undefined
+            }
+        >
             <div className='space-y-3'>{children}</div>
-        </section>
+        </AdminSection>
     );
 }
 
@@ -374,13 +370,45 @@ export default function MainPageContentEditor({
     );
 
     // Проверки читаемости — отдельно для светлой и тёмной темы.
+    // Если дизайнер задал свой фон страницы, текст лежит на нём: проверки
+    // идут по нему, иначе близкий к primary фон прошёл бы молча.
+    const pageBackground = useMemo(() => {
+        const mode = content.theme.background.mode;
+        if (!content.theme.useCustomTheme || mode === 'default') {
+            return { light: undefined, dark: undefined };
+        }
+        if (mode === 'solid' && content.theme.background.color) {
+            const c = content.theme.background.color;
+            return { light: c, dark: mixWithBlack(c, 0.45) };
+        }
+        // seed-tint: 8% primary поверх surface-container-low — тот же
+        // расчёт, что в page.tsx (color-mix).
+        const light = mixHex(
+            chromaResult?.tokens.light.primary ?? '#000000',
+            chromaResult?.tokens.light['surface-container-low'] ?? '#ffffff',
+            0.08,
+        );
+        const dark = mixHex(
+            chromaResult?.tokens.dark.primary ?? '#000000',
+            chromaResult?.tokens.dark['surface-container-low'] ?? '#000000',
+            0.08,
+        );
+        return { light, dark };
+    }, [
+        content.theme.useCustomTheme,
+        content.theme.background.mode,
+        content.theme.background.color,
+        chromaResult,
+    ]);
+
     const lightChecks = useMemo(
-        () => buildThemeChecks(chromaResult?.tokens.light ?? {}),
-        [chromaResult],
+        () =>
+            buildThemeChecks(chromaResult?.tokens.light ?? {}, pageBackground.light),
+        [chromaResult, pageBackground],
     );
     const darkChecks = useMemo(
-        () => buildThemeChecks(chromaResult?.tokens.dark ?? {}),
-        [chromaResult],
+        () => buildThemeChecks(chromaResult?.tokens.dark ?? {}, pageBackground.dark),
+        [chromaResult, pageBackground],
     );
     const readable =
         checksPassed(lightChecks) && checksPassed(darkChecks);

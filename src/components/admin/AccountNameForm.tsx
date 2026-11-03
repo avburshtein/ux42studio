@@ -1,5 +1,6 @@
 'use client';
 
+import { AdminSection } from '@/components/admin/AdminSection';
 import { useAdminLang } from '@/components/admin/AdminLang';
 
 import { useEffect, useState } from 'react';
@@ -7,7 +8,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import Field from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import {
@@ -83,13 +83,8 @@ export default function AccountNameForm() {
     };
 
     return (
-        <Card className='p-6'>
-            <h2 className='text-title-md text-on-surface'>{t('nameForm.title')}</h2>
-            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                {t('nameForm.desc')}
-            </p>
-
-            <form onSubmit={handleSubmit(onSubmit)} noValidate className='mt-6'>
+        <AdminSection title={t('nameForm.title')} description={t('nameForm.desc')}>
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
                 <Field
                     id='fullName'
                     label={t('nameForm.label')}
@@ -125,6 +120,6 @@ export default function AccountNameForm() {
                     </Button>
                 </div>
             </form>
-        </Card>
+        </AdminSection>
     );
 }

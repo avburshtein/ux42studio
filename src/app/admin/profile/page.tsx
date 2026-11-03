@@ -1,5 +1,6 @@
 'use client';
 
+import { AdminSection } from '@/components/admin/AdminSection';
 import { useAdminLang } from '@/components/admin/AdminLang';
 
 import { useEffect, useState } from 'react';
@@ -8,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import Field from '@/components/ui/Field';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -261,13 +261,8 @@ export default function ProfilePage() {
                 <div className='min-w-0 flex-1'>
                 <div className={section === 'seo' ? '' : 'hidden'}>
                     <form onSubmit={handleSubmit(onSubmit)}>
-                        <Card className='p-6'>
-                            <h2 className='text-title-md text-on-surface'>{t("profile.seo")}</h2>
-                            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                {t('profile.seoDesc')}
-                            </p>
-
-                            <div className='mt-6 grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2'>
+                        <AdminSection title={t('profile.seo')} description={t('profile.seoDesc')}>
+                            <div className='grid grid-cols-1 gap-x-6 gap-y-1 md:grid-cols-2'>
                                 <Field
                                     id='headline'
                                     label={t('profile.labelHeading')}
@@ -472,7 +467,7 @@ export default function ProfilePage() {
                                     {saving ? t('common.saving') : t('common.save')}
                                 </Button>
                             </div>
-                        </Card>
+                        </AdminSection>
                     </form>
 
                     {/* Адрес страницы — отдельная карточка со своей формой

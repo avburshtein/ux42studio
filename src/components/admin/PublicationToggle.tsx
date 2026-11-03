@@ -1,11 +1,11 @@
 'use client';
 
+import { AdminSection } from '@/components/admin/AdminSection';
 import { useAdminLang } from '@/components/admin/AdminLang';
 
 import { useState } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { Switch } from '@/components/ui/Switch';
 import { setProfileVisibility } from '@/lib/actions/profile';
 
@@ -53,35 +53,38 @@ export default function PublicationToggle({
     }
 
     return (
-        <Card className='p-6'>
-            <div className='flex items-start gap-3'>
-                {isPublic ? (
-                    <Eye
-                        className='mt-0.5 h-5 w-5 shrink-0 text-primary'
-                        aria-hidden='true'
-                    />
-                ) : (
-                    <EyeOff
-                        className='mt-0.5 h-5 w-5 shrink-0 text-on-surface-variant'
-                        aria-hidden='true'
-                    />
-                )}
-                <div className='min-w-0 flex-1'>
-                    <h2 className='text-title-md text-on-surface'>
-                        {t('pubToggle.title')}
-                    </h2>
-                    <p className='mt-1 text-body-sm text-on-surface-variant'>
-                        {t('pubToggle.descPrefix')}
-                        <span className='font-mono text-body-sm'>
-                            {' '}
-                            /u/{'{slug}'}
-                        </span>{' '}
-                        {t('pubToggle.descSuffix')}
-                    </p>
-
-                    {/* Статус словами — не только цветом и положением
+        <AdminSection
+            title={
+                <span className='flex items-center gap-2'>
+                    {isPublic ? (
+                        <Eye
+                            className='h-5 w-5 shrink-0 text-primary'
+                            aria-hidden='true'
+                        />
+                    ) : (
+                        <EyeOff
+                            className='h-5 w-5 shrink-0 text-on-surface-variant'
+                            aria-hidden='true'
+                        />
+                    )}
+                    {t('pubToggle.title')}
+                </span>
+            }
+            description={
+                <>
+                    {t('pubToggle.descPrefix')}
+                    <span className='font-mono text-body-sm'>
+                        {' '}
+                        /u/{'{slug}'}
+                    </span>{' '}
+                    {t('pubToggle.descSuffix')}
+                </>
+            }
+        >
+            <div className='min-w-0 flex-1'>
+                {/* Статус словами — не только цветом и положением
                         переключателя (§5.1 «не полагаться на цвет»). */}
-                    <div className='mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant pt-4'>
+                <div className='mt-1 flex flex-wrap items-center justify-between gap-4 border-t border-outline-variant pt-4'>
                         <p
                             role='status'
                             className='text-body-sm text-on-surface'
@@ -127,8 +130,7 @@ export default function PublicationToggle({
                     <p className='mt-3 text-body-sm text-on-surface-variant'>
                         {t('pubToggle.footer')}
                     </p>
-                </div>
             </div>
-        </Card>
+        </AdminSection>
     );
 }

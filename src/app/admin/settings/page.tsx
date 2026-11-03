@@ -1,11 +1,11 @@
 'use client';
 
+import { AdminSection } from '@/components/admin/AdminSection';
 import { useAdminLang } from '@/components/admin/AdminLang';
 
 import { useEffect, useState } from 'react';
 import { Lock } from 'lucide-react';
 import PageTitle from '@/components/ui/PageTitle';
-import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import AccountNameForm from '@/components/admin/AccountNameForm';
@@ -103,14 +103,11 @@ export default function SettingsPage() {
                             {/* Email — идентификатор входа, менять его нельзя.
                                 Показываем здесь же, чтобы не искать в
                                 другом разделе. */}
-                            <Card className='p-6'>
-                                <h2 className='text-title-md text-on-surface'>
-                                    {t('settings.emailSection')}
-                                </h2>
-                                <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                    {t('settings.emailDesc')}
-                                </p>
-                                <div className='mt-6 max-w-sm'>
+                            <AdminSection
+                                title={t('settings.emailSection')}
+                                description={t('settings.emailDesc')}
+                            >
+                                <div className='max-w-sm'>
                                     <Label htmlFor='account-email'>
                                         Email
                                     </Label>
@@ -131,7 +128,7 @@ export default function SettingsPage() {
                                         {t('settings.emailLocked')}
                                     </p>
                                 </div>
-                            </Card>
+                            </AdminSection>
 
                             <AccountNameForm />
 
@@ -148,15 +145,14 @@ export default function SettingsPage() {
                     )}
 
                     {section === 'security' && (
-                        <Card className='p-6'>
-                            <h2 className='text-title-md text-on-surface'>{t("settings.passwordSection")}</h2>
-                            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                {t('settings.passwordDesc')}
-                            </p>
-                            <div className='mt-6 max-w-sm'>
+                        <AdminSection
+                            title={t('settings.passwordSection')}
+                            description={t('settings.passwordDesc')}
+                        >
+                            <div className='max-w-sm'>
                                 <ChangePasswordForm />
                             </div>
-                        </Card>
+                        </AdminSection>
                     )}
 
                     {section === 'danger' &&
@@ -164,12 +160,12 @@ export default function SettingsPage() {
                             /* Оформление как «Danger Zone» в GitHub: рамка
                                контейнера в цвете ошибки + кнопка в error.
                                Класс `border-error` перебивает дефолтную
-                               рамку Card через twMerge (cn). */
-                            <Card className='border-error p-6'>
+                               рамку через twMerge (cn). */
+                            <AdminSection className='border-error'>
                                 <DeleteAccountSection
                                     accountEmail={accountEmail}
                                 />
-                            </Card>
+                            </AdminSection>
                         ) : (
                             <p className='text-body-sm text-on-surface-variant'>
                                 {t('settings.loading')}

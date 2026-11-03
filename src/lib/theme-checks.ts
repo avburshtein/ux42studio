@@ -29,7 +29,13 @@ export type ThemeCheck = {
     required: number;
 };
 
-/** Пары «текст на фоне», которые действительно есть в интерфейсе. */
+/**
+ * Пары «текст на фоне», которые действительно есть в интерфейсе.
+ *
+ * `bg: PAGE` — пара проверяется на ФОНЕ СТРАНИЦЫ, а не на токене surface:
+ * если дизайнер задал свой цвет фона, текст лежит на нём (фидбэк
+ * 2026-11-03: «хрома не выдала ошибку», хотя фон был близок к primary).
+ */
 const PAIRS: {
     id: ThemeCheckId;
     fg: string;
@@ -39,14 +45,14 @@ const PAIRS: {
     // Кнопка видна на фоне страницы. Заливая кнопки, мы рисуем ей
     // границу цветом primary-text: у тёмного сида она совпадает с
     // заливкой (невидима), у яркого — даёт видимый контур.
-    { id: 'buttonVisible', fg: 'primary-text', bg: 'surface', required: 3 },
+    { id: 'buttonVisible', fg: 'primary-text', bg: 'PAGE', required: 3 },
     // Текст на кнопке.
     { id: 'buttonText', fg: 'on-primary', bg: 'primary', required: 4.5 },
     // Основной и второстепенный текст на поверхности.
-    { id: 'bodyText', fg: 'on-surface', bg: 'surface', required: 4.5 },
-    { id: 'mutedText', fg: 'on-surface-variant', bg: 'surface', required: 4.5 },
+    { id: 'bodyText', fg: 'on-surface', bg: 'PAGE', required: 4.5 },
+    { id: 'mutedText', fg: 'on-surface-variant', bg: 'PAGE', required: 4.5 },
     // Ссылки и подписи брендовым цветом.
-    { id: 'links', fg: 'primary-text', bg: 'surface', required: 4.5 },
+    { id: 'links', fg: 'primary-text', bg: 'PAGE', required: 4.5 },
     // Значки и метки (primary-container).
     { id: 'chips', fg: 'on-primary-container', bg: 'primary-container', required: 4.5 },
     // Текст на приподнятых карточках.
@@ -56,13 +62,18 @@ const PAIRS: {
 /**
  * Считает проверки по набору токенов режима.
  * Токены передаются без префикса `--md-sys-color-`.
+ *
+ * @param pageBackground фон страницы, если дизайнер задал свой. Если не
+ *   задан — берётся токен surface.
  */
 export function buildThemeChecks(
     tokens: Record<string, string | undefined>,
+    pageBackground?: string,
 ): ThemeCheck[] {
     return PAIRS.map(({ id, fg, bg, required }) => {
         const fgColor = tokens[fg];
-        const bgColor = tokens[bg];
+        const bgColor =
+            bg === 'PAGE' ? (pageBackground ?? tokens.surface) : tokens[bg];
         if (!fgColor || !bgColor) {
             return { id, ok: true, ratio: 0, required };
         }
