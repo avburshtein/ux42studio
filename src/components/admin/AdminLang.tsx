@@ -80,14 +80,18 @@ export function useAdminLang(): AdminLangContextValue {
 }
 
 /** Переключатель RU/EN — пилюля в хедере админки. Показывает язык,
- *  на который переключит (активный не активен — aria-pressed). */
+ *  на который переключит (активный не активен — aria-pressed).
+ *
+ *  Бордер: активный сегмент перекрывает рамку пилюли (-m-px + z-10),
+ *  иначе серая линия контейнера обтекала зелёную кнопку (фидбэк
+ *  2026-11-02). У неактивного сегмента рамка остаётся. */
 export function AdminLangSwitch() {
     const { lang, setLang } = useAdminLang();
     return (
         <div
             role='group'
             aria-label='Language'
-            className='flex overflow-hidden rounded-full border border-outline-variant text-label-sm'
+            className='flex rounded-full border border-outline-variant text-label-sm'
         >
             {(['ru', 'en'] as const).map((code) => (
                 <button
@@ -97,7 +101,7 @@ export function AdminLangSwitch() {
                     aria-pressed={lang === code}
                     className={`px-2.5 py-1.5 uppercase transition-colors ${
                         lang === code
-                            ? 'bg-primary text-on-primary'
+                            ? 'relative z-10 -m-px rounded-full bg-primary text-on-primary'
                             : 'text-on-surface-variant hover:bg-surface-variant'
                     }`}
                 >

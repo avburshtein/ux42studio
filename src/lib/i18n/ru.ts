@@ -241,6 +241,7 @@ const ru = {
         addExperience: 'Добавить место работы',
         addEducation: 'Добавить образование',
         removeItem: 'Удалить',
+        dragHandle: 'Перетащить, чтобы изменить порядок',
         ctaHeading: 'Заголовок CTA *',
         descriptionLine1: 'Описание, строка 1',
         descriptionLine2: 'Описание, строка 2',

@@ -240,6 +240,7 @@ const en: Translations = {
         addExperience: 'Add experience',
         addEducation: 'Add education',
         removeItem: 'Remove',
+        dragHandle: 'Drag to reorder',
         ctaHeading: 'CTA heading *',
         descriptionLine1: 'Description line 1',
         descriptionLine2: 'Description line 2',

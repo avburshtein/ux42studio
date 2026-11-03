@@ -68,7 +68,7 @@ export default function SettingsPage() {
 
             <div className='flex flex-col gap-8 md:flex-row'>
                 <aside className='w-full shrink-0 md:w-64'>
-                    <nav className='md:sticky md:top-8'>
+                    <nav className='md:sticky md:top-20 md:max-h-[calc(100dvh-6rem)] md:overflow-y-auto'>
                         <ul className='flex gap-1 overflow-x-auto pb-2 md:flex-col md:space-y-1 md:overflow-visible md:pb-0'>
                             {SECTIONS.map((s) => (
                                 <li

@@ -5,6 +5,11 @@ import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Plus, Trash2 } from 'lucide-react';
 import { useAdminLang } from '@/components/admin/AdminLang';
+import {
+    SortableItem,
+    SortableList,
+    reorderByIndex,
+} from '@/components/admin/SortableList';
 import type { ExperienceItem } from '@/lib/mainPageContent';
 
 const textareaClass =
@@ -24,11 +29,13 @@ export function ExperienceItemsEditor({
 
     return (
         <div className='flex flex-col gap-4'>
+            <SortableList
+                ids={items.map((_, i) => String(i))}
+                onMove={(from, to) => onChange(reorderByIndex(items, from, to))}
+            >
             {items.map((item, i) => (
-                <div
-                    key={i}
-                    className='flex flex-col gap-3 rounded-md border border-outline-variant p-4'
-                >
+                <SortableItem key={i} id={String(i)} handleLabel={t('mpc.dragHandle')}>
+                <div className='flex flex-col gap-3 rounded-md border border-outline-variant p-4'>
                     <div className='flex items-end gap-2'>
                         <div className='flex-1'>
                             <Label htmlFor={`mp-exp-c-${i}`}>{t('mpc.company')}</Label>
@@ -80,7 +87,9 @@ export function ExperienceItemsEditor({
                         </div>
                     </div>
                 </div>
+                </SortableItem>
             ))}
+            </SortableList>
             <div>
                 <Button
                     type='button'

@@ -100,24 +100,26 @@ export function AdaptiveHeroCover({
             }
         };
 
-        // L → градиент. Плавный длинный хвост без резких переходов.
+        // L → градиент. Плотная зона — только под текстом (низ ~40%),
+        // выше — резкий спад: обложка не «чернеет» целиком (фидбэк
+        // 2026-11-02 — светлая обложка выглядела почти чёрной).
         // boost 0..1 на участке L 0.45..0.75:
-        //   тёмная (L≈0.2): низ 0.55, середина 0.08 — скрим почти прозрачный;
-        //   средняя (L≈0.45): низ 0.75, середина 0.16 — как статичный CSS;
-        //   светлая (L≈0.75+): низ 0.95, середина 0.70, верх 0.15,
-        //   нижний стоп поднят до 38% — зона под высоким заголовком.
-        // Контроль контраста белого заголовка: низ ≥ 12:1, зона заголовка
-        // ≥ 3:1 (WCAG AA large).
+        //   тёмная (L≈0.2): низ 0.52, середина 0.04 — скрим почти прозрачный;
+        //   светлая (L≈0.75+): низ 0.88, середина 0.20 — контраст под
+        //   заголовком ≥ 3:1 (WCAG AA large), а выше текста картинка чистая.
         const applyScrim = () => {
             const l = measureLum();
             if (l == null) return;
             const boost = Math.min(1, Math.max(0, (l - 0.45) / 0.3));
-            const bottom = 0.55 + 0.4 * boost;
-            const mid = 0.08 + 0.62 * boost;
-            const top = 0.15 * boost;
-            const stop = Math.round(18 + 20 * boost);
+            const bottom = 0.52 + 0.36 * boost;
+            const mid = 0.04 + 0.16 * boost;
+            const top = 0.02 * boost;
+            // Нижняя плотная зона — до 40% высоты: там заголовок и teaser.
+            const stop = Math.round(34 + 6 * boost);
+            // Спад: от плотной зоны к чистой картинке — между 40% и 62%.
+            const midStop = Math.round(62);
             setScrimStyle({
-                backgroundImage: `linear-gradient(0deg, rgba(27,27,29,${bottom.toFixed(2)}) ${stop}%, rgba(24,29,26,${mid.toFixed(2)}) 55%, rgba(27,27,29,${top.toFixed(2)}) 100%)`,
+                backgroundImage: `linear-gradient(0deg, rgba(27,27,29,${bottom.toFixed(2)}) ${stop}%, rgba(24,29,26,${mid.toFixed(2)}) ${midStop}%, rgba(27,27,29,${top.toFixed(2)}) 100%)`,
             });
         };
 

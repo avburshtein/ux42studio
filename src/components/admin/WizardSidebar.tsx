@@ -140,9 +140,14 @@ export function WizardSidebar({
                 )}
             </div>
 
-            {/* === Десктоп (≥lg): сайдбар как был === */}
+            {/* === Десктоп (≥lg): сайдбар как был ===
+                Сайдбар «прилипает» под хедером админки: top-20 = 80px
+                (хедер h-18 = 72px + зазор 8px). Раньше был top-8 (32px) —
+                верх меню уезжал под стеклянный хедер, и меню «прокручивалось»
+                (фидбэк 2026-11-02). max-h + overflow: если пунктов много,
+                прокручивается сам сайдбар, а не уезжает под хедер. */}
             <aside className='hidden w-64 shrink-0 lg:block'>
-            <nav className='sticky top-8'>
+            <nav className='sticky top-20 max-h-[calc(100dvh-6rem)] overflow-y-auto'>
                 <div className=''>
                     <h2 className='mb-4 text-title-lg text-on-background'>
                         {projectTitle}

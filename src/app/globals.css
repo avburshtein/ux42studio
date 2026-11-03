@@ -427,17 +427,17 @@ body {
    (решение (16)); тёмная зона растянута до ~85% высоты. */
 .hero-image-scrim {
   background: linear-gradient(0deg,
-      rgba(27, 27, 29, 0.75) 14%,
-      rgba(24, 29, 26, 0.16) 50%,
+      rgba(27, 27, 29, 0.75) 34%,
+      rgba(24, 29, 26, 0.14) 62%,
       rgba(27, 27, 29, 0) 100%);
 }
 
 @media (max-width: 1023px) {
   .hero-image-scrim {
     background: linear-gradient(0deg,
-        rgba(27, 27, 29, 0.8) 22%,
-        rgba(24, 29, 26, 0.45) 55%,
-        rgba(27, 27, 29, 0.12) 85%,
+        rgba(27, 27, 29, 0.8) 30%,
+        rgba(24, 29, 26, 0.3) 58%,
+        rgba(27, 27, 29, 0.06) 88%,
         rgba(27, 27, 29, 0) 100%);
   }
 }
