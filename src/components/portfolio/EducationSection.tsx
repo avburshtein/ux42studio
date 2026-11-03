@@ -3,6 +3,11 @@ import type { EducationItem } from '@/lib/mainPageContent';
 /**
  * Education Section — Main_page_Spec §10
  * Рендерит образование: учреждение + степень + период + локация.
+ *
+ * Сетка (D-016): две колонки на широких экранах — «учреждение + степень»
+ * слева, «период + локация» справа. Раньше степень/локация имели
+ * whitespace-nowrap, из-за чего длинные значения («BSc Psychology. Thesis
+ * on the effects of colour…») не переносились и ломали строку на части.
  */
 export function EducationSection({
   heading,
@@ -15,37 +20,40 @@ export function EducationSection({
 
   return (
     <section id='education' className='bg-surface-container-lowest py-12 md:py-24'>
-      <div className='section-container flex flex-col gap-16'>
-        <div className='flex flex-col gap-10 lg:flex-row lg:gap-10'>
-          <div className='flex w-full flex-col gap-8 lg:w-[502px]'>
-            <h3 className='text-title-sm font-medium text-on-surface-variant'>
-              {heading}
-            </h3>
-            <div className='flex flex-col gap-6'>
-              {items.map((item) => (
-                <div key={`${item.institution}-${item.degree}`} className='flex flex-col gap-2'>
-                  <div className='flex items-baseline gap-2'>
-                    <span className='text-label-lg font-semibold text-on-surface'>
-                      {item.institution}
-                    </span>
-                    <span className='text-body-sm font-medium text-on-surface-variant whitespace-nowrap'>
-                      {item.degree}
-                    </span>
-                  </div>
-                  <div className='flex items-baseline gap-2'>
-                    <span className='text-body-sm text-on-surface-variant whitespace-nowrap'>
-                      {item.period}
-                    </span>
-                    {item.location && (
-                      <span className='text-body-sm text-on-surface-variant whitespace-nowrap'>
-                        {item.location}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+      <div className='section-container flex flex-col gap-10'>
+        <h3 className='text-title-sm font-medium text-on-surface-variant'>
+          {heading}
+        </h3>
+        <div className='flex flex-col'>
+          {items.map((item, i) => (
+            <div
+              key={`${item.institution}-${item.degree}-${i}`}
+              className='grid grid-cols-1 gap-x-8 gap-y-1 border-t border-outline-variant py-5 first:border-t-0 first:pt-0 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start'
+            >
+              <div className='flex flex-col gap-1'>
+                <span className='text-label-lg font-semibold leading-snug text-on-surface'>
+                  {item.institution}
+                </span>
+                {item.degree && (
+                  <span className='text-body-sm leading-relaxed text-on-surface-variant'>
+                    {item.degree}
+                  </span>
+                )}
+              </div>
+              <div className='flex flex-row gap-x-4 lg:flex-col lg:items-end lg:gap-y-0.5'>
+                {item.period && (
+                  <span className='text-body-sm font-medium whitespace-nowrap text-on-surface-variant'>
+                    {item.period}
+                  </span>
+                )}
+                {item.location && (
+                  <span className='text-body-sm whitespace-nowrap text-on-surface-variant'>
+                    {item.location}
+                  </span>
+                )}
+              </div>
             </div>
-          </div>
+          ))}
         </div>
       </div>
     </section>
