@@ -82,19 +82,19 @@ export function useAdminLang(): AdminLangContextValue {
 /** Переключатель RU/EN — в хедере админки. Показывает язык, на который
  *  переключит (активный не активен — aria-pressed).
  *
- *  Форма: два ОТДЕЛЬНЫХ скруглённых сегмента (как в исходном макете) —
- *  активный залит primary без рамки, неактивный с рамкой outline-variant.
- *  Раньше это была одна пилюля с общей рамкой и заливкой кнопки:
- *  рамка обтекала зелёную часть, а при попытке её перекрыть (border на
- *  контейнере + overflow-hidden) сегмент превращался в круг, торчащий
- *  за рамку, и hover-фон вылезал квадратом за скругление
- *  (фидбэк 2026-11-02). Раздельные сегменты снимают обе проблемы:
- *  у зелёного нет рамки, hover у серого скруглён и не выходит за неё. */
+ *  Форма: просто текст без рамок и заливок — активный язык зелёный
+ *  (primary), неактивный приглушённый. Так задумано в макете
+ *  (фидбэк 2026-11-02): до этого были пилюля/сегменты с рамками —
+ *  визуально тяжело для двух коротких слов в шапке. */
 export function AdminLangSwitch() {
     const { lang, setLang } = useAdminLang();
 
     return (
-        <div role='group' aria-label='Language' className='flex items-center gap-1 text-label-sm'>
+        <div
+            role='group'
+            aria-label='Language'
+            className='flex items-center gap-2 text-label-sm'
+        >
             {(['ru', 'en'] as const).map((code) => {
                 const active = lang === code;
                 return (
@@ -103,10 +103,10 @@ export function AdminLangSwitch() {
                         type='button'
                         onClick={() => setLang(code)}
                         aria-pressed={active}
-                        className={`rounded-full px-2.5 py-1.5 uppercase transition-colors ${
+                        className={`rounded px-0.5 py-1.5 uppercase transition-colors ${
                             active
-                                ? 'bg-primary text-on-primary'
-                                : 'border border-outline-variant text-on-surface-variant hover:bg-surface-variant'
+                                ? 'text-primary'
+                                : 'text-on-surface-variant hover:text-on-surface'
                         }`}
                     >
                         {code}
