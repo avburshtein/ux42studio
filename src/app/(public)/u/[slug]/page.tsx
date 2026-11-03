@@ -471,7 +471,8 @@ export default async function ProfilePage({ params }: PageProps) {
                             />
                         </>
                     )}
-                    {mpc.experience.visible && (
+                    {mpc.experience.visible &&
+                        mpc.experience.items.length > 0 && (
                         <>
                             <NavLabel label='Experience' id='experience' />
                             <ExperienceSection
@@ -517,7 +518,8 @@ export default async function ProfilePage({ params }: PageProps) {
                             ctaVariant={mpc.expertise.proBonoCtaVariant}
                         />
                     )}
-                    {mpc.education.visible && (
+                    {mpc.education.visible &&
+                        mpc.education.items.length > 0 && (
                         <>
                             <NavLabel label='Education' id='education' />
                             <EducationSection
