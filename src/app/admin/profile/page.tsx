@@ -63,8 +63,10 @@ const SECTIONS = [
     { id: 'seo', label: 'Брендинг и SEO' },
     { id: 'hero', label: '01 · Hero' },
     { id: 'portfolio', label: '02 · Portfolio Gallery' },
+    { id: 'experience', label: '02b · Experience' },
     { id: 'about', label: '03 · About' },
     { id: 'expertise', label: '04 · Expertise' },
+    { id: 'education', label: '04b · Education' },
     { id: 'cta', label: '05 · CTA (Get in Touch)' },
     { id: 'theme', label: '06 · Color Theme' },
 ] as const;

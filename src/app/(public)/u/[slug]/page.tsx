@@ -6,6 +6,8 @@ import { verifyJwt } from '@/lib/jwt';
 import type { Metadata } from 'next';
 import { SiteHeader } from '@/components/case/SiteHeader';
 import { SiteFooter } from '@/components/case/SiteFooter';
+import { EducationSection } from '@/components/portfolio/EducationSection';
+import { ExperienceSection } from '@/components/portfolio/ExperienceSection';
 import { HeroSection } from '@/components/portfolio/HeroSection';
 import { PortfolioGallerySection } from '@/components/portfolio/PortfolioGallerySection';
 import { PortfolioCard } from '@/components/PortfolioCard';
@@ -469,6 +471,15 @@ export default async function ProfilePage({ params }: PageProps) {
                             />
                         </>
                     )}
+                    {mpc.experience.visible && (
+                        <>
+                            <NavLabel label='Experience' id='experience' />
+                            <ExperienceSection
+                                heading={mpc.experience.heading}
+                                items={mpc.experience.items}
+                            />
+                        </>
+                    )}
                     {mpc.about.visible && aboutParagraphs.length > 0 && (
                         <>
                             <NavLabel label='About' id='about' />
@@ -505,6 +516,15 @@ export default async function ProfilePage({ params }: PageProps) {
                             ctaUrl={mpc.expertise.proBonoCtaUrl || '#contact'}
                             ctaVariant={mpc.expertise.proBonoCtaVariant}
                         />
+                    )}
+                    {mpc.education.visible && (
+                        <>
+                            <NavLabel label='Education' id='education' />
+                            <EducationSection
+                                heading={mpc.education.heading}
+                                items={mpc.education.items}
+                            />
+                        </>
                     )}
                     {mpc.cta.visible && <NavLabel label='Reach' />}
                 </div>

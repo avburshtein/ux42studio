@@ -12,6 +12,40 @@ export type ProcessStep = {
   description: string;
 };
 
+/** Один пункт опыта работы. */
+export type ExperienceItem = {
+  company: string;
+  role: string;
+  period: string;        // «2021–2024» / «2024 — настоящее время»
+  description: string;   // короткое описание отвественности/достижения
+};
+
+/** Секция опыта работы. */
+export type ExperienceContent = {
+  visible: boolean;
+  /** experience_heading */
+  heading: string;
+  /** experience_items */
+  items: ExperienceItem[];
+};
+
+/** Один пункт образования. */
+export type EducationItem = {
+  institution: string;
+  degree: string;
+  period: string;        // «2015–2019»
+  location?: string;     // город / страна (опционально)
+};
+
+/** Секция образования. */
+export type EducationContent = {
+  visible: boolean;
+  /** education_heading */
+  heading: string;
+  /** education_items */
+  items: EducationItem[];
+};
+
 export type HeroContent = {
   /** Показ блока на странице */
   visible: boolean;
@@ -144,6 +178,8 @@ export type MainPageContent = {
   hero: HeroContent;
   portfolio: PortfolioContent;
   about: AboutContent;
+  experience: ExperienceContent;
+  education: EducationContent;
   expertise: ExpertiseContent;
   cta: CtaContent;
   /** Цветовая тема (пункт 4, решение 7) */
@@ -189,6 +225,16 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
     paragraph4: '',
     paragraph5: '',
     processImageFileId: null,
+  },
+  experience: {
+    visible: true,
+    heading: 'Experience',
+    items: [],
+  },
+  education: {
+    visible: true,
+    heading: 'Education',
+    items: [],
   },
   expertise: {
     visible: true,
@@ -396,6 +442,34 @@ export function normalizeMainPageContent(
         src.about?.processImageFileId,
         d.about.processImageFileId,
       ),
+    },
+    experience: {
+      visible: bool(src.experience?.visible),
+      heading: str(src.experience?.heading, d.experience.heading),
+      items: Array.isArray(src.experience?.items)
+        ? (src.experience.items as ExperienceItem[])
+            .filter((it) => typeof it.company === "string")
+            .map((it) => ({
+              company: it.company,
+              role: it.role,
+              period: it.period,
+              description: it.description,
+            }))
+        : d.experience.items,
+    },
+    education: {
+      visible: bool(src.education?.visible),
+      heading: str(src.education?.heading, d.education.heading),
+      items: Array.isArray(src.education?.items)
+        ? (src.education.items as EducationItem[])
+            .filter((it) => typeof it.institution === "string")
+            .map((it) => ({
+              institution: it.institution,
+              degree: it.degree,
+              period: it.period,
+              location: it.location,
+            }))
+        : d.education.items,
     },
     expertise: {
       visible: bool(src.expertise?.visible),

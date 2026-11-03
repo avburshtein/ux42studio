@@ -8,6 +8,21 @@
 
 ---
 
+## D-015 · 2026-11-02 · Секции Experience и Education на личной странице + перевод редактора главной · ✅ Принято
+
+**Контекст.** Ревью копии потребовало секций Experience и Education (их не было в модели вообще) и финального порядка блоков: Hero → Work → Experience → About → Skills → Process → Education → Contact. Параллельно вскрылся пробел этапа 2 (D-012): редактор главной страницы (`MainPageContentEditor`) был целиком на захардкоженном EN — в отличие от форм визарда, он не входил в словари.
+
+**Варианты:** (1) отдельные таблицы под каждую секцию — две миграции, дублирование CRUD; (2) расширить JSON-модель `main_page_content` секциями `experience`/`education`; (3) оставить редактор на EN как «внутренний» инструмент.
+
+**Решение.** Вариант (2) + перевод редактора:
+- `experience: { visible, heading, items[] }`, `education: { visible, heading, items[] }` — в JSON-колонке, без миграции БД; normalize чистит битые записи и отбрасывает пункты без company/institution;
+- новые компоненты `ExperienceSection` / `EducationSection` — рендер в порядке из ревью (Experience между Work и About, Education между Skills и Contact);
+- редактор: `ExperienceItemsEditor` / `EducationItemsEditor` отдельными файлами (главный файл редактора уже ~1300 строк), плюс новый namespace `mpc.*` в словарях — ~90 ключей на все лейблы, подсказки, плейсхолдеры и aria-лейблы редактора.
+
+**Почему.** JSON вместо таблиц — по precedent'у остальных секций главной (D-014): копирайт живёт в редакторе, миграции не нужны. Порядок блоков зафиксирован в коде страницы: ревью рекомендовало именно такой, а секции Process (правая колонка Skills) и Contact уже существуют. Перевод редактора закрывает последний EN-остров в админке и выполняет обещание D-012 («весь интерфейс двуязычный»).
+
+**Где в коде:** `src/lib/mainPageContent.ts` (типы, дефолты, normalize), `src/components/portfolio/{ExperienceSection,EducationSection}.tsx`, `src/app/(public)/u/[slug]/page.tsx` (порядок секций), `src/components/admin/{ExperienceItemsEditor,EducationItemsEditor}.tsx`, `MainPageContentEditor.tsx` (namespace `mpc`), `src/lib/i18n/{ru,en}.ts`.
+
 ## D-014 · 2026-11-02 · Контент личной страницы: факты, третья CTA, группы Tools, бейджи статуса, абзацы 4–5 · ✅ Принято
 
 **Контекст.** Ревью копии личной страницы (фидбэк внешнего ревьюера): Hero не открывает рекрутера фактами (сертификат, стек, результаты); нет кнопки CV; плоский список Tools смешивает категории и заявляет незнания; карточкам Work не хватает честных меток статуса; About жёстко на 3 абзаца.

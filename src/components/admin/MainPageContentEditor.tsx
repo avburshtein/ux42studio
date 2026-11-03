@@ -5,12 +5,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Plus, Trash2 } from 'lucide-react';
+import { useAdminLang } from '@/components/admin/AdminLang';
 import {
     saveMainPageContent,
     updateProfile,
     updateProfileThemeSettings,
 } from '@/lib/actions/profile';
 import ImageUploaderField from '@/components/ImageUploaderField';
+import { ExperienceItemsEditor } from '@/components/admin/ExperienceItemsEditor';
+import { EducationItemsEditor } from '@/components/admin/EducationItemsEditor';
 import {
     Select,
     SelectContent,
@@ -55,6 +58,7 @@ function TagList({
     tags: string[];
     onChange: (tags: string[]) => void;
 }) {
+    const { t } = useAdminLang();
     const [draft, setDraft] = useState('');
 
     const add = () => {
@@ -78,7 +82,7 @@ function TagList({
                             type='button'
                             onClick={() => onChange(tags.filter((_, j) => j !== i))}
                             className='cursor-pointer text-on-surface-variant hover:text-error'
-                            aria-label={`Remove ${tag}`}
+                            aria-label={`${t('mpc.removeItem')} ${tag}`}
                         >
                             <Trash2 className='h-3 w-3' />
                         </button>
@@ -95,10 +99,10 @@ function TagList({
                             add();
                         }
                     }}
-                    placeholder='Add tag…'
+                    placeholder={t('mpc.addTag')}
                 />
                 <Button type='button' variant='outline' size='sm' onClick={add}>
-                    <Plus className='mr-1 h-4 w-4' /> Add
+                    <Plus className='mr-1 h-4 w-4' /> {t('mpc.add')}
                 </Button>
             </div>
         </div>
@@ -116,6 +120,7 @@ function ToolGroupsEditor({
     groups: ToolGroup[];
     onChange: (groups: ToolGroup[]) => void;
 }) {
+    const { t } = useAdminLang();
     const update = (i: number, patch: Partial<ToolGroup>) => {
         onChange(groups.map((g, j) => (j === i ? { ...g, ...patch } : g)));
     };
@@ -130,7 +135,7 @@ function ToolGroupsEditor({
                 >
                     <div className='flex items-end gap-2'>
                         <div className='flex-1'>
-                            <Label htmlFor={`mp-tg-l-${i}`}>Group label</Label>
+                            <Label htmlFor={`mp-tg-l-${i}`}>{t('mpc.groupLabel')}</Label>
                             <Input
                                 id={`mp-tg-l-${i}`}
                                 value={group.label}
@@ -142,13 +147,13 @@ function ToolGroupsEditor({
                             variant='ghost'
                             size='sm'
                             onClick={() => onChange(groups.filter((_, j) => j !== i))}
-                            aria-label={`Remove group ${group.label}`}
+                            aria-label={`${t('mpc.removeItem')} ${group.label}`}
                         >
                             <Trash2 className='h-4 w-4' />
                         </Button>
                     </div>
                     <TagList
-                        label='Tags'
+                        label={t('mpc.tags')}
                         tags={group.items}
                         onChange={(items) => update(i, { items })}
                     />
@@ -161,18 +166,18 @@ function ToolGroupsEditor({
                     size='sm'
                     onClick={() => onChange([...groups, { label: '', items: [] }])}
                 >
-                    <Plus className='mr-1 h-4 w-4' /> Add group
+                    <Plus className='mr-1 h-4 w-4' /> {t('mpc.addGroup')}
                 </Button>
             </div>
         </div>
     );
 }
 
-const VARIANT_OPTIONS: { value: ButtonVariant; label: string }[] = [
-    { value: 'primary', label: 'Primary (solid)' },
-    { value: 'secondary', label: 'Secondary (outline)' },
-    { value: 'ghost', label: 'Ghost (text only)' },
-    { value: 'link', label: 'Link (underline)' },
+const VARIANT_OPTIONS: { value: ButtonVariant; labelKey: string }[] = [
+    { value: 'primary', labelKey: 'mpc.variantPrimary' },
+    { value: 'secondary', labelKey: 'mpc.variantSecondary' },
+    { value: 'ghost', labelKey: 'mpc.variantGhost' },
+    { value: 'link', labelKey: 'mpc.variantLink' },
 ];
 
 /** Выбор варианта кнопки (семейства: primary/secondary/ghost/link). */
@@ -187,6 +192,7 @@ function VariantSelect({
     value: ButtonVariant;
     onChange: (v: ButtonVariant) => void;
 }) {
+    const { t } = useAdminLang();
     return (
         <div>
             <Label htmlFor={id}>{label}</Label>
@@ -200,7 +206,7 @@ function VariantSelect({
                 <SelectContent>
                     {VARIANT_OPTIONS.map((opt) => (
                         <SelectItem key={opt.value} value={opt.value}>
-                            {opt.label}
+                            {t(opt.labelKey)}
                         </SelectItem>
                     ))}
                 </SelectContent>
@@ -219,6 +225,7 @@ function StepsEditor({
     steps: ProcessStep[];
     onChange: (steps: ProcessStep[]) => void;
 }) {
+    const { t } = useAdminLang();
     const update = (i: number, patch: Partial<ProcessStep>) =>
         onChange(steps.map((s, j) => (j === i ? { ...s, ...patch } : s)));
 
@@ -238,7 +245,7 @@ function StepsEditor({
                             <Input
                                 value={step.title}
                                 onChange={(e) => update(i, { title: e.target.value })}
-                                placeholder='Step title'
+                                placeholder={t('mpc.stepTitle')}
                                 aria-label={`Step ${i + 1} title`}
                             />
                             <button
@@ -247,7 +254,7 @@ function StepsEditor({
                                     onChange(steps.filter((_, j) => j !== i))
                                 }
                                 className='flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-md text-on-surface-variant hover:bg-surface-variant hover:text-error'
-                                aria-label={`Remove step ${i + 1}`}
+                                aria-label={`${t('mpc.removeItem')} ${t('mpc.processSteps')} ${i + 1}`}
                             >
                                 <Trash2 className='h-4 w-4' />
                             </button>
@@ -259,7 +266,7 @@ function StepsEditor({
                             onChange={(e) =>
                                 update(i, { description: e.target.value })
                             }
-                            placeholder='Step description'
+                            placeholder={t('mpc.stepDescription')}
                             aria-label={`Step ${i + 1} description`}
                         />
                     </div>
@@ -272,7 +279,7 @@ function StepsEditor({
                 className='mt-2 w-full'
                 onClick={() => onChange([...steps, { title: '', description: '' }])}
             >
-                <Plus className='mr-1 h-4 w-4' /> Add step
+                <Plus className='mr-1 h-4 w-4' /> {t('mpc.addStep')}
             </Button>
         </div>
     );
@@ -289,6 +296,7 @@ function Section({
     onVisibleChange?: (v: boolean) => void;
     children: React.ReactNode;
 }) {
+    const { t } = useAdminLang();
     return (
         <fieldset className='rounded-xl border border-outline-variant p-4'>
             <legend className='flex w-full items-center gap-3 px-2 text-left'>
@@ -303,7 +311,7 @@ function Section({
                             onChange={(e) => onVisibleChange(e.target.checked)}
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
-                        Show on page
+                        {t('mpc.showOnPage')}
                     </label>
                 )}
             </legend>
@@ -320,6 +328,7 @@ export default function MainPageContentEditor({
     visibleSection,
     applyThemeToChildPages: initialApplyTheme,
 }: Props) {
+    const { t } = useAdminLang();
     const [content, setContent] = useState<MainPageContent>(initialContent);
     const [avatarFileId, setAvatarFileId] = useState(initialAvatar);
     const [coverFileId, setCoverFileId] = useState(initialCover);
@@ -401,13 +410,13 @@ export default function MainPageContentEditor({
         <form onSubmit={onSubmit} className='space-y-6'>
                 {wrap('hero', (
                 <Section
-                    title='01 · Hero'
+                    title={t('mpc.sectionHero')}
                     visible={content.hero.visible}
                     onVisibleChange={(v) => set('hero', { visible: v })}
                 >
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label>Avatar</Label>
+                            <Label>{t('mpc.avatar')}</Label>
                             <ImageUploaderField
                                 value={avatarFileId || null}
                                 onChange={(fileId) => setAvatarFileId(fileId ?? '')}
@@ -416,7 +425,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label>Cover</Label>
+                            <Label>{t('mpc.cover')}</Label>
                             <ImageUploaderField
                                 value={coverFileId || null}
                                 onChange={(fileId) => setCoverFileId(fileId ?? '')}
@@ -434,11 +443,11 @@ export default function MainPageContentEditor({
                             }
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
-                        Floating elements (bokeh)
+                        {t('mpc.floatingElements')}
                     </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                         <div>
-                            <Label htmlFor='mp-h1'>Heading line 1 *</Label>
+                            <Label htmlFor='mp-h1'>{t('mpc.headingLine1')}</Label>
                             <Input
                                 id='mp-h1'
                                 value={content.hero.headingLine1}
@@ -446,7 +455,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-ha'>Heading accent *</Label>
+                            <Label htmlFor='mp-ha'>{t('mpc.headingAccent')}</Label>
                             <Input
                                 id='mp-ha'
                                 value={content.hero.headingAccent}
@@ -454,7 +463,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-h2'>Heading line 2</Label>
+                            <Label htmlFor='mp-h2'>{t('mpc.headingLine2')}</Label>
                             <Input
                                 id='mp-h2'
                                 value={content.hero.headingLine2}
@@ -463,7 +472,7 @@ export default function MainPageContentEditor({
                         </div>
                     </div>
                     <div>
-                        <Label htmlFor='mp-hd'>Description *</Label>
+                        <Label htmlFor='mp-hd'>{t('mpc.description')}</Label>
                         <textarea
                             id='mp-hd'
                             rows={3}
@@ -475,13 +484,13 @@ export default function MainPageContentEditor({
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <VariantSelect
                             id='mp-hpv'
-                            label='CTA primary — button style'
+                            label={t('mpc.ctaPrimaryStyle')}
                             value={content.hero.ctaPrimaryVariant}
                             onChange={(v) => set('hero', { ctaPrimaryVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-hpl'>CTA primary — label</Label>
+                            <Label htmlFor='mp-hpl'>{t('mpc.ctaPrimaryLabel')}</Label>
                             <Input
                                 id='mp-hpl'
                                 value={content.hero.ctaPrimaryLabel}
@@ -489,7 +498,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-hpu'>CTA primary — link</Label>
+                            <Label htmlFor='mp-hpu'>{t('mpc.ctaPrimaryLink')}</Label>
                             <Input
                                 id='mp-hpu'
                                 value={content.hero.ctaPrimaryUrl}
@@ -498,13 +507,13 @@ export default function MainPageContentEditor({
                         </div>
                         <VariantSelect
                             id='mp-hsv'
-                            label='CTA secondary — button style'
+                            label={t('mpc.ctaSecondaryStyle')}
                             value={content.hero.ctaSecondaryVariant}
                             onChange={(v) => set('hero', { ctaSecondaryVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-hsl'>CTA secondary — label</Label>
+                            <Label htmlFor='mp-hsl'>{t('mpc.ctaSecondaryLabel')}</Label>
                             <Input
                                 id='mp-hsl'
                                 value={content.hero.ctaSecondaryLabel}
@@ -512,7 +521,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-hsu'>CTA secondary — link</Label>
+                            <Label htmlFor='mp-hsu'>{t('mpc.ctaSecondaryLink')}</Label>
                             <Input
                                 id='mp-hsu'
                                 value={content.hero.ctaSecondaryUrl}
@@ -521,13 +530,13 @@ export default function MainPageContentEditor({
                         </div>
                         <VariantSelect
                             id='mp-htv'
-                            label='CTA tertiary (e.g. Download CV) — button style'
+                            label={t('mpc.ctaTertiaryStyle')}
                             value={content.hero.ctaTertiaryVariant}
                             onChange={(v) => set('hero', { ctaTertiaryVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-htl'>CTA tertiary — label</Label>
+                            <Label htmlFor='mp-htl'>{t('mpc.ctaTertiaryLabel')}</Label>
                             <Input
                                 id='mp-htl'
                                 placeholder='Download CV'
@@ -536,7 +545,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-htu'>CTA tertiary — link (PDF URL)</Label>
+                            <Label htmlFor='mp-htu'>{t('mpc.ctaTertiaryLink')}</Label>
                             <Input
                                 id='mp-htu'
                                 placeholder='https://…/cv.pdf'
@@ -547,7 +556,7 @@ export default function MainPageContentEditor({
                     </div>
                     {/* Полоса фактов под кнопками («первый экран CV», D-013) */}
                     <TagList
-                        label='Hero facts (short, one line each — e.g. certificates, stack, results)'
+                        label={t('mpc.heroFacts')}
                         tags={content.hero.facts}
                         onChange={(facts) => set('hero', { facts })}
                     />
@@ -556,13 +565,13 @@ export default function MainPageContentEditor({
 
                 {wrap('portfolio', (
                 <Section
-                    title='02 · Portfolio Gallery'
+                    title={t('mpc.sectionPortfolio')}
                     visible={content.portfolio.visible}
                     onVisibleChange={(v) => set('portfolio', { visible: v })}
                 >
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label htmlFor='mp-pt'>Section title *</Label>
+                            <Label htmlFor='mp-pt'>{t('mpc.portfolioTitle')}</Label>
                             <Input
                                 id='mp-pt'
                                 value={content.portfolio.title}
@@ -570,7 +579,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-ps'>Section subtitle</Label>
+                            <Label htmlFor='mp-ps'>{t('mpc.portfolioSubtitle')}</Label>
                             <Input
                                 id='mp-ps'
                                 value={content.portfolio.subtitle}
@@ -578,7 +587,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-pcl'>CTA button — label</Label>
+                            <Label htmlFor='mp-pcl'>{t('mpc.portfolioCtaLabel')}</Label>
                             <Input
                                 id='mp-pcl'
                                 value={content.portfolio.ctaLabel}
@@ -586,7 +595,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-pcu'>CTA button — link</Label>
+                            <Label htmlFor='mp-pcu'>{t('mpc.portfolioCtaLink')}</Label>
                             <Input
                                 id='mp-pcu'
                                 value={content.portfolio.ctaUrl}
@@ -595,7 +604,7 @@ export default function MainPageContentEditor({
                         </div>
                         <VariantSelect
                             id='mp-pcv'
-                            label='CTA button — style'
+                            label={t('mpc.portfolioCtaStyle')}
                             value={content.portfolio.ctaVariant}
                             onChange={(v) => set('portfolio', { ctaVariant: v })}
                         />
@@ -603,14 +612,39 @@ export default function MainPageContentEditor({
                 </Section>
                 ))}
 
+                {wrap('experience', (
+                <Section
+                    title={t('mpc.sectionExperience')}
+                    visible={content.experience.visible}
+                    onVisibleChange={(v) => set('experience', { visible: v })}
+                >
+                    <div>
+                        <Label htmlFor='mp-exp-heading'>{t('mpc.heading')}</Label>
+                        <Input
+                            id='mp-exp-heading'
+                            value={content.experience.heading}
+                            onChange={(e) =>
+                                set('experience', { heading: e.target.value })
+                            }
+                        />
+                    </div>
+                    <div className='mt-6'>
+                        <ExperienceItemsEditor
+                            items={content.experience.items}
+                            onChange={(items) => set('experience', { items })}
+                        />
+                    </div>
+                </Section>
+                ))}
+
                 {wrap('about', (
                 <Section
-                    title='03 · About'
+                    title={t('mpc.sectionAbout')}
                     visible={content.about.visible}
                     onVisibleChange={(v) => set('about', { visible: v })}
                 >
                     <div>
-                        <Label htmlFor='mp-ah'>About heading *</Label>
+                        <Label htmlFor='mp-ah'>{t('mpc.aboutHeading')}</Label>
                         <Input
                             id='mp-ah'
                             value={content.about.heading}
@@ -618,7 +652,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-ap1'>Paragraph 1 *</Label>
+                        <Label htmlFor='mp-ap1'>{t('mpc.paragraph1')}</Label>
                         <textarea
                             id='mp-ap1'
                             rows={3}
@@ -628,7 +662,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-ap2'>Paragraph 2</Label>
+                        <Label htmlFor='mp-ap2'>{t('mpc.paragraph2')}</Label>
                         <textarea
                             id='mp-ap2'
                             rows={3}
@@ -638,7 +672,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-ap3'>Paragraph 3</Label>
+                        <Label htmlFor='mp-ap3'>{t('mpc.paragraph3')}</Label>
                         <textarea
                             id='mp-ap3'
                             rows={3}
@@ -648,7 +682,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-ap4'>Paragraph 4</Label>
+                        <Label htmlFor='mp-ap4'>{t('mpc.paragraph4')}</Label>
                         <textarea
                             id='mp-ap4'
                             rows={3}
@@ -658,7 +692,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-ap5'>Paragraph 5</Label>
+                        <Label htmlFor='mp-ap5'>{t('mpc.paragraph5')}</Label>
                         <textarea
                             id='mp-ap5'
                             rows={3}
@@ -668,7 +702,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label>Process image</Label>
+                        <Label>{t('mpc.processImage')}</Label>
                         <ImageUploaderField
                             value={content.about.processImageFileId}
                             onChange={(fileId) =>
@@ -683,13 +717,13 @@ export default function MainPageContentEditor({
 
                 {wrap('expertise', (
                 <Section
-                    title='04 · Expertise'
+                    title={t('mpc.sectionExpertise')}
                     visible={content.expertise.visible}
                     onVisibleChange={(v) => set('expertise', { visible: v })}
                 >
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label htmlFor='mp-esl'>Skills label</Label>
+                            <Label htmlFor='mp-esl'>{t('mpc.skillsLabel')}</Label>
                             <Input
                                 id='mp-esl'
                                 value={content.expertise.skillsLabel}
@@ -698,12 +732,12 @@ export default function MainPageContentEditor({
                         </div>
                     </div>
                     <TagList
-                        label='Skills tags'
+                        label={t('mpc.skillsTags')}
                         tags={content.expertise.skills}
                         onChange={(skills) => set('expertise', { skills })}
                     />
                     <ToolGroupsEditor
-                        label='Tools groups (label + tags — e.g. Design / AI-assisted workflow / Code)'
+                        label={t('mpc.toolsGroups')}
                         groups={content.expertise.toolGroups}
                         onChange={(toolGroups) => set('expertise', { toolGroups })}
                     />
@@ -716,7 +750,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <div>
-                        <Label htmlFor='mp-epl'>Process label</Label>
+                        <Label htmlFor='mp-epl'>{t('mpc.processLabel')}</Label>
                         <Input
                             id='mp-epl'
                             value={content.expertise.processLabel}
@@ -724,7 +758,7 @@ export default function MainPageContentEditor({
                         />
                     </div>
                     <StepsEditor
-                        label='Process steps'
+                        label={t('mpc.processSteps')}
                         steps={content.expertise.processSteps}
                         onChange={(processSteps) => set('expertise', { processSteps })}
                     />
@@ -740,7 +774,7 @@ export default function MainPageContentEditor({
                         Pro Bono — show banner on page
                     </label>
                     <div>
-                        <Label htmlFor='mp-epb'>Pro Bono text</Label>
+                        <Label htmlFor='mp-epb'>{t('mpc.proBonoText')}</Label>
                         <textarea
                             id='mp-epb'
                             rows={3}
@@ -752,13 +786,13 @@ export default function MainPageContentEditor({
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <VariantSelect
                             id='mp-epbv'
-                            label='Pro Bono CTA — button style'
+                            label={t('mpc.proBonoCtaStyle')}
                             value={content.expertise.proBonoCtaVariant}
                             onChange={(v) => set('expertise', { proBonoCtaVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-epbl'>Pro Bono CTA — label</Label>
+                            <Label htmlFor='mp-epbl'>{t('mpc.proBonoCtaLabel')}</Label>
                             <Input
                                 id='mp-epbl'
                                 value={content.expertise.proBonoCtaLabel}
@@ -766,7 +800,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-epbu'>Pro Bono CTA — link</Label>
+                            <Label htmlFor='mp-epbu'>{t('mpc.proBonoCtaLink')}</Label>
                             <Input
                                 id='mp-epbu'
                                 value={content.expertise.proBonoCtaUrl}
@@ -777,14 +811,39 @@ export default function MainPageContentEditor({
                 </Section>
                 ))}
 
+                {wrap('education', (
+                <Section
+                    title={t('mpc.sectionEducation')}
+                    visible={content.education.visible}
+                    onVisibleChange={(v) => set('education', { visible: v })}
+                >
+                    <div>
+                        <Label htmlFor='mp-edu-heading'>{t('mpc.heading')}</Label>
+                        <Input
+                            id='mp-edu-heading'
+                            value={content.education.heading}
+                            onChange={(e) =>
+                                set('education', { heading: e.target.value })
+                            }
+                        />
+                    </div>
+                    <div className='mt-6'>
+                        <EducationItemsEditor
+                            items={content.education.items}
+                            onChange={(items) => set('education', { items })}
+                        />
+                    </div>
+                </Section>
+                ))}
+
                 {wrap('cta', (
                 <Section
-                    title='05 · CTA (Get in Touch)'
+                    title={t('mpc.sectionCta')}
                     visible={content.cta.visible}
                     onVisibleChange={(v) => set('cta', { visible: v })}
                 >
                     <div>
-                        <Label htmlFor='mp-ch'>CTA heading *</Label>
+                        <Label htmlFor='mp-ch'>{t('mpc.ctaHeading')}</Label>
                         <Input
                             id='mp-ch'
                             value={content.cta.heading}
@@ -800,11 +859,11 @@ export default function MainPageContentEditor({
                             }
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
-                        Floating elements (bokeh)
+                        {t('mpc.floatingElements')}
                     </label>
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label htmlFor='mp-cd1'>Description line 1</Label>
+                            <Label htmlFor='mp-cd1'>{t('mpc.descriptionLine1')}</Label>
                             <Input
                                 id='mp-cd1'
                                 value={content.cta.description1}
@@ -812,7 +871,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-cd2'>Description line 2</Label>
+                            <Label htmlFor='mp-cd2'>{t('mpc.descriptionLine2')}</Label>
                             <Input
                                 id='mp-cd2'
                                 value={content.cta.description2}
@@ -821,13 +880,13 @@ export default function MainPageContentEditor({
                         </div>
                         <VariantSelect
                             id='mp-cev'
-                            label='Email button — style'
+                            label={t('mpc.emailButtonStyle')}
                             value={content.cta.emailVariant}
                             onChange={(v) => set('cta', { emailVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-cel'>Email button — label</Label>
+                            <Label htmlFor='mp-cel'>{t('mpc.emailButtonLabel')}</Label>
                             <Input
                                 id='mp-cel'
                                 value={content.cta.emailLabel}
@@ -835,7 +894,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-cea'>Email address</Label>
+                            <Label htmlFor='mp-cea'>{t('mpc.emailAddress')}</Label>
                             <Input
                                 id='mp-cea'
                                 type='email'
@@ -845,13 +904,13 @@ export default function MainPageContentEditor({
                         </div>
                         <VariantSelect
                             id='mp-cwv'
-                            label='WhatsApp button — style'
+                            label={t('mpc.whatsappButtonStyle')}
                             value={content.cta.whatsappVariant}
                             onChange={(v) => set('cta', { whatsappVariant: v })}
                         />
                         <div />
                         <div>
-                            <Label htmlFor='mp-cwl'>WhatsApp button — label</Label>
+                            <Label htmlFor='mp-cwl'>{t('mpc.whatsappButtonLabel')}</Label>
                             <Input
                                 id='mp-cwl'
                                 value={content.cta.whatsappLabel}
@@ -859,7 +918,7 @@ export default function MainPageContentEditor({
                             />
                         </div>
                         <div>
-                            <Label htmlFor='mp-cwu'>WhatsApp link</Label>
+                            <Label htmlFor='mp-cwu'>{t('mpc.whatsappLink')}</Label>
                             <Input
                                 id='mp-cwu'
                                 value={content.cta.whatsappUrl}
@@ -872,7 +931,7 @@ export default function MainPageContentEditor({
 
                 {/* 06 · Color Theme: seed → M3-схема (light+dark), live-превью */}
                 {wrap('theme', (
-                <Section title='06 · Color Theme'>
+                <Section title={t('mpc.sectionTheme')}>
                     <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
                         <input
                             type='checkbox'
@@ -882,7 +941,7 @@ export default function MainPageContentEditor({
                             }
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
-                        Custom color theme (seed → M3 light &amp; dark)
+                        {t('mpc.customTheme')}
                     </label>
 
                     {/* D-010: распространение темы на кейс-страницы — здесь,
@@ -910,18 +969,16 @@ export default function MainPageContentEditor({
                             className='h-4 w-4 cursor-pointer accent-[var(--md-sys-color-primary)]'
                         />
                         <span>
-                            Применять мою цветовую тему к кейсам
+                            {t('mpc.applyThemeToCases')}
                             <span className='mt-0.5 block text-body-sm text-on-surface-variant'>
-                                Страницы всех кейсов портфолио получат эту же
-                                тему (светлую и тёмную). Без галочки кейсы
-                                используют стандартную тему платформы.
+                                {t('mpc.applyThemeToCasesHint')}
                             </span>
                         </span>
                     </label>
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label htmlFor='mp-seed'>Seed color</Label>
+                            <Label htmlFor='mp-seed'>{t('mpc.seedColor')}</Label>
                             <div className='flex items-center gap-2'>
                                 <input
                                     id='mp-seed'
@@ -948,12 +1005,12 @@ export default function MainPageContentEditor({
                             </div>
                             {!isValidSeed(content.theme.seedColor) && (
                                 <p className='mt-1 text-body-sm text-error'>
-                                    Hex format: #RRGGBB
+                                    {t('mpc.hexFormat')}
                                 </p>
                             )}
                         </div>
                         <div>
-                            <Label>Presets</Label>
+                            <Label>{t('mpc.presets')}</Label>
                             <div className='flex flex-wrap gap-2'>
                                 {PRESET_SEEDS.map((preset) => (
                                     <button
@@ -977,14 +1034,12 @@ export default function MainPageContentEditor({
                     </div>
 
                     <p className='text-body-sm text-on-surface-variant'>
-                        Светлая и тёмная схемы генерируются автоматически по
-                        логике токенов Material 3 — контраст сохраняется.
-                        Выключенный чекбокс = дефолтная зелёная тема.
+                        {t('mpc.themeAutoNote')}
                     </p>
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
-                            <Label htmlFor='mp-header-mode'>Header</Label>
+                            <Label htmlFor='mp-header-mode'>{t('mpc.header')}</Label>
                             <Select
                                 value={content.theme.header.mode}
                                 onValueChange={(v) =>
@@ -1002,13 +1057,13 @@ export default function MainPageContentEditor({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value='default'>
-                                        Default (glass)
+                                        {t('mpc.modeDefaultGlass')}
                                     </SelectItem>
                                     <SelectItem value='transparent'>
-                                        Transparent
+                                        {t('mpc.modeTransparent')}
                                     </SelectItem>
                                     <SelectItem value='solid'>
-                                        Solid color
+                                        {t('mpc.modeSolidColor')}
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
@@ -1016,7 +1071,7 @@ export default function MainPageContentEditor({
                                 <div className='mt-2 flex items-center gap-2'>
                                     <input
                                         type='color'
-                                        aria-label='Header color'
+                                        aria-label={t('mpc.headerColor')}
                                         value={content.theme.header.color ?? '#0b6e4f'}
                                         onChange={(e) =>
                                             set('theme', {
@@ -1053,16 +1108,16 @@ export default function MainPageContentEditor({
                                             })
                                         }
                                     >
-                                        Reset
+                                        {t('mpc.reset')}
                                     </Button>
                                 </div>
                             )}
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Solid: текст шапки автоматически контрастный.
+                                {t('mpc.headerSolidHint')}
                             </p>
                         </div>
                         <div>
-                            <Label htmlFor='mp-bg-mode'>Background</Label>
+                            <Label htmlFor='mp-bg-mode'>{t('mpc.background')}</Label>
                             <Select
                                 value={content.theme.background.mode}
                                 onValueChange={(v) =>
@@ -1080,13 +1135,13 @@ export default function MainPageContentEditor({
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value='default'>
-                                        Default (surface)
+                                        {t('mpc.modeDefaultSurface')}
                                     </SelectItem>
                                     <SelectItem value='seed-tint'>
-                                        Accent tint (seed)
+                                        {t('mpc.modeAccentTint')}
                                     </SelectItem>
                                     <SelectItem value='solid'>
-                                        Solid color
+                                        {t('mpc.modeSolidColor')}
                                     </SelectItem>
                                 </SelectContent>
                             </Select>
@@ -1094,7 +1149,7 @@ export default function MainPageContentEditor({
                                 <div className='mt-2 flex items-center gap-2'>
                                     <input
                                         type='color'
-                                        aria-label='Background color'
+                                        aria-label={t('mpc.backgroundColor')}
                                         value={content.theme.background.color ?? '#f7faf5'}
                                         onChange={(e) =>
                                             set('theme', {
@@ -1131,24 +1186,23 @@ export default function MainPageContentEditor({
                                             })
                                         }
                                     >
-                                        Reset
+                                        {t('mpc.reset')}
                                     </Button>
                                 </div>
                             )}
                             <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                Контент остаётся на светлой поверхности —
-                                читаемость сохраняется.
+                                {t('mpc.bgSolidHint')}
                             </p>
                         </div>
                     </div>
 
                     <div className='rounded-xl border border-outline-variant p-4'>
                         <h3 className='mb-3 text-title-sm font-semibold text-on-surface'>
-                            Floating elements
+                            {t('mpc.floatingTitle')}
                         </h3>
                         <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                             <div>
-                                <Label htmlFor='mp-float-color'>Color</Label>
+                                <Label htmlFor='mp-float-color'>{t('mpc.color')}</Label>
                                 <div className='flex items-center gap-2'>
                                     <input
                                         id='mp-float-color'
@@ -1165,15 +1219,15 @@ export default function MainPageContentEditor({
                                         size='sm'
                                         onClick={() => set('floating', { color: null })}
                                     >
-                                        Reset
+                                        {t('mpc.reset')}
                                     </Button>
                                 </div>
                                 <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                    Пусто = дефолтная палитра.
+                                    {t('mpc.floatingColorHint')}
                                 </p>
                             </div>
                             <div>
-                                <Label htmlFor='mp-float-shape'>Shape</Label>
+                                <Label htmlFor='mp-float-shape'>{t('mpc.shape')}</Label>
                                 <Select
                                     value={content.floating.shape}
                                     onValueChange={(v) =>
@@ -1187,11 +1241,17 @@ export default function MainPageContentEditor({
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectItem value='default'>
-                                            Default (mixed)
+                                            {t('mpc.shapeDefault')}
                                         </SelectItem>
-                                        <SelectItem value='circle'>Circles</SelectItem>
-                                        <SelectItem value='square'>Squares</SelectItem>
-                                        <SelectItem value='triangle'>Triangles</SelectItem>
+                                        <SelectItem value='circle'>
+                                            {t('mpc.shapeCircles')}
+                                        </SelectItem>
+                                        <SelectItem value='square'>
+                                            {t('mpc.shapeSquares')}
+                                        </SelectItem>
+                                        <SelectItem value='triangle'>
+                                            {t('mpc.shapeTriangles')}
+                                        </SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -1203,13 +1263,13 @@ export default function MainPageContentEditor({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
                 {success && (
                     <p className='text-body-sm text-primary'>
-                        Main page content saved successfully!
+                        {t('mpc.saveSuccess')}
                     </p>
                 )}
 
                 <div className='flex justify-end gap-3 pt-2'>
                     <Button type='submit' disabled={saving}>
-                        {saving ? 'Saving...' : 'Save Main Page Content'}
+                        {saving ? t('mpc.saving') : t('mpc.save')}
                     </Button>
                 </div>
             </form>
