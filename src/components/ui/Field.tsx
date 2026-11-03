@@ -18,6 +18,10 @@ type FieldProps = {
  * Место под текст зарезервировано `min-h-[1.5rem]` — появление ошибки
  * не должно сдвигать форму (DS §3.3, No-CLS). Ошибка показывается вместо
  * подсказки, приоритет у ошибки.
+ *
+ * Цвет текста зависит от типа сообщения: ошибка — error (красный),
+ * подсказка — обычный приглушённый текст. Раньше подсказки тоже красились
+ * в красный, хотя ничего не нарушено (фидбэк 2026-11-03).
  */
 export default function Field({
     id,
@@ -31,7 +35,11 @@ export default function Field({
         <div className={className}>
             <Label htmlFor={id}>{label}</Label>
             {children}
-            <p className='mt-1 min-h-[1.5rem] text-body-sm text-error'>
+            <p
+                className={`mt-1 min-h-[1.5rem] text-body-sm ${
+                    error ? 'text-error' : 'text-on-surface-variant'
+                }`}
+            >
                 {error ?? hint ?? ''}
             </p>
         </div>

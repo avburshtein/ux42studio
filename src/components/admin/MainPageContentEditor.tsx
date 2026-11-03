@@ -379,7 +379,8 @@ export default function MainPageContentEditor({
         }
         if (mode === 'solid' && content.theme.background.color) {
             const c = content.theme.background.color;
-            return { light: c, dark: mixWithBlack(c, 0.45) };
+            // Тот же расчёт, что на странице (page.tsx).
+            return { light: c, dark: mixWithBlack(c, 0.72) };
         }
         // seed-tint: 8% primary поверх surface-container-low — тот же
         // расчёт, что в page.tsx (color-mix).

@@ -238,7 +238,9 @@ export default async function ProfilePage({ params }: PageProps) {
             );
         } else if (bgMode === 'solid' && mpc.theme.background.color) {
             const c = mpc.theme.background.color;
-            const darkBg = mixWithBlack(c, 0.45);
+            // Тёмный вариант фона — заметно темнее исходного: иначе
+            // «тёмная» тема оставалась серой (фидбэк 2026-11-03).
+            const darkBg = mixWithBlack(c, 0.72);
             customVars.push(
                 `:root{--mp-page-bg:${c}}`,
                 `[data-theme=dark]{--mp-page-bg:${darkBg}}`,

@@ -70,20 +70,32 @@ export function mixWithBlack(hex: string, t: number): string {
  * иначе медиа-фолбэк темы перебьёт его по специфичности.
  */
 const SURFACE_TOKENS: { token: string; light: number; dark: number }[] = [
-    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 4 },
-    { token: '--md-sys-color-surface-container-low', light: 30, dark: 7 },
-    { token: '--md-sys-color-surface-container', light: 40, dark: 10 },
-    { token: '--md-sys-color-surface-container-high', light: 50, dark: 13 },
-    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 16 },
+    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 8 },
+    { token: '--md-sys-color-surface-container-low', light: 30, dark: 12 },
+    { token: '--md-sys-color-surface-container', light: 40, dark: 16 },
+    { token: '--md-sys-color-surface-container-high', light: 50, dark: 20 },
+    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 24 },
 ];
 
+/**
+ * Токены, которые при кастомном фоне считаются от него самого.
+ *
+ * - `surface-container-*` — карточки, метки и панели: иначе на насыщенном
+ *   фоне они выглядят белыми пятнами.
+ * - `background` — подвал: в светлой теме он был белым на сером фоне.
+ *   Теперь он чуть темнее фона, как в дефолтной теме (там подвал темнее
+ *   страницы).
+ * - `shadow-card-glow` — «белое свечение» карточки: на сером фоне белый
+ *   отсвет читался как белый налёт (фидбэк 2026-11-03), поэтому отсвет
+ *   берётся от фона.
+ */
 export function surfaceTokensFrom(
     lightBg: string,
     darkBg: string = lightBg,
 ): string[] {
     // Светлая тема: поверхность — фон, подмешанный с белым (18% → 60%:
     // чем выше уровень, тем насыщеннее). Тёмная: в фон добавляется белый
-    // (4% → 16%), чтобы карточки были чуть светлее фона, как в M3.
+    // (8% → 24%), чтобы карточки и метки были видны, а не сливались.
     const decls = (bg: string, dark: boolean) =>
         SURFACE_TOKENS.map(({ token, light, dark: d }) =>
             dark
@@ -91,8 +103,18 @@ export function surfaceTokensFrom(
                 : `${token}: color-mix(in srgb, ${bg} ${light}%, #ffffff);`,
         ).join('');
 
-    const light = decls(lightBg, false);
-    const dark = decls(darkBg, true);
+    const light = [
+        ...decls(lightBg, false),
+        // Подвал: чуть темнее фона (как в дефолтной теме).
+        `--md-sys-color-background: color-mix(in srgb, ${lightBg} 88%, #000000);`,
+        // Отсвет карточки — от фона, а не белый.
+        `--shadow-card-glow: color-mix(in srgb, ${lightBg} 55%, #ffffff);`,
+    ].join('');
+    const dark = [
+        ...decls(darkBg, true),
+        `--md-sys-color-background: color-mix(in srgb, ${darkBg} 88%, #000000);`,
+        `--shadow-card-glow: color-mix(in srgb, #000000 86%, ${darkBg});`,
+    ].join('');
 
     return [
         `:root{${light}}`,
