@@ -63,14 +63,6 @@ export function SkillsSection({
                 )}
               </div>
             )}
-
-            {stackNote && (
-              /* «Project stack» (D-013): честная пометка — с чем работали,
-                  без заявки этих технологий как навыка. */
-              <p className="text-body-md font-normal text-on-surface-variant">
-                {stackNote}
-              </p>
-            )}
           </div>
 
           {processSteps.length > 0 && (
@@ -95,6 +87,12 @@ export function SkillsSection({
                   </div>
                 ))}
               </div>
+              {/* Процесс занимает только верх колонки; остаток места — Project stack (D-013). */}
+              {stackNote && (
+                <p className="mt-4 text-body-md font-normal text-on-surface-variant">
+                  {stackNote}
+                </p>
+              )}
             </div>
           )}
         </div>
