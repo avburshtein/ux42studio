@@ -79,35 +79,40 @@ export function useAdminLang(): AdminLangContextValue {
     return ctx;
 }
 
-/** Переключатель RU/EN — пилюля в хедере админки. Показывает язык,
- *  на который переключит (активный не активен — aria-pressed).
+/** Переключатель RU/EN — в хедере админки. Показывает язык, на который
+ *  переключит (активный не активен — aria-pressed).
  *
- *  Бордер: активный сегмент перекрывает рамку пилюли (-m-px + z-10),
- *  иначе серая линия контейнера обтекала зелёную кнопку (фидбэк
- *  2026-11-02). У неактивного сегмента рамка остаётся. */
+ *  Форма: два ОТДЕЛЬНЫХ скруглённых сегмента (как в исходном макете) —
+ *  активный залит primary без рамки, неактивный с рамкой outline-variant.
+ *  Раньше это была одна пилюля с общей рамкой и заливкой кнопки:
+ *  рамка обтекала зелёную часть, а при попытке её перекрыть (border на
+ *  контейнере + overflow-hidden) сегмент превращался в круг, торчащий
+ *  за рамку, и hover-фон вылезал квадратом за скругление
+ *  (фидбэк 2026-11-02). Раздельные сегменты снимают обе проблемы:
+ *  у зелёного нет рамки, hover у серого скруглён и не выходит за неё. */
 export function AdminLangSwitch() {
     const { lang, setLang } = useAdminLang();
+
     return (
-        <div
-            role='group'
-            aria-label='Language'
-            className='flex rounded-full border border-outline-variant text-label-sm'
-        >
-            {(['ru', 'en'] as const).map((code) => (
-                <button
-                    key={code}
-                    type='button'
-                    onClick={() => setLang(code)}
-                    aria-pressed={lang === code}
-                    className={`px-2.5 py-1.5 uppercase transition-colors ${
-                        lang === code
-                            ? 'relative z-10 -m-px rounded-full bg-primary text-on-primary'
-                            : 'text-on-surface-variant hover:bg-surface-variant'
-                    }`}
-                >
-                    {code}
-                </button>
-            ))}
+        <div role='group' aria-label='Language' className='flex items-center gap-1 text-label-sm'>
+            {(['ru', 'en'] as const).map((code) => {
+                const active = lang === code;
+                return (
+                    <button
+                        key={code}
+                        type='button'
+                        onClick={() => setLang(code)}
+                        aria-pressed={active}
+                        className={`rounded-full px-2.5 py-1.5 uppercase transition-colors ${
+                            active
+                                ? 'bg-primary text-on-primary'
+                                : 'border border-outline-variant text-on-surface-variant hover:bg-surface-variant'
+                        }`}
+                    >
+                        {code}
+                    </button>
+                );
+            })}
         </div>
     );
 }
