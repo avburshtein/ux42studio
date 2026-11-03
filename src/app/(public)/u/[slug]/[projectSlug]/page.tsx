@@ -360,12 +360,12 @@ export default async function ProjectPage({ params }: PageProps) {
 
     // D-010: распространение кастомной темы дизайнера. Чекбокс в
     // /admin/profile включает правило; тема та же, что на главной
-    // дизайнера (mainPageContent.theme.seedColor → M3-схема). Без
-    // галочки — дефолтные токены globals.css.
+    // дизайнера (mainPageContent.theme.seedColor → схема токенов движка,
+    // указанного в theme.engine). Без галочки — дефолтные токены globals.css.
     const mpc = profile.mainPageContent;
     const themeCss =
         profile.applyThemeToChildPages && mpc?.theme?.useCustomTheme
-            ? buildThemeCss(mpc.theme.seedColor, mpc.theme.engine)
+            ? buildThemeCss(mpc.theme.seedColor, mpc.theme.engine ?? 'm3')
             : '';
 
     return (

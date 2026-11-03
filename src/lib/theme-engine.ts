@@ -20,7 +20,7 @@ export function buildThemeCss(
     seed: string | undefined,
     engine: ThemeEngine = 'm3',
 ): string {
-    if (!seed) return '';
+    if (typeof seed !== 'string' || !seed.trim()) return '';
     return engine === 'chroma42'
         ? generateChromaThemeCss(seed).css
         : generateThemeCss(seed);
@@ -34,6 +34,7 @@ export function buildThemeAudit(
     seed: string | undefined,
     engine: ThemeEngine = 'm3',
 ): ChromaAudit | null {
-    if (!seed || engine !== 'chroma42') return null;
+    if (typeof seed !== 'string' || !seed.trim()) return null;
+    if (engine !== 'chroma42') return null;
     return generateChromaThemeCss(seed).audit;
 }
