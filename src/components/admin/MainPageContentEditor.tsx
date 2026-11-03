@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -21,11 +21,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/Select';
-import {
-    generateThemeCss,
-    isValidSeed,
-    PRESET_SEEDS,
-} from '@/lib/theme';
+import { isValidSeed, PRESET_SEEDS } from '@/lib/theme';
+import { buildThemeCss } from '@/lib/theme-engine';
+import { generateChromaThemeCss } from '@/lib/chroma42';
 import type {
     ButtonVariant,
     MainPageContent,
@@ -358,11 +356,24 @@ export default function MainPageContentEditor({
         <div className={visibleSection === id ? '' : 'hidden'}>{node}</div>
     );
 
+    // D-019: тема Chroma42 — из неё получаем и CSS, и «паспорт доступности».
+    const chromaResult = useMemo(
+        () =>
+            content.theme.engine === 'chroma42' &&
+            isValidSeed(content.theme.seedColor)
+                ? generateChromaThemeCss(content.theme.seedColor)
+                : null,
+        [content.theme.engine, content.theme.seedColor],
+    );
+
     // Live-превью темы в админке: инжектим CSS пока открыт раздел 06
     useEffect(() => {
         if (visibleSection !== 'theme') return;
         const css = content.theme.useCustomTheme
-            ? generateThemeCss(content.theme.seedColor)
+            ? chromaResult?.css ||
+              (content.theme.engine === 'm3'
+                  ? buildThemeCss(content.theme.seedColor, 'm3')
+                  : '')
             : '';
         let styleTag = document.getElementById('admin-theme-preview');
         if (!css) {
@@ -375,7 +386,13 @@ export default function MainPageContentEditor({
             document.head.appendChild(styleTag);
         }
         styleTag.textContent = css;
-    }, [visibleSection, content.theme.useCustomTheme, content.theme.seedColor]);
+    }, [
+        visibleSection,
+        content.theme.useCustomTheme,
+        content.theme.seedColor,
+        content.theme.engine,
+        chromaResult,
+    ]);
 
     const set = <S extends keyof MainPageContent>(
         section: S,
@@ -978,6 +995,39 @@ export default function MainPageContentEditor({
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>
+                            <Label>{t('mpc.engine')}</Label>
+                            <div className='flex gap-2'>
+                                {(
+                                    [
+                                        ['m3', t('mpc.engineM3')],
+                                        ['chroma42', t('mpc.engineChroma42')],
+                                    ] as const
+                                ).map(([value, label]) => (
+                                    <button
+                                        key={value}
+                                        type='button'
+                                        onClick={() =>
+                                            set('theme', { engine: value })
+                                        }
+                                        disabled={!content.theme.useCustomTheme}
+                                        aria-pressed={
+                                            content.theme.engine === value
+                                        }
+                                        className={`flex-1 cursor-pointer rounded-md border px-3 py-2 text-body-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                                            content.theme.engine === value
+                                                ? 'border-transparent bg-primary text-on-primary'
+                                                : 'border-outline-variant bg-surface text-on-surface-variant hover:border-outline'
+                                        }`}
+                                    >
+                                        {label}
+                                    </button>
+                                ))}
+                            </div>
+                            <p className='mt-1 text-body-sm text-on-surface-variant'>
+                                {t('mpc.engineHint')}
+                            </p>
+                        </div>
+                        <div>
                             <Label htmlFor='mp-seed'>{t('mpc.seedColor')}</Label>
                             <div className='flex items-center gap-2'>
                                 <input
@@ -1036,6 +1086,63 @@ export default function MainPageContentEditor({
                     <p className='text-body-sm text-on-surface-variant'>
                         {t('mpc.themeAutoNote')}
                     </p>
+
+                    {/* D-019: паспорт доступности Chroma42 — сводка аудита
+                        контрастных пар по всем режимам темы. */}
+                    {chromaResult && (
+                        <div className='rounded-lg border border-outline-variant bg-surface-container-lowest p-3'>
+                            <div className='flex flex-wrap items-center justify-between gap-2'>
+                                <span className='text-body-sm font-medium text-on-surface'>
+                                    {t('mpc.auditTitle')}
+                                </span>
+                                <span
+                                    className={`rounded-full px-2 py-0.5 text-body-sm ${
+                                        chromaResult.audit.failed > 0
+                                            ? 'bg-error-container text-on-error-container'
+                                            : 'bg-primary-container text-on-primary-container'
+                                    }`}
+                                >
+                                    {chromaResult.audit.failed > 0
+                                        ? t('mpc.auditFail')
+                                        : t('mpc.auditOk')}
+                                </span>
+                            </div>
+                            <dl className='mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-body-sm sm:grid-cols-4'>
+                                <div>
+                                    <dt className='text-on-surface-variant'>
+                                        {t('mpc.auditPairs')}
+                                    </dt>
+                                    <dd className='text-on-surface'>
+                                        {chromaResult.audit.totalPairsChecked}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className='text-on-surface-variant'>
+                                        {t('mpc.auditPassed')}
+                                    </dt>
+                                    <dd className='text-on-surface'>
+                                        {chromaResult.audit.passed}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className='text-on-surface-variant'>
+                                        {t('mpc.auditWarnings')}
+                                    </dt>
+                                    <dd className='text-on-surface'>
+                                        {chromaResult.audit.warnings}
+                                    </dd>
+                                </div>
+                                <div>
+                                    <dt className='text-on-surface-variant'>
+                                        {t('mpc.auditFailed')}
+                                    </dt>
+                                    <dd className='text-on-surface'>
+                                        {chromaResult.audit.failed}
+                                    </dd>
+                                </div>
+                            </dl>
+                        </div>
+                    )}
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                         <div>

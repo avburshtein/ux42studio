@@ -30,7 +30,7 @@ import { TestimonialCard } from '@/components/case/TestimonialCard';
 import { NextProjectShowcase } from '@/components/case/NextProjectShowcase';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import AuthBar from '@/components/AuthBar';
-import { generateThemeCss } from '@/lib/theme';
+import { buildThemeCss } from '@/lib/theme-engine';
 
 export const revalidate = 3600;
 
@@ -365,7 +365,7 @@ export default async function ProjectPage({ params }: PageProps) {
     const mpc = profile.mainPageContent;
     const themeCss =
         profile.applyThemeToChildPages && mpc?.theme?.useCustomTheme
-            ? generateThemeCss(mpc.theme.seedColor)
+            ? buildThemeCss(mpc.theme.seedColor, mpc.theme.engine)
             : '';
 
     return (

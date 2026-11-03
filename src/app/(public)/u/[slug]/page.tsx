@@ -23,7 +23,8 @@ import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import AuthBar from '@/components/AuthBar';
 import { EyeOff } from 'lucide-react';
-import { generateThemeCss, contrastOn, mixWithBlack } from '@/lib/theme';
+import { contrastOn, mixWithBlack } from '@/lib/theme';
+import { buildThemeCss } from '@/lib/theme-engine';
 import { sql } from 'drizzle-orm';
 import type { CaseSortMode } from '@/db/schema/profiles';
 
@@ -204,10 +205,10 @@ export default async function ProfilePage({ params }: PageProps) {
     // с fallback на дефолты (Main Page Admin Panel Fields.md)
     const mpc = normalizeMainPageContent(profile.mainPageContent, bioParagraphs);
 
-    // Кастомная цветовая тема: M3-схема из seed → CSS-переопределения токенов.
+    // Кастомная цветовая тема: схема токенов из seed → CSS-переопределения.
     // Пустая строка = дефолтная тема globals.css (useCustomTheme = false).
     const themeCss = mpc.theme.useCustomTheme
-        ? generateThemeCss(mpc.theme.seedColor)
+        ? buildThemeCss(mpc.theme.seedColor, mpc.theme.engine)
         : '';
 
     // Кастомная шапка/фон (раздел 06). Цвета задаются CSS-переменными
