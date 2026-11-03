@@ -13,6 +13,7 @@
 		"check": "npm run typecheck && npm run lint",
 		"smoke": "node scripts/smoke-test.mjs",
 		"theme:parity": "tsx scripts/check-theme-parity.ts",
+		"theme:default": "tsx scripts/check-theme-default.ts",
 		"smoke:prod": "node scripts/smoke-test.mjs https://ux42.studio",
 		"verify": "npm run check && node scripts/smoke-test.mjs",
 		"deploy": "npm run build:cf && node scripts/build-cloudflare.mjs deploy",

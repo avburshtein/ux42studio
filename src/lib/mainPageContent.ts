@@ -157,6 +157,16 @@ export type ThemeHeaderMode = 'default' | 'transparent' | 'solid';
 /** Движок генерации темы из seed-цвета. */
 export type ThemeEngine = 'm3' | 'chroma42';
 
+/**
+ * Движок темы по умолчанию — Chroma42 (D-019).
+ *
+ * Chroma42 держит выбранный seed-цвет: M3-HCT его «выбеливал»
+ * (тон 40 в светлой теме, светлая пастель в тёмной). Дизайнер может
+ * вернуть Material 3 переключателем в кастомайзере — выбор сохраняется
+ * в профиле (mpc.theme.engine) и перекрывает дефолт.
+ */
+export const DEFAULT_THEME_ENGINE: ThemeEngine = 'chroma42';
+
 /** Настройки цветовой темы: seed-цвет → схема токенов. */
 export type ThemeSettings = {
   /** false = дефолтная тема globals.css («как есть») */
@@ -309,7 +319,7 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   theme: {
     useCustomTheme: false,
     seedColor: '#0b6e4f',
-    engine: 'm3',
+    engine: DEFAULT_THEME_ENGINE,
     background: { mode: 'default', color: null },
     header: { mode: 'default', color: null },
   },
@@ -381,7 +391,7 @@ const headerMode = (v: unknown): ThemeHeaderMode =>
   v === 'transparent' || v === 'solid' ? v : 'default';
 
 const engine = (v: unknown): ThemeEngine =>
-  v === 'chroma42' ? 'chroma42' : 'm3';
+  v === 'm3' ? 'm3' : DEFAULT_THEME_ENGINE;
 
 const shape = (v: unknown): FloatingStyle['shape'] =>
   SHAPES.includes(v as FloatingStyle['shape'])
