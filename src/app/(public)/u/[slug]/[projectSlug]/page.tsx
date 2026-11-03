@@ -31,7 +31,6 @@ import { NextProjectShowcase } from '@/components/case/NextProjectShowcase';
 import { SiteFooter } from '@/components/case/SiteFooter';
 import AuthBar from '@/components/AuthBar';
 import { buildThemeCss } from '@/lib/theme-engine';
-import { DEFAULT_THEME_ENGINE } from '@/lib/mainPageContent';
 
 export const revalidate = 3600;
 
@@ -366,10 +365,7 @@ export default async function ProjectPage({ params }: PageProps) {
     const mpc = profile.mainPageContent;
     const themeCss =
         profile.applyThemeToChildPages && mpc?.theme?.useCustomTheme
-            ? buildThemeCss(
-                  mpc.theme.seedColor,
-                  mpc.theme.engine ?? DEFAULT_THEME_ENGINE,
-              )
+            ? buildThemeCss(mpc.theme.seedColor)
             : '';
 
     return (
@@ -744,7 +740,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                                                     />
                                                                 </div>
                                                                 <div>
-                                                                    <p className='text-label-sm font-medium uppercase tracking-[0.5px] text-primary'>
+                                                                    <p className='text-label-sm font-medium uppercase tracking-[0.5px] text-primary-text'>
                                                                         After
                                                                     </p>
                                                                     <RichText

@@ -72,7 +72,7 @@ export function ApproachSection() {
             {PRINCIPLES.map((principle, i) => (
               <li key={principle.title} className='flex flex-col gap-2'>
                 <div className='flex items-center gap-4'>
-                  <span className='font-display text-title-md font-medium tabular-nums text-primary'>
+                  <span className='font-display text-title-md font-medium tabular-nums text-primary-text'>
                     {String(i + 1).padStart(2, '0')}
                   </span>
                   <span aria-hidden className='h-px flex-1 bg-outline-variant' />

@@ -111,10 +111,10 @@ export function PlatformBenefitsSection({
                             key={title}
                             className='portfolio-card platform-benefit-card flex flex-col gap-4 rounded-[24px] p-8'
                         >
-                            <span className='shrink-0 text-primary'>
+                            <span className='shrink-0 text-primary-text'>
                                 <Icon size={28} aria-hidden='true' />
                             </span>
-                            <h3 className='font-display text-title-lg font-medium text-primary'>
+                            <h3 className='font-display text-title-lg font-medium text-primary-text'>
                                 {title}
                             </h3>
                             <p className='text-body-md text-on-surface-variant'>

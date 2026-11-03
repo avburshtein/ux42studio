@@ -7,7 +7,7 @@ interface MetadataCardProps {
 export function MetadataCard({ label, value }: MetadataCardProps) {
     return (
         <div className='flex w-full flex-col items-start gap-2 rounded-base p-4 sm:p-6'>
-            <span className='text-label-md uppercase text-primary'>
+            <span className='text-label-md uppercase text-primary-text'>
                 {label}
             </span>
             <span className='text-body-sm break-words text-on-surface'>

@@ -10,7 +10,7 @@ interface BlockLabelProps {
 export function BlockLabel({ number, label, className }: BlockLabelProps) {
     return (
         <div className={cn('flex w-full items-center gap-4', className)}>
-            <span className='text-[11px] font-semibold uppercase leading-[16.5px] tracking-[0.14em] text-primary'>
+            <span className='text-[11px] font-semibold uppercase leading-[16.5px] tracking-[0.14em] text-primary-text'>
                 {number}
             </span>
             <span
@@ -37,7 +37,7 @@ export function SectionLabel({ children, className }: SectionLabelProps) {
         <span
             className={cn(
                 // a11y (LH color-contrast): text-outline на белом < 4.5:1 —
-                // on-surface-variant проходит AA; вызовы с text-primary
+                // on-surface-variant проходит AA; вызовы с text-primary-text
                 // переопределяют цвет через tailwind-merge как раньше
                 'text-[11px] font-semibold uppercase leading-4 tracking-[0.0455em] text-on-surface-variant',
                 className,

@@ -22,8 +22,8 @@ import {
     SelectValue,
 } from '@/components/ui/Select';
 import { isValidSeed, PRESET_SEEDS } from '@/lib/theme';
-import { buildThemeCss } from '@/lib/theme-engine';
 import { generateChromaThemeCss } from '@/lib/chroma42';
+import { buildThemeChecks, checksPassed } from '@/lib/theme-checks';
 import type {
     ButtonVariant,
     MainPageContent,
@@ -295,12 +295,20 @@ function Section({
     children: React.ReactNode;
 }) {
     const { t } = useAdminLang();
+    // Рамка ведётся плотно вокруг содержимого: маленький отступ и
+    // заголовок ВНУТРИ рамки. Раньше заголовок лежал на верхней линии
+    // (legend), из-за чего между ним и содержимым оставалась пустая
+    // полоса, а рамка выглядела «далеко от текста» (фидбэк 2026-11-03).
     return (
-        <fieldset className='rounded-xl border border-outline-variant p-4'>
-            <legend className='flex w-full items-center gap-3 px-2 text-left'>
-                <span className='text-title-sm font-semibold text-on-surface'>
+        <section
+            role='group'
+            aria-label={title}
+            className='rounded-lg border border-outline-variant p-3'
+        >
+            <div className='mb-3 flex flex-wrap items-center gap-3'>
+                <h3 className='text-title-sm font-semibold text-on-surface'>
                     {title}
-                </span>
+                </h3>
                 {onVisibleChange && (
                     <label className='flex cursor-pointer items-center gap-1.5 text-body-sm text-on-surface-variant'>
                         <input
@@ -312,9 +320,9 @@ function Section({
                         {t('mpc.showOnPage')}
                     </label>
                 )}
-            </legend>
-            <div className='space-y-4'>{children}</div>
-        </fieldset>
+            </div>
+            <div className='space-y-3'>{children}</div>
+        </section>
     );
 }
 
@@ -356,24 +364,32 @@ export default function MainPageContentEditor({
         <div className={visibleSection === id ? '' : 'hidden'}>{node}</div>
     );
 
-    // D-019: тема Chroma42 — из неё получаем и CSS, и «паспорт доступности».
+    // D-019: тема Chroma42 — из неё получаем и CSS, и проверки читаемости.
     const chromaResult = useMemo(
         () =>
-            content.theme.engine === 'chroma42' &&
             isValidSeed(content.theme.seedColor)
                 ? generateChromaThemeCss(content.theme.seedColor)
                 : null,
-        [content.theme.engine, content.theme.seedColor],
+        [content.theme.seedColor],
     );
+
+    // Проверки читаемости — отдельно для светлой и тёмной темы.
+    const lightChecks = useMemo(
+        () => buildThemeChecks(chromaResult?.tokens.light ?? {}),
+        [chromaResult],
+    );
+    const darkChecks = useMemo(
+        () => buildThemeChecks(chromaResult?.tokens.dark ?? {}),
+        [chromaResult],
+    );
+    const readable =
+        checksPassed(lightChecks) && checksPassed(darkChecks);
 
     // Live-превью темы в админке: инжектим CSS пока открыт раздел 06
     useEffect(() => {
         if (visibleSection !== 'theme') return;
         const css = content.theme.useCustomTheme
-            ? chromaResult?.css ||
-              (content.theme.engine === 'm3'
-                  ? buildThemeCss(content.theme.seedColor, 'm3')
-                  : '')
+            ? (chromaResult?.css ?? '')
             : '';
         let styleTag = document.getElementById('admin-theme-preview');
         if (!css) {
@@ -390,7 +406,6 @@ export default function MainPageContentEditor({
         visibleSection,
         content.theme.useCustomTheme,
         content.theme.seedColor,
-        content.theme.engine,
         chromaResult,
     ]);
 
@@ -946,7 +961,7 @@ export default function MainPageContentEditor({
                 </Section>
                 ))}
 
-                {/* 06 · Color Theme: seed → M3-схема (light+dark), live-превью */}
+                {/* 06 · Color Theme: seed → схема токенов Chroma42 (light+dark), live-превью */}
                 {wrap('theme', (
                 <Section title={t('mpc.sectionTheme')}>
                     <label className='flex cursor-pointer items-center gap-2 text-body-sm text-on-surface-variant'>
@@ -994,39 +1009,6 @@ export default function MainPageContentEditor({
                     </label>
 
                     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                        <div>
-                            <Label>{t('mpc.engine')}</Label>
-                            <div className='flex gap-2'>
-                                {(
-                                    [
-                                        ['m3', t('mpc.engineM3')],
-                                        ['chroma42', t('mpc.engineChroma42')],
-                                    ] as const
-                                ).map(([value, label]) => (
-                                    <button
-                                        key={value}
-                                        type='button'
-                                        onClick={() =>
-                                            set('theme', { engine: value })
-                                        }
-                                        disabled={!content.theme.useCustomTheme}
-                                        aria-pressed={
-                                            content.theme.engine === value
-                                        }
-                                        className={`flex-1 cursor-pointer rounded-md border px-3 py-2 text-body-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                                            content.theme.engine === value
-                                                ? 'border-transparent bg-primary text-on-primary'
-                                                : 'border-outline-variant bg-surface text-on-surface-variant hover:border-outline'
-                                        }`}
-                                    >
-                                        {label}
-                                    </button>
-                                ))}
-                            </div>
-                            <p className='mt-1 text-body-sm text-on-surface-variant'>
-                                {t('mpc.engineHint')}
-                            </p>
-                        </div>
                         <div>
                             <Label htmlFor='mp-seed'>{t('mpc.seedColor')}</Label>
                             <div className='flex items-center gap-2'>
@@ -1087,8 +1069,10 @@ export default function MainPageContentEditor({
                         {t('mpc.themeAutoNote')}
                     </p>
 
-                    {/* D-019: паспорт доступности Chroma42 — сводка аудита
-                        контрастных пар по всем режимам темы. */}
+                    {/* D-019: проверка читаемости — на языке пользователя («кнопки видны,
+                        текст читаем»), а не цифры аудита: дизайнер не может
+                        починить пару токенов, ему важно понимать, всё ли
+                        нормально и что именно сломано. */}
                     {chromaResult && (
                         <div className='rounded-lg border border-outline-variant bg-surface-container-lowest p-3'>
                             <div className='flex flex-wrap items-center justify-between gap-2'>
@@ -1097,50 +1081,45 @@ export default function MainPageContentEditor({
                                 </span>
                                 <span
                                     className={`rounded-full px-2 py-0.5 text-body-sm ${
-                                        chromaResult.audit.failed > 0
-                                            ? 'bg-error-container text-on-error-container'
-                                            : 'bg-primary-container text-on-primary-container'
+                                        readable
+                                            ? 'bg-primary-container text-on-primary-container'
+                                            : 'bg-error-container text-on-error-container'
                                     }`}
                                 >
-                                    {chromaResult.audit.failed > 0
-                                        ? t('mpc.auditFail')
-                                        : t('mpc.auditOk')}
+                                    {readable ? t('mpc.auditOk') : t('mpc.auditFail')}
                                 </span>
                             </div>
-                            <dl className='mt-2 grid grid-cols-2 gap-x-4 gap-y-1 text-body-sm sm:grid-cols-4'>
-                                <div>
-                                    <dt className='text-on-surface-variant'>
-                                        {t('mpc.auditPairs')}
-                                    </dt>
-                                    <dd className='text-on-surface'>
-                                        {chromaResult.audit.totalPairsChecked}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className='text-on-surface-variant'>
-                                        {t('mpc.auditPassed')}
-                                    </dt>
-                                    <dd className='text-on-surface'>
-                                        {chromaResult.audit.passed}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className='text-on-surface-variant'>
-                                        {t('mpc.auditWarnings')}
-                                    </dt>
-                                    <dd className='text-on-surface'>
-                                        {chromaResult.audit.warnings}
-                                    </dd>
-                                </div>
-                                <div>
-                                    <dt className='text-on-surface-variant'>
-                                        {t('mpc.auditFailed')}
-                                    </dt>
-                                    <dd className='text-on-surface'>
-                                        {chromaResult.audit.failed}
-                                    </dd>
-                                </div>
-                            </dl>
+                            <ul className='mt-2 grid grid-cols-1 gap-x-4 gap-y-1 text-body-sm sm:grid-cols-2'>
+                                {lightChecks.map((check) => (
+                                    <li
+                                        key={check.id}
+                                        className='flex items-center gap-1.5'
+                                    >
+                                        <span
+                                            aria-hidden='true'
+                                            className={
+                                                check.ok
+                                                    ? 'text-primary-text'
+                                                    : 'text-error'
+                                            }
+                                        >
+                                            {check.ok ? '✓' : '✕'}
+                                        </span>
+                                        <span
+                                            className={
+                                                check.ok
+                                                    ? 'text-on-surface-variant'
+                                                    : 'text-error'
+                                            }
+                                        >
+                                            {t(`mpc.check.${check.id}`)}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <p className='mt-2 text-body-sm text-on-surface-variant'>
+                                {t('mpc.auditHint')}
+                            </p>
                         </div>
                     )}
 

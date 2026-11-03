@@ -50,7 +50,7 @@ export function NextProjectShowcase({
             {/* Primary Button — "Start Project" (Figma: Button / Primary, 166×58, radius=48) */}
             <Link
                 href={contactUrl ?? `/u/${profileSlug}`}
-                className='inline-flex h-[58px] w-fit items-center justify-center gap-2 rounded-5xl bg-primary px-8 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
+                className='inline-flex h-[58px] w-fit items-center justify-center gap-2 rounded-5xl border border-primary-text bg-primary px-8 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
             >
                 Start Project
             </Link>
@@ -63,7 +63,7 @@ export function NextProjectShowcase({
                 >
                     <div className='flex min-w-0 flex-1 flex-col gap-4'>
                         <div className='flex items-center gap-3'>
-                            <SectionLabel className='text-primary'>
+                            <SectionLabel className='text-primary-text'>
                                 Up next
                             </SectionLabel>
                             <span className='text-label-md font-medium text-outline-variant'>
@@ -87,7 +87,7 @@ export function NextProjectShowcase({
                         viewBox='0 0 32 32'
                         fill='none'
                         aria-hidden='true'
-                        className='shrink-0 text-primary transition-transform group-hover:translate-x-1'
+                        className='shrink-0 text-primary-text transition-transform group-hover:translate-x-1'
                     >
                         <path
                             d='M6.66663 16H25.3333M25.3333 16L16 6.66669M25.3333 16L16 25.3334'

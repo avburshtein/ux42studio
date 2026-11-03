@@ -154,27 +154,12 @@ export type ThemeBackgroundMode = 'default' | 'seed-tint' | 'solid';
 /** Режим шапки (кастомная тема). */
 export type ThemeHeaderMode = 'default' | 'transparent' | 'solid';
 
-/** Движок генерации темы из seed-цвета. */
-export type ThemeEngine = 'm3' | 'chroma42';
-
-/**
- * Движок темы по умолчанию — Chroma42 (D-019).
- *
- * Chroma42 держит выбранный seed-цвет: M3-HCT его «выбеливал»
- * (тон 40 в светлой теме, светлая пастель в тёмной). Дизайнер может
- * вернуть Material 3 переключателем в кастомайзере — выбор сохраняется
- * в профиле (mpc.theme.engine) и перекрывает дефолт.
- */
-export const DEFAULT_THEME_ENGINE: ThemeEngine = 'chroma42';
-
-/** Настройки цветовой темы: seed-цвет → схема токенов. */
+/** Настройки цветовой темы: seed-цвет → схема токенов (движок Chroma42). */
 export type ThemeSettings = {
   /** false = дефолтная тема globals.css («как есть») */
   useCustomTheme: boolean;
   /** Seed-цвет HEX (#RRGGBB) */
   seedColor: string;
-  /** Движок: m3 (Material 3 HCT) / chroma42 (Chroma42) */
-  engine: ThemeEngine;
   /** Фон страницы: default (surface) / seed-tint (акцент сида) / solid (цвет) */
   background: { mode: ThemeBackgroundMode; color: string | null };
   /** Шапка: default (стекло) / transparent / solid (цвет + контрастный текст) */
@@ -319,7 +304,6 @@ export const DEFAULT_MAIN_PAGE_CONTENT: MainPageContent = {
   theme: {
     useCustomTheme: false,
     seedColor: '#0b6e4f',
-    engine: DEFAULT_THEME_ENGINE,
     background: { mode: 'default', color: null },
     header: { mode: 'default', color: null },
   },
@@ -389,9 +373,6 @@ const bgMode = (v: unknown): ThemeBackgroundMode =>
 
 const headerMode = (v: unknown): ThemeHeaderMode =>
   v === 'transparent' || v === 'solid' ? v : 'default';
-
-const engine = (v: unknown): ThemeEngine =>
-  v === 'm3' ? 'm3' : DEFAULT_THEME_ENGINE;
 
 const shape = (v: unknown): FloatingStyle['shape'] =>
   SHAPES.includes(v as FloatingStyle['shape'])
@@ -520,7 +501,6 @@ export function normalizeMainPageContent(
     theme: {
       useCustomTheme: bool(src.theme?.useCustomTheme, false),
       seedColor: hex(src.theme?.seedColor, d.theme.seedColor),
-      engine: engine(src.theme?.engine),
       background: {
         mode: bgMode(src.theme?.background?.mode),
         color: hexOrNull(src.theme?.background?.color),

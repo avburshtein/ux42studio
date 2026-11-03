@@ -71,7 +71,7 @@ export function SkillsSection({
               <div className="flex flex-col gap-6">
                 {processSteps.map((step) => (
                   <div key={step.number} className="flex items-start gap-4">
-                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-surface text-[11px] leading-4 tracking-[0.5px] font-semibold text-primary">
+                    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-primary bg-surface text-[11px] leading-4 tracking-[0.5px] font-semibold text-primary-text">
                       {step.number}
                     </span>
                     <div className="flex flex-col gap-1">

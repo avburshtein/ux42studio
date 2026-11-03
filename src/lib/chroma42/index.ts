@@ -8,6 +8,7 @@ import {
 import {
     buildExtTokens,
     buildMdTokens,
+    buildPrimaryText,
     isBwSeed,
     type MdTokenMap,
 } from './tokens';
@@ -46,6 +47,11 @@ export type ChromaThemeResult = {
     audit: ChromaAudit;
     /** Тема близка к нейтральной → применён ч/б режим. */
     bw: boolean;
+    /** Токены режимов (без префикса `--md-sys-color-`) — для проверок читаемости. */
+    tokens: {
+        light: Record<string, string>;
+        dark: Record<string, string>;
+    };
 };
 
 const EMPTY_AUDIT: ChromaAudit = {
@@ -70,10 +76,16 @@ function tokensFor(
     bw: boolean,
 ): MdTokenMap {
     const dark = mode === 'dark-normal';
-    return {
+    const tokens: MdTokenMap = {
         ...buildMdTokens(theme, mode, flat, bw),
         ...buildExtTokens(seed, dark, bw),
     };
+    // Читаемый вариант брендового цвета — для ссылок и подписей.
+    const primaryText = bw
+        ? tokens['--md-sys-color-primary']
+        : buildPrimaryText(theme, mode, flat);
+    if (primaryText) tokens['--md-sys-color-primary-text'] = primaryText;
+    return tokens;
 }
 
 /**
@@ -86,7 +98,7 @@ export function generateChromaThemeCss(
 ): ChromaThemeResult {
     const trimmed = (seed ?? '').trim();
     if (!isValidHex(trimmed)) {
-        return { css: '', audit: EMPTY_AUDIT, bw: false };
+        return { css: '', audit: EMPTY_AUDIT, bw: false, tokens: { light: {}, dark: {} } };
     }
 
     const scheme = options.scheme ?? 'triad';
@@ -128,7 +140,21 @@ export function generateChromaThemeCss(
         block(':root:not([data-theme=light])', dark) +
         '\n}';
 
-    return { css, audit: theme.audit.summary, bw };
+    // Токены без префикса — для проверок читаемости в кастомайзере.
+    const strip = (map: MdTokenMap) =>
+        Object.fromEntries(
+            Object.entries(map).map(([key, value]) => [
+                key.replace('--md-sys-color-', ''),
+                value,
+            ]),
+        );
+
+    return {
+        css,
+        audit: theme.audit.summary,
+        bw,
+        tokens: { light: strip(light), dark: strip(dark) },
+    };
 }
 
 export type { MdTokenMap };

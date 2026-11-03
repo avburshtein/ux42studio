@@ -11,7 +11,7 @@ interface MetricCardProps {
 export function MetricCard({ value, description }: MetricCardProps) {
     return (
         <div className='flex flex-1 flex-col gap-2 rounded-base bg-surface-container-lowest p-5 shadow-card'>
-            <span className='font-display text-headline-sm text-primary'>
+            <span className='font-display text-headline-sm text-primary-text'>
                 {value}
             </span>
             <RichText

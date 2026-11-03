@@ -121,7 +121,7 @@ export function MoodboardGrid({ assets, presetId }: MoodboardGridProps) {
                 type='button'
                 onClick={() => setExpanded(true)}
                 aria-expanded={expanded}
-                className='inline-flex h-12 items-center gap-2 self-start rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-colors duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] lg:hidden'
+                className='inline-flex h-12 items-center gap-2 self-start rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text transition-colors duration-150 ease-out hover:bg-[rgba(11,110,79,0.05)] lg:hidden'
             >
                 <Images size={20} aria-hidden='true' />
                 View moodboard

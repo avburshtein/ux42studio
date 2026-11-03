@@ -36,6 +36,10 @@
 
   /* Семантические цвета (bg-*, text-*, border-*) */
   --color-primary: var(--md-sys-color-primary);
+  /* Брендовый цвет как ТЕКСТ (ссылки, подписи). Отдельный токен нужен
+     потому, что в теме дизайнера primary — это выбранный seed: он может
+     быть ярким (заливка кнопки — хорошо), но нечитаемым как текст. */
+  --color-primary-text: var(--md-sys-color-primary-text);
   --color-on-primary: var(--md-sys-color-on-primary);
   --color-primary-container: var(--md-sys-color-primary-container);
   --color-on-primary-container: var(--md-sys-color-on-primary-container);
@@ -184,6 +188,10 @@
 
   /* M3 Light Palette */
   --md-sys-color-primary: #00543b;
+  /* Тот же брендовый цвет, но для ТЕКСТА (ссылки, подписи): в теме
+     дизайнера primary — это выбранный seed, и он может быть слишком
+     светлым для текста на светлой поверхности. */
+  --md-sys-color-primary-text: #00543b;
   --md-sys-color-surface-tint: #056c4d;
   /* Белый на #056c4d = 6.44:1 (AA). Раньше тут стоял литерал text-white
      в TagBadge — в тёмной теме tint светлеет до #83d7b1, и белый падал
@@ -260,6 +268,9 @@
 /* 3a. Explicit dark theme (user toggle) */
 [data-theme="dark"] {
   --md-sys-color-primary: #83d7b1;
+  /* В тёмной теме брендовый цвет и так светлый — текстовый вариант
+     совпадает с primary. */
+  --md-sys-color-primary-text: #83d7b1;
   --md-sys-color-surface-tint: #83d7b1;
   --md-sys-color-on-surface-tint: #003826;
   --md-sys-color-on-primary: #003826;
@@ -327,6 +338,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --md-sys-color-primary: #83d7b1;
+    --md-sys-color-primary-text: #83d7b1;
     --md-sys-color-surface-tint: #83d7b1;
     --md-sys-color-on-surface-tint: #003826;
     --md-sys-color-on-primary: #003826;
@@ -446,6 +458,20 @@ body {
    Канвас страницы с решения (12) — surface-container-lowest. */
 .hero-block-gradient {
   background-color: var(--md-sys-color-background);
+}
+
+/* Кастомный фон страницы дизайнера («акцентный тон» или «сплошной цвет»).
+   Каждая секция красила себя в surface-container-lowest, поэтому заданый
+   фон был виден только полоской над хедером, а все блоки оставались
+   белыми (фидбэк 2026-11-03). Здесь секции становятся прозрачными — фон
+   страницы виден на всю высоту.
+
+   Правило бьёт только по секциям верхнего уровня: вложенные карточки
+   (PortfolioCard, ProBonoBanner) сохраняют свои поверхности, иначе
+   потеряется иерархия «карточка на фоне». */
+[data-mp-bg='custom'] main > div,
+[data-mp-bg='custom'] main > div > section {
+  background-color: transparent;
 }
 
 /* Header glass — фон и тень (решения 2026-08-27 (7), (8)). Равномерный
@@ -731,6 +757,7 @@ textarea {
   /* Принудительно светлая палитра (копия M3 Light из :root) */
   :root {
     --md-sys-color-primary: #00543b;
+    --md-sys-color-primary-text: #00543b;
     --md-sys-color-surface-tint: #056c4d;
     --md-sys-color-on-surface-tint: #ffffff;
     --md-sys-color-on-primary: #ffffff;

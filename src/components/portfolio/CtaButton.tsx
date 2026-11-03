@@ -9,7 +9,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   // solid-семейство: bg-primary, мягкая тень 0/4/8/15% (FullStory-style,
   // решение (27)) → hover: opacity-90 + тень 0/8/16/20%
   primary:
-    'bg-primary text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity] duration-150 ease-out',
+    'border border-primary-text bg-primary text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity] duration-150 ease-out',
   // outline-семейство (secondary): border-primary-container, hover заливка 5% —
   // от токена primary (color-mix), чтобы работать с кастомным сидом
   secondary:
@@ -18,7 +18,7 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
   ghost:
     'text-on-background hover:opacity-70 transition-opacity duration-150 ease-out',
   // link-семейство: текст primary, подчёркивание в hover
-  link: 'text-primary underline-offset-4 hover:underline transition-opacity duration-150 ease-out',
+  link: 'text-primary-text underline-offset-4 hover:underline transition-opacity duration-150 ease-out',
 };
 
 interface CtaButtonProps {

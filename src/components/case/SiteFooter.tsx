@@ -48,7 +48,7 @@ export function SiteFooter({
                 <div className='flex flex-col gap-2'>
                     <Link
                         href='/'
-                        className='inline-flex items-center self-start font-display text-title-lg font-medium text-primary'
+                        className='inline-flex items-center self-start font-display text-title-lg font-medium text-primary-text'
                         aria-label='UX42.studio'
                     >
                         UX42.studio
@@ -78,7 +78,7 @@ export function SiteFooter({
                                 // даёт aria-label; фолбэк на platform (notNull),
                                 // если title в админке пуст (axe link-name).
                                 aria-label={link.title || link.platform}
-                                className='inline-flex h-11 w-11 items-center justify-center rounded-full text-primary transition-opacity hover:opacity-70'
+                                className='inline-flex h-11 w-11 items-center justify-center rounded-full text-primary-text transition-opacity hover:opacity-70'
                                 title={link.title}
                             >
                                 <SocialIcon platform={link.platform} url={link.url} />
@@ -128,7 +128,7 @@ export function SiteFooter({
                 {profileSlug && (
                     <Link
                         href={`/u/${profileSlug}`}
-                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary transition-[background-color,opacity] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90'
+                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text transition-[background-color,opacity] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90'
                     >
                         Back to Gallery
                     </Link>

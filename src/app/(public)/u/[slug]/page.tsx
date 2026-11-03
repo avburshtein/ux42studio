@@ -208,7 +208,7 @@ export default async function ProfilePage({ params }: PageProps) {
     // Кастомная цветовая тема: схема токенов из seed → CSS-переопределения.
     // Пустая строка = дефолтная тема globals.css (useCustomTheme = false).
     const themeCss = mpc.theme.useCustomTheme
-        ? buildThemeCss(mpc.theme.seedColor, mpc.theme.engine)
+        ? buildThemeCss(mpc.theme.seedColor)
         : '';
 
     // Кастомная шапка/фон (раздел 06). Цвета задаются CSS-переменными
@@ -366,6 +366,7 @@ export default async function ProfilePage({ params }: PageProps) {
         <div
             className='min-h-screen w-full bg-surface-container-low'
             style={pageBgStyle}
+            data-mp-bg={bgMode !== 'default' ? 'custom' : undefined}
         >
             {/* Кастомная тема: переопределяем --md-sys-color-* ДО рендера контента */}
             {themeCss && (

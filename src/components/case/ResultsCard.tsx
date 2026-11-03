@@ -22,7 +22,7 @@ export function ResultsCard({ content, className }: ResultsCardProps) {
                 viewBox='0 0 20 20'
                 fill='none'
                 aria-hidden='true'
-                className='shrink-0 text-primary'
+                className='shrink-0 text-primary-text'
             >
                 <path
                     d='M16.6667 5L7.5 14.1667L3.33334 10'

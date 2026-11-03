@@ -83,7 +83,7 @@ export function CtaSection({
           By reaching out you agree to our{' '}
           <Link
             href="/privacy"
-            className="text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80"
+            className="text-primary-text underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80"
           >
             Privacy Policy
           </Link>

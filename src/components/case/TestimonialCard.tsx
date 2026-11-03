@@ -32,7 +32,7 @@ export function TestimonialCard({
     >
       <span
         aria-hidden
-        className='font-display text-[100px] leading-[76px] text-primary'
+        className='font-display text-[100px] leading-[76px] text-primary-text'
       >
         “
       </span>
@@ -50,7 +50,7 @@ export function TestimonialCard({
           />
         ) : null}
         <div className='flex flex-col'>
-          <span className='text-label-lg text-primary'>{authorName}</span>
+          <span className='text-label-lg text-primary-text'>{authorName}</span>
           {authorRole && (
             <span className='text-body-md text-on-surface-variant'>
               {authorRole}

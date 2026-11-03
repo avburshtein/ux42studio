@@ -180,14 +180,14 @@ export function SiteHeader({
                                         fallbackEmail={
                                             contactDialog.fallbackEmail
                                         }
-                                        triggerClassName='inline-flex h-14 items-center justify-center rounded-full bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
+                                        triggerClassName='inline-flex h-14 items-center justify-center rounded-full border border-primary-text bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
                                     />
                                 </div>
                             ) : (
                                 <Link
                                     href={ctaHref}
                                     onClick={closeMenu}
-                                    className='inline-flex h-14 items-center justify-center self-center rounded-full bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
+                                    className='inline-flex h-14 items-center justify-center self-center rounded-full border border-primary-text bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
                                 >
                                     {ctaLabel}
                                 </Link>
@@ -250,7 +250,7 @@ export function SiteHeader({
                             onClick={() => setMenuOpen((v) => !v)}
                             aria-expanded={menuOpen}
                             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                            className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                            className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary-text'
                         >
                             {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
                         </button>
@@ -278,7 +278,7 @@ export function SiteHeader({
                                 onClick={() => setMenuOpen((v) => !v)}
                                 aria-expanded={menuOpen}
                                 aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-                                className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary md:hidden'
+                                className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary-text md:hidden'
                             >
                                 {menuOpen ? <X size={24} aria-hidden='true' /> : <Menu size={24} aria-hidden='true' />}
                             </button>
@@ -315,7 +315,7 @@ export function SiteHeader({
                                     type='button'
                                     onClick={closeMenu}
                                     aria-label='Close menu'
-                                    className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary'
+                                    className='inline-flex h-12 w-12 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary-text'
                                 >
                                     <X size={24} aria-hidden='true' />
                                 </button>
@@ -341,7 +341,7 @@ export function SiteHeader({
                                                     fallbackEmail={
                                                         contactDialog.fallbackEmail
                                                     }
-                                                    triggerClassName='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                                    triggerClassName='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary-text'
                                                 />
                                             </div>
                                         ) : (
@@ -349,7 +349,7 @@ export function SiteHeader({
                                                 key={item.label}
                                                 href={item.href}
                                                 onClick={closeMenu}
-                                                className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary'
+                                                className='inline-flex items-center py-3 text-title-md font-normal text-on-surface transition-colors hover:text-primary-text'
                                             >
                                                 {item.label}
                                             </Link>
@@ -362,7 +362,7 @@ export function SiteHeader({
                             <Link
                                 href='/login'
                                 onClick={closeMenu}
-                                className='inline-flex items-center py-3 text-title-md font-medium text-primary transition-opacity hover:opacity-80'
+                                className='inline-flex items-center py-3 text-title-md font-medium text-primary-text transition-opacity hover:opacity-80'
                             >
                                 Sign In / Sign Up
                             </Link>
@@ -496,7 +496,7 @@ function WordmarkLink({
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary md:h-14',
+                'inline-flex h-12 shrink-0 items-center justify-center px-2.5 font-display text-title-lg font-medium text-primary-text md:h-14',
                 className,
             )}
             aria-label={label}
@@ -511,7 +511,7 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
         <Link
             href={href}
             className={cn(
-                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary md:h-14',
+                'inline-flex h-12 shrink-0 items-center justify-center p-2.5 font-display text-title-lg font-medium text-primary-text md:h-14',
                 className,
             )}
             aria-label='UX42.studio'
@@ -531,7 +531,7 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
 // Общая константа: тот же стиль у триггера ContactDialog в шапке
 // страницы дизайнера (иначе у диалога дефолт — filled-пилюля).
 const QUIET_CTA_CLASS =
-    'inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90';
+    'inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary-text transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90';
 
 function CtaButton({
     href,
@@ -599,7 +599,7 @@ function BreadcrumbLink({
     return (
         <Link
             href={href}
-            className='shrink-0 text-body-md font-normal text-primary transition-colors hover:underline'
+            className='shrink-0 text-body-md font-normal text-primary-text transition-colors hover:underline'
         >
             {children}
         </Link>

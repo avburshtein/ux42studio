@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
  *  - двойной перенос  → новый абзац;
  *  - одинарный перенос → <br/> (принудительная строка);
  *  - строка с «- » или «* » в начале → элемент списка, маркер зелёный
- *    (text-primary — насыщенный зелёный бренда; заметнее
+ *    (text-primary-text — насыщенный зелёный бренда; заметнее
  *    primary-container, который на белом фоне пастельный);
  *  - **текст** → жирный, *текст* → курсив.
  *
@@ -42,7 +42,7 @@ function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
                     href={linkMatch[2]}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-primary underline underline-offset-4 hover:opacity-80'
+                    className='text-primary-text underline underline-offset-4 hover:opacity-80'
                 >
                     {renderInline(linkMatch[1], `${prefix}-lt`)}
                 </a>,
@@ -57,7 +57,7 @@ function renderInline(text: string, keyPrefix: string): React.ReactNode[] {
                     href={part}
                     target='_blank'
                     rel='noopener noreferrer'
-                    className='text-primary underline underline-offset-4 hover:opacity-80'
+                    className='text-primary-text underline underline-offset-4 hover:opacity-80'
                 >
                     {part}
                 </a>,

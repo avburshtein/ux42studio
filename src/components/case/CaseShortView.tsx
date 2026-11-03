@@ -177,7 +177,7 @@ export function CaseShortView({
                                     key={i}
                                     className='print-avoid rounded-2xl border border-outline-variant bg-surface-container-lowest p-6'
                                 >
-                                    <p className='font-display text-headline-sm text-primary'>
+                                    <p className='font-display text-headline-sm text-primary-text'>
                                         {metric.value}
                                     </p>
                                     {metric.description && (
@@ -228,7 +228,7 @@ export function CaseShortView({
                 <section className='no-print flex flex-col items-start gap-6 border-t border-outline-variant pt-8'>
                     <Link
                         href={fullCaseHref}
-                        className='inline-flex h-12 items-center gap-2 rounded-5xl bg-primary px-6 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
+                        className='inline-flex h-12 items-center gap-2 rounded-5xl border border-primary-text bg-primary px-6 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
                     >
                         View full case study
                         <ArrowRight className='h-4 w-4' aria-hidden='true' />
@@ -237,7 +237,7 @@ export function CaseShortView({
                         More work by{' '}
                         <Link
                             href={`/u/${profileSlug}`}
-                            className='text-primary hover:opacity-80'
+                            className='text-primary-text hover:opacity-80'
                         >
                             {profileName}
                         </Link>

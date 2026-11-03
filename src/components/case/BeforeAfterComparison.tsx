@@ -58,7 +58,7 @@ export function BeforeAfterComparison({
 
                 {/* After — label НАД изображением, текст — на всю ширину */}
                 <div className='flex flex-col gap-3'>
-                    <span className='text-label-md font-semibold uppercase text-primary'>
+                    <span className='text-label-md font-semibold uppercase text-primary-text'>
                         After
                     </span>
                     <div className='relative aspect-[4/3] overflow-hidden rounded-base bg-surface-variant'>

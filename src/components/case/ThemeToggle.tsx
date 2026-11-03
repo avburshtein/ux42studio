@@ -13,7 +13,7 @@ interface ThemeToggleProps {
 // HORIZONTAL, pad 4×12, radius full. Icon 24×24.
 // Ховер (решение 2026-08-27 (11) + уточнение там же, Main_page_Spec.md):
 // без заливки и без бордера — в ховере меняется только цвет иконки
-// на green (hover:text-primary). Форма круга 48×48 сохранена.
+// на green (hover:text-primary-text). Форма круга 48×48 сохранена.
 export function ThemeToggle({ className }: ThemeToggleProps) {
     const { theme, toggleTheme } = useTheme();
     const [mounted, setMounted] = useState(false);
@@ -28,7 +28,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
             aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
             className={cn(
                 'inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full px-3 py-1',
-                'text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary',
+                'text-on-surface-variant transition-colors duration-150 ease-out hover:text-primary-text',
                 className,
             )}
         >

@@ -3,6 +3,7 @@ import {
     IDEAL_TONES_LIGHT,
     formatHex,
     generateScale,
+    getContrastRatio,
     oklchToRgbSafe,
     parseHex,
     rgbToOklch,
@@ -90,6 +91,49 @@ export function isBwSeed(seed: string): boolean {
     const parsed = parseHex(seed);
     if (!parsed) return false;
     return rgbToOklch(parsed).c < BW_CHROMA_LIMIT;
+}
+
+/**
+ * Читаемый вариант брендового цвета — для ТЕКСТА (ссылки, подписи).
+ *
+ * Первичный цвет — это «настоящий» выбранный seed, и он же заливка кнопки.
+ * Но как текст на светлой поверхности яркий seed нечитаем (контраст ~2:1).
+ * Поэтому для текста берётся тот же оттенок и та же насыщенность, но
+ * затемнённые до 4.5:1 на поверхности — цвет остаётся «тем же», а читается.
+ *
+ * В тёмной теме primary и так светлый (тон 70 якорной шкалы) — берём его же.
+ */
+export function buildPrimaryText(
+    theme: ChromaTheme,
+    mode: 'light-normal' | 'dark-normal',
+    flat: Record<string, string>,
+): string | undefined {
+    const primary = flat['primary'];
+    if (!primary) return undefined;
+
+    if (mode === 'dark-normal') return primary;
+
+    const surface = flat['surface'];
+    if (!surface) return primary;
+
+    // Если выбранный цвет и так читается как текст — не трогаем его:
+    // кнопка остаётся ровно того цвета, который выбрали.
+    if (getContrastRatio(primary, surface) >= 4.5) return primary;
+
+    const scale = theme.primitives.primary;
+    // Тоны ниже 50 — темнее сида. Ищем самый светлый из проходящих по
+    // контрасту: так текст остаётся максимально близким к выбранному.
+    const candidates = Object.keys(scale)
+        .map(Number)
+        .filter((tone) => tone < 50)
+        .sort((a, b) => b - a);
+
+    for (const tone of candidates) {
+        const color = scale[tone];
+        if (!color) continue;
+        if (getContrastRatio(color, surface) >= 4.5) return color;
+    }
+    return scale[0] ?? '#000000';
 }
 
 /**

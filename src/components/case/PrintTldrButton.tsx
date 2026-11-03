@@ -84,7 +84,7 @@ export function PrintTldrButton() {
                 onClick={openPrintDialog}
                 aria-label='Скачать PDF — открыть диалог печати'
                 title='В диалоге печати выберите «Сохранить как PDF»'
-                className='print:hidden fixed bottom-6 right-6 z-50 inline-flex h-12 items-center gap-2 rounded-5xl bg-primary px-5 text-label-lg font-medium text-on-primary shadow-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
+                className='print:hidden fixed bottom-6 right-6 z-50 inline-flex h-12 items-center gap-2 rounded-5xl border border-primary-text bg-primary px-5 text-label-lg font-medium text-on-primary shadow-lg transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary'
             >
                 <Printer className='h-5 w-5' aria-hidden='true' />
                 Скачать PDF

@@ -20,7 +20,7 @@ export function LinkButton({
 
     const content = (
         <>
-            <span className='text-title-md tracking-[0.15px] text-primary'>
+            <span className='text-title-md tracking-[0.15px] text-primary-text'>
                 {label}
             </span>
             <svg
@@ -29,7 +29,7 @@ export function LinkButton({
                 viewBox='0 0 20 20'
                 fill='none'
                 aria-hidden='true'
-                className='shrink-0 text-primary'
+                className='shrink-0 text-primary-text'
             >
                 <path
                     d='M7.5 3.75L13.75 10L7.5 16.25'
