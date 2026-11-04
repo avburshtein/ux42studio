@@ -69,61 +69,65 @@ export function mixWithBlack(hex: string, t: number): string {
  * `@media (prefers-color-scheme: dark)` + `:root:not([data-theme=light])`),
  * иначе медиа-фолбэк темы перебьёт его по специфичности.
  */
-const SURFACE_TOKENS: { token: string; light: number; dark: number }[] = [
-    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 75 },
-    { token: '--md-sys-color-surface-container-low', light: 30, dark: 90 },
-    { token: '--md-sys-color-surface-container', light: 40, dark: 8 },
-    { token: '--md-sys-color-surface-container-high', light: 50, dark: 13 },
-    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 18 },
-];
+/**
+ * Уровни поверхностей и доля фона в смеси с темой.
+ *
+ * Поверхности не ЗАМЕНЯются фоном, а СМЕШИВАЮТСЯ с ним: так они сохраняют
+ * характер темы (оттенок сида в нейтралях, а не серая безликость) и при
+ * этом не выглядят белыми пятнами на насыщенном фоне.
+ *
+ * Раньше поверхности считались чисто от фона — и всё становилось серым
+ * при сером фоне (фидбэк 2026-11-03).
+ */
+const SURFACE_LEVELS = [
+    'surface-container-lowest',
+    'surface-container-low',
+    'surface-container',
+    'surface-container-high',
+    'surface-container-highest',
+] as const;
+
+/** Доля фона в смеси: чем выше уровень, тем сильнее цвет фона. */
+const LIGHT_SHARE = [12, 22, 32, 42, 52];
+const DARK_SHARE = [18, 32, 46, 60, 74];
 
 /**
- * Токены, которые при кастомном фоне считаются от него самого.
+ * Токены, которые при кастомном фоне считаются от него самого — но через
+ * палитру темы.
  *
- * - `surface-container-*` — карточки, метки и панели: иначе на насыщенном
- *   фоне они выглядят белыми пятнами. В тёмной теме уровни идут по
- *   M3: самый нижний — ТЕМНЕЕ фона (это «утопленные» слои и затемняющая
- *   вуаль поверх обложки в Hero), остальные — светлее.
+ * - `surface-container-*` — карточки, метки и панели: смесь фона с
+ *   поверхностями темы. В тёмной теме нижние уровни уходят вглубь (это
+ *   «утопленные» слои и затемняющая вуаль поверх обложки в Hero),
+ *   верхние — наверх.
  * - `page-bg` — что реально видно под контентом: вторичная кнопка и
  *   внутренняя заливка бейджей не должны выделяться чёрным или белым.
- * - `background` — подвал: в светлой теме он был белым на сером фоне.
- *   Теперь он чуть темнее фона, как в дефолтной теме (там подвал темнее
- *   страницы).
- * - `shadow-card-glow` — «белое свечение» карточки: на сером фоне белый
- *   отсвет читался как белый налёт (фидбэк 2026-11-03), поэтому отсвет
- *   берётся от фона.
+ * - `background` — подвал: чуть другого оттенка, чем страница.
+ * - `shadow-card-glow` — отсвет карточки: на сером фоне белый отсвет
+ *   читался как белый налёт (фидбэк 2026-11-03), поэтому он тоже идёт
+ *   через тему.
  */
 export function surfaceTokensFrom(
     lightBg: string,
-    darkBg: string = lightBg,
+    darkBg: string,
+    theme: { light: Record<string, string>; dark: Record<string, string> },
 ): string[] {
-    // Светлая тема: поверхность — фон, подмешанный с белым (18% → 60%:
-    // чем выше уровень, тем насыщеннее). Тёмная: нижние уровни — темнее
-    // фона (75% и 90% фона), верхние — светлее (8% → 18% белого).
-    const decls = (bg: string, dark: boolean) =>
-        SURFACE_TOKENS.map(({ token, light, dark: d }) =>
-            dark
-                ? d >= 50
-                    ? `${token}: color-mix(in srgb, ${bg} ${d}%, #000000);`
-                    : `${token}: color-mix(in srgb, #ffffff ${d}%, ${bg});`
-                : `${token}: color-mix(in srgb, ${bg} ${light}%, #ffffff);`,
-        ).join('');
+    const mix = (bg: string, base: string | undefined, share: number) =>
+        base ? mixHex(bg, base, share / 100) : bg;
 
-    const light = [
-        ...decls(lightBg, false),
-        // Фон страницы: вторичная кнопка и бейджи сливаются с ним.
-        `--md-sys-color-page-bg: ${lightBg};`,
-        // Подвал: чуть темнее фона (как в дефолтной теме).
-        `--md-sys-color-background: color-mix(in srgb, ${lightBg} 88%, #000000);`,
-        // Отсвет карточки — от фона, а не белый.
-        `--shadow-card-glow: color-mix(in srgb, ${lightBg} 55%, #ffffff);`,
-    ].join('');
-    const dark = [
-        ...decls(darkBg, true),
-        `--md-sys-color-page-bg: ${darkBg};`,
-        `--md-sys-color-background: color-mix(in srgb, ${darkBg} 88%, #000000);`,
-        `--shadow-card-glow: color-mix(in srgb, #000000 86%, ${darkBg});`,
-    ].join('');
+    const build = (bg: string, tokens: Record<string, string>, shares: number[]) => {
+        const surfaces = SURFACE_LEVELS.map((level, i) =>
+            `--md-sys-color-${level}: ${mix(bg, tokens[level], shares[i])};`,
+        ).join('');
+        return [
+            surfaces,
+            `--md-sys-color-page-bg: ${bg};`,
+            `--md-sys-color-background: ${mix(bg, tokens.background, 0.8)};`,
+            `--shadow-card-glow: ${mix(bg, tokens['surface-container-lowest'], 0.55)};`,
+        ].join('');
+    };
+
+    const light = build(lightBg, theme.light, LIGHT_SHARE);
+    const dark = build(darkBg, theme.dark, DARK_SHARE);
 
     return [
         `:root{${light}}`,

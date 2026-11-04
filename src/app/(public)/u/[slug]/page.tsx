@@ -24,7 +24,7 @@ import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import AuthBar from '@/components/AuthBar';
 import { EyeOff } from 'lucide-react';
 import { contrastOn, mixWithBlack, surfaceTokensFrom } from '@/lib/theme';
-import { buildThemeCss } from '@/lib/theme-engine';
+import { generateChromaThemeCss } from '@/lib/chroma42';
 import { sql } from 'drizzle-orm';
 import type { CaseSortMode } from '@/db/schema/profiles';
 
@@ -207,9 +207,12 @@ export default async function ProfilePage({ params }: PageProps) {
 
     // Кастомная цветовая тема: схема токенов из seed → CSS-переопределения.
     // Пустая строка = дефолтная тема globals.css (useCustomTheme = false).
-    const themeCss = mpc.theme.useCustomTheme
-        ? buildThemeCss(mpc.theme.seedColor)
-        : '';
+    // Тема Chroma42: CSS-переопределения + палитра токенов (нужна, чтобы
+    // смешать кастомный фон с поверхностями темы, а не заменить их).
+    const chroma = mpc.theme.useCustomTheme
+        ? generateChromaThemeCss(mpc.theme.seedColor)
+        : null;
+    const themeCss = chroma?.css ?? '';
 
     // Кастомная шапка/фон (раздел 06). Цвета задаются CSS-переменными
     // --mp-header-* / --mp-page-bg ОТДЕЛЬНО для light и dark (см. customVarsCss):
@@ -233,8 +236,6 @@ export default async function ProfilePage({ params }: PageProps) {
             customVars.push(
                 `:root{--mp-page-bg:${tint}}`,
                 `[data-theme=dark]{--mp-page-bg:${tint}}`,
-                // Поверхности выводим из фона (см. surfaceTokensFrom).
-                ...surfaceTokensFrom(tint),
             );
         } else if (bgMode === 'solid' && mpc.theme.background.color) {
             const c = mpc.theme.background.color;
@@ -244,9 +245,14 @@ export default async function ProfilePage({ params }: PageProps) {
             customVars.push(
                 `:root{--mp-page-bg:${c}}`,
                 `[data-theme=dark]{--mp-page-bg:${darkBg}}`,
-                // Поверхности выводим из фона (см. surfaceTokensFrom).
-                ...surfaceTokensFrom(c, darkBg),
             );
+            // Поверхности — смесь фона с палитрой темы (см. surfaceTokensFrom):
+            // так они сохраняют оттенок сида, а не становятся серыми.
+            if (chroma) {
+                customVars.push(
+                    ...surfaceTokensFrom(c, darkBg, chroma.tokens),
+                );
+            }
         }
     }
     const customVarsCss = customVars.join('\n');
