@@ -26,7 +26,7 @@ export function TestimonialCard({
   return (
     <figure
       className={cn(
-        'flex flex-col gap-4 rounded-lg bg-surface-container-lowest p-8 shadow-card',
+        'case-card flex flex-col gap-4 rounded-lg p-8',
         className,
       )}
     >

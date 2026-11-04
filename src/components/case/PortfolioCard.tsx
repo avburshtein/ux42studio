@@ -9,7 +9,7 @@ interface PortfolioCardProps {
 // (RichText: переносы, списки с зелёными маркерами, **жирный**, *курсив*)
 export function PortfolioCard({ title, body }: PortfolioCardProps) {
     return (
-        <div className='flex flex-1 flex-col gap-3 rounded-lg bg-surface-container-lowest p-6 shadow-card'>
+        <div className='case-card flex flex-1 flex-col gap-3 rounded-lg p-6'>
             <h3 className='font-display text-headline-sm text-primary-text'>
                 {title}
             </h3>

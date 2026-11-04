@@ -409,6 +409,47 @@
   }
 }
 
+/* 3c. Карточки кейса (D-026, 2026-11-03) */
+
+/*
+ * Карточка кейса — мягкая подложка с оттенком бренда, БЕЗ тени.
+ *
+ * Проблема была в том, что карточка и фон секции были одного цвета
+ * (surface-container-lowest), поэтому в тёмной теме карточек не было
+ * видно вообще: тёмная тень на почти чёрном фоне не читается.
+ *
+ * Теперь подложка собирается из двух цветов темы:
+ *   светлая — 5% бренда + почти белый фон (≈ #f3f8f6 на белом, как в макете);
+ *   тёмная  — 12% бренда + почти чёрный фон (иначе подложка не читается).
+ * Смешивание с переменными темы — значит, кастомная тема работает так же.
+ */
+.case-card {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 5%,
+    var(--md-sys-color-surface-container-lowest)
+  );
+}
+
+[data-theme='dark'] .case-card {
+  background-color: color-mix(
+    in srgb,
+    var(--md-sys-color-primary) 12%,
+    var(--md-sys-color-surface-container-lowest)
+  );
+}
+
+/* Тот же фолбэк, что и у токенов темы: системная тёмная без явного выбора */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .case-card {
+    background-color: color-mix(
+      in srgb,
+      var(--md-sys-color-primary) 12%,
+      var(--md-sys-color-surface-container-lowest)
+    );
+  }
+}
+
 /* 4. BASE STYLES & UTILITIES */
 
 /* Admin: все input и textarea имеют цвет фона --md-sys-color-surface-input */

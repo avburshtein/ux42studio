@@ -12,6 +12,8 @@ import { CaseSection } from '@/components/case/CaseSection';
 import { RichText } from '@/components/case/RichText';
 import { SectionLabel } from '@/components/case/BlockLabel';
 import { PortfolioCard } from '@/components/case/PortfolioCard';
+import { CaseBlock } from '@/components/case/CaseBlock';
+import { StatementCard } from '@/components/case/StatementCard';
 import { MetricCard } from '@/components/case/MetricCard';
 import { PersonaCard } from '@/components/case/PersonaCard';
 import { BeforeAfterComparison } from '@/components/case/BeforeAfterComparison';
@@ -43,7 +45,9 @@ function getImageUrl(r2Key: string): string {
 }
 
 // D-011: подразделы внутри секции — блоки «заголовок + RichText-текст».
-// С заголовком → карточка (как Goal/Target users), без → просто текст.
+// Без заголовка → просто текст, с заголовком → контейнер с бордером
+// (как блоки «Color Tokens» / «Type scale»), а не карточка (фидбэк
+// 2026-11-03).
 function SubsectionBlocks({
     items,
 }: {
@@ -54,7 +58,7 @@ function SubsectionBlocks({
         <div className='flex flex-col gap-6'>
             {items.map((s) =>
                 s.heading ? (
-                    <PortfolioCard key={s.id} title={s.heading} body={s.body ?? ''} />
+                    <CaseBlock key={s.id} title={s.heading} body={s.body ?? ''} />
                 ) : (
                     <RichText key={s.id} text={s.body} />
                 ),
@@ -429,8 +433,14 @@ export default async function ProjectPage({ params }: PageProps) {
                                     number={caseNumbers.problem}
                                     label='Problem & Audience'
                                     title={project.problemTitle ?? 'The challenge'}
-                                    description={project.problemStatement}
                                 >
+                                    {/* Проблема — карточка с оттенком бренда
+                                        (без тени и без зелёной линии слева),
+                                        фидбэк 2026-11-03. */}
+                                    <StatementCard
+                                        label='Problem'
+                                        text={project.problemStatement}
+                                    />
                                     <div className='flex flex-col gap-6 md:flex-row'>
                                         {project.projectGoal && (
                                             <PortfolioCard
@@ -460,7 +470,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                     description={project.researchMethodology}
                                 >
                                     {project.userStory && (
-                                        <PortfolioCard
+                                        <CaseBlock
                                             title='User story'
                                             body={project.userStory}
                                         />
