@@ -387,10 +387,7 @@ export default function MainPageContentEditor({
             // Тот же расчёт, что на странице (page.tsx).
             return {
                 light: c,
-                dark: darkPageBackground(
-                    chromaResult?.tokens.dark['surface-container-low'],
-                    c,
-                ),
+                dark: darkPageBackground(c),
             };
         }
         // seed-tint: 8% primary поверх surface-container-low — тот же

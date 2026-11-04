@@ -26,7 +26,6 @@ import { EyeOff } from 'lucide-react';
 import {
     contrastOn,
     darkPageBackground,
-    mixWithBlack,
     surfaceTokensFrom,
 } from '@/lib/theme';
 import { generateChromaThemeCss } from '@/lib/chroma42';
@@ -229,7 +228,9 @@ export default async function ProfilePage({ params }: PageProps) {
     if (mpc.theme.useCustomTheme) {
         if (headerMode === 'solid' && mpc.theme.header.color) {
             const c = mpc.theme.header.color;
-            const dark = mixWithBlack(c, 0.45);
+            // Тёмная тема — тот же цвет, но затемнённый (белый → почти
+            // чёрный), а не серый: тот же приём, что и для фона страницы.
+            const dark = darkPageBackground(c);
             customVars.push(
                 `:root{--mp-header-bg:${c};--mp-header-fg:${contrastOn(c)}}`,
                 `[data-theme=dark]{--mp-header-bg:${dark};--mp-header-fg:${contrastOn(dark)}}`,
@@ -244,13 +245,10 @@ export default async function ProfilePage({ params }: PageProps) {
             );
         } else if (bgMode === 'solid' && mpc.theme.background.color) {
             const c = mpc.theme.background.color;
-            // Тёмный фон — из тёмной поверхности темы + 25% выбранного цвета:
-            // затемнение серого цвета чёрным давало серый фон, а не тёмную
-            // тему (фидбэк 2026-11-03).
-            const darkBg = darkPageBackground(
-                chroma?.tokens.dark['surface-container-low'],
-                c,
-            );
+            // Тёмный фон — тот же выбранный цвет, но сильно затемнённый:
+            // белый → почти чёрный, серый → тёмно-серый, насыщенный →
+            // глубокий оттенок того же цвета (фидбэк 2026-11-03).
+            const darkBg = darkPageBackground(c);
             customVars.push(
                 `:root{--mp-page-bg:${c}}`,
                 `[data-theme=dark]{--mp-page-bg:${darkBg}}`,
