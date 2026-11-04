@@ -23,7 +23,12 @@ import { ProBonoBanner } from '@/components/portfolio/ProBonoBanner';
 import { normalizeMainPageContent } from '@/lib/mainPageContent';
 import AuthBar from '@/components/AuthBar';
 import { EyeOff } from 'lucide-react';
-import { contrastOn, mixWithBlack, surfaceTokensFrom } from '@/lib/theme';
+import {
+    contrastOn,
+    darkPageBackground,
+    mixWithBlack,
+    surfaceTokensFrom,
+} from '@/lib/theme';
 import { generateChromaThemeCss } from '@/lib/chroma42';
 import { sql } from 'drizzle-orm';
 import type { CaseSortMode } from '@/db/schema/profiles';
@@ -239,9 +244,13 @@ export default async function ProfilePage({ params }: PageProps) {
             );
         } else if (bgMode === 'solid' && mpc.theme.background.color) {
             const c = mpc.theme.background.color;
-            // Тёмный вариант фона — заметно темнее исходного: иначе
-            // «тёмная» тема оставалась серой (фидбэк 2026-11-03).
-            const darkBg = mixWithBlack(c, 0.72);
+            // Тёмный фон — из тёмной поверхности темы + 25% выбранного цвета:
+            // затемнение серого цвета чёрным давало серый фон, а не тёмную
+            // тему (фидбэк 2026-11-03).
+            const darkBg = darkPageBackground(
+                chroma?.tokens.dark['surface-container-low'],
+                c,
+            );
             customVars.push(
                 `:root{--mp-page-bg:${c}}`,
                 `[data-theme=dark]{--mp-page-bg:${darkBg}}`,

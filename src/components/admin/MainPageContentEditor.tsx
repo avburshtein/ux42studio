@@ -22,7 +22,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/Select';
-import { isValidSeed, mixHex, mixWithBlack, PRESET_SEEDS } from '@/lib/theme';
+import {
+    darkPageBackground,
+    isValidSeed,
+    mixHex,
+    PRESET_SEEDS,
+} from '@/lib/theme';
 import { generateChromaThemeCss } from '@/lib/chroma42';
 import { buildThemeChecks, checksPassed } from '@/lib/theme-checks';
 import type {
@@ -380,7 +385,13 @@ export default function MainPageContentEditor({
         if (mode === 'solid' && content.theme.background.color) {
             const c = content.theme.background.color;
             // Тот же расчёт, что на странице (page.tsx).
-            return { light: c, dark: mixWithBlack(c, 0.72) };
+            return {
+                light: c,
+                dark: darkPageBackground(
+                    chromaResult?.tokens.dark['surface-container-low'],
+                    c,
+                ),
+            };
         }
         // seed-tint: 8% primary поверх surface-container-low — тот же
         // расчёт, что в page.tsx (color-mix).
