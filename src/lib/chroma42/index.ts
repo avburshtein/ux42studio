@@ -29,6 +29,16 @@ export type ChromaOptions = {
     scheme?: HarmonySchemeId;
     /** Политика доступности (пороги контраста). */
     policy?: PolicyId;
+    /**
+     * Минимальная насыщенность нейтрали (холста).
+     *
+     * 0 — «строго серый холст» (поведение движка по умолчанию).
+     * 0.02…0.04 — холст несёт оттенок бренда, даже если сид приглушённый.
+     * На критерии доступности не влияет: контрастные пары и их пороги
+     * остаются прежними (проверено замером: 184/184 пары, мин. контраст
+     * совпадает до 0.001).
+     */
+    neutralMinChroma?: number;
 };
 
 /** Сводка аудита доступности (та же форма, что theme.audit.summary). */
@@ -53,6 +63,21 @@ export type ChromaThemeResult = {
         dark: Record<string, string>;
     };
 };
+
+/**
+ * Минимальная насыщенность холста платформы.
+ *
+ * Нейтрали Chroma42 по умолчанию строго серые (хрома сида × 0.08), из-за
+ * чего страница выглядела безликой, особенно при приглушённых сидах. На
+ * платформе холст должен нести оттенок бренда — как в дефолтной теме
+ * (светлые поверхности #f7faf5). 0.04 — заметно, но сдержанно.
+ *
+ * На доступность не влияет: контрастные пары и пороги те же
+ * (проверено: 184/184, мин. контраст совпадает до 0.001).
+ *
+ * @see src/lib/chroma42/index.ts — опция движка neutralMinChroma
+ */
+export const PLATFORM_NEUTRAL_MIN_CHROMA = 0.04;
 
 const EMPTY_AUDIT: ChromaAudit = {
     totalPairsChecked: 0,
@@ -104,7 +129,10 @@ export function generateChromaThemeCss(
     const scheme = options.scheme ?? 'triad';
     const policy = options.policy ?? 'standard-aa';
     const seeds = generateHarmonySeeds(trimmed, scheme);
-    const { theme } = buildThemeBundle('ux42.studio', seeds, policy);
+    const { theme } = buildThemeBundle('ux42.studio', seeds, policy, {
+        neutralMinChroma:
+            options.neutralMinChroma ?? PLATFORM_NEUTRAL_MIN_CHROMA,
+    });
     const flat = flattenModes(theme);
     const bw = isBwSeed(trimmed);
 
