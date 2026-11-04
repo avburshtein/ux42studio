@@ -299,6 +299,7 @@ const en: Translations = {
         bgSolidHint:
             'Content stays on the light surface — readability is preserved.',
         floatingTitle: 'Floating elements',
+        floatingShow: 'Show floating elements on the page',
         floatingColorHint: 'Empty = default palette.',
         modeDefaultGlass: 'Default (glass)',
         modeTransparent: 'Transparent',

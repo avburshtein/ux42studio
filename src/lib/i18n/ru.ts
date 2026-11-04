@@ -300,6 +300,7 @@ const ru = {
         bgSolidHint:
             'Контент остаётся на светлой поверхности — читаемость сохраняется.',
         floatingTitle: 'Плавающие элементы',
+        floatingShow: 'Показывать плавающие элементы на странице',
         floatingColorHint: 'Пусто = дефолтная палитра.',
         modeDefaultGlass: 'Дефолт (стекло)',
         modeTransparent: 'Прозрачная',

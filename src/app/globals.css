@@ -62,6 +62,12 @@
   --color-background: var(--md-sys-color-background);
   --color-on-background: var(--md-sys-color-on-background);
 
+  /* ФОН СТРАНИЦЫ — то, что реально видно под контентом. По умолчанию это
+     обычная поверхность; при кастомном фоне дизайнера — его цвет.
+     Нужен там, где элемент должен сливаться с фоном, а не выделяться
+     белым пятном: вторичная кнопка, внутренняя заливка бейджей. */
+  --color-page-bg: var(--md-sys-color-page-bg);
+
   --color-surface: var(--md-sys-color-surface);
   --color-on-surface: var(--md-sys-color-on-surface);
   --color-surface-variant: var(--md-sys-color-surface-variant);
@@ -188,6 +194,8 @@
 
   /* M3 Light Palette */
   --md-sys-color-primary: #00543b;
+  /* Фон страницы по умолчанию = обычная поверхность. */
+  --md-sys-color-page-bg: var(--md-sys-color-surface);
   /* Тот же брендовый цвет, но для ТЕКСТА (ссылки, подписи): в теме
      дизайнера primary — это выбранный seed, и он может быть слишком
      светлым для текста на светлой поверхности. */
@@ -268,6 +276,7 @@
 /* 3a. Explicit dark theme (user toggle) */
 [data-theme="dark"] {
   --md-sys-color-primary: #83d7b1;
+  --md-sys-color-page-bg: var(--md-sys-color-surface);
   /* В тёмной теме брендовый цвет и так светлый — текстовый вариант
      совпадает с primary. */
   --md-sys-color-primary-text: #83d7b1;
@@ -338,6 +347,7 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --md-sys-color-primary: #83d7b1;
+    --md-sys-color-page-bg: var(--md-sys-color-surface);
     --md-sys-color-primary-text: #83d7b1;
     --md-sys-color-surface-tint: #83d7b1;
     --md-sys-color-on-surface-tint: #003826;
@@ -763,6 +773,7 @@ textarea {
   /* Принудительно светлая палитра (копия M3 Light из :root) */
   :root {
     --md-sys-color-primary: #00543b;
+    --md-sys-color-page-bg: var(--md-sys-color-surface);
     --md-sys-color-primary-text: #00543b;
     --md-sys-color-surface-tint: #056c4d;
     --md-sys-color-on-surface-tint: #ffffff;

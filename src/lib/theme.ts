@@ -70,18 +70,22 @@ export function mixWithBlack(hex: string, t: number): string {
  * иначе медиа-фолбэк темы перебьёт его по специфичности.
  */
 const SURFACE_TOKENS: { token: string; light: number; dark: number }[] = [
-    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 8 },
-    { token: '--md-sys-color-surface-container-low', light: 30, dark: 12 },
-    { token: '--md-sys-color-surface-container', light: 40, dark: 16 },
-    { token: '--md-sys-color-surface-container-high', light: 50, dark: 20 },
-    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 24 },
+    { token: '--md-sys-color-surface-container-lowest', light: 18, dark: 75 },
+    { token: '--md-sys-color-surface-container-low', light: 30, dark: 90 },
+    { token: '--md-sys-color-surface-container', light: 40, dark: 8 },
+    { token: '--md-sys-color-surface-container-high', light: 50, dark: 13 },
+    { token: '--md-sys-color-surface-container-highest', light: 60, dark: 18 },
 ];
 
 /**
  * Токены, которые при кастомном фоне считаются от него самого.
  *
  * - `surface-container-*` — карточки, метки и панели: иначе на насыщенном
- *   фоне они выглядят белыми пятнами.
+ *   фоне они выглядят белыми пятнами. В тёмной теме уровни идут по
+ *   M3: самый нижний — ТЕМНЕЕ фона (это «утопленные» слои и затемняющая
+ *   вуаль поверх обложки в Hero), остальные — светлее.
+ * - `page-bg` — что реально видно под контентом: вторичная кнопка и
+ *   внутренняя заливка бейджей не должны выделяться чёрным или белым.
  * - `background` — подвал: в светлой теме он был белым на сером фоне.
  *   Теперь он чуть темнее фона, как в дефолтной теме (там подвал темнее
  *   страницы).
@@ -94,17 +98,21 @@ export function surfaceTokensFrom(
     darkBg: string = lightBg,
 ): string[] {
     // Светлая тема: поверхность — фон, подмешанный с белым (18% → 60%:
-    // чем выше уровень, тем насыщеннее). Тёмная: в фон добавляется белый
-    // (8% → 24%), чтобы карточки и метки были видны, а не сливались.
+    // чем выше уровень, тем насыщеннее). Тёмная: нижние уровни — темнее
+    // фона (75% и 90% фона), верхние — светлее (8% → 18% белого).
     const decls = (bg: string, dark: boolean) =>
         SURFACE_TOKENS.map(({ token, light, dark: d }) =>
             dark
-                ? `${token}: color-mix(in srgb, #ffffff ${d}%, ${bg});`
+                ? d >= 50
+                    ? `${token}: color-mix(in srgb, ${bg} ${d}%, #000000);`
+                    : `${token}: color-mix(in srgb, #ffffff ${d}%, ${bg});`
                 : `${token}: color-mix(in srgb, ${bg} ${light}%, #ffffff);`,
         ).join('');
 
     const light = [
         ...decls(lightBg, false),
+        // Фон страницы: вторичная кнопка и бейджи сливаются с ним.
+        `--md-sys-color-page-bg: ${lightBg};`,
         // Подвал: чуть темнее фона (как в дефолтной теме).
         `--md-sys-color-background: color-mix(in srgb, ${lightBg} 88%, #000000);`,
         // Отсвет карточки — от фона, а не белый.
@@ -112,6 +120,7 @@ export function surfaceTokensFrom(
     ].join('');
     const dark = [
         ...decls(darkBg, true),
+        `--md-sys-color-page-bg: ${darkBg};`,
         `--md-sys-color-background: color-mix(in srgb, ${darkBg} 88%, #000000);`,
         `--shadow-card-glow: color-mix(in srgb, #000000 86%, ${darkBg});`,
     ].join('');
