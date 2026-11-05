@@ -10,24 +10,41 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 - **Database:** Cloudflare D1 + Drizzle ORM
 - **Storage:** Cloudflare R2
 - **Styling:** Tailwind CSS v4 + design tokens on CSS variables (seed: `#0B6E4F`)
+- **Theme engine:** Chroma42 — a palette derived from a single seed color (`src/lib/chroma42/`); the Material 3 engine is still available as an alternative in the customizer
+- **i18n:** bilingual admin area (ru/en) — `src/lib/i18n/`
 - **Deployment:** Cloudflare Pages / Workers via `@opennextjs/cloudflare`
 
 ## Team & Areas of Responsibility
 
 | Who | Area of responsibility |
 | --- | --- |
-| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Markup and design system: public pages (`/`, `/platform`, the designer's page `/u/[slug]`, case study and its TL;DR/PDF), components in `src/components/portfolio/*` and `src/components/case/*`, design tokens and styles (`src/app/globals.css`, `src/tokens.md`), component UI specs (`Docs/ui/`), admin UI (profile editor, case wizard, section visibility, TL;DR/PDF). Branches: `verstka`, `token`, `cursor/*` |
+| **Alex** ([@avburshtein](https://github.com/avburshtein)) | Markup and design system: public pages (`/`, `/platform`, `/help`, the designer's page `/u/[slug]`, case study and its TL;DR/PDF), components in `src/components/portfolio/*` and `src/components/case/*`, design tokens and styles (`src/app/globals.css`, `src/tokens.md`), the Chroma42 theme engine (`src/lib/chroma42/`), component UI specs (`Docs/ui/`), admin UI (profile editor, case wizard, section visibility, bilingual interface, TL;DR/PDF). Branches: `verstka`, `token`, `cursor/*` |
 | **Denis Zakharchenko** (<den.zakh@gmail.com>) | Backend and platform: authentication (`src/middleware.ts`, `src/lib/jwt.ts`, `/api/auth`), Server Actions (`src/lib/actions/`), database schema and migrations (D1 + Drizzle), admin panel and super admin core (`/admin`, `/super-admin`), file uploads to R2, Cloudflare/Next.js configuration |
 
-> Active development: August — October 2026 (`verstka` branch, 115+ commits after the last merge into `main`). The admin UI layer (main page content editor) on top of the backend — Alex; the server side and admin core — Denis (last activity — 2026-08-24).
+> Active development: August — November 2026 (`verstka` branch, 206 commits after the last merge into `main`). The admin UI layer (main page content editor) on top of the backend — Alex; the server side and admin core — Denis (last activity — 2026-08-24).
 
 ## Branches
 
-- **`main`** — stable branch, integration point (PRs from `verstka`; last merge — 2026-08-24). Lags `verstka` by 115+ commits.
+- **`main`** — stable branch, integration point (PRs from `verstka`; last merge — 2026-08-24). Lags `verstka` by 206 commits.
 - **`verstka`** — active UI development (Alex), periodically merged into `main` via PRs.
 - **`token`**, **`cursor/case-page-surface-tokens`**, **`cursor/agent-docs-and-guidelines`** — Alex's historical branches (design tokens, case page surface tokens, agent documentation), fully merged into `main`.
 
-## What's New in `verstka` (September — October 2026)
+## What's New in `verstka` (September — November 2026)
+
+### October — November 2026
+
+- **Chroma42 color theme engine** — the chosen seed color produces exactly the primary you picked (`#053820` → `#053820`), without being washed out to lightness 0.5. The Material 3 engine remains as an alternative (switcher in the customizer). New "page background" token, custom background across the whole page, M3 dark surface levels, a toggle for floating elements. A readability check replaces the "accessibility passport" — 184 contrast pairs, recalculated automatically on color change. Decisions D-019…D-026 (`Docs/decisions-log.md`).
+- **Designer theme on case pages** — the custom theme now extends to cases (opt-in checkbox in section 06); surfaces blend with the palette instead of replacing it.
+- **Bilingual admin area (ru/en)** — the whole private-area interface is translated, dictionaries in `src/lib/i18n/`, language switcher in the admin.
+- **Subsections inside case sections** — the `project_subsections` table, an editor across five wizard steps, rendered on the public case page.
+- **Rich text in cases** — links, lists and **bold** in headings, cards, annotations, Before/After and User story.
+- **Personal page** — Experience and Education sections (drag-and-drop order), fact strip, a third CTA (CV), Tools groups, status badges, `jobTitle` and `metaDescription` SEO fields.
+- **Help center** — a `/help` section with articles covering every platform feature.
+- **Performance** — ISR/SSG in R2 for public pages and the admin area, static shells, transform quality 75 → 85, cover export 1600 → 2560 with a 2560 candidate in `srcSet`, a hero scrim that adapts to cover brightness.
+- **Auth** — self-service password reset without signing in, case-insensitive email, invite emails, a real "Back" button on auth screens.
+- **Case wizard** — draft previews, a publish toggle, a flexible review step, drag-and-drop gallery sorting, a first-class profile slug editor, instant case refresh after saving.
+
+### September — October 2026
 
 - **Designer home page & case page** — fully rebuilt from Figma specs (`Docs/ui/`), responsive mobile layout, gallery carousel, header with menu panel and hash navigation.
 - **Main page content from DB** — "Main Page Content" editor in `/admin/profile` (sections, gallery, social links, OG cover, favicon); `/u/[slug]` renders content from D1.
@@ -49,7 +66,7 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 
   Plus a historical a11y measurement from 2026-09-11: desktop/mobile × light/dark → Accessibility 100 everywhere; global `prefers-reduced-motion`, 2px in-field focus indicators, WCAG contrast for components.
 - **Site visibility** — the "Publish site" toggle hides the designer's page (`/admin/settings`).
-- **Documentation** — the canonical design-system document (`Docs/design-system.md` + `Docs/figma-tokens.md`), specs (`Docs/specs/`, `Docs/ui/`), briefs (`Docs/roadmap/`, `Docs/ds-chat-brief.md`), mail (`Docs/MAIL.md`), domain analytics snapshot (`Docs/ANALYTICS.md`).
+- **Documentation** — changelog (`Docs/CHANGELOG.md`) and the decision log with decisions D-001…D-026 (`Docs/decisions-log.md`), the canonical design-system document (`Docs/design-system.md` + `Docs/figma-tokens.md`), specs (`Docs/specs/`, `Docs/ui/`), briefs and migrations (`Docs/roadmap/`), mail (`Docs/MAIL.md`), domain analytics snapshot (`Docs/ANALYTICS.md`).
 
 ## Pages
 
@@ -60,8 +77,10 @@ Multi-tenant portfolio platform for designers built with Next.js + Cloudflare (D
 | `/u/[slug]` | Designer's personal page (content from D1) |
 | `/u/[slug]/[projectSlug]` | Case study: sections + visibility, gallery layouts, lightbox |
 | `/u/[slug]/[projectSlug]/short` | TL;DR case version for hiring managers (+ PDF) |
+| `/help`, `/help/[slug]` | Help center: articles covering the platform's features |
 | `/privacy`, `/terms` | Legal documents (EN + ES) |
-| `/admin`, `/super-admin` | Private area (auth, case wizard, profile editor) |
+| `/login`, `/register`, `/forgot-password`, `/reset-password` | Public auth area (including self-service password reset) |
+| `/admin`, `/super-admin` | Private area (auth, case wizard, profile editor, bilingual interface) |
 
 ## Development
 
