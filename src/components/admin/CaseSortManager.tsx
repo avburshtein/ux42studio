@@ -23,8 +23,9 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Check, ChevronDown, GripVertical, Loader2 } from 'lucide-react';
+import { Check, ChevronDown, ExternalLink, GripVertical, Loader2, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import {
     archiveProject,
     deleteProject,
@@ -137,55 +138,64 @@ function RowContent({
                 </span>
             </div>
 
-            <div className='flex flex-wrap items-center gap-1 sm:pl-2'>
+            {/* Действия разделены на две группы (фидбэк 2026-11-03):
+                слева — статус проекта сегментированным переключателем
+                (M3 segmented button: видно выбранный статус), справа —
+                опасное (удалить) и внешнее (открыть сайт) иконками.
+                Так на мобильном не нужно гадать, какая кнопка что делает. */}
+            <div className='flex flex-wrap items-center gap-2 pl-2'>
+                <SegmentedControl
+                    label={t('projects.statusLabel')}
+                    value={row.status}
+                    onValueChange={(next) => {
+                        if (next === row.status) return;
+                        if (next === 'published') {
+                            onSetStatus(
+                                row.id,
+                                row.status === 'archived'
+                                    ? 'unarchive'
+                                    : 'publish',
+                            );
+                        } else if (next === 'draft') {
+                            onSetStatus(row.id, 'unpublish');
+                        } else {
+                            onSetStatus(row.id, 'archive');
+                        }
+                    }}
+                    options={[
+                        { value: 'draft', label: t('projects.statusDraft') },
+                        {
+                            value: 'published',
+                            label: t('projects.statusPublished'),
+                        },
+                        {
+                            value: 'archived',
+                            label: t('projects.statusArchived'),
+                        },
+                    ]}
+                />
+
                 <Button
                     variant='ghost'
+                    size='icon'
                     onClick={() => onDelete(row.id)}
                     disabled={pending}
+                    aria-label={t('projects.delete')}
+                    title={t('projects.delete')}
                     className='text-error'
                 >
-                    {t('projects.delete')}
+                    <Trash2 className='h-4 w-4' aria-hidden='true' />
                 </Button>
-                {row.status === 'published' && (
-                    <Button
-                        variant='ghost'
-                        onClick={() => onSetStatus(row.id, 'unpublish')}
-                        disabled={pending}
-                    >
-                        {t('projects.unpublish')}
-                    </Button>
-                )}
-                {row.status === 'published' && (
-                    <Button
-                        variant='ghost'
-                        onClick={() => onSetStatus(row.id, 'archive')}
-                        disabled={pending}
-                    >
-                        {t('projects.archive')}
-                    </Button>
-                )}
-                {row.status === 'draft' && (
-                    <Button
-                        variant='ghost'
-                        onClick={() => onSetStatus(row.id, 'publish')}
-                        disabled={pending}
-                        className='text-primary'
-                    >
-                        {t('projects.publish')}
-                    </Button>
-                )}
-                {row.status === 'archived' && (
-                    <Button
-                        variant='ghost'
-                        onClick={() => onSetStatus(row.id, 'unarchive')}
-                        disabled={pending}
-                        className='text-primary'
-                    >
-                        {t('projects.unarchive')}
-                    </Button>
-                )}
-                <Link href={`/u/${profileSlug}/${row.slug}`}>
-                    <Button variant='ghost'>{t('projects.viewSite')}</Button>
+
+                <Link
+                    href={`/u/${profileSlug}/${row.slug}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    aria-label={t('projects.viewSite')}
+                    title={t('projects.viewSite')}
+                    className='inline-flex h-10 w-10 items-center justify-center rounded-md text-on-surface transition-colors hover:bg-surface-variant focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--md-sys-color-background)]'
+                >
+                    <ExternalLink className='h-4 w-4' aria-hidden='true' />
                 </Link>
             </div>
         </div>

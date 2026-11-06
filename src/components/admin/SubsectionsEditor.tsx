@@ -19,12 +19,19 @@ import {
     getProjectSubsections,
     updateProjectSubsections,
 } from '@/lib/actions/projects';
+import {
+    DEFAULT_SUBSECTION_POSITION,
+    positionsForSection,
+    type SubsectionPosition,
+} from '@/lib/caseSubsections';
 
 type SubsectionDraft = {
     id?: string;
     sectionKey: string;
     heading: string;
     body: string;
+    /** Где внутри секции встанет блок (D-027). */
+    position: SubsectionPosition;
 };
 
 interface SubsectionsEditorProps {
@@ -66,7 +73,8 @@ export default function SubsectionsEditor({
                             sectionKey: r.sectionKey,
                             heading: r.heading,
                             body: r.body ?? '',
-                        })),
+                            position: (r.position ??
+                                DEFAULT_SUBSECTION_POSITION) as SubsectionPosition,                        })),
                 );
             })
             .catch(() => {})
@@ -88,6 +96,7 @@ export default function SubsectionsEditor({
                 sectionKey: sectionKeys[0].key,
                 heading: '',
                 body: '',
+                position: DEFAULT_SUBSECTION_POSITION,
             },
         ]);
 
@@ -121,6 +130,7 @@ export default function SubsectionsEditor({
                     sectionKey: s.sectionKey,
                     heading: s.heading,
                     body: s.body,
+                    position: s.position,
                     order: i,
                 })),
             );
@@ -270,6 +280,39 @@ function SubsectionRow({
                             ))}
                         </SelectContent>
                     </Select>
+                </div>
+            )}
+
+            {/* D-027: где именно внутри секции встанет подраздел.
+                Список позиций зависит от выбранной секции — он общий
+                с публичной страницей (src/lib/caseSubsections.ts).
+                Если осмысленная позиция одна (в секции Testing нет других
+                блоков), селект не показываем — выбирать нечего. */}
+            {positionsForSection(item.sectionKey).length > 1 && (
+                <div className='mb-3'>
+                    <Label>{t('sub.positionLabel')}</Label>
+                    <Select
+                        value={item.position}
+                        onValueChange={(v) =>
+                            onUpdate(index, {
+                                position: v as SubsectionPosition,
+                            })
+                        }
+                    >
+                        <SelectTrigger>
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {positionsForSection(item.sectionKey).map((pos) => (
+                                <SelectItem key={pos.value} value={pos.value}>
+                                    {t(pos.labelKey)}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <p className='mt-1 text-body-sm text-on-surface-variant'>
+                        {t('sub.positionHint')}
+                    </p>
                 </div>
             )}
 

@@ -22,6 +22,7 @@ import { ShowcaseGallery } from '@/components/case/ShowcaseGallery';
 import { MasonryGallery } from '@/components/case/MasonryGallery';
 import { JustifiedGallery } from '@/components/case/JustifiedGallery';
 import { MoodboardGrid } from '@/components/case/MoodboardGrid';
+import { resolveSubsectionPosition } from '@/lib/caseSubsections';
 import { DesignSystemColors } from '@/components/case/DesignSystemColors';
 import { TypographyScale } from '@/components/case/TypographyScale';
 import { LinkButton } from '@/components/case/LinkButton';
@@ -206,8 +207,10 @@ export default async function ProjectPage({ params }: PageProps) {
                 orderBy: { order: 'asc' },
             }),
             // D-011: подразделы внутри секций кейса
+            // D-027: columns — нужна позиция блока внутри секции
             db.query.projectSubsections.findMany({
                 where: { projectId: project.id },
+
                 orderBy: { order: 'asc' },
             }),
         ]);
@@ -273,7 +276,23 @@ export default async function ProjectPage({ params }: PageProps) {
 
     // D-011: подразделы по ключу секции (order уже отсортирован в запросе)
     const subsections = (key: string) =>
-        subsectionsAll.filter((s) => s.sectionKey === key);
+        subsectionsAll.filter((s) => s.sectionKey === key).map((s) => ({
+            id: s.id,
+            heading: s.heading,
+            body: s.body,
+            position: s.position,
+        }));
+    // D-027: подразделы с выбранной позицией внутри секции.
+    // resolveSubsectionPosition приводит устаревшие значения (например
+    // 'problem.audience', 'designProcess.wireframes' — они дублировали
+    // «конец раздела» и убраны из списка) к 'end', чтобы уже сохранённые
+    // подразделы не исчезли со страницы.
+    const subsectionsAt = (key: string, position: string) =>
+        subsectionsAll.filter(
+            (s) =>
+                s.sectionKey === key &&
+                resolveSubsectionPosition(key, s.position) === position,
+        );
 
     const showProblem = !!(
         project.problemStatement ||
@@ -441,6 +460,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                         label='Problem'
                                         text={project.problemStatement}
                                     />
+                                    <SubsectionBlocks
+                                        items={subsectionsAt("problem", "problem.statement")}
+                                    />
                                     <div className='flex flex-col gap-6 md:flex-row'>
                                         {project.projectGoal && (
                                             <PortfolioCard
@@ -456,7 +478,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         )}
                                     </div>
                                     <SubsectionBlocks
-                                        items={subsections('problem')}
+                                        items={subsectionsAt("problem", "end")}
                                     />
                                 </CaseSection>
                             )}
@@ -475,6 +497,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             body={project.userStory}
                                         />
                                     )}
+                                    <SubsectionBlocks
+                                        items={subsectionsAt("research", "research.story")}
+                                    />
                                     {keyMetrics.length > 0 && (
                                         <div className='flex flex-col gap-6 md:flex-row'>
                                             {keyMetrics.map((metric) => (
@@ -488,6 +513,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             ))}
                                         </div>
                                     )}
+                                    <SubsectionBlocks
+                                        items={subsectionsAt("research", "research.metrics")}
+                                    />
                                     {personas.map((persona) => (
                                         <PersonaCard
                                             key={persona.id}
@@ -505,7 +533,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         />
                                     ))}
                                     <SubsectionBlocks
-                                        items={subsections('research')}
+                                        items={subsectionsAt("research", "end")}
                                     />
                                 </CaseSection>
                             )}
@@ -519,6 +547,13 @@ export default async function ProjectPage({ params }: PageProps) {
                                     description={project.designApproach}
                                 >
                                     <div className='flex flex-col gap-8'>
+                                        {/* Подразделы «в начале» — сразу после
+                                            вводного текста (Design Approach) и
+                                            ПЕРЕД вайрфреймами. Фидбэк 2026-11-06:
+                                            раньше такой позиции не было. */}
+                                        <SubsectionBlocks
+                                            items={subsectionsAt("designProcess", "designProcess.approach")}
+                                        />
                                         {/* Wireframes Grid [199:57] */}
                                         {wireframeAssets.length > 0 && (
                                             <div className='flex flex-col gap-6'>
@@ -538,7 +573,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                             (фидбэк 2026-10-26) */}
                                     </div>
                                     <SubsectionBlocks
-                                        items={subsections('designProcess')}
+                                        items={subsectionsAt('designProcess', 'end')}
                                     />
                                 </CaseSection>
                             )}
@@ -569,6 +604,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 />
                                             </div>
                                         )}
+                                        <SubsectionBlocks
+                                            items={subsectionsAt("designSystem", "designSystem.moodboard")}
+                                        />
 
                                         {/* 4b. Color Tokens [276:148] */}
                                         {colorRolesData.length > 0 && (
@@ -576,6 +614,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 roles={colorRolesData}
                                             />
                                         )}
+                                        <SubsectionBlocks
+                                            items={subsectionsAt("designSystem", "designSystem.colors")}
+                                        />
 
                                         {/* 4c. Typography Scale [280:217] */}
                                         <TypographyScale
@@ -588,7 +629,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         />
                                     </div>
                                     <SubsectionBlocks
-                                        items={subsections('designSystem')}
+                                        items={subsectionsAt('designSystem', 'end')}
                                     />
                                 </CaseSection>
                             )}
@@ -630,7 +671,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         ))}
                                     </div>
                                     <SubsectionBlocks
-                                        items={subsections('testing')}
+                                        items={subsectionsAt('testing', 'end')}
                                     />
                                 </CaseSection>
                             )}
@@ -669,6 +710,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                                     }
                                                 />
                                             ))}
+                                        <SubsectionBlocks
+                                            items={subsectionsAt("finalDesign", "finalDesign.gallery")}
+                                        />
 
                                         {/* Prototype links — привязка строго
                                             к полям админки (фидбэк 2026-10-26:
@@ -700,6 +744,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                                 )}
                                             </div>
                                         )}
+                                        <SubsectionBlocks
+                                            items={subsectionsAt("finalDesign", "finalDesign.prototypes")}
+                                        />
 
                                         {/* Results — 2-col grid, gap=24 */}
                                         {resultItems.length > 0 && (
@@ -786,7 +833,7 @@ export default async function ProjectPage({ params }: PageProps) {
                                         )}
                                     </div>
                                     <SubsectionBlocks
-                                        items={subsections('finalDesign')}
+                                        items={subsectionsAt('finalDesign', 'end')}
                                     />
                                 </CaseSection>
                             )}
@@ -809,6 +856,9 @@ export default async function ProjectPage({ params }: PageProps) {
                                             />
                                         </div>
                                     )}
+                                    <SubsectionBlocks
+                                        items={subsectionsAt("reflection", "reflection.nextSteps")}
+                                    />
 
                                     {/* Client reviews [Sec 08] — TestimonialCard,
                                         Figma 176:378 (white r=14 + shadow-card,
@@ -845,7 +895,10 @@ export default async function ProjectPage({ params }: PageProps) {
                                         </div>
                                     )}
                                     <SubsectionBlocks
-                                        items={subsections('reflection')}
+                                        items={subsectionsAt("reflection", "reflection.reviews")}
+                                    />
+                                    <SubsectionBlocks
+                                        items={subsectionsAt("reflection", "end")}
                                     />
                                 </CaseSection>
                             )}

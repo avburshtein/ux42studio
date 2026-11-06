@@ -79,7 +79,7 @@ export function GalleryGrid({
             {assets.map((asset) => (
                 <figure
                     key={asset.id}
-                    className='flex flex-col gap-3'
+                    className='flex min-w-0 flex-col gap-3'
                 >
                     <div className='relative aspect-[4/3] w-full overflow-hidden rounded-base bg-surface-variant'>
                         {asset.url && (

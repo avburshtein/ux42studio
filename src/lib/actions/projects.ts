@@ -736,6 +736,7 @@ export async function getProjectSubsections(projectId: string) {
             sectionKey: projectSubsections.sectionKey,
             heading: projectSubsections.heading,
             body: projectSubsections.body,
+            position: projectSubsections.position,
             order: projectSubsections.order,
         })
         .from(projectSubsections)
@@ -757,6 +758,7 @@ export async function updateProjectSubsections(
         sectionKey: string;
         heading?: string;
         body?: string;
+        position?: string;
         order: number;
     }>,
 ) {
@@ -779,6 +781,7 @@ export async function updateProjectSubsections(
                     sectionKey: s.sectionKey,
                     heading: (s.heading ?? '').trim(),
                     body: (s.body ?? '').trim() || null,
+                    position: s.position || 'end',
                     order: s.order,
                 }),
             ),

@@ -85,5 +85,8 @@ export const projectSubsections = sqliteTable('project_subsections', {
     sectionKey: text('section_key').notNull(),
     heading: text('heading').notNull(),
     body: text('body'),
+    /** Позиция внутри секции (D-027): после какого блока стоит.
+     *  По умолчанию — в конце секции (прежнее поведение). */
+    position: text('position').notNull().default('end'),
     order: integer('order').notNull().default(0),
 });
