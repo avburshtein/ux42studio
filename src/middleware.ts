@@ -15,10 +15,21 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    const jwtSecret = process.env.JWT_SECRET;
+    // JWT_SECRET читаем из Cloudflare-окружения: локально это `.dev.vars`
+    // (next dev поднимает эмуляцию через initOpenNextCloudflareForDev), в
+    // проде — Secret воркера. process.env оставлен фолбэком: файл .env.local
+    // для этого не нужен и не должен содержать секретов (см. Docs/DEPLOY.md §1).
+    let jwtSecret = process.env.JWT_SECRET;
+    try {
+        const { env } = await getCloudflareContext();
+        jwtSecret = env.JWT_SECRET || jwtSecret;
+    } catch {
+        // Вне Cloudflare-контекста (например, статический анализ) — фолбэк.
+    }
+
     if (!jwtSecret) {
         console.error(
-            '❌ [Middleware]: JWT_SECRET не найден в process.env. Проверьте .env.local',
+            '❌ [Middleware]: JWT_SECRET не найден ни в Cloudflare env (.dev.vars), ни в process.env',
         );
         return NextResponse.json(
             { error: 'JWT_SECRET is not configured' },

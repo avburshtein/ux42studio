@@ -87,7 +87,8 @@ ORM: Drizzle ORM — полная строгая типизация TypeScript, 
 
 - Для `signJwt` и `verifyJwt` используется библиотека **`jose@^6`** (`SignJWT`, `jwtVerify`) — стандартное, проверенное решение вместо самописной криптографии на `crypto.subtle`.
 - Токен подписывается алгоритмом **HS256**, срок жизни — **7 дней** (`setExpirationTime('7d')`).
-- Секретный ключ берётся из `process.env.JWT_SECRET`. Если переменная не задана, middleware логирует ошибку `❌ [Middleware]: JWT_SECRET не найден в process.env. Проверьте .env.local` и возвращает 500.
+- Секретный ключ берётся из Cloudflare-окружения: локально — `.dev.vars`, в проде — Secret воркера. `process.env.JWT_SECRET` оставлен только фолбэком. Если ключа нет ни там, ни там, middleware логирует `❌ [Middleware]: JWT_SECRET не найден ни в Cloudflare env (.dev.vars), ни в process.env` и возвращает 500.
+  **Почему нельзя полагаться на `.env.local`:** middleware исполняется вне Cloudflare-контекста и `.dev.vars` ему напрямую не виден, поэтому раньше вход «зависал» на 500 после успешной проверки пароля. Секрет в `.env.local` держать нельзя ещё и потому, что `@opennextjs/cloudflare` затягивает эти файлы в бандл воркера (см. `Docs/DEPLOY.md` §1).
 - Middleware (`src/middleware.ts`) проверяет наличие куки `auth-token` на всех защищённых маршрутах; при отсутствии — редирект на `/login`.
 
 **Запуск Next.js в окружении Cloudflare (next dev):**

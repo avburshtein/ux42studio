@@ -115,6 +115,29 @@ cp .dev.vars.example .dev.vars     # заполнить значения
 npm run dev                        # http://localhost:3000, D1/R2 эмулируются
 ```
 
+`next dev` поднимает эмуляцию Cloudflare через `initOpenNextCloudflareForDev()`
+(`next.config.ts`), поэтому `getCloudflareContext().env` и секреты из `.dev.vars`
+доступны в route handlers, server actions и middleware. В логе при старте
+появляется строка `Using secrets defined in .dev.vars` — это подтверждение, что
+файл подхвачен.
+
+> **`.env.local` для локального входа НЕ нужен.** `JWT_SECRET` берётся из
+> `.dev.vars` через Cloudflare-контекст (middleware делает так же, как
+> `/api/auth/login`). Класть секреты в `.env.local` нельзя — см. §1.
+
+### Если `/api/*` отдаёт 404, а страницы открываются
+
+Признак рассинхрона кэша: в `.next` осталась production-сборка (`npm run build`
+/ `build:cf`), и dev-сервер поверх неё не компилирует route handlers. Симптомы:
+`/` и `/login` отвечают 200, а `POST /api/auth/login` — 404 HTML-страницей.
+Лечение:
+
+```bash
+# остановить dev-сервер, затем
+rm -rf .next
+npm run dev
+```
+
 ## 3. Проверка перед деплоем
 
 ```bash
