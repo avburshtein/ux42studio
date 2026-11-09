@@ -3,6 +3,11 @@ import { Poppins, Inter } from 'next/font/google';
 import ThemeProvider from '@/components/ThemeProvider';
 import './globals.css';
 
+import { clipperQaIsEnabled } from '@/../plugins/clipper-qa/clipperQaEnv';
+import { ClipperQA } from '@/../plugins/clipper-qa/ClipperQA';
+
+const clipperQaEnabled = clipperQaIsEnabled();
+
 const poppins = Poppins({
     variable: '--font-poppins',
     subsets: ['latin'],
@@ -26,7 +31,8 @@ export const metadata: Metadata = {
     applicationName: 'UX42 Studio',
     authors: [{ name: 'Aleksandra Burshtein' }],
     creator: 'UX42 Studio',
-    description: 'Product design studio — we help teams ship clear, human interfaces.',
+    description:
+        'Product design studio — we help teams ship clear, human interfaces.',
     alternates: { canonical: '/' },
     openGraph: {
         type: 'website',
@@ -34,7 +40,8 @@ export const metadata: Metadata = {
         locale: 'en_US',
         url: '/',
         title: 'UX42 Studio',
-        description: 'Product design studio — we help teams ship clear, human interfaces.',
+        description:
+            'Product design studio — we help teams ship clear, human interfaces.',
         images: [
             {
                 url: '/og/og-cover.png',
@@ -47,7 +54,8 @@ export const metadata: Metadata = {
     twitter: {
         card: 'summary_large_image',
         title: 'UX42 Studio',
-        description: 'Product design studio — we help teams ship clear, human interfaces.',
+        description:
+            'Product design studio — we help teams ship clear, human interfaces.',
         images: ['/og/og-cover.png'],
     },
     robots: { index: true, follow: true },
@@ -91,6 +99,7 @@ export default function RootLayout({
             </head>
             <body className='antialiased'>
                 <ThemeProvider>{children}</ThemeProvider>
+                {clipperQaEnabled ? <ClipperQA /> : null}
             </body>
         </html>
     );
