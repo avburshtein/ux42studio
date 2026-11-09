@@ -109,20 +109,59 @@ The **`formatBugsForJira.ts`** module generates **Markdown**: a "Context" block 
 
 -----
 
-## Next.js — `.babelrc`
+## Next.js — `next.config.ts` (webpack pre-loader)
 
-```json
-{
-  "presets": ["next/babel"],
-  "plugins": ["./plugins/clipper-qa/index.js"]
-}
+Next.js 16 использует SWC по умолчанию. Подключение кастомного `.babelrc`
+отключит SWC и сломает `next/font` и Server Actions. Поэтому плагин
+подключается через **webpack pre-loader** в `next.config.ts`:
+
+```typescript
+// next.config.ts
+import type { NextConfig } from 'next';
+import path from 'path';
+
+const nextConfig: NextConfig = {
+    // … ваши опции …
+    webpack(config) {
+        const clipperQaPluginPath = path.resolve(
+            process.cwd(),
+            'plugins/clipper-qa/index.js',
+        );
+
+        config.module.rules.unshift({
+            test: /\.(tsx|jsx|ts|js)$/,
+            exclude: /node_modules/,
+            enforce: 'pre',
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: [[require.resolve('@babel/preset-typescript')]],
+                    plugins: [
+                        require.resolve('@babel/plugin-syntax-jsx'),
+                        clipperQaPluginPath,
+                    ],
+                    babelrc: false,
+                    configFile: false,
+                },
+            },
+        });
+
+        return config;
+    },
+};
 ```
 
-Equivalent to: `"./plugins/clipper-qa/babel-plugin-clipper-qa.js"`.
+Установите зависимости:
+
+```bash
+npm install --save-dev babel-loader @babel/core @babel/preset-typescript
+```
 
 ### Next.js 16 + `next dev` (Turbopack)
 
-Turbopack may handle `.babelrc` differently. For reliability: use `next dev --webpack` or explicitly connect `<ClipperQA />` in `layout.tsx` with `NEXT_PUBLIC_CLIPPER_QA_ENABLED=true` set during build.
+Turbopack может по-разному обрабатывать кастомные загрузчики. Для надёжности
+используйте `next dev --webpack` или явно подключайте `<ClipperQA />` в
+`layout.tsx` с `NEXT_PUBLIC_CLIPPER_QA_ENABLED=true` во время сборки.
 
 -----
 

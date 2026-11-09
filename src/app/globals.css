@@ -9,7 +9,7 @@
 
 /* 1. РЕГИСТРАЦИЯ ПЕРЕМЕННЫХ В СИСТЕМЕ TAILWIND v4 */
 @theme {
-  /* Шрифты */
+  /* Шрифты (через next/font/google, переменные --font-poppins / --font-inter) */
   --font-display: var(--font-poppins), sans-serif;
   --font-body: var(--font-inter), sans-serif;
 

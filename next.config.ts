@@ -117,6 +117,37 @@ const nextConfig: NextConfig = {
             },
         ],
     },
+    webpack(config) {
+        // Babel pre-loader для инъекции data-qa-* через плагин clipper-qa.
+        // SWC остаётся основным компилятором (next/font, Server Actions и т.п.),
+        // а babel-loader запускается ДО SWC только для добавления атрибутов.
+        const clipperQaPluginPath = path.resolve(
+            process.cwd(),
+            'plugins/clipper-qa/index.js',
+        );
+
+        config.module.rules.unshift({
+            test: /\.(tsx|jsx|ts|js)$/,
+            exclude: /node_modules/,
+            enforce: 'pre',
+            use: {
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        [require.resolve('@babel/preset-typescript')],
+                    ],
+                    plugins: [
+                        require.resolve('@babel/plugin-syntax-jsx'),
+                        clipperQaPluginPath,
+                    ],
+                    babelrc: false,
+                    configFile: false,
+                },
+            },
+        });
+
+        return config;
+    },
 };
 
 export default nextConfig;
