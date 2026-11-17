@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LogIn } from 'lucide-react';
+import { LangSwitch } from './LangSwitch';
 
 interface AuthBarProps {
     /** userId владельца профиля/проекта — для проверки, является ли текущий юзер владельцем */
@@ -74,23 +74,9 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
     }, []);
 
     if (session.status === 'loading' || session.status === 'guest') {
-        return (
-            <div className='absolute top-2 right-2 z-50'>
-                <Link
-                    href='/login'
-                    // a11y: было w-8 h-8 opacity-10 — зона клика 32px и
-                    // контраст ~0.1 (не виден; WCAG 2.5.8 + 1.4.11). Теперь
-                    // 44×44 и токен on-surface-variant (8.87:1 в светлой,
-                    // 10.90:1 в тёмной) — минимально проходимое значение;
-                    // «спрятанность» сохранена размером, а не прозрачностью.
-                    className='inline-flex h-11 w-11 items-center justify-center rounded-full text-on-surface-variant transition-colors duration-150 ease-out hover:bg-surface-variant hover:text-primary'
-                    title='Log in'
-                    aria-label='Log in'
-                >
-                    <LogIn className='w-4 h-4' aria-hidden />
-                </Link>
-            </div>
-        );
+        // Гостям панель не показываем (фидбэк 2026-11-17): иконка LogIn в
+        // углу дублировала вход в меню главной («Sign In / Sign Up»).
+        return null;
     }
 
     const { userId, role, profileSlug } = session;
@@ -101,6 +87,10 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
         // Один визуальный хедер с SiteHeader: тот же фон-стекло и тот же
         // section-container (max-w 1280 + pads 24/48/64), без разделительной
         // черты — полоса выглядит верхней строкой единой шапки.
+        // Лейблы на английском (фидбэк 2026-11-17): панель видна поверх
+        // любых публичных страниц, основной язык сайта — английский.
+        // LangSwitch — тот же механизм cookie admin_lang, что в админке:
+        // переключение отсюда меняет язык админ-интерфейса после перехода.
         <div className='header-glass w-full backdrop-blur-md backdrop-saturate-[1.8]'>
             <div className='section-container flex w-full items-center justify-end gap-6 py-1.5'>
                 {isSuperAdmin && (
@@ -108,14 +98,14 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
                         href='/super-admin'
                         className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                     >
-                        Суперадминка
+                        Super admin
                     </Link>
                 )}
                 <Link
                     href='/admin'
                     className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                 >
-                    Мой профиль
+                    My profile
                 </Link>
 
                 {profileSlug && (
@@ -123,7 +113,7 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
                         href='/admin/profile'
                         className='text-label-sm text-on-surface-variant hover:text-on-surface transition-colors'
                     >
-                        Редактировать сайт
+                        Edit site
                     </Link>
                 )}
                 {isOwner && projectId && (
@@ -134,9 +124,10 @@ export default function AuthBar({ profileUserId, projectId }: AuthBarProps) {
                         // state layer: приглушение в hover.
                         className='text-label-sm text-primary transition-opacity duration-150 ease-out hover:opacity-80 font-medium'
                     >
-                        Редактировать проект
+                        Edit project
                     </Link>
                 )}
+                <LangSwitch />
             </div>
         </div>
     );

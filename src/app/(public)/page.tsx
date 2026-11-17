@@ -157,12 +157,16 @@ export default async function HomePage() {
                             categories={galleryCategories}
                         />
 
-                        {studioProfile && (
+                        {studioProfile && galleryCards.length > 6 && (
                             /* Ссылка на личную страницу основателя:
                                 главная студии и страница дизайнера —
                                 разные аудитории (решение (69)). Стоит
                                 после карточек (фидбэк 2026-10-26) —
-                                читатель доходит до неё, просмотрев работы */
+                                читатель доходит до неё, просмотрев работы.
+                                Показ только при >6 карточек (фидбэк
+                                2026-11-17): пока галерея мала, ссылка
+                                обещает «библиотеку», которой не видно —
+                                на странице дизайнера те же карточки. */
                             <Link
                                 href={`/u/${studioProfile.slug}`}
                                 className='inline-flex items-center gap-2 text-body-md font-medium text-primary transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary'

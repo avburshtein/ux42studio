@@ -458,8 +458,11 @@ export function SiteHeaderBreadcrumb({
                     </nav>
                 </div>
 
-                {/* Center: имя дизайнера — только ≥768 (на мобильных место отдано бэк-навигации) */}
-                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} className='hidden md:inline-flex' />
+                {/* Center: имя дизайнера — только ≥lg. На планшете (md–lg)
+                    имя в центре сжимало крошки, и заголовок кейса обрезался
+                    (фидбэк 2026-11-17); имя не теряется — оно в hero и
+                    метаданных страницы. На мобильных место отдано Back. */}
+                <WordmarkLink href={`/u/${profileSlug}`} label={displayName} className='hidden lg:inline-flex' />
 
                 {/* Right zone: Theme Toggle + CTA (CTA — только ≥768) */}
                 <div className='flex shrink-0 items-center justify-end gap-3 md:gap-6'>

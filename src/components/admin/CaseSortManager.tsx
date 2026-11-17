@@ -110,7 +110,10 @@ function RowContent({
     return (
         // Мобила: заголовок+badge и кнопки действий — двумя строками,
         // чтобы действия не уезжали за край (D-008). ≥sm — один ряд.
-        <div className='flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-center sm:gap-0'>
+        // Гап 3 (12px, фидбэк 2026-11-17): gap-1 прижимал бейдж статуса
+        // к сегментному переключателю — правило «внутри карточки
+        // gap-3/gap-4» (design-system §2.3). ≥sm — row, gap-0.
+        <div className='flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center sm:gap-0'>
             <div className='flex min-w-0 flex-1 items-center gap-2 px-2'>
                 <div className='min-w-0 flex-1'>
                     <Link

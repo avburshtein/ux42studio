@@ -32,9 +32,13 @@ export function TagBadge({
                 // Outlined: bg container-lowest, border primary/16, pad 6×12, radius 10
                 variant === 'outlined' &&
                     'rounded-md border border-primary/16 bg-surface-container-lowest px-3 py-1.5 text-on-surface-variant',
-                // Ghost: frosted glass bg on-secondary/16 + blur, pad 4×12, radius 12
+                // Ghost: frosted glass bg on-secondary/16, pad 4×12, radius 12.
+                // backdrop-blur убран (фидбэк 2026-11-17): бейджи лежат на
+                // анимируемом слое (картинка zoom 700ms + градиент fade) —
+                // блюр пересчитывается каждый кадр, бейджи «моргают» при
+                // ховере. Полупрозрачный фон читается на плотном градиенте.
                 variant === 'ghost' &&
-                    'rounded-base bg-on-secondary/16 px-3 py-1 text-on-primary backdrop-blur-sm',
+                    'rounded-base bg-on-secondary/16 px-3 py-1 text-on-primary',
                 className,
             )}
         >

@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
 
     return (
         <main className=''>
-            <div className='mb-8 flex items-center justify-between'>
+            <div className='mb-8 flex items-center justify-between gap-4'>
                 <div className=''>
                     <PageTitle>{t('dashboard.title')}</PageTitle>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
