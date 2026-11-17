@@ -60,3 +60,6 @@ next-env.d.ts
 Docs/Исходник UX42.zip
 material-theme/
 tmp-*.log
+
+# Screen recordings in docs (heavy binaries, not stored in repo)
+Docs/**/*.mp4
