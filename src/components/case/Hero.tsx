@@ -72,20 +72,20 @@ export function Hero({
                     {/* Пропорциональное уменьшение на мобильных (паттерн главной
                         40/48→68/76): 32/40 → sm display-sm 52/60. Иначе длинный
                         заголовок не помещается и оверлей срезается под шапкой. */}
-                    {/* Заголовок ≤2 строк на десктопе, на мобиле — целиком
-                        без обрезки (фидбэк 2026-10-26: кейс — единственное
-                        место с полным названием). Teaser на мобиле скрыт:
-                        поджимал заголовок, на десктопе ≤1 строки.
-                        lg:pb-3 — line-clamp клипает по padding-box: без
-                        паддинга overflow:hidden срезает хвостик «g» у
-                        последней строки (выносная ниже полей строки 52/60). */}
-                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px] lg:line-clamp-2 lg:pb-3'>
+                    {/* Заголовок — целиком на всех экранах (D-030, фидбэк
+                        2026-11-17): line-clamp с явными переносами (<br> из
+                        RichTextInline) ломается — после ellipsis второй строки
+                        рендерился срезанный «огрызок» третьей строки и часть
+                        тизера (скрин 2026-11-17). Полное название — прежний
+                        принцип D-005 (расширен с мобилы на все экраны); лимит
+                        длины остаётся в админке (TITLE_MAX/TEASER_MAX). */}
+                    <h1 className='font-display text-[32px] font-medium leading-[40px] text-white sm:text-display-sm sm:leading-[60px]'>
                         <RichTextInline text={title} />
                     </h1>
                     {teaser && (
                         <RichText
                             text={teaser}
-                            className='hidden max-w-3xl text-body-md text-white/80 sm:text-body-lg lg:block lg:line-clamp-1'
+                            className='hidden max-w-3xl text-body-md text-white/80 sm:text-body-lg lg:block'
                         />
                     )}
                 </div>
