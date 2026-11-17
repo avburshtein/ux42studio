@@ -15,7 +15,10 @@ export function AboutSection({ title, paragraphs, imageUrl }: AboutSectionProps)
             блока (align-items: stretch), верх текста = верх картинки.
             Figma-эталон: ~516×495; min-h защищает пропорцию при коротком тексте.
             img — absolute, чтобы не влиять на высоту ряда: высоту определяет
-            только текст (или min-h). */}
+            только текст (или min-h).
+            Кроп в админке — свободный (пропорция исходника, D-028): высота
+            слота зависит от текста, фикс-кроп 516/495 кадр не гарантировал бы —
+            object-cover дорезает под фактическую высоту. */}
         <div className="flex flex-col gap-10 lg:flex-row lg:items-stretch lg:gap-10">
           {/* Image: высоту держит wrapper (aspect на мобиле, stretch на lg) */}
           <div className='relative aspect-[516/495] w-full shrink-0 overflow-hidden rounded-3xl bg-surface-container-low lg:aspect-auto lg:w-[516px] lg:min-h-[495px]'>

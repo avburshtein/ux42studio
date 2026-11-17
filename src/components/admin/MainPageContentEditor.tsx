@@ -772,13 +772,18 @@ export default function MainPageContentEditor({
                     </div>
                     <div>
                         <Label>{t('mpc.processImage')}</Label>
+                        {/* Слот на публичной странице (AboutSection) на lg
+                            тянется по высоте текста — фиксированная пропорция
+                            кадра не гарантирована. Кроп свободный (рамка =
+                            пропорция исходника, как в галерее кейса);
+                            aspectRatio — только окно превью. */}
                         <ImageUploaderField
                             value={content.about.processImageFileId}
                             onChange={(fileId) =>
                                 set('about', { processImageFileId: fileId ?? null })
                             }
                             aspectRatio={516 / 495}
-                            cropRatio={516 / 495}
+                            crop
                         />
                     </div>
                 </Section>
