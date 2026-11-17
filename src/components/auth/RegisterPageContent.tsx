@@ -1,6 +1,5 @@
 'use client';
 
-import { useSearchParams } from 'next/navigation';
 import { CONTACT_EMAIL } from '@/lib/contact';
 import { useAdminLang } from '@/components/admin/AdminLang';
 import RegisterForm from './RegisterForm';
@@ -12,12 +11,18 @@ const STEP_KEYS = ['auth.step1', 'auth.step2', 'auth.step3'] as const;
 
 /**
  * Клиентская обёртка /register: заголовок, плашка приглашений и шаги
- * переводятся мгновенно при переключении ru/en (D-032). Invite-код из
- * URL читается useSearchParams (поэтому страница обёрнута в Suspense).
+ * переводятся мгновенно при переключении ru/en (D-032). Invite-код
+ * приходит пропом со страницы (server searchParams): useSearchParams
+ * уводил контент под Suspense-фолбэк, и RGPD-уведомление исчезало из
+ * статического HTML (словил smoke-тест) — поэтому здесь его нет.
  */
-export default function RegisterPageContent() {
+export default function RegisterPageContent({
+    inviteCode = '',
+}: {
+    /** Код из ссылки /register?invite=CODE (читает серверная страница). */
+    inviteCode?: string;
+}) {
     const { t } = useAdminLang();
-    const inviteCode = (useSearchParams().get('invite') ?? '').trim();
 
     return (
         <>
@@ -53,3 +58,4 @@ export default function RegisterPageContent() {
         </>
     );
 }
+
