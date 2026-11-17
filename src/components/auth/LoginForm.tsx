@@ -6,9 +6,11 @@ import { Input } from '../ui/Input';
 import { PasswordInput } from '../ui/PasswordInput';
 import { Label } from '../ui/Label';
 import { Button } from '../ui/Button';
+import { useAdminLang } from '@/components/admin/AdminLang';
 
 export default function LoginForm() {
     const router = useRouter();
+    const { t } = useAdminLang();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
@@ -33,11 +35,13 @@ export default function LoginForm() {
             const data = (await res.json().catch(() => ({}))) as {
                 message?: string;
             };
-            setError(data?.message || 'Ошибка входа');
+            // Сообщение сервера приходит на языке бэкенда (ru) — локальный
+            // фолбэк переведён; серверные тексты переводятся отдельно.
+            setError(data?.message || t('auth.loginFailed'));
         } catch {
             // Сетевая ошибка: детали не логируем (иначе в консоль утекут
             // чувствительные данные ответа), показываем нейтральный текст.
-            setError('Сетевая ошибка');
+            setError(t('auth.networkError'));
         } finally {
             setLoading(false);
         }
@@ -46,7 +50,7 @@ export default function LoginForm() {
     return (
         <form onSubmit={onSubmit} className='space-y-4'>
             <div>
-                <Label htmlFor='email'>Email</Label>
+                <Label htmlFor='email'>{t('auth.email')}</Label>
                 <Input
                     id='email'
                     type='email'
@@ -57,7 +61,7 @@ export default function LoginForm() {
                 />
             </div>
             <div>
-                <Label htmlFor='password'>Пароль</Label>
+                <Label htmlFor='password'>{t('auth.password')}</Label>
                 <PasswordInput
                     id='password'
                     required
@@ -76,24 +80,22 @@ export default function LoginForm() {
                     href='/forgot-password'
                     className='text-body-sm text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80'
                 >
-                    Забыли пароль?
+                    {t('auth.forgot')}
                 </Link>
                 <Button type='submit' disabled={loading}>
-                    {loading ? 'Загрузка...' : 'Войти'}
+                    {loading ? t('auth.loading') : t('auth.login')}
                 </Button>
             </div>
 
             {/* RGPD Art. 13: вход тоже обрабатывает email (аутентификация).
                 Уведомление + ссылка на политику. */}
             <p className='text-xs leading-relaxed text-on-surface-variant'>
-                При входе используется email для аутентификации.
-                Подробности об
-                обработке данных — в{' '}
+                {t('auth.rgpdLogin')}
                 <Link
                     href='/privacy'
                     className='text-primary underline decoration-1 underline-offset-2 transition-opacity hover:opacity-80'
                 >
-                    Политике конфиденциальности
+                    {t('auth.privacyPolicy')}
                 </Link>
                 .
             </p>

@@ -8,6 +8,28 @@
 
 ---
 
+## D-032 · 2026-11-17 · Экраны входа/регистрации — двуязычные · ✅ Принято
+
+**Контекст.** После D-029 переключатель ru/en на (auth)-страницах менял только cookie — сам контент (заголовки, плашки, формы) оставался русским хардкодом. Владелец: «перевести не просила))».
+
+**Решение.** Тот же механизм, что в админке (D-012): в `(auth)/layout.tsx` монтируется `AdminLangProvider`, переключатель — штатный `AdminLangSwitch` (LangSwitch из D-029 остался только в AuthBar, где провайдера нет). Новый namespace `auth.*` (~35 ключей в ru.ts/en.ts, типизированы) — заголовки, плашки приглашений, 3 шага регистрации, лейблы/кнопки/ошибки обеих форм, RGPD-уведомления, success-экран «пароль создан» с 5 шагами «что дальше». `/login` и `/register` переведены на клиентские обёртки (`LoginPageContent`/`RegisterPageContent`) — переключение мгновенное, без перезагрузки; `/register` читает invite-код через `useSearchParams` под `Suspense` (требование Next для статического рендера).
+
+**Почему.** Cookie `admin_lang` общий: язык, выбранный до входа, подхватывается админкой, и наоборот — один выбор на всё приватное. Хардкод EN в AuthBar оставлен (панель видна только авторизованным; её язык — отдельное решение).
+
+**Ограничение.** Сообщения об ошибках от API приходят на русском (бэкенд) — вне словаря; `lang='ru'` на контейнере (auth) остаётся статичным при EN-выборе (a11y-компромисс, помечен в коде).
+
+**Где в коде.** `(auth)/layout.tsx`, `auth/LoginPageContent.tsx`, `auth/RegisterPageContent.tsx`, `auth/LoginForm.tsx`, `auth/RegisterForm.tsx`, `i18n/ru.ts`, `i18n/en.ts`, `admin/page.tsx` (мобильная шапка «My projects» — тоже фидбэк-пачка: колонка заголовок/подзаголовок/кнопка полной ширины на мобиле).
+
+## D-031 · 2026-11-17 · Pressed = M3 State Layer 16% (не opacity) · ✅ Принято
+
+**Контекст.** D-029 добавил кнопкам `active:opacity-80` — владелец не увидела нажатие: переход 0.9→0.8 (10%) без анимации глаз не фиксирует, тем более что `transition-colors` opacity не анимирует. В Figma-компонентах и Figma Make стейт был — описание нашлось в спеке (`Docs/ui/figma-master-components-spec.md` §4: State Layer overlay — hover 8% / focus 10% / **pressed 16%** цвета `on-*`).
+
+**Решение.** `ui/Button`: общий псевдоэлемент `after:` (absolute inset-0, `rounded-[inherit]`, `pointer-events-none`, `transition-opacity 150ms`) с цветом пары варианта (default → `after:bg-on-primary`, destructive → `on-error`, secondary → `on-secondary-container`, outline/ghost → `on-surface`); `hover:after:opacity-[0.08]`, `focus-visible:after:opacity-[0.10]`, `active:after:opacity-[0.16]`. Прежние hover/active-хаки (`opacity-90`, `bg-surface-variant`) сняты — hover теперь тоже state layer 8%. Link — без overlay (`hover:underline active:opacity-80`). Публичные Make-пилюли (QUIET_CTA, мобильный CTA, чипы категорий WorkGallery) — `active:scale-95` по `DESIGN_CHEATSHEET.md` (transition расширен на transform).
+
+**Почему.** State Layer 16% поверх контента — заметное затемнение всего клика (по спеке Figma), работает на любом фоне и радиусе (`rounded-[inherit]`), не сдвигает layout. Make-стиль (scale) оставлен только там, где макет Make.
+
+**Где в коде.** `ui/Button.tsx`, `case/SiteHeader.tsx` (QUIET_CTA_CLASS, мобильный CTA), `home/WorkGallery.tsx` (chipClass), `Docs/design-system.md` §3.1 (обновлена таблица состояний).
+
 ## D-030 · 2026-11-17 · Hero кейса: line-clamp снят — заголовок/тизер целиком · ✅ Принято (уточнение D-005/D-029)
 
 **Контекст.** Скрин планшета (~1032px): заголовок кейса обрывался «…» после второй строки, ниже рендерился срезанный сверху «огрызок» третьей строки. Причина: title хранится с явными переносами строк (D-014), `RichTextInline` рендерит их как `<br/>`, а `-webkit-line-clamp` с `<br/>` внутри работает некорректно — ellipsis ставится после второй строки, но контент после переноса продолжает рендериться, обрезаясь по верхней кромке. Тот же риск был у тизера (`lg:line-clamp-1`).
@@ -29,7 +51,7 @@
 3. **LangSwitch (новый `src/components/LangSwitch.tsx`)** — переключатель ru/en вне `AdminLangProvider`, работает с тем же cookie `admin_lang`: выбор на экране входа подхватывается админкой. Размещён в AuthBar и в верхней строке (auth)-layout. Визуал — как `AdminLangSwitch` (текст, активный — primary).
 4. **Экран входа/регистрации по сетке**: BackButton/ThemeToggle были `fixed left-4/right-4` — вне сетки; теперь в `section-container` в потоке, края совпадают с контентом главной.
 5. **Доступ по приглашениям**: вежливые плашки на /login и /register с mailto `hello@ux42.studio` (CONTACT_EMAIL) — гость узнаёт о закрытом доступе до ошибки формы.
-6. **Pressed-стейт кнопок** (`ui/Button`): filled/destructive/secondary — `active:opacity-80` (глубже hover 0.9); outline/ghost — `active:bg-surface-container-high` (state layer на ступень темнее hover); link — `active:opacity-80`.
+6. **Pressed-стейт кнопок** (`ui/Button`): filled/destructive/secondary — `active:opacity-80` (глубже hover 0.9); outline/ghost — `active:bg-surface-container-high` (state layer на ступень темнее hover); link — `active:opacity-80`. **→ Подход пересмотрен в D-031**: opacity-разница 0.9→0.8 без анимации незаметна; по спеке внедрён State Layer 16%.
 7. **Мигающие бейджи**: `backdrop-blur-sm` у ghost-`TagBadge` убран — блюр поверх анимируемого слоя (картинка zoom 700ms + fade градиента) пересчитывался каждый кадр и давал видимое мерцание. Используется ghost только в `PortfolioCard` — правка безопасна для остальных.
 8. **«See the full case library»** — только при `galleryCards.length > 6`: до этого ссылка обещала библиотеку, ведя к тем же немногим карточкам.
 9. **Заголовок кейса в крошках на планшете**: центральное имя в `SiteHeaderBreadcrumb` скрыто до lg (`hidden lg:inline-flex`) — оно дублирует hero и на md–lg сжимало крошки, длинный заголовок обрезался truncate'ом.

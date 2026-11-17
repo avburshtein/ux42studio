@@ -342,7 +342,7 @@
 
 Базовая кнопка действий (админка, диалоги, формы). Построена на `class-variance-authority` + Radix-независимая; стили — на raw `var(--md-sys-color-*)` (все компоненты `ui/` используют этот стиль, прикладные — семантические утилиты; смешивание допустимо, но внутри одного файла — один стиль).
 
-**Варианты:** `default` (primary: `bg-primary`/`on-primary`), `destructive` (`bg-error`/`on-error` — пара `error-container`/`on-error-container` давала 2.4:1 в светлой теме, Lighthouse), `outline` (граница `outline`, hover — `surface-variant`), `secondary` (`secondary-container`/`on-secondary-container`), `ghost` (прозрачная, hover — `surface-variant`), `link` (текст `primary`, `underline` в hover).
+**Варианты:** `default` (primary: `bg-primary`/`on-primary`), `destructive` (`bg-error`/`on-error` — пара `error-container`/`on-error-container` давала 2.4:1 в светлой теме, Lighthouse), `outline` (граница `outline`), `secondary` (`secondary-container`/`on-secondary-container`), `ghost` (прозрачная), `link` (текст `primary`, `underline` в hover).
 **Размеры:** `default` `h-10 px-4 py-2`, `sm` `h-9 px-3`, `lg` `h-11 px-8`, `icon` `h-10 w-10`. Скругление `rounded-md` (10px).
 
 ```tsx
@@ -354,7 +354,7 @@ import { Button } from '@/components/ui/Button';
 <Button variant='destructive' size='sm'>Delete project</Button>
 ```
 
-**Состояния:** default / `hover:opacity-90` (заливка) или `hover:bg-surface-variant` (ghost, outline) / active — тот же вид, без отдельного акцента (дефолт Tailwind) / focus-visible — `ring-2 ring-primary ring-offset-2` / disabled — `opacity-50` + `pointer-events-none` / loading — текст меняется на «Saving…» (пример: `WizardSaveBar`).
+**Состояния (M3 State Layer, спека `Docs/ui/figma-master-components-spec.md` §4):** поверх контента — полупрозрачный оверлей цвета пары `on-*` варианта (default → `on-primary`, destructive → `on-error`, secondary → `on-secondary-container`, outline/ghost → `on-surface`), реализован псевдоэлементом `after:`: hover — **8%**, focus — **10%** (+ `ring-2 ring-primary ring-offset-2`), pressed (`active:`) — **16%**; link — `hover:underline` + `active:opacity-80`. disabled — `opacity-50` + `pointer-events-none`; loading — текст меняется на «Saving…» (пример: `WizardSaveBar`). Публичные CTA-пилюли семейства Make (Figma Make) вместо state layer используют `hover:opacity-90 active:scale-95`.
 
 **Do:** `<Button type='button'>` для не-отправляющих действий; иконка + текст, `aria-label` если иконка одна.
 **Don't:** не оборачивать кнопку в `<Link>` (или наоборот) — для навигации `LinkButton`/`CtaButton`; не красить `style={{}}`; не использовать `secondary` для деструктивных действий.

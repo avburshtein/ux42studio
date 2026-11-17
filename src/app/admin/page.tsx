@@ -164,7 +164,7 @@ export default function AdminDashboardPage() {
 
     return (
         <main className=''>
-            <div className='mb-8 flex items-center justify-between gap-4'>
+            <div className='mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4'>
                 <div className=''>
                     <PageTitle>{t('dashboard.title')}</PageTitle>
                     <p className='mt-1 text-body-sm text-on-surface-variant'>
@@ -172,13 +172,14 @@ export default function AdminDashboardPage() {
                     </p>
                 </div>
 
-                <div>
-                    <Link href='/admin/projects/new'>
-                        <Button className='whitespace-nowrap'>
-                            {t('dashboard.createProject')}
-                        </Button>
-                    </Link>
-                </div>
+                {/* Мобайл (фидбэк 2026-11-17): заголовок в одну строку,
+                    под ним текст и кнопка полной ширины — раньше кнопка
+                    жалась к заголовку и правому краю */}
+                <Link href='/admin/projects/new' className='w-full sm:w-auto'>
+                    <Button className='w-full whitespace-nowrap sm:w-auto'>
+                        {t('dashboard.createProject')}
+                    </Button>
+                </Link>
             </div>
 
             <div className='mb-6 flex gap-2 border-b border-outline-variant pb-0'>

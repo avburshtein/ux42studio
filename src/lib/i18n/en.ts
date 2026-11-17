@@ -3,6 +3,52 @@
 import type { Translations } from './ru';
 
 const en: Translations = {
+    auth: {
+        loginTitle: 'Sign in',
+        loginInviteNote1:
+            'The platform is currently invite-only. If you don’t have an account yet — write to us at ',
+        loginInviteNote2: ', and we’ll send you an invitation.',
+        registerTitle: 'Invite sign-up',
+        registerInviteNote1:
+            'Sign-up is by invitation only: the code arrives by email. Didn’t receive an invitation? Write to us at ',
+        registerInviteNote2: ' — we’ll be happy to invite you.',
+        step1: 'Enter the code from the email — 8 characters, case-insensitive.',
+        step2: 'Specify the email the invitation was sent to.',
+        step3:
+            'Click “Sign up”: a password will be generated and shown to you once.',
+        email: 'Email',
+        password: 'Password',
+        inviteCode: 'Invite code',
+        forgot: 'Forgot password?',
+        login: 'Sign in',
+        register: 'Sign up',
+        loading: 'Loading...',
+        loginFailed: 'Sign-in failed',
+        registerFailed: 'Sign-up failed',
+        networkError: 'Network error',
+        rgpdLogin:
+            'Your email is used for authentication when you sign in. See our ',
+        privacyPolicy: 'Privacy Policy',
+        rgpdRegister:
+            'By signing up you provide your email to create an account and use the platform. Legal bases: performance of a contract (Art. 6.1.b GDPR) and legitimate interest (Art. 6.1.f). Data is kept while the account exists and deleted on request. Details in our ',
+        rgpdContact: '. Questions: privacy@ux42.studio',
+        doneTitle: 'Sign-up complete',
+        doneIntro:
+            'Save the generated password. You’ll need it to sign in from other devices:',
+        copied: 'Copied!',
+        copy: 'Copy',
+        nextSteps: 'What to do next',
+        nextEmail:
+            'We’ve sent an email to {email} with the same plan — check “Spam” if you can’t find it.',
+        nextPassword1: 'Change it to something memorable in ',
+        nextPasswordLink: 'Profile settings → Security',
+        nextFields:
+            'The rest of your profile — “Edit site” → “Branding & SEO”.',
+        nextProfile:
+            'Fill in “Profile settings” — that’s what visitors see on your page.',
+        nextCase: 'Build your first case: “Projects” → “New project”.',
+        nextDone: 'I’ve saved the password — Go to dashboard',
+    },
     common: {
         save: 'Save',
         saving: 'Saving…',

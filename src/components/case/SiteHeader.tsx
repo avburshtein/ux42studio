@@ -187,7 +187,7 @@ export function SiteHeader({
                                 <Link
                                     href={ctaHref}
                                     onClick={closeMenu}
-                                    className='inline-flex h-14 items-center justify-center self-center rounded-full border border-primary-text bg-primary px-8 text-button font-medium text-on-primary transition-opacity duration-150 ease-out hover:opacity-90'
+                                    className='inline-flex h-14 items-center justify-center self-center rounded-full border border-primary-text bg-primary px-8 text-button font-medium text-on-primary transition-[opacity,transform] duration-150 ease-out hover:opacity-90 active:scale-95'
                                 >
                                     {ctaLabel}
                                 </Link>
@@ -534,7 +534,7 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
 // Общая константа: тот же стиль у триггера ContactDialog в шапке
 // страницы дизайнера (иначе у диалога дефолт — filled-пилюля).
 const QUIET_CTA_CLASS =
-    'inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary-text transition-[border-color,opacity] duration-150 ease-out hover:border-primary-container hover:opacity-90';
+    'inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary-text transition-[border-color,opacity,transform] duration-150 ease-out hover:border-primary-container hover:opacity-90 active:scale-95';
 
 function CtaButton({
     href,
