@@ -431,14 +431,23 @@ export function SiteHeaderBreadcrumb({
             <div className='section-container flex w-full items-center justify-between gap-0'>
                 {/* Left zone: Back + Breadcrumb — gap 24 */}
                 <div className='flex min-w-0 items-center gap-6'>
-                    {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8, radius 8.
+                    {/* Back — Ghost Large Arrow=Left: pad 12×16, gap 8.
                         Шаг назад по истории (кнопка, не ссылка): фолбэк — страница
-                        дизайнера, если возвращаться некуда. */}
+                        дизайнера, если возвращаться некуда.
+                        Стейты — язык текстовых ссылок футера (Help / Privacy
+                        Policy / Terms of Use, D-037): hover — затухание текста
+                        до 70%; прежний hover:bg-surface-variant (серый
+                        прямоугольник rounded-sm) нигде больше на внешних
+                        страницах не встречался и выбивался из системы.
+                        Pressed — углубление затухания до 60%: фидбэк
+                        «прессд как такового нет» — нажатие теперь видно,
+                        по-прежнему без заливок. Геометрия (h-12, px-4,
+                        тач-зона) не менялась. */}
                     <BackButton
                         fallbackHref={`/u/${profileSlug}`}
                         label={backLabel}
                         iconSize={24}
-                        className='inline-flex h-12 shrink-0 items-center gap-2 rounded-sm px-4 py-3 text-button font-medium text-on-surface-variant transition-colors hover:bg-surface-variant'
+                        className='inline-flex h-12 shrink-0 items-center gap-2 px-4 py-3 text-button font-medium text-on-surface-variant transition-opacity duration-150 ease-out hover:opacity-70 active:opacity-60'
                     />
 
                     {/* Breadcrumb Navigation — gap 8 */}
