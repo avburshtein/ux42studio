@@ -76,13 +76,22 @@ export function HeroSection({
         </div>
       )}
       {floatingElements && (
-        <FloatingElements
-          count={20}
-          minBlur={0}
-          maxBlur={20}
-          color={floatingColor}
-          shape={floatingShape}
-        />
+        /* Слой плавающих — в сетке контента (D-034, фидбэк 2026-11-17):
+           контейнер совпадает с section-container (pads 24/48/64), а не
+           с полной шириной секции — «гап» между боке и контентом исчезает.
+           bounded: элементы зажаты внутри области контента. */
+        <div className='section-container absolute inset-0' aria-hidden='true'>
+          <div className='absolute inset-x-6 inset-y-0 md:inset-x-12 lg:inset-x-16'>
+            <FloatingElements
+              count={20}
+              minBlur={0}
+              maxBlur={20}
+              color={floatingColor}
+              shape={floatingShape}
+              bounded
+            />
+          </div>
+        </div>
       )}
 
       <div className="section-container relative z-10 flex flex-col gap-16">

@@ -35,13 +35,22 @@ export function CtaSection({
   return (
     <section id='contact' className="relative scroll-mt-20 overflow-hidden bg-surface-container-lowest py-12 md:py-24 lg:py-30">
       {floatingElements && (
-        <FloatingElements
-          count={20}
-          minBlur={0}
-          maxBlur={20}
-          color={floatingColor}
-          shape={floatingShape}
-        />
+        /* Слой плавающих — в сетке контента (D-034, фидбэк 2026-11-17):
+           контейнер совпадает с section-container (pads 24/48/64) блока
+           «Reach out», а не с полной шириной секции. bounded: элементы
+           зажаты внутри области контента. */
+        <div className='section-container absolute inset-0' aria-hidden='true'>
+          <div className='absolute inset-x-6 inset-y-0 md:inset-x-12 lg:inset-x-16'>
+            <FloatingElements
+              count={20}
+              minBlur={0}
+              maxBlur={20}
+              color={floatingColor}
+              shape={floatingShape}
+              bounded
+            />
+          </div>
+        </div>
       )}
 
       <div className="section-container relative z-10 flex flex-col items-center gap-8 text-center">
