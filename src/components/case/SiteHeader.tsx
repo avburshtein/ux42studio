@@ -534,16 +534,19 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
 }
 
 // Nav CTA "Hire me" — пилюля семейства secondary (решение 2026-08-27 (10)
-// в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон):
-// дефолт — только текст (прозрачный фон и бордер); в hover/focus
-// появляется тонкий бордер primary-container — как у secondary,
-// + его ховер-фидбек opacity-90. border-transparent держит место —
-// layout не сдвигается при появлении рамки. Размер как у secondary:
-// h-14 px-8 (в Make: px-[32px] py-[16px] rounded-[48px]).
+// в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон).
+// Геометрия и стейты приведены к «Back to Gallery» из футера (D-038,
+// фидбэк: при том же кегле 16/24 кнопка казалась крупнее — h-14/px-8
+// против h-12/px-6): высота 48px, паддинги 24px, постоянный тонкий
+// контур outline-variant (бордер больше не «появляется» в hover),
+// шрифт text-label-lg (16/24 — кегль тот же, что был у text-button,
+// но класс теперь общий с Back to Gallery). Hover — state layer 8%
+// + лёгкий primary-тинт 5% (как у Back to Gallery), pressed —
+// scale-95: механика Make-пилюль (D-033) сохранена.
 // Общая константа: тот же стиль у триггера ContactDialog в шапке
-// страницы дизайнера (иначе у диалога дефолт — filled-пилюля).
+// страницы дизайнера и кейса (иначе у диалога дефолт — filled-пилюля).
 const QUIET_CTA_CLASS =
-    'state-layer inline-flex h-14 items-center justify-center rounded-full border border-transparent px-8 text-button font-medium text-primary-text after:bg-primary-text transition-[border-color,transform] duration-150 ease-out hover:border-primary-container active:scale-95';
+    'state-layer inline-flex h-12 items-center justify-center rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text after:bg-primary-text transition-[background-color,transform] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] active:scale-95';
 
 function CtaButton({
     href,
