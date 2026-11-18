@@ -463,6 +463,7 @@ export default async function ProfilePage({ params }: PageProps) {
                     floatingElements={mpc.hero.floatingElements}
                     floatingColor={mpc.floating.color}
                     floatingShape={mpc.floating.shape}
+                    floatingExtend='-bottom-6'
                 />
             )}
             <main>

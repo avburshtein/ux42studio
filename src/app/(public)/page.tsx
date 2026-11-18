@@ -136,6 +136,7 @@ export default async function HomePage() {
                     secondaryCtaLabel='Get in touch'
                     secondaryCtaHref='#contact'
                     secondaryCtaDialog={{ source: 'Home' }}
+                    floatingExtend='-bottom-12 md:-bottom-24'
                 />
 
                 {/* Work — каталог проектов (Main_page_Spec §6 паттерн) */}

@@ -37,6 +37,12 @@ interface HeroSectionProps {
   /** Цвет/форма плавающих элементов (из админки) */
   floatingColor?: string | null;
   floatingShape?: 'default' | 'circle' | 'square' | 'triangle';
+  /** Вылет слоя плавающих вниз за секцию — tailwind-классы нижнего края
+   *  слоя (например, '-bottom-12 md:-bottom-24' = верхний py Work-блока
+   *  48/96px). Боке заканчивается на уровне надписи WORK (верх
+   *  section-container Work-секции), а не на границе секций (фидбэк
+   *  2026-11-17). Без пропса слой = вся высота секции. */
+  floatingExtend?: string;
 }
 
 /**
@@ -64,9 +70,10 @@ export function HeroSection({
   avatarUrl, coverUrl, displayName,
   floatingElements = true,
   floatingColor, floatingShape,
+  floatingExtend,
 }: HeroSectionProps) {
   return (
-    <section className="relative -mt-16 flex min-h-[100dvh] items-center overflow-hidden bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
+    <section className="relative -mt-16 flex min-h-[100dvh] items-center bg-surface-container-lowest pb-12 pt-28 md:-mt-[72px] md:pb-24 md:pt-42 lg:pb-30 lg:pt-48">
       {/* Cover — фон Hero (из профиля); оверлей сохраняет читаемость текста */}
       {coverUrl && (
         <div className="absolute inset-0" aria-hidden="true">
@@ -76,19 +83,28 @@ export function HeroSection({
         </div>
       )}
       {floatingElements && (
-        /* Слой плавающих — absolute inset-0 на всю секцию (фидбэк
-           2026-11-17, откат D-034: full-bleed по ширине лучше зажима
-           в контейнер). По вертикали слой = высота секции — в hero
-           заканчивается на границе с блоком Work. Свободный режим
-           (без bounded): элементы гуляют по всей секции, у краёв
-           телепортируются на противоположную сторону. */
-        <FloatingElements
-          count={20}
-          minBlur={0}
-          maxBlur={20}
-          color={floatingColor}
-          shape={floatingShape}
-        />
+        /* Слой плавающих — full-bleed по ширине (откат D-034), свободный
+           режим без bounded. По вертикали слой может вылетать за секцию
+           вниз (floatingExtend) — в верхний отступ Work-блока: боке
+           заканчивается на уровне надписи WORK (верх section-container
+           Work-секции), а не на границе секций (фидбэк 2026-11-17).
+           overflow-hidden перенесён с секции на сам слой: секция срезала
+           бы вылет, а слой режет элементы только по ширине (за края
+           экрана боке не выйдет — горизонтального скролла нет). */
+        <div
+          className={`pointer-events-none absolute inset-x-0 top-0 overflow-hidden ${
+            floatingExtend ?? 'bottom-0'
+          }`}
+          aria-hidden="true"
+        >
+          <FloatingElements
+            count={20}
+            minBlur={0}
+            maxBlur={20}
+            color={floatingColor}
+            shape={floatingShape}
+          />
+        </div>
       )}
 
       <div className="section-container relative z-10 flex flex-col gap-16">
