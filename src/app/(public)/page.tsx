@@ -343,6 +343,17 @@ export default async function HomePage() {
                     только в футере (SiteFooter showPlatformLink) —
                     ненавязчивый и не мешает витрине кейсов. Вернуть
                     промо на главную, когда платформа откроется. */}
+                {/* Разделитель Reach (D-036): подпись-разделитель перед CTA —
+                    однотипно со страницей дизайнера (там NavLabel «Reach»
+                    стоит отдельным разделителем перед тем же CtaSection)
+                    и с Work/Studio здесь. Фон совпадает с соседними
+                    секциями, без вертикальных паддингов — линия стоит
+                    между Studio (pb 48/96) и CTA (pt 48/96/120). */}
+                <div className='bg-surface-container-lowest'>
+                    <div className='section-container'>
+                        <NavLabel label='Reach' />
+                    </div>
+                </div>
                 <CtaSection
                     title='Get in touch'
                     bodyLines={[
