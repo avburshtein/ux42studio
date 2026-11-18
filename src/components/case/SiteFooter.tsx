@@ -128,7 +128,7 @@ export function SiteFooter({
                 {profileSlug && (
                     <Link
                         href={`/u/${profileSlug}`}
-                        className='inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text transition-[background-color,opacity] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90'
+                        className='state-layer inline-flex h-12 self-start items-center gap-2 whitespace-nowrap rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text after:bg-primary-text transition-[background-color] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)]'
                     >
                         Back to Gallery
                     </Link>

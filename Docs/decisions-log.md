@@ -8,6 +8,20 @@
 
 ---
 
+## D-033 · 2026-11-17 · Фидбэк-пачка №2: публичный state layer, визард-футеры, карточки · ✅ Принято
+
+**Контекст.** Второй проход по фидбэку владельца после D-029/D-031/D-032: (1) pressed виден в админке, но не на публичных страницах — D-031 покрывал только `ui/Button`; (2) на 360px в футерах визарда текст «Save & Next →» переносил текстовую стрелку «→» на вторую строку, ломая паддинги; (3) у второй карточки галереи при ховере первой на долю секунды проступали прямые углы; (4) «Create project» в full-width на мобиле — слишком широка.
+
+**Решения.**
+1. **State layer на публичных CTA**: общий CSS-класс `.state-layer` в globals (механика: `::after` overlay, hover 8% / active 16%, `border-radius: inherit`, `pointer-events: none`); цвет оверлея — через Tailwind `after:bg-on-*` в call-site (цвет пары `on-*` своего текста, по спеке §4). Покрыто: `ctaButtonClass` (primary/secondary/ghost — единая точка для главной, страниц дизайнеров и триггера ContactDialog), `CaseShortView` «View full case», `NextProjectShowcase`, `PrintTldrButton`, `SiteFooter`, чипы фильтров `PortfolioGallerySection` и `WorkGallery`, `QUIET_CTA_CLASS` («Hire me»). Прежние `hover:opacity-90` сняты — hover теперь state layer 8%.
+2. **Футеры визарда**: стрелки «←/→» были текстом внутри словарных строк (`common.back`, `wizard.saveNext`) — убраны из словарей (ru/en), кнопки получили Lucide `ArrowLeft`/`ArrowRight` иконки; `whitespace-nowrap` на Save & Next; **Back на <sm — только иконка** (текст скрыт, sr-only сохранён). Back-кнопка переехала из 8 дублированных блоков страниц в `WizardSaveBar` (новый проп `backHref`) — правится в одном месте; `/edit/general` не передаёт `backHref` (первый шаг).
+3. **Карточки галереи**: `.portfolio-card` — `transition: all` заменён на `transform, box-shadow` + `transform: translateZ(0)` (композит-слой поднят заранее) — repaint соседа при ховере первой карточки больше не показывает прямые углы второй.
+4. **«Create project»**: на мобиле фиксированная ширина (колонка заголовок→подзаголовок→кнопка осталась).
+
+**Почему.** State layer честнее scale для «видимого» нажатия (пользователь не видела scale-95); текстовые стрелки в словарях ломали типографику кнопок — иконки должны быть компонентными (Lucide, правило проекта); `translateZ(0)` — стандартное лекарство от paint-flash при анимации соседей.
+
+**Где в коде.** `globals.css` (`.state-layer`, `.portfolio-card`), `portfolio/CtaButton.tsx`, `case/{CaseShortView,NextProjectShowcase,PrintTldrButton,SiteFooter,SiteHeader}.tsx`, `portfolio/PortfolioGallerySection.tsx`, `home/WorkGallery.tsx`, `admin/WizardSaveBar.tsx`, 8 страниц `edit/*/page.tsx`, `i18n/{ru,en}.ts`, `admin/page.tsx`.
+
 ## D-032 · 2026-11-17 · Экраны входа/регистрации — двуязычные · ✅ Принято
 
 **Контекст.** После D-029 переключатель ru/en на (auth)-страницах менял только cookie — сам контент (заголовки, плашки, формы) оставался русским хардкодом. Владелец: «перевести не просила))».

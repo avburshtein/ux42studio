@@ -173,10 +173,10 @@ export default function AdminDashboardPage() {
                 </div>
 
                 {/* Мобайл (фидбэк 2026-11-17): заголовок в одну строку,
-                    под ним текст и кнопка полной ширины — раньше кнопка
-                    жалась к заголовку и правому краю */}
-                <Link href='/admin/projects/new' className='w-full sm:w-auto'>
-                    <Button className='w-full whitespace-nowrap sm:w-auto'>
+                    под ним текст и кнопка (фиксированная ширина — фидбэк
+                    второго прохода: full-width оказалась слишком широкой) */}
+                <Link href='/admin/projects/new'>
+                    <Button className='whitespace-nowrap'>
                         {t('dashboard.createProject')}
                     </Button>
                 </Link>

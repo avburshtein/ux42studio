@@ -525,22 +525,14 @@ export default function GalleryPage({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
                 <div className='sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
-                    <Button
-                        type='button'
-                        variant='ghost'
-                        onClick={() =>
-                            router.push(
-                                `/admin/projects/${projectId}/edit/design`,
-                            )
-                        }
-                    >
-                        ← Back
-                    </Button>
-                    <WizardSaveBar
-                        saving={saving}
-                        saved={saved}
-                        onSave={handleSubmit(onSaveOnly)}
-                    />
+                {/* Back внутри WizardSaveBar: Lucide-стрелка, на <sm — только
+                    иконка (фидбэк 2026-11-17) */}
+                <WizardSaveBar
+                    saving={saving}
+                    saved={saved}
+                    onSave={handleSubmit(onSaveOnly)}
+                    backHref={`/admin/projects/${projectId}/edit/design`}
+                />
                 </div>
             </form>
         </div>

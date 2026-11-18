@@ -228,7 +228,7 @@ export function CaseShortView({
                 <section className='no-print flex flex-col items-start gap-6 border-t border-outline-variant pt-8'>
                     <Link
                         href={fullCaseHref}
-                        className='inline-flex h-12 items-center gap-2 rounded-5xl border border-primary-text bg-primary px-6 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
+                        className='state-layer inline-flex h-12 items-center gap-2 rounded-5xl border border-primary-text bg-primary px-6 text-label-lg font-medium text-on-primary after:bg-on-primary'
                     >
                         View full case study
                         <ArrowRight className='h-4 w-4' aria-hidden='true' />

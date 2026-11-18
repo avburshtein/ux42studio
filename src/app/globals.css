@@ -580,7 +580,14 @@ textarea {
     4px 4px 2px 0px rgba(0, 0, 0, 0.05),
     16px 9px 12px -1px rgba(242, 242, 242, 0.86),
     10px 10px 8px -2px rgba(177, 211, 196, 0.3);
-  transition: all 500ms ease;
+  /* Фидбэк 2026-11-17: transition: all + repaint соседа при ховере
+     первой карточки — у второй на долю секунды «моргали» прямые углы
+     (Chrome перерастеризовал слой). Оставлены только анимируемые
+     свойства + заранее поднятый композит-слой (translateZ(0)). */
+  transform: translateZ(0);
+  transition:
+    transform 500ms ease,
+    box-shadow 500ms ease;
 }
 
 .portfolio-card:hover {
@@ -602,6 +609,34 @@ textarea {
   box-shadow:
     0px 30px 60px 0px rgba(0, 0, 0, 0.5),
     0px 15px 30px 0px rgba(0, 0, 0, 0.4);
+}
+
+/*
+ * M3 State Layer для публичных CTA (D-033) — механика общая, цвет
+ * оверлея задаёт call-site через Tailwind after:bg-on-* (цвет пары
+ * on-* своего текста, по спеке компонентов §4): hover 8%, pressed 16%.
+ * Использование: className='state-layer after:bg-on-primary …'.
+ */
+.state-layer {
+  position: relative;
+}
+
+.state-layer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+
+.state-layer:hover::after {
+  opacity: 0.08;
+}
+
+.state-layer:active::after {
+  opacity: 0.16;
 }
 
 /*

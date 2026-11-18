@@ -50,7 +50,7 @@ export function NextProjectShowcase({
             {/* Primary Button — "Start Project" (Figma: Button / Primary, 166×58, radius=48) */}
             <Link
                 href={contactUrl ?? `/u/${profileSlug}`}
-                className='inline-flex h-[58px] w-fit items-center justify-center gap-2 rounded-5xl border border-primary-text bg-primary px-8 text-label-lg font-medium text-on-primary transition-opacity hover:opacity-90'
+                className='state-layer inline-flex h-[58px] w-fit items-center justify-center gap-2 rounded-5xl border border-primary-text bg-primary px-8 text-label-lg font-medium text-on-primary after:bg-on-primary'
             >
                 Start Project
             </Link>

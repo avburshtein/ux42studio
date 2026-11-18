@@ -57,7 +57,7 @@ const ru = {
         cancel: 'Отмена',
         remove: 'Удалить',
         add: 'Добавить',
-        back: '← Назад',
+        back: 'Назад',
         loading: 'Загрузка…',
         saveFailed: 'Не удалось сохранить',
         required: 'Обязательное поле',
@@ -122,7 +122,7 @@ const ru = {
         },
         selectSection: 'Выбрать раздел кейса',
         viewProject: 'Просмотр проекта',
-        saveNext: 'Сохранить и далее →',
+        saveNext: 'Сохранить и далее',
         // D-012 этап 2: формы шагов
         sectionTitleOpt: 'Заголовок секции (необязательно)',
         sectionTitleDesignProcess: 'Заголовок «Design Process» (необязательно)',

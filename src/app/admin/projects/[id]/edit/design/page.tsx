@@ -373,21 +373,11 @@ export default function DesignPage({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
                 <div className='sticky bottom-0 z-30 -mx-4 mt-6 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
-                    <Button
-                        type='button'
-                        variant='ghost'
-                        onClick={() =>
-                            router.push(
-                                `/admin/projects/${projectId}/edit/research`,
-                            )
-                        }
-                    >
-                        ← Back
-                    </Button>
                     <WizardSaveBar
                         saving={saving}
                         saved={saved}
                         onSave={handleSubmit(onSaveOnly)}
+                        backHref={`/admin/projects/${projectId}/edit/research`}
                     />
                 </div>
             </form>

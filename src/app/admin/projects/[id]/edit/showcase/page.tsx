@@ -360,21 +360,11 @@ export default function ShowcasePage({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
                 <div className='sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
-                    <Button
-                        type='button'
-                        variant='ghost'
-                        onClick={() =>
-                            router.push(
-                                `/admin/projects/${projectId}/edit/gallery`,
-                            )
-                        }
-                    >
-                        ← Back
-                    </Button>
                     <WizardSaveBar
                         saving={saving}
                         saved={saved}
                         onSave={handleSubmit(onSaveOnly)}
+                        backHref={`/admin/projects/${projectId}/edit/gallery`}
                     />
                 </div>
             </form>

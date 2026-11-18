@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Button } from '@/components/ui/Button';
 import WizardSaveBar, {
     useSavedFlag,
 } from '@/components/admin/WizardSaveBar';
@@ -180,21 +179,11 @@ export default function ProblemPage({
                 {error && <p className='text-body-sm text-error'>{error}</p>}
 
                 <div className='sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
-                    <Button
-                        type='button'
-                        variant='ghost'
-                        onClick={() =>
-                            router.push(
-                                `/admin/projects/${projectId}/edit/general`,
-                            )
-                        }
-                    >
-                        ← Back
-                    </Button>
                     <WizardSaveBar
                         saving={saving}
                         saved={saved}
                         onSave={handleSubmit(onSaveOnly)}
+                        backHref={`/admin/projects/${projectId}/edit/general`}
                     />
                 </div>
             </form>

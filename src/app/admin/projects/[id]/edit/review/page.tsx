@@ -429,17 +429,6 @@ export default function ReviewPage({
                 )}
 
                 <div className='sticky bottom-0 z-30 -mx-4 flex items-center justify-between gap-3 border-t border-outline-variant bg-surface/95 px-4 py-3 backdrop-blur-md md:-mx-8 md:px-8'>
-                    <Button
-                        type='button'
-                        variant='ghost'
-                        onClick={() =>
-                            router.push(
-                                `/admin/projects/${projectId}/edit/results`,
-                            )
-                        }
-                    >
-                        ← Back
-                    </Button>
                     <div className='flex gap-3'>
                         <WizardSaveBar
                             saving={saving}
@@ -447,6 +436,7 @@ export default function ReviewPage({
                             onSave={handleSubmit(onSubmit)}
                             nextHidden
                             saveVariant='default'
+                            backHref={`/admin/projects/${projectId}/edit/results`}
                         />
                     </div>
                 </div>

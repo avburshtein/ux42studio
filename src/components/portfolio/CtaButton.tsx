@@ -7,20 +7,20 @@ import type { ButtonVariant } from '@/lib/mainPageContent';
 // Все варианты — пилюли h-14 px-8, как Hero CTA.
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   // solid-семейство: bg-primary, мягкая тень 0/4/8/15% (FullStory-style,
-  // решение (27)) → hover: opacity-90 + тень 0/8/16/20%
+  // решение (27)) → hover: тень 0/8/16/20% + state layer 8%.
+  // Pressed — state layer 16% поверх контента (D-033, по спеке §4).
   primary:
-    'border border-primary-text bg-primary text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity] duration-150 ease-out',
+    'border border-primary-text bg-primary text-on-primary shadow-[0_4px_8px_rgba(0,0,0,0.15)] after:bg-on-primary hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow] duration-150 ease-out',
   // outline-семейство (secondary): заливка = цвет фона страницы (bg-page-bg),
   // контур primary-container. Раньше здесь была заливка поверхностью темы
   // (на своём фоне — белая кнопка) или, наоборот, полная прозрачность
   // (фидбэк 2026-11-03: кнопка должна быть «в цвет фона»).
   secondary:
-    'border border-primary-container bg-page-bg text-on-background shadow-[0_4px_8px_rgba(0,0,0,0.15)] hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:opacity-90 hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,opacity,background-color] duration-150 ease-out',
-  // ghost-семейство: без заливки и бордера, hover opacity-70
-  ghost:
-    'text-on-background hover:opacity-70 transition-opacity duration-150 ease-out',
+    'border border-primary-container bg-page-bg text-on-background shadow-[0_4px_8px_rgba(0,0,0,0.15)] after:bg-on-background hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] hover:shadow-[0_8px_16px_rgba(0,0,0,0.20)] transition-[box-shadow,background-color] duration-150 ease-out',
+  // ghost-семейство: без заливки и бордера, hover — state layer 8%
+  ghost: 'text-on-background after:bg-on-background duration-150 ease-out',
   // link-семейство: текст primary, подчёркивание в hover
-  link: 'text-primary-text underline-offset-4 hover:underline transition-opacity duration-150 ease-out',
+  link: 'text-primary-text underline-offset-4 hover:underline active:opacity-80 transition-opacity duration-150 ease-out',
 };
 
 interface CtaButtonProps {
@@ -37,7 +37,7 @@ interface CtaButtonProps {
  * компонентами запрещено дизайн-системой (§3.2, анти-паттерн 13).
  */
 export function ctaButtonClass(variant: ButtonVariant = 'primary', className = ''): string {
-  return `inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 text-button font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${VARIANT_CLASS[variant]} ${className}`;
+  return `state-layer inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 text-button font-medium whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${VARIANT_CLASS[variant]} ${className}`;
 }
 
 export function CtaButton({
