@@ -8,6 +8,20 @@
 
 ---
 
+## D-041 · 2026-11-19 · Яркий зелёный для hover текстовых элементов — анализ, изменение отложено · ⏸ Отложено
+
+**Контекст.** Фидбэк владельца: зелёный, используемый в hover-стейтах, плохо отличим от дефолтного цвета текста там, где смена состояния — единственная индикация интерактивности (текстовые кнопки и ссылки). Пример — переключатель языка в AuthBar над основным хедером. Вопрос: есть ли в токенах более яркий зелёный.
+
+**Анализ.** Текущий hover-зелёный — `--md-sys-color-primary` / `--md-sys-color-primary-text` (#00543b светлая / #83d7b1 тёмная; классы `text-primary` / `text-primary-text`). На светлой теме #00543b против почти чёрного `on-surface` #1b1b1d: контраст 8.5:1, но визуально оба цвета тёмные — разница улавливается слабо. В переключателях языка (`LangSwitch`, `AdminLang`) и нейтральных hover (`AuthBar`, `NavLink/MobileNavLink` шапок, admin-табы `AdminShell`/super-admin) зелёного нет вовсе: hover = `on-surface-variant → on-surface` (#44474b → #1b1b1d) — «серый → чуть темнее серый», наименее заметный переход. Ярче в токенах: `primary-container` #0b6e4f (одинаков в обеих темах; на светлом фоне 5.9:1 AA; в тёмной как цвет текста — 2.97:1, НЕ годится), `surface-tint` #056c4d (6.1:1; семантика токена — тонирование поверхностей), `md-ext-green-accent` #336210 (6.9:1, но оливковый — уходит от брендового елового). В тёмной теме primary #83d7b1 (10.9:1) — проблемы нет.
+
+**Решение.** Изменение ОТЛОЖЕНО владельцем (2026-11-19): сейчас ничего не менять, зафиксировать анализ. План на будущее, если вернёмся: семантический токен `--md-sys-color-interactive-accent` (light #0b6e4f = primary-container; dark #83d7b1 = primary) и раскатка на все текстовые hover — зелёные (`BackButton`, `(auth)/layout`, `LegalPageShell`, `ThemeToggle`, `CaseSortManager`, `AssetGallery`) и нейтральные (`LangSwitch`, `AdminLang`, `AuthBar`, `NavLink/MobileNavLink`, admin-табы).
+
+**Почему.** Двухтеменный токен нужен потому, что `primary-container` напрямую в тёмной теме нечитаем как текст (2.97:1); единый «акцент интерактивности» даёт владельцу один рычаг на все текстовые стейты сразу. Отложено: приоритет у других задач, к цветам вернуться отдельной итерацией.
+
+**Ограничения.** Контрасты посчитаны от `surface-container-lowest` (#ffffff, светлая) и `surface` (#131314, тёмная); при смене фонов пересчитать. `surface-tint` и `green-accent` для текста не использовать без переназначения семантики. Активные состояния (выбранный язык `text-primary`) анализ тоже покрывает — при раскатке решить, менять ли и их.
+
+**Где в коде.** Зелёный hover: `components/BackButton.tsx`, `app/(auth)/layout.tsx`, `components/legal/LegalPageShell.tsx`, `case/SiteHeader.tsx` (ThemeToggle), `admin/CaseSortManager.tsx`, `components/AssetGallery.tsx`. Нейтральный hover: `components/LangSwitch.tsx`, `components/AuthBar.tsx`, `components/admin/AdminLang.tsx`, `case/SiteHeader.tsx` (NavLink/MobileNavLink), `components/admin/AdminShell.tsx`, `app/super-admin/layout.tsx`, `app/admin/page.tsx`. Токены: `app/globals.css` (:root / [data-theme='dark']).
+
 ## D-040 · 2026-11-19 · Якорные CTA не скроллили к секциям (next/link + hash) · ✅ Принято
 
 **Контекст.** Hero-кнопка «View case studies» студийной главной (href `#work`, значение из админки) не скроллила к блоку портфолио. Якорь `id="work"` на странице был — проблема в `next/link`: в App Router `<Link href="#hash">` при переходе на ту же страницу не выполняет скролл к якорю (известное поведение soft-навигации). Через `CtaButton` (portfolio) рендерятся все CTA-пилюли секций, в т.ч. hero secondary/tertiary страницы дизайнера (`#portfolio`, `#contact`) — не работали все якорные кнопки.
