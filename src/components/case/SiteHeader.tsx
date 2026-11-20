@@ -582,12 +582,19 @@ function NavLink({
     href: string;
     children: React.ReactNode;
 }) {
-    // Nav Link: pad 10×0, Inter Regular 16/24, On Surface Variant
+    // Nav Link: pad 10×0, Inter Regular 16/24, On Surface Variant.
+    // Якорные (#work, #studio…) — нативный <a>, не next/link: Link в
+    // App Router не скроллит к якорю на той же странице (D-040).
+    const cls = 'inline-flex items-center px-0 py-2.5 text-body-md font-normal text-on-surface-variant transition-colors hover:text-on-surface';
+    if (href.startsWith('#')) {
+        return (
+            <a href={href} className={cls}>
+                {children}
+            </a>
+        );
+    }
     return (
-        <Link
-            href={href}
-            className='inline-flex items-center px-0 py-2.5 text-body-md font-normal text-on-surface-variant transition-colors hover:text-on-surface'
-        >
+        <Link href={href} className={cls}>
             {children}
         </Link>
     );
@@ -602,13 +609,19 @@ function MobileNavLink({
     onClick: () => void;
     children: React.ReactNode;
 }) {
-    // Мобильное меню: крупные тач-цели (py-3 → строка 48px)
+    // Мобильное меню: крупные тач-цели (py-3 → строка 48px).
+    // Якорные — нативный <a> (D-040); onClick (закрытие меню) работает
+    // и на <a>.
+    const cls = 'inline-flex w-full items-center px-2 py-3 text-body-lg font-normal text-on-surface-variant transition-colors hover:text-on-surface';
+    if (href.startsWith('#')) {
+        return (
+            <a href={href} onClick={onClick} className={cls}>
+                {children}
+            </a>
+        );
+    }
     return (
-        <Link
-            href={href}
-            onClick={onClick}
-            className='inline-flex w-full items-center px-2 py-3 text-body-lg font-normal text-on-surface-variant transition-colors hover:text-on-surface'
-        >
+        <Link href={href} onClick={onClick} className={cls}>
             {children}
         </Link>
     );
