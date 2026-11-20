@@ -535,18 +535,17 @@ function LogoLink({ href, className }: { href: string; className?: string }) {
 
 // Nav CTA "Hire me" — пилюля семейства secondary (решение 2026-08-27 (10)
 // в Main_page_Spec.md, фидбэк: был серый прямоугольный hover-фон).
-// Геометрия и стейты приведены к «Back to Gallery» из футера (D-038,
-// фидбэк: при том же кегле 16/24 кнопка казалась крупнее — h-14/px-8
-// против h-12/px-6): высота 48px, паддинги 24px, постоянный тонкий
-// контур outline-variant (бордер больше не «появляется» в hover),
-// шрифт text-label-lg (16/24 — кегль тот же, что был у text-button,
-// но класс теперь общий с Back to Gallery). Hover — state layer 8%
-// + лёгкий primary-тинт 5% (как у Back to Gallery), pressed —
-// scale-95: механика Make-пилюль (D-033) сохранена.
+// Геометрия — как у «Back to Gallery» из футера (D-038): высота 48px,
+// паддинги 24px, шрифт text-label-lg (16/24). Дефолт — только текст:
+// бордер прозрачный, но место держит — layout не сдвигается (D-039).
+// В hover и при клавиатурном фокусе плавно (150ms) появляется тот же
+// тонкий контур outline-variant, что у Back to Gallery. Hover-заливка —
+// state layer 8% + лёгкий primary-тинт 5% (как у Back to Gallery),
+// pressed — scale-95: механика Make-пилюль (D-033) сохранена.
 // Общая константа: тот же стиль у триггера ContactDialog в шапке
 // страницы дизайнера и кейса (иначе у диалога дефолт — filled-пилюля).
 const QUIET_CTA_CLASS =
-    'state-layer inline-flex h-12 items-center justify-center rounded-full border border-outline-variant px-6 text-label-lg font-medium text-primary-text after:bg-primary-text transition-[background-color,transform] duration-150 ease-out hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] active:scale-95';
+    'state-layer inline-flex h-12 items-center justify-center rounded-full border border-transparent px-6 text-label-lg font-medium text-primary-text after:bg-primary-text transition-[background-color,border-color,transform] duration-150 ease-out hover:border-outline-variant hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_5%,transparent)] focus-visible:border-outline-variant active:scale-95';
 
 function CtaButton({
     href,
