@@ -140,7 +140,7 @@ export default async function HomePage() {
                 />
 
                 {/* Work — каталог проектов (Main_page_Spec §6 паттерн) */}
-                <section id='work' className='bg-surface-container-lowest py-12 md:py-24'>
+                <section id='work' className='scroll-mt-20 bg-surface-container-lowest py-12 md:py-24'>
                     <div className='section-container flex flex-col items-center gap-16'>
                         <NavLabel label='Work' />
                         <div className='flex flex-col items-center gap-8 text-center'>

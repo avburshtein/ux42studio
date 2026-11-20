@@ -49,6 +49,20 @@ export function CtaButton({
 }: CtaButtonProps) {
   const cls = ctaButtonClass(variant, className);
 
+  // Якорные ссылки (#work, #contact…) — нативный <a>, не next/link:
+  // Link в App Router не скроллит к якорю при переходе на ту же страницу
+  // (фидбэк: hero-кнопка «View case studies» с href=#work не скроллит
+  // к портфолио, D-040). Браузерный скролл к секции гарантирован;
+  // перекрытие sticky-шапкой гасит scroll-mt-20 у секций.
+  if (href.startsWith('#')) {
+    return (
+      <a href={href} className={cls}>
+        {children}
+      </a>
+    );
+  }
+
+
   if (external) {
     return (
       <Link href={href} target='_blank' rel='noopener noreferrer' className={cls}>

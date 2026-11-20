@@ -554,6 +554,17 @@ function CtaButton({
     href: string;
     children: React.ReactNode;
 }) {
+    // Якорные ссылки (#contact, кастомные #…) — нативный <a>, не next/link:
+    // Link в App Router не скроллит к якорю при переходе на ту же страницу
+    // (D-040, там же фикс hero-кнопок). Диалог-дефолт '#contact' сюда не
+    // попадает — он перехватывается ContactDialog выше по ветке.
+    if (href.startsWith('#')) {
+        return (
+            <a href={href} className={QUIET_CTA_CLASS}>
+                {children}
+            </a>
+        );
+    }
     return (
         <Link
             href={href}
